@@ -12,4 +12,4 @@ path = "~/.config/dub-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-DUB_TOKEN = true
+"DUB_TOKEN" = true

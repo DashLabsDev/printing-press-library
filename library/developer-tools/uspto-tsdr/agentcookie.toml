@@ -12,4 +12,4 @@ path = "~/.config/uspto-tsdr-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-TSDR_APIKEY_HEADER = true
+"TSDR_APIKEY_HEADER" = true

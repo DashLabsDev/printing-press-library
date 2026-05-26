@@ -12,4 +12,4 @@ path = "~/.config/numista-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-NUMISTA_API_KEY = true
+"NUMISTA_API_KEY" = true

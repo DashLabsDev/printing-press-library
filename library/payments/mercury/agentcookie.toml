@@ -13,4 +13,4 @@ path = "~/.config/mercury-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-MERCURY_BEARER_AUTH = true
+"MERCURY_BEARER_AUTH" = true

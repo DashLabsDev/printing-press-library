@@ -13,4 +13,4 @@ path = "~/.config/pcgs-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-PCGS_AUTH_TOKEN = true
+"PCGS_AUTH_TOKEN" = true

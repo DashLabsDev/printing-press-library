@@ -13,4 +13,4 @@ path = "~/.config/seats-aero-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-SEATS_AERO_API_KEY = true
+"SEATS_AERO_API_KEY" = true

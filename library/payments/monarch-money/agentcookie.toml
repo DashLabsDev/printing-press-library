@@ -13,6 +13,6 @@ path = "~/.config/monarch-money-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-MONARCH_EMAIL = true
-MONARCH_PASSWORD = true
-MONARCH_TOKEN = true
+"MONARCH_EMAIL" = true
+"MONARCH_PASSWORD" = true
+"MONARCH_TOKEN" = true

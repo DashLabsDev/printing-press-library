@@ -12,5 +12,5 @@ path = "~/.config/movie-goat-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-OMDB_API_KEY = true
-TMDB_API_KEY = true
+"OMDB_API_KEY" = true
+"TMDB_API_KEY" = true

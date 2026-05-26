@@ -12,4 +12,4 @@ path = "~/.config/kalshi-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-KALSHI_TRADE_MANUAL_KALSHI_ACCESS_KEY = true
+"KALSHI_TRADE_MANUAL_KALSHI_ACCESS_KEY" = true

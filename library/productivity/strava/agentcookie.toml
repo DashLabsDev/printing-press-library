@@ -13,4 +13,4 @@ path = "~/.config/strava-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-STRAVA_STRAVA_OAUTH = true
+"STRAVA_STRAVA_OAUTH" = true

@@ -12,4 +12,4 @@ path = "~/.config/fathom-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-FATHOM_PP_CLI_API_KEY = true
+"FATHOM_PP_CLI_API_KEY" = true

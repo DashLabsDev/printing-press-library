@@ -13,4 +13,4 @@ path = "~/.config/sec-edgar-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-SEC_EDGAR_USER_AGENT = true
+"SEC_EDGAR_USER_AGENT" = true

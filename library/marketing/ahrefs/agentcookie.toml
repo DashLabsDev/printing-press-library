@@ -13,4 +13,4 @@ path = "~/.config/ahrefs-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-AHREFS_API_KEY = true
+"AHREFS_API_KEY" = true

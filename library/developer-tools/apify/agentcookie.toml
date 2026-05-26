@@ -12,4 +12,4 @@ path = "~/.config/apify-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-APIFY_TOKEN = true
+"APIFY_TOKEN" = true

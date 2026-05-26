@@ -12,4 +12,4 @@ path = "~/.config/render-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-RENDER_API_KEY = true
+"RENDER_API_KEY" = true

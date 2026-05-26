@@ -12,4 +12,4 @@ path = "~/.config/nylas-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-NYLAS_API_KEY = true
+"NYLAS_API_KEY" = true

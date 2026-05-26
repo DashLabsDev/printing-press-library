@@ -13,6 +13,6 @@ path = "~/.config/amazon-seller-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-SP_API_LWA_CLIENT_ID = true
-SP_API_LWA_CLIENT_SECRET = true
-SP_API_REFRESH_TOKEN = true
+"SP_API_LWA_CLIENT_ID" = true
+"SP_API_LWA_CLIENT_SECRET" = true
+"SP_API_REFRESH_TOKEN" = true

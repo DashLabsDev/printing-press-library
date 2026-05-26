@@ -14,6 +14,24 @@ func writeManifestFile(t *testing.T, dir, body string) {
 	}
 }
 
+// emitAgentcookieToml is a test helper that renders + writes in one step,
+// mirroring what sweepCLI does in production. Tests can use this to
+// verify end-to-end behavior without each test repeating the write boilerplate.
+func emitAgentcookieToml(t *testing.T, dir string) (bool, error) {
+	t.Helper()
+	body, changed, err := agentcookieManifestForSweep(dir)
+	if err != nil {
+		return false, err
+	}
+	if !changed {
+		return false, nil
+	}
+	if err := os.WriteFile(filepath.Join(dir, agentcookieTomlFilename), []byte(body), 0o644); err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 func TestSweepAgentcookieManifest_BearerToken(t *testing.T) {
 	dir := t.TempDir()
 	writeManifestFile(t, dir, `{
@@ -24,9 +42,9 @@ func TestSweepAgentcookieManifest_BearerToken(t *testing.T) {
   "auth_type": "bearer_token",
   "auth_env_vars": ["STRIPE_SECRET_KEY"]
 }`)
-	changed, err := sweepAgentcookieManifest(dir)
+	changed, err := emitAgentcookieToml(t, dir)
 	if err != nil {
-		t.Fatalf("sweepAgentcookieManifest: %v", err)
+		t.Fatalf("emitAgentcookieToml: %v", err)
 	}
 	if !changed {
 		t.Fatal("expected changed=true on first emit")
@@ -43,7 +61,7 @@ func TestSweepAgentcookieManifest_BearerToken(t *testing.T) {
 		"[sync]",
 		"default = false",
 		"[sync.keys]",
-		"STRIPE_SECRET_KEY = true",
+		`"STRIPE_SECRET_KEY" = true`,
 	} {
 		if !strings.Contains(got, want) {
 			t.Errorf("expected emit to contain %q; got:\n%s", want, got)
@@ -58,9 +76,9 @@ func TestSweepAgentcookieManifest_SkipsCookieOnly(t *testing.T) {
   "cli_name": "instacart-pp-cli",
   "auth_type": "cookie"
 }`)
-	changed, err := sweepAgentcookieManifest(dir)
+	changed, err := emitAgentcookieToml(t, dir)
 	if err != nil {
-		t.Fatalf("sweepAgentcookieManifest: %v", err)
+		t.Fatalf("emitAgentcookieToml: %v", err)
 	}
 	if changed {
 		t.Error("expected changed=false for cookie-only CLI")
@@ -79,11 +97,11 @@ func TestSweepAgentcookieManifest_Idempotent(t *testing.T) {
   "auth_type": "bearer_token",
   "auth_env_vars": ["STRIPE_SECRET_KEY"]
 }`)
-	changed1, err := sweepAgentcookieManifest(dir)
+	changed1, err := emitAgentcookieToml(t, dir)
 	if err != nil || !changed1 {
 		t.Fatalf("first emit: changed=%v err=%v", changed1, err)
 	}
-	changed2, err := sweepAgentcookieManifest(dir)
+	changed2, err := emitAgentcookieToml(t, dir)
 	if err != nil {
 		t.Fatalf("second emit: %v", err)
 	}
@@ -104,9 +122,9 @@ func TestSweepAgentcookieManifest_OverrideMarkerRespected(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, agentcookieTomlFilename), []byte(override), 0o644); err != nil {
 		t.Fatalf("seed override: %v", err)
 	}
-	changed, err := sweepAgentcookieManifest(dir)
+	changed, err := emitAgentcookieToml(t, dir)
 	if err != nil {
-		t.Fatalf("sweepAgentcookieManifest: %v", err)
+		t.Fatalf("emitAgentcookieToml: %v", err)
 	}
 	if changed {
 		t.Error("expected changed=false when override marker present")
@@ -128,9 +146,9 @@ func TestSweepAgentcookieManifest_MultipleEnvVarsSorted(t *testing.T) {
   "auth_type": "oauth2",
   "auth_env_vars": ["EXAMPLE_CLIENT_SECRET", "EXAMPLE_CLIENT_ID"]
 }`)
-	_, err := sweepAgentcookieManifest(dir)
+	_, err := emitAgentcookieToml(t, dir)
 	if err != nil {
-		t.Fatalf("sweepAgentcookieManifest: %v", err)
+		t.Fatalf("emitAgentcookieToml: %v", err)
 	}
 	body, _ := os.ReadFile(filepath.Join(dir, agentcookieTomlFilename))
 	got := string(body)
@@ -151,9 +169,9 @@ func TestSweepAgentcookieManifest_NoEnvVarsSkipped(t *testing.T) {
   "cli_name": "noauth-public-api-pp-cli",
   "auth_type": "none"
 }`)
-	changed, err := sweepAgentcookieManifest(dir)
+	changed, err := emitAgentcookieToml(t, dir)
 	if err != nil {
-		t.Fatalf("sweepAgentcookieManifest: %v", err)
+		t.Fatalf("emitAgentcookieToml: %v", err)
 	}
 	if changed {
 		t.Error("expected changed=false for no-auth CLI")
@@ -172,7 +190,7 @@ func TestAgentcookieManifestWouldChange(t *testing.T) {
 	if err != nil || !would {
 		t.Fatalf("expected would-change=true on first probe; got would=%v err=%v", would, err)
 	}
-	if _, err := sweepAgentcookieManifest(dir); err != nil {
+	if _, err := emitAgentcookieToml(t, dir); err != nil {
 		t.Fatalf("emit: %v", err)
 	}
 	would, err = agentcookieManifestWouldChange(dir)

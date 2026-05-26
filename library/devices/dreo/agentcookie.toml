@@ -13,5 +13,5 @@ path = "~/.config/dreo-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-DREO_PASSWORD = true
-DREO_USERNAME = true
+"DREO_PASSWORD" = true
+"DREO_USERNAME" = true

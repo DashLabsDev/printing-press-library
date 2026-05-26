@@ -13,4 +13,4 @@ path = "~/.config/elevenlabs-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-ELEVENLABS_API_KEY = true
+"ELEVENLABS_API_KEY" = true

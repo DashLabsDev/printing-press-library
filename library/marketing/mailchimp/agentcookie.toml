@@ -12,5 +12,5 @@ path = "~/.config/mailchimp-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-MAILCHIMP_PASSWORD = true
-MAILCHIMP_USERNAME = true
+"MAILCHIMP_PASSWORD" = true
+"MAILCHIMP_USERNAME" = true

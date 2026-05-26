@@ -12,4 +12,4 @@ path = "~/.config/smartlead-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-SMARTLEAD_API_KEY = true
+"SMARTLEAD_API_KEY" = true

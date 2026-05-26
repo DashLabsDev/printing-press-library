@@ -12,4 +12,4 @@ path = "~/.config/figma-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-FIGMA_OAUTH2 = true
+"FIGMA_OAUTH2" = true

@@ -12,4 +12,4 @@ path = "~/.config/openfda-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-FDA_API_KEY = true
+"FDA_API_KEY" = true

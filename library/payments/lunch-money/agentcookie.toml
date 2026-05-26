@@ -12,4 +12,4 @@ path = "~/.config/lunch-money-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-LUNCHMONEY_API_KEY = true
+"LUNCHMONEY_API_KEY" = true

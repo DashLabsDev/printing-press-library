@@ -13,4 +13,4 @@ path = "~/.config/tesla-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-TESLA_AUTH_TOKEN = true
+"TESLA_AUTH_TOKEN" = true

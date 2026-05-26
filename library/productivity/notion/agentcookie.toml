@@ -12,4 +12,4 @@ path = "~/.config/notion-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-NOTION_BEARER_AUTH = true
+"NOTION_BEARER_AUTH" = true

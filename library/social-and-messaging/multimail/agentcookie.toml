@@ -12,4 +12,4 @@ path = "~/.config/multimail-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-MULTIMAIL_BEARER_AUTH = true
+"MULTIMAIL_BEARER_AUTH" = true

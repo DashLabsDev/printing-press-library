@@ -13,4 +13,4 @@ path = "~/.config/whoop-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-WHOOP_OAUTH = true
+"WHOOP_OAUTH" = true

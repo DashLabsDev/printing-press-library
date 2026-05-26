@@ -13,4 +13,4 @@ path = "~/.config/kit-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-KIT_API_KEY = true
+"KIT_API_KEY" = true

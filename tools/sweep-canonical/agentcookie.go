@@ -35,69 +35,52 @@ type extendedManifest struct {
 	AuthEnvVars []string `json:"auth_env_vars"`
 }
 
-// sweepAgentcookieManifest emits agentcookie.toml into cliDir when the
-// CLI has env-var-based auth. Returns (changed, err). Idempotent: a
-// second call against the same inputs produces zero textual diff.
+// agentcookieManifestForSweep computes the next-state body for
+// agentcookie.toml at cliDir, returning (body, changed, err).
+// Idempotent: a second call against the same inputs returns changed=false.
 //
-// Skip semantics:
-//   - CLIs with no auth_env_vars (cookie-only or no auth): skip, no
-//     error, returns (false, nil). Logged to stderr for visibility.
-//   - Existing agentcookie.toml carrying the override marker: skip
-//     with stderr note. Returns (false, nil).
-func sweepAgentcookieManifest(cliDir string) (bool, error) {
+// Skip semantics — all return ("", false, nil):
+//   - CLIs with no auth_env_vars (cookie-only or no auth). Logged to stderr.
+//   - Existing agentcookie.toml carrying the override marker. Logged to stderr.
+//
+// The caller owns the os.WriteFile (mirroring the skill/readme pattern in
+// sweepCLI) so a partial write failure can't leave a malformed file
+// alongside correctly rolled-back peer artifacts.
+func agentcookieManifestForSweep(cliDir string) (string, bool, error) {
 	mfPath := filepath.Join(cliDir, ".printing-press.json")
 	raw, err := os.ReadFile(mfPath)
 	if err != nil {
-		return false, fmt.Errorf("read manifest: %w", err)
+		return "", false, fmt.Errorf("read manifest: %w", err)
 	}
 	var mf extendedManifest
 	if err := json.Unmarshal(raw, &mf); err != nil {
-		return false, fmt.Errorf("parse manifest: %w", err)
+		return "", false, fmt.Errorf("parse manifest: %w", err)
 	}
 	if !hasNonCookieAuth(mf) {
 		fmt.Fprintf(os.Stderr, "  agentcookie: skipping %s (cookie-only or no env-var auth)\n", mf.CLIName)
-		return false, nil
+		return "", false, nil
 	}
 	outPath := filepath.Join(cliDir, agentcookieTomlFilename)
 	if hasAgentcookieOverrideMarker(outPath) {
 		fmt.Fprintf(os.Stderr, "  agentcookie: skipping %s (manual override marker)\n", mf.CLIName)
-		return false, nil
+		return "", false, nil
 	}
 	body := renderAgentcookieToml(mf)
 	before, _ := os.ReadFile(outPath)
 	if string(before) == body {
-		return false, nil
+		return body, false, nil
 	}
-	if err := os.WriteFile(outPath, []byte(body), 0o644); err != nil {
-		return false, fmt.Errorf("write %s: %w", outPath, err)
-	}
-	return true, nil
+	return body, true, nil
 }
 
-// agentcookieManifestWouldChange returns true when sweepAgentcookieManifest
-// would write a new or modified file for cliDir, without performing the
-// write. Used by sweepCLI's early-return path so a CLI whose only
-// pending change is the agentcookie manifest still gets swept.
+// agentcookieManifestWouldChange returns true when the sweep would
+// produce a new or modified file for cliDir. Used by sweepCLI's
+// early-return path so a CLI whose only pending change is the
+// agentcookie manifest still gets swept. Thin wrapper around
+// agentcookieManifestForSweep.
 func agentcookieManifestWouldChange(cliDir string) (bool, error) {
-	mfPath := filepath.Join(cliDir, ".printing-press.json")
-	raw, err := os.ReadFile(mfPath)
-	if err != nil {
-		return false, fmt.Errorf("read manifest: %w", err)
-	}
-	var mf extendedManifest
-	if err := json.Unmarshal(raw, &mf); err != nil {
-		return false, fmt.Errorf("parse manifest: %w", err)
-	}
-	if !hasNonCookieAuth(mf) {
-		return false, nil
-	}
-	outPath := filepath.Join(cliDir, agentcookieTomlFilename)
-	if hasAgentcookieOverrideMarker(outPath) {
-		return false, nil
-	}
-	body := renderAgentcookieToml(mf)
-	before, _ := os.ReadFile(outPath)
-	return string(before) != body, nil
+	_, changed, err := agentcookieManifestForSweep(cliDir)
+	return changed, err
 }
 
 // hasNonCookieAuth returns true when the CLI has at least one env-var
@@ -178,7 +161,12 @@ func renderAgentcookieToml(mf extendedManifest) string {
 			// client_id paired with a sensitive client_secret) lands
 			// when the generator's EnvVarSpecs path emits the manifest
 			// directly, not via this retrofit sweep.
-			fmt.Fprintf(&b, "%s = true\n", k)
+			//
+			// %q quotes the key so a future env var containing a dot
+			// or other non-bare-key character can't accidentally land
+			// as TOML dotted-table notation (nested sub-table under
+			// [sync.keys] instead of the intended flat key).
+			fmt.Fprintf(&b, "%q = true\n", k)
 		}
 	}
 	return b.String()

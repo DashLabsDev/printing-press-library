@@ -12,4 +12,4 @@ path = "~/.config/opensnow-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-OPENSNOW_API_KEY = true
+"OPENSNOW_API_KEY" = true

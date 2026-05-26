@@ -13,4 +13,4 @@ path = "~/.config/suno-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-SUNO_TOKEN = true
+"SUNO_TOKEN" = true

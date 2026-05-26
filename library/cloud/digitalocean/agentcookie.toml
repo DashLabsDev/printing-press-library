@@ -13,4 +13,4 @@ path = "~/.config/digitalocean-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-DIGITALOCEAN_BEARER_AUTH = true
+"DIGITALOCEAN_BEARER_AUTH" = true

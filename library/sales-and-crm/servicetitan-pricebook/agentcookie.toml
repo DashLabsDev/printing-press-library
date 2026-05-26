@@ -13,5 +13,5 @@ path = "~/.config/servicetitan-pricebook-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-ST_CLIENT_ID = true
-ST_CLIENT_SECRET = true
+"ST_CLIENT_ID" = true
+"ST_CLIENT_SECRET" = true

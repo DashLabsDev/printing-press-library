@@ -13,4 +13,4 @@ path = "~/.config/lawhub-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-LAWHUB_USER_ID = true
+"LAWHUB_USER_ID" = true

@@ -13,4 +13,4 @@ path = "~/.config/conduyt-crm-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-CONDUYT_CRM_TOKEN = true
+"CONDUYT_CRM_TOKEN" = true

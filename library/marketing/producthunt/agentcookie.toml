@@ -13,4 +13,4 @@ path = "~/.config/producthunt-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-PRODUCT_HUNT_TOKEN = true
+"PRODUCT_HUNT_TOKEN" = true

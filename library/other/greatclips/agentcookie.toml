@@ -13,4 +13,4 @@ path = "~/.config/greatclips-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-GREATCLIPS_TOKEN = true
+"GREATCLIPS_TOKEN" = true

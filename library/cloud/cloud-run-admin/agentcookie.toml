@@ -13,4 +13,4 @@ path = "~/.config/cloud-run-admin-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-CLOUD_RUN_ADMIN_OAUTH2C = true
+"CLOUD_RUN_ADMIN_OAUTH2C" = true

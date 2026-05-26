@@ -13,4 +13,4 @@ path = "~/.config/outlook-calendar-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-OUTLOOK_CALENDAR_TOKEN = true
+"OUTLOOK_CALENDAR_TOKEN" = true

@@ -12,4 +12,4 @@ path = "~/.config/linear-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-LINEAR_API_KEY = true
+"LINEAR_API_KEY" = true

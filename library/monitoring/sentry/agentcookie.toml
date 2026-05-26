@@ -13,4 +13,4 @@ path = "~/.config/sentry-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-SENTRY_AUTH_TOKEN = true
+"SENTRY_AUTH_TOKEN" = true

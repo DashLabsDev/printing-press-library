@@ -12,4 +12,4 @@ path = "~/.config/etherpad-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-ETHERPAD_OPENID = true
+"ETHERPAD_OPENID" = true

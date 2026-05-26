@@ -12,4 +12,4 @@ path = "~/.config/youtube-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-YOUTUBE_API_KEY = true
+"YOUTUBE_API_KEY" = true

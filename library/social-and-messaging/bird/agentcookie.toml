@@ -13,4 +13,4 @@ path = "~/.config/bird-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-BIRD_API_KEY = true
+"BIRD_API_KEY" = true

@@ -12,5 +12,5 @@ path = "~/.config/freshservice-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-FRESHSERVICE_APIKEY = true
-FRESHSERVICE_DOMAIN = true
+"FRESHSERVICE_APIKEY" = true
+"FRESHSERVICE_DOMAIN" = true

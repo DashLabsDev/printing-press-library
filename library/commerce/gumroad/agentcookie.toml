@@ -12,4 +12,4 @@ path = "~/.config/gumroad-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-GUMROAD_ACCESS_TOKEN = true
+"GUMROAD_ACCESS_TOKEN" = true

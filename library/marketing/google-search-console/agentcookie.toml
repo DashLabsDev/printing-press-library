@@ -13,4 +13,4 @@ path = "~/.config/google-search-console-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-GSC_ACCESS_TOKEN = true
+"GSC_ACCESS_TOKEN" = true

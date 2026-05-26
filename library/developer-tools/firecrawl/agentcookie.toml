@@ -12,4 +12,4 @@ path = "~/.config/firecrawl-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-FIRECRAWL_BEARER_AUTH = true
+"FIRECRAWL_BEARER_AUTH" = true

@@ -12,6 +12,6 @@ path = "~/.config/squarespace-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-COMMERCE_AUTHORIZATION = true
-SQUARESPACE_ACCOUNT_COOKIE = true
-SQUARESPACE_ACCOUNT_COOKIE_FILE = true
+"COMMERCE_AUTHORIZATION" = true
+"SQUARESPACE_ACCOUNT_COOKIE" = true
+"SQUARESPACE_ACCOUNT_COOKIE_FILE" = true

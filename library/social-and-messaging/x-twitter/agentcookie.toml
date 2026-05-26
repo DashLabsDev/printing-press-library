@@ -13,5 +13,5 @@ path = "~/.config/x-twitter-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-X_BEARER_TOKEN = true
-X_OAUTH2_USER_TOKEN = true
+"X_BEARER_TOKEN" = true
+"X_OAUTH2_USER_TOKEN" = true

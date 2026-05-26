@@ -13,4 +13,4 @@ path = "~/.config/posthog-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-POSTHOG_PERSONAL_APIKEY_AUTH = true
+"POSTHOG_PERSONAL_APIKEY_AUTH" = true

@@ -13,4 +13,4 @@ path = "~/.config/allrecipes-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-ALLRECIPES_COOKIES = true
+"ALLRECIPES_COOKIES" = true

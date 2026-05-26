@@ -12,9 +12,9 @@ path = "~/.config/podcast-goat-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-DEEPGRAM_API_KEY = true
-ELEVENLABS_API_KEY = true
-OPENAI_API_KEY = true
-SPOKEN_API_KEY = true
-TADDY_API_KEY = true
-TADDY_USER_ID = true
+"DEEPGRAM_API_KEY" = true
+"ELEVENLABS_API_KEY" = true
+"OPENAI_API_KEY" = true
+"SPOKEN_API_KEY" = true
+"TADDY_API_KEY" = true
+"TADDY_USER_ID" = true

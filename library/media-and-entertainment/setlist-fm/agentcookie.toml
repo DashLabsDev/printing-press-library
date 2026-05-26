@@ -13,4 +13,4 @@ path = "~/.config/setlist-fm-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-SETLIST_FM_API_KEY = true
+"SETLIST_FM_API_KEY" = true

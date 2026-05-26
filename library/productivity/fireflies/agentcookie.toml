@@ -12,4 +12,4 @@ path = "~/.config/fireflies-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-FIREFLIES_PP_CLI_API_KEY = true
+"FIREFLIES_PP_CLI_API_KEY" = true

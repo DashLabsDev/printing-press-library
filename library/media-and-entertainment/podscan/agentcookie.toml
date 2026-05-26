@@ -13,4 +13,4 @@ path = "~/.config/podscan-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-PODSCAN_BEARER_AUTH = true
+"PODSCAN_BEARER_AUTH" = true

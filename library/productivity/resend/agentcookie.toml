@@ -12,4 +12,4 @@ path = "~/.config/resend-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-RESEND_API_KEY = true
+"RESEND_API_KEY" = true

@@ -13,4 +13,4 @@ path = "~/.config/stripe-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-STRIPE_SECRET_KEY = true
+"STRIPE_SECRET_KEY" = true

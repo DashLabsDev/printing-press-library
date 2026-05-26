@@ -12,4 +12,4 @@ path = "~/.config/sendgrid-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-SENDGRID_API_KEY = true
+"SENDGRID_API_KEY" = true

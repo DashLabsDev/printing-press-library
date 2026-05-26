@@ -13,8 +13,8 @@ path = "~/.config/tiktok-shop-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-TIKTOK_SHOP_ACCESS_TOKEN = true
-TIKTOK_SHOP_APP_KEY = true
-TIKTOK_SHOP_APP_SECRET = true
-TIKTOK_SHOP_REFRESH_TOKEN = true
-TIKTOK_SHOP_SHOP_CIPHER = true
+"TIKTOK_SHOP_ACCESS_TOKEN" = true
+"TIKTOK_SHOP_APP_KEY" = true
+"TIKTOK_SHOP_APP_SECRET" = true
+"TIKTOK_SHOP_REFRESH_TOKEN" = true
+"TIKTOK_SHOP_SHOP_CIPHER" = true

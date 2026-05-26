@@ -12,4 +12,4 @@ path = "~/.config/steam-web-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-STEAM_WEB_API_KEY = true
+"STEAM_WEB_API_KEY" = true

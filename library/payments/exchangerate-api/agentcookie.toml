@@ -13,4 +13,4 @@ path = "~/.config/exchangerate-api-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-EXCHANGERATE_API_KEY = true
+"EXCHANGERATE_API_KEY" = true

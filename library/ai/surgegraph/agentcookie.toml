@@ -12,4 +12,4 @@ path = "~/.config/surgegraph-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-SURGEGRAPH_TOKEN = true
+"SURGEGRAPH_TOKEN" = true

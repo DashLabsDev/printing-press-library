@@ -12,4 +12,4 @@ path = "~/.config/supabase-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-SUPABASE_ACCESS_TOKEN = true
+"SUPABASE_ACCESS_TOKEN" = true

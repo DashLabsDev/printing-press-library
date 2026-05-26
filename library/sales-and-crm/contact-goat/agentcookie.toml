@@ -13,5 +13,5 @@ path = "~/.config/contact-goat-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-DEEPLINE_API_KEY = true
-HAPPENSTANCE_API_KEY = true
+"DEEPLINE_API_KEY" = true
+"HAPPENSTANCE_API_KEY" = true

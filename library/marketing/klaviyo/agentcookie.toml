@@ -13,4 +13,4 @@ path = "~/.config/klaviyo-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-KLAVIYO_API_KEY = true
+"KLAVIYO_API_KEY" = true

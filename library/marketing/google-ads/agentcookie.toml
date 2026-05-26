@@ -13,6 +13,6 @@ path = "~/.config/google-ads-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-GOOGLE_ADS_ACCESS_TOKEN = true
-GOOGLE_ADS_DEVELOPER_TOKEN = true
-GOOGLE_ADS_LOGIN_CUSTOMER_ID = true
+"GOOGLE_ADS_ACCESS_TOKEN" = true
+"GOOGLE_ADS_DEVELOPER_TOKEN" = true
+"GOOGLE_ADS_LOGIN_CUSTOMER_ID" = true

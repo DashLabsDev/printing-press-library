@@ -13,6 +13,6 @@ path = "~/.config/dominos-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-DOMINOS_PASSWORD = true
-DOMINOS_TOKEN = true
-DOMINOS_USERNAME = true
+"DOMINOS_PASSWORD" = true
+"DOMINOS_TOKEN" = true
+"DOMINOS_USERNAME" = true

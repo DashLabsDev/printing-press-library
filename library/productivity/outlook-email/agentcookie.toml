@@ -13,4 +13,4 @@ path = "~/.config/outlook-email-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-OUTLOOK_EMAIL_TOKEN = true
+"OUTLOOK_EMAIL_TOKEN" = true

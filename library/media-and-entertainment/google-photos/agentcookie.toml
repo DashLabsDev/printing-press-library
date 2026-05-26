@@ -13,4 +13,4 @@ path = "~/.config/google-photos-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-GOOGLE_PHOTOS_TOKEN = true
+"GOOGLE_PHOTOS_TOKEN" = true

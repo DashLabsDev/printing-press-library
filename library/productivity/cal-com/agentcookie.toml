@@ -12,4 +12,4 @@ path = "~/.config/cal-com-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-CAL_COM_TOKEN = true
+"CAL_COM_TOKEN" = true

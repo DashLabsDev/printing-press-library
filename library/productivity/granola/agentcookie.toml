@@ -12,4 +12,4 @@ path = "~/.config/granola-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-GRANOLA_API_KEY = true
+"GRANOLA_API_KEY" = true

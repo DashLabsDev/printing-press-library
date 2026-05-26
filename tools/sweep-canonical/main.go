@@ -515,10 +515,23 @@ func sweepCLI(cliDir, ownerName string, readmeOnly, attributionOnly bool, contri
 	// agentcookie.toml emit. Skipped CLIs (cookie-only, override marker)
 	// silently return changed=false; readability of the per-CLI sweep
 	// line takes priority over surfacing every skip in the status field.
-	agentcookieChanged, agentcookieErr := sweepAgentcookieManifest(cliDir)
+	// Render here, then write inside the snapshot block, so a partial
+	// write failure (e.g. ENOSPC mid-write) lands the snapshot in
+	// `written` and rollback() can restore the prior contents — matching
+	// the skill/readme pattern above.
+	agentcookieBody, agentcookieChanged, agentcookieErr := agentcookieManifestForSweep(cliDir)
 	if agentcookieErr != nil {
 		rollback()
-		return statusUnchanged, fmt.Errorf("emit agentcookie.toml: %w", agentcookieErr)
+		return statusUnchanged, fmt.Errorf("render agentcookie.toml: %w", agentcookieErr)
+	}
+	if agentcookieChanged {
+		agentcookiePath := filepath.Join(cliDir, agentcookieTomlFilename)
+		agentcookieBefore, _ := os.ReadFile(agentcookiePath)
+		written = append(written, fileEdit{path: agentcookiePath, before: agentcookieBefore, after: []byte(agentcookieBody)})
+		if err := os.WriteFile(agentcookiePath, []byte(agentcookieBody), 0o644); err != nil {
+			rollback()
+			return statusUnchanged, fmt.Errorf("write agentcookie.toml: %w", err)
+		}
 	}
 
 	switch {

@@ -13,4 +13,4 @@ path = "~/.config/gohighlevel-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-GHL_PIT_TOKEN = true
+"GHL_PIT_TOKEN" = true

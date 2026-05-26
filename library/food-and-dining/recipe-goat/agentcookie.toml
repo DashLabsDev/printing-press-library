@@ -13,4 +13,4 @@ path = "~/.config/recipe-goat-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-USDA_FDC_API_KEY = true
+"USDA_FDC_API_KEY" = true

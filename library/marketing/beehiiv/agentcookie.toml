@@ -13,4 +13,4 @@ path = "~/.config/beehiiv-pp-cli/config.toml"
 default = false
 
 [sync.keys]
-BEEHIIV_BEARER_AUTH = true
+"BEEHIIV_BEARER_AUTH" = true
