@@ -3,7 +3,7 @@
 schema_version = 2
 name = "suno-pp-cli"
 display_name = "Suno"
-description = "Every Suno feature, plus a local SQLite library, offline FTS5 search, MCP-native agent surface, and a single-binary Go install."
+description = "The correct, offline-first Suno CLI — every feature the abandoned clients have, plus a local SQLite library, full-text search, and agent-native output none of them ship."
 project_kind = "cli"
 
 [secrets.file]
@@ -13,4 +13,5 @@ path = "~/.config/suno-pp-cli/config.toml"
 default = false
 
 [sync.keys]
+"SUNO_JWT" = true
 "SUNO_TOKEN" = true

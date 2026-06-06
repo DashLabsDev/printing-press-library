@@ -3,6 +3,7 @@
 schema_version = 2
 name = "shopify-pp-cli"
 display_name = "Shopify"
+description = "Operate a Shopify store from the terminal with local sync, analytics, and bulk exports."
 project_kind = "cli"
 
 [secrets.file]
