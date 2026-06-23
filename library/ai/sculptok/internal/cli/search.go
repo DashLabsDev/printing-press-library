@@ -1,0 +1,94 @@
+// Copyright 2026 Vincent Colombo and contributors. Licensed under Apache-2.0. See LICENSE.
+//
+// Hand-authored (was a generator stub). Offline search over the local mirror of
+// jobs / credit events / drawings. No API call.
+//
+// pp:data-source local
+
+package cli
+
+import (
+	"fmt"
+	"strings"
+
+	"github.com/spf13/cobra"
+
+	"github.com/mvanhorn/printing-press-library/library/ai/sculptok/internal/store"
+)
+
+func newNovelSearchCmd(flags *rootFlags) *cobra.Command {
+	var typ, db string
+	var limit int
+
+	cmd := &cobra.Command{
+		Use:   "search [query]",
+		Short: "Search your local mirror of draws, credit events, and drawings (offline)",
+		Long: strings.Trim(`
+Search the local SQLite mirror, no API call. Default --type is jobs (your
+generate runs and the settings that produced them). Run 'sync' first to populate
+credit events and drawings.`, "\n"),
+		Example: strings.Trim(`
+  sculptok-pp-cli search "stl" --type jobs --limit 20
+  sculptok-pp-cli search "pro" --type jobs --agent
+  sculptok-pp-cli search --type drawings`, "\n"),
+		Annotations: map[string]string{"mcp:read-only": "true"},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if dryRunOK(flags) {
+				fmt.Fprintln(cmd.OutOrStdout(), "would search local mirror")
+				return nil
+			}
+			term := ""
+			if len(args) > 0 {
+				term = args[0]
+			}
+			ctx, cancel := boundCtx(cmd.Context(), flags)
+			defer cancel()
+			dbPath := resolveDBPath(db)
+			st, ok, err := openReadStore(ctx, dbPath)
+			if err != nil {
+				return err
+			}
+			if !ok {
+				return emptyMirror(cmd, flags, dbPath)
+			}
+			defer st.Close()
+
+			switch typ {
+			case "", "jobs":
+				jobs, err := st.SearchJobs(ctx, term, limit)
+				if err != nil {
+					return err
+				}
+				return printJSONFiltered(cmd.OutOrStdout(), jobs, flags)
+			case "credits", "credit_events":
+				events, err := st.ListCreditEvents(ctx, limit)
+				if err != nil {
+					return err
+				}
+				if term != "" {
+					lower := strings.ToLower(term)
+					filtered := make([]store.CreditEvent, 0, len(events))
+					for _, e := range events {
+						if strings.Contains(strings.ToLower(e.Remarks), lower) {
+							filtered = append(filtered, e)
+						}
+					}
+					events = filtered
+				}
+				return printJSONFiltered(cmd.OutOrStdout(), events, flags)
+			case "drawings":
+				rows, err := st.ListDrawings(ctx, limit)
+				if err != nil {
+					return err
+				}
+				return printJSONFiltered(cmd.OutOrStdout(), rows, flags)
+			default:
+				return usageErr(fmt.Errorf("unknown --type %q (use jobs, credits, or drawings)", typ))
+			}
+		},
+	}
+	cmd.Flags().StringVar(&typ, "type", "jobs", "What to search: jobs|credits|drawings")
+	cmd.Flags().IntVar(&limit, "limit", 20, "Maximum rows to return")
+	cmd.Flags().StringVar(&db, "db", "", "Local store path (default ~/.config/sculptok-pp-cli/sculptok.db)")
+	return cmd
+}
