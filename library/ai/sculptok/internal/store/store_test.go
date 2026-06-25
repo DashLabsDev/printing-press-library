@@ -5,6 +5,7 @@ package store
 import (
 	"context"
 	"path/filepath"
+	"strconv"
 	"testing"
 )
 
@@ -98,6 +99,52 @@ func TestCreditEventsAnalytics(t *testing.T) {
 	// unsupported group-by is an error, not a silent empty result.
 	if _, err := st.AnalyticsCreditEvents(ctx, "bogus", 10); err == nil {
 		t.Fatal("Analytics(bogus) should error")
+	}
+}
+
+func TestSearchCreditEvents(t *testing.T) {
+	ctx := context.Background()
+	st := newTestStore(t)
+
+	// One older event matching "p1", then many newer non-matching events. A
+	// fetch-newest-N-then-filter approach would push the match out of the
+	// window; SQL-level filtering keeps it findable under a small --limit.
+	if err := st.UpsertCreditEvent(ctx, CreditEvent{ID: "old", ChangeNum: -10, Remarks: "API Draw: p1-target", CreateDate: "2026-01-01 00:00:00"}); err != nil {
+		t.Fatalf("UpsertCreditEvent: %v", err)
+	}
+	for i := 0; i < 30; i++ {
+		id := "newer-" + strconv.Itoa(i)
+		date := "2026-02-" + strconv.Itoa(i+1) + " 00:00:00"
+		if err := st.UpsertCreditEvent(ctx, CreditEvent{ID: id, ChangeNum: 5, Remarks: "check-in", CreateDate: date}); err != nil {
+			t.Fatalf("UpsertCreditEvent: %v", err)
+		}
+	}
+
+	// Default-sized limit: the match is far outside the newest-20 window.
+	found, err := st.SearchCreditEvents(ctx, "p1-target", 20)
+	if err != nil || len(found) != 1 || found[0].ID != "old" {
+		t.Fatalf("SearchCreditEvents(p1-target) = %v, %v; want [old]", found, err)
+	}
+
+	// Empty term returns the most recent N (acts like ListCreditEvents).
+	recent, err := st.SearchCreditEvents(ctx, "", 5)
+	if err != nil || len(recent) != 5 {
+		t.Fatalf("SearchCreditEvents(\"\") = %d rows, %v; want 5", len(recent), err)
+	}
+
+	// A term matching nothing returns empty, not all rows.
+	none, err := st.SearchCreditEvents(ctx, "nonexistent-xyz", 20)
+	if err != nil || len(none) != 0 {
+		t.Fatalf("SearchCreditEvents(miss) = %d rows; want 0", len(none))
+	}
+
+	// LIKE metacharacters in the term match literally, not as wildcards.
+	if err := st.UpsertCreditEvent(ctx, CreditEvent{ID: "pct", ChangeNum: -1, Remarks: "50% off promo", CreateDate: "2026-03-01 00:00:00"}); err != nil {
+		t.Fatalf("UpsertCreditEvent: %v", err)
+	}
+	pct, err := st.SearchCreditEvents(ctx, "50%", 20)
+	if err != nil || len(pct) != 1 || pct[0].ID != "pct" {
+		t.Fatalf("SearchCreditEvents(50%%) = %v, %v; want [pct]", pct, err)
 	}
 }
 

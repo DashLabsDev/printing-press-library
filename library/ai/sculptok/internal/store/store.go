@@ -231,6 +231,34 @@ func (s *Store) ListCreditEvents(ctx context.Context, limit int) ([]CreditEvent,
 	if err != nil {
 		return nil, err
 	}
+	return scanCreditEvents(rows)
+}
+
+// SearchCreditEvents does a LIKE search over credit-event remarks, applying
+// limit as a SQL-level result cap (like SearchJobs) so older matching events
+// are not silently dropped — unlike a fetch-newest-N-then-filter approach,
+// where the limit would act as a search window rather than a result cap. With
+// an empty term it returns the most recent events.
+func (s *Store) SearchCreditEvents(ctx context.Context, term string, limit int) ([]CreditEvent, error) {
+	if limit <= 0 {
+		limit = 50
+	}
+	if strings.TrimSpace(term) == "" {
+		return s.ListCreditEvents(ctx, limit)
+	}
+	// Escape % and _ so they match literally; ESCAPE '\' tells SQLite how.
+	like := "%" + likeEscaper.Replace(term) + "%"
+	rows, err := s.db.QueryContext(ctx, `
+		SELECT id, action_type, remain_value, change_num, remarks, create_date FROM credit_events
+		WHERE remarks LIKE ? ESCAPE '\'
+		ORDER BY create_date DESC, rowid DESC LIMIT ?`, like, limit)
+	if err != nil {
+		return nil, err
+	}
+	return scanCreditEvents(rows)
+}
+
+func scanCreditEvents(rows *sql.Rows) ([]CreditEvent, error) {
 	defer rows.Close()
 	out := make([]CreditEvent, 0)
 	for rows.Next() {

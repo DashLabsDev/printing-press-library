@@ -8,6 +8,7 @@
 package cli
 
 import (
+	"strconv"
 	"strings"
 	"time"
 
@@ -36,20 +37,29 @@ map use 'generate depthmap'; for a full 3D model use 'generate threed'.`, "\n"),
 		Annotations: map[string]string{"pp:typed-exit-codes": "0,2", "pp:no-error-path-probe": "true"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			body := map[string]any{}
+			// recorded mirrors the flags actually set into the persisted job
+			// params (a string map), so STL jobs are searchable offline by their
+			// parameters like depthmap/threed — not stored with params={}.
+			recorded := map[string]string{}
 			if cmd.Flags().Changed("width-mm") {
 				body["width_mm"] = widthMm
+				recorded["width_mm"] = strconv.FormatFloat(widthMm, 'f', -1, 64)
 			}
 			if cmd.Flags().Changed("min-thickness") {
 				body["min_thickness"] = minThickness
+				recorded["min_thickness"] = strconv.FormatFloat(minThickness, 'f', -1, 64)
 			}
 			if cmd.Flags().Changed("max-thickness") {
 				body["max_thickness"] = maxThickness
+				recorded["max_thickness"] = strconv.FormatFloat(maxThickness, 'f', -1, 64)
 			}
 			if cmd.Flags().Changed("scale-image") {
 				body["scale_image"] = scaleImage
+				recorded["scale_image"] = strconv.FormatFloat(scaleImage, 'f', -1, 64)
 			}
 			if cmd.Flags().Changed("invert") {
 				body["invert"] = invert
+				recorded["invert"] = strconv.FormatBool(invert)
 			}
 			return executeGenerate(cmd, flags, args, genCmdConfig{
 				kind:         "stl",
@@ -60,6 +70,7 @@ map use 'generate depthmap'; for a full 3D model use 'generate threed'.`, "\n"),
 				db:           db,
 				pollInterval: pollInterval,
 				body:         body,
+				recorded:     recorded,
 			})
 		},
 	}

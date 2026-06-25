@@ -12,8 +12,6 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-
-	"github.com/mvanhorn/printing-press-library/library/ai/sculptok/internal/store"
 )
 
 func newNovelSearchCmd(flags *rootFlags) *cobra.Command {
@@ -61,19 +59,12 @@ credit events and drawings.`, "\n"),
 				}
 				return printJSONFiltered(cmd.OutOrStdout(), jobs, flags)
 			case "credits", "credit_events":
-				events, err := st.ListCreditEvents(ctx, limit)
+				// Filter in SQL so --limit caps matched rows (like the jobs
+				// path), not just the newest-N window we then scan in memory —
+				// otherwise an older matching event past the limit is missed.
+				events, err := st.SearchCreditEvents(ctx, term, limit)
 				if err != nil {
 					return err
-				}
-				if term != "" {
-					lower := strings.ToLower(term)
-					filtered := make([]store.CreditEvent, 0, len(events))
-					for _, e := range events {
-						if strings.Contains(strings.ToLower(e.Remarks), lower) {
-							filtered = append(filtered, e)
-						}
-					}
-					events = filtered
 				}
 				return printJSONFiltered(cmd.OutOrStdout(), events, flags)
 			case "drawings":
