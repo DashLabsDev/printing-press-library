@@ -58,3 +58,19 @@ func TestYAMLQuoteEscaping(t *testing.T) {
 		t.Errorf("yamlQuote = %s", got)
 	}
 }
+
+// Control characters (CR/LF/TAB) must be escaped so a stray CR from CRLF HTML
+// cannot produce invalid YAML. A real front-matter value carrying a CR must
+// keep the block on a single logical line (no raw newline leaks).
+func TestYAMLQuoteControlChars(t *testing.T) {
+	if got := yamlQuote("a\r\nb\tc"); got != `"a\r\nb\tc"` {
+		t.Errorf("yamlQuote control chars = %s", got)
+	}
+	fm := FrontMatter(Provvedimento{DataDeposito: "28/10/2021\r"})
+	if strings.Contains(fm, "\r") {
+		t.Errorf("front matter leaked a raw CR:\n%q", fm)
+	}
+	if !strings.Contains(fm, `data_deposito: "28/10/2021\r"`) {
+		t.Errorf("CR not escaped in front matter:\n%s", fm)
+	}
+}

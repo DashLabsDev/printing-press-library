@@ -39,10 +39,30 @@ func FrontMatter(p Provvedimento) string {
 	return b.String()
 }
 
-// yamlQuote returns s as a YAML double-quoted scalar, escaping backslashes and
-// double quotes.
+// yamlQuote returns s as a YAML double-quoted scalar. Besides backslash and
+// double quote, it escapes the control characters that are invalid inside a
+// double-quoted scalar (newline, carriage return, tab) so a stray CR/LF from
+// CRLF-encoded HTML can never produce syntactically invalid YAML.
 func yamlQuote(s string) string {
-	s = strings.ReplaceAll(s, `\`, `\\`)
-	s = strings.ReplaceAll(s, `"`, `\"`)
-	return `"` + s + `"`
+	var b strings.Builder
+	b.Grow(len(s) + 2)
+	b.WriteByte('"')
+	for _, r := range s {
+		switch r {
+		case '\\':
+			b.WriteString(`\\`)
+		case '"':
+			b.WriteString(`\"`)
+		case '\n':
+			b.WriteString(`\n`)
+		case '\r':
+			b.WriteString(`\r`)
+		case '\t':
+			b.WriteString(`\t`)
+		default:
+			b.WriteRune(r)
+		}
+	}
+	b.WriteByte('"')
+	return b.String()
 }
