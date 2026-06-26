@@ -20,3 +20,22 @@ func TestYearRange(t *testing.T) {
 		}
 	}
 }
+
+func TestDedupKey(t *testing.T) {
+	// ECLI wins; then idprovv; then the document coordinates. An item lacking
+	// every identifier must still yield a stable, non-empty key so the sweep
+	// de-duplicates it instead of repeating it once per year.
+	if got := dedupKey(Provvedimento{Ecli: "E", Idprovv: "I"}); got != "E" {
+		t.Errorf("ecli should win, got %q", got)
+	}
+	if got := dedupKey(Provvedimento{Idprovv: "I"}); got != "I" {
+		t.Errorf("idprovv fallback, got %q", got)
+	}
+	noID := Provvedimento{Schema: "tar_na", Nrg: "202102978", NomeFile: "202106765_01.html"}
+	if got := dedupKey(noID); got != "tar_na|202102978|202106765_01.html" {
+		t.Errorf("coordinate fallback, got %q", got)
+	}
+	if dedupKey(noID) != dedupKey(noID) {
+		t.Errorf("dedupKey not stable for identical items")
+	}
+}

@@ -260,9 +260,23 @@ func yearRange(from, to int) (int, int) {
 	return from, to
 }
 
+// dedupKey identifies a provvedimento for de-duplication: ECLI, else idprovv,
+// else the document coordinates (schema|nrg|nome_file). It never returns "" for
+// a real result, so items lacking an ECLI/idprovv still de-duplicate instead of
+// being appended once per swept year.
+func dedupKey(p Provvedimento) string {
+	if p.Ecli != "" {
+		return p.Ecli
+	}
+	if p.Idprovv != "" {
+		return p.Idprovv
+	}
+	return p.Schema + "|" + p.Nrg + "|" + p.NomeFile
+}
+
 // searchSweep iterates the year filter from AnnoFrom to AnnoTo (inclusive),
-// running searchOnce per year and de-duplicating the union by id (ECLI, else
-// idprovv). Limit applies per year. Total is the sum of per-year totals.
+// running searchOnce per year and de-duplicating the union by dedupKey. Limit
+// applies per year. Total is the sum of per-year totals.
 func (c *Client) searchSweep(ctx context.Context, opts SearchOptions) (*SearchResult, error) {
 	from, to := yearRange(opts.AnnoFrom, opts.AnnoTo)
 	res := &SearchResult{}
@@ -277,16 +291,11 @@ func (c *Client) searchSweep(ctx context.Context, opts SearchOptions) (*SearchRe
 		}
 		res.Total += part.Total
 		for _, p := range part.Items {
-			id := p.Ecli
-			if id == "" {
-				id = p.Idprovv
+			key := dedupKey(p)
+			if seen[key] {
+				continue
 			}
-			if id != "" {
-				if seen[id] {
-					continue
-				}
-				seen[id] = true
-			}
+			seen[key] = true
 			res.Items = append(res.Items, p)
 		}
 	}
