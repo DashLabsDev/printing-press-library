@@ -57,18 +57,20 @@ func New() *Client {
 
 // SearchOptions describes a provvedimenti query.
 type SearchOptions struct {
-	Testo   string // simple full-text
-	All     string // advanced: all of these words
-	Any     string // advanced: any of these words
-	Not     string // advanced: none of these words
-	Phrase  string // advanced: exact phrase
-	Tipo    string // sentenza|ordinanza|decreto|parere|plenaria|generale
-	Sede    string // roma|milano|consiglio-di-stato|...
-	Anno    int
-	Numero  int
-	Nrg     int
-	AnnoNrg int
-	Limit   int // max results to return
+	Testo    string // simple full-text
+	All      string // advanced: all of these words
+	Any      string // advanced: any of these words
+	Not      string // advanced: none of these words
+	Phrase   string // advanced: exact phrase
+	Tipo     string // sentenza|ordinanza|decreto|parere|plenaria|generale
+	Sede     string // roma|milano|consiglio-di-stato|...
+	Anno     int
+	AnnoFrom int // year-range sweep: first year (inclusive)
+	AnnoTo   int // year-range sweep: last year (inclusive)
+	Numero   int
+	Nrg      int
+	AnnoNrg  int
+	Limit    int // max results to return (per year when sweeping a year range)
 }
 
 func (c *Client) get(ctx context.Context, rawURL string) ([]byte, int, error) {
@@ -220,17 +222,80 @@ type SearchResult struct {
 	Total int
 }
 
-// Search runs a query, paginating until Limit results are collected. It performs
-// the session handshake on first use and retries once on a 403 (expired token).
+// Search runs a query and returns up to Limit results. It performs the session
+// handshake on first use. When a year range (AnnoFrom/AnnoTo) is set it sweeps
+// the years one by one — the portal has no relevance sort and only a single-year
+// filter, so historical coverage requires iterating the year filter — applying
+// Limit per year and de-duplicating the union by id.
 func (c *Client) Search(ctx context.Context, opts SearchOptions) (*SearchResult, error) {
 	if opts.Limit <= 0 {
 		opts.Limit = defaultPageSize
+	}
+	if opts.Anno != 0 && (opts.AnnoFrom != 0 || opts.AnnoTo != 0) {
+		return nil, fmt.Errorf("usa --anno oppure --anno-from/--anno-to, non entrambi")
 	}
 	if c.token() == "" {
 		if err := c.handshake(ctx); err != nil {
 			return nil, err
 		}
 	}
+	if opts.AnnoFrom != 0 || opts.AnnoTo != 0 {
+		return c.searchSweep(ctx, opts)
+	}
+	return c.searchOnce(ctx, opts)
+}
+
+// yearRange normalizes an inclusive year span: a missing bound mirrors the
+// other, and a reversed span is swapped so from <= to.
+func yearRange(from, to int) (int, int) {
+	if from == 0 {
+		from = to
+	}
+	if to == 0 {
+		to = from
+	}
+	if from > to {
+		from, to = to, from
+	}
+	return from, to
+}
+
+// searchSweep iterates the year filter from AnnoFrom to AnnoTo (inclusive),
+// running searchOnce per year and de-duplicating the union by id (ECLI, else
+// idprovv). Limit applies per year. Total is the sum of per-year totals.
+func (c *Client) searchSweep(ctx context.Context, opts SearchOptions) (*SearchResult, error) {
+	from, to := yearRange(opts.AnnoFrom, opts.AnnoTo)
+	res := &SearchResult{}
+	seen := map[string]bool{}
+	yearOpts := opts
+	yearOpts.AnnoFrom, yearOpts.AnnoTo = 0, 0
+	for y := from; y <= to; y++ {
+		yearOpts.Anno = y
+		part, err := c.searchOnce(ctx, yearOpts)
+		if err != nil {
+			return nil, err
+		}
+		res.Total += part.Total
+		for _, p := range part.Items {
+			id := p.Ecli
+			if id == "" {
+				id = p.Idprovv
+			}
+			if id != "" {
+				if seen[id] {
+					continue
+				}
+				seen[id] = true
+			}
+			res.Items = append(res.Items, p)
+		}
+	}
+	return res, nil
+}
+
+// searchOnce paginates a single query until Limit results are collected,
+// retrying once on a 403 (expired token).
+func (c *Client) searchOnce(ctx context.Context, opts SearchOptions) (*SearchResult, error) {
 	res := &SearchResult{}
 	maxPages := (opts.Limit + defaultPageSize - 1) / defaultPageSize
 	for page := 1; page <= maxPages; page++ {
