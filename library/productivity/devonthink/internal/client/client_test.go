@@ -86,11 +86,11 @@ func TestSplitOSAList_RecordSeparatorPreservesCommas(t *testing.T) {
 	}
 }
 
-func TestSplitOSAList_CommaFallback(t *testing.T) {
+func TestSplitOSAList_WithoutRecordSeparatorIsSingleValue(t *testing.T) {
 	t.Parallel()
 
 	got := splitOSAList("Research, Inbox")
-	want := []string{"Research", "Inbox"}
+	want := []string{"Research, Inbox"}
 	if len(got) != len(want) {
 		t.Fatalf("len = %d, want %d: %#v", len(got), len(want), got)
 	}

@@ -578,27 +578,17 @@ func (c *Client) localMirrorSync(params map[string]string) map[string]any {
 	}
 }
 
-func (c *Client) localMirrorSearch(ctx context.Context, params map[string]string) []map[string]any {
+func (c *Client) localMirrorSearch(_ context.Context, params map[string]string) []map[string]any {
 	query := firstNonEmpty(params["query"], params["q"])
-	limit := firstNonEmpty(params["limit"], "20")
-	records := c.localRecordSearch(ctx, map[string]string{"query": query, "limit": limit})
-	if len(records) == 0 {
-		return []map[string]any{{
-			"uuid":    "mirror-not-implemented",
-			"name":    "Local mirror backend is not active",
-			"path":    "query:" + query,
-			"query":   query,
-			"source":  "live-metadata-fallback",
-			"status":  "not_implemented",
-			"warning": "The local SQLite mirror backend is not active in this build; use records search for live MCP metadata.",
-		}}
-	}
-	for i := range records {
-		records[i]["mirror_query"] = query
-		records[i]["source"] = "live-metadata-fallback"
-		records[i]["warning"] = "The local SQLite mirror backend is not active in this build; this result came from live metadata fallback."
-	}
-	return records
+	return []map[string]any{{
+		"uuid":    "mirror-not-implemented",
+		"name":    "Local mirror backend is not active",
+		"path":    "query:" + query,
+		"query":   query,
+		"source":  "local-mirror",
+		"status":  "not_implemented",
+		"warning": "The local SQLite mirror backend is not active in this build; use records search for live MCP metadata.",
+	}}
 }
 
 func (c *Client) localContextPack(ctx context.Context, params map[string]string) map[string]any {
@@ -927,11 +917,10 @@ func splitOSAList(out string) []string {
 	if out == "" || out == "missing value" {
 		return []string{}
 	}
-	separator := ", "
+	parts := []string{out}
 	if strings.Contains(out, "\x1e") {
-		separator = "\x1e"
+		parts = strings.Split(out, "\x1e")
 	}
-	parts := strings.Split(out, separator)
 	values := make([]string, 0, len(parts))
 	for _, part := range parts {
 		part = strings.TrimSpace(part)
