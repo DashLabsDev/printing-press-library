@@ -70,3 +70,33 @@ func TestTruncateBody_UTF8RuneAtBoundary(t *testing.T) {
 		t.Fatalf("len = %d, want %d (partial rune should be dropped, not replaced)", len(got), want)
 	}
 }
+
+func TestSplitOSAList_RecordSeparatorPreservesCommas(t *testing.T) {
+	t.Parallel()
+
+	got := splitOSAList("Research, 2026\x1eInbox")
+	want := []string{"Research, 2026", "Inbox"}
+	if len(got) != len(want) {
+		t.Fatalf("len = %d, want %d: %#v", len(got), len(want), got)
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Fatalf("got[%d] = %q, want %q", i, got[i], want[i])
+		}
+	}
+}
+
+func TestSplitOSAList_CommaFallback(t *testing.T) {
+	t.Parallel()
+
+	got := splitOSAList("Research, Inbox")
+	want := []string{"Research", "Inbox"}
+	if len(got) != len(want) {
+		t.Fatalf("len = %d, want %d: %#v", len(got), len(want), got)
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Fatalf("got[%d] = %q, want %q", i, got[i], want[i])
+		}
+	}
+}
