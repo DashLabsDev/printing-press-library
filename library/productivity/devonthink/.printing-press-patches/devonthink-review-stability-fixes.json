@@ -9,7 +9,9 @@
   "files": [
     "internal/client/local_devonthink.go",
     "internal/client/client_test.go",
-    "internal/cli/mcp_call.go"
+    "internal/cli/mcp_call.go",
+    "internal/cli/records_search.go",
+    "internal/cli/graph_audit.go"
   ],
   "validated_outcome": "go test ./... passed in the source repo and packaged public-library module."
 }

@@ -34,7 +34,7 @@ func newGraphAuditCmd(flags *rootFlags) *cobra.Command {
 			if flagLimit != 0 {
 				params["limit"] = formatCLIParamValue(flagLimit)
 			}
-			data, prov, err := resolveReadWithStrategy(cmd.Context(), c, flags, "auto", "graph", false, path, params, nil, cmd.ErrOrStderr())
+			data, prov, err := resolveReadWithStrategy(cmd.Context(), c, flags, "auto", "graph", true, path, params, nil, cmd.ErrOrStderr())
 			if err != nil {
 				return classifyAPIError(err, flags)
 			}

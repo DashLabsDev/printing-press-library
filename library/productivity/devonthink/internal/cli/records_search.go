@@ -58,7 +58,7 @@ func newRecordsSearchCmd(flags *rootFlags) *cobra.Command {
 			if flagLimit != 0 {
 				params["limit"] = formatCLIParamValue(flagLimit)
 			}
-			data, prov, err := resolveReadWithStrategy(cmd.Context(), c, flags, "auto", "records", false, path, params, nil, cmd.ErrOrStderr())
+			data, prov, err := resolveReadWithStrategy(cmd.Context(), c, flags, "auto", "records", true, path, params, nil, cmd.ErrOrStderr())
 			if err != nil {
 				return classifyAPIError(err, flags)
 			}
