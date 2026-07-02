@@ -399,6 +399,12 @@ Manage news
 - **`benzinga-pp-cli news get`** - This REST API returns structured data for news. For optimal performance, limit the scope of the query using parameters such as tickers, date, and channels, or use updatedSince for deltas. Page offsets are limited from 0 - 100000.
 - **`benzinga-pp-cli news get-channels`** - Returns a list of all available news channels that can be used to filter news items. Channels can have sub-channels, but they will all be listed as their own item.
 
+### news-quantified
+
+Manage news quantified
+
+- **`benzinga-pp-cli news-quantified`** - Quantitative news analytics with sentiment scores, relevance metrics, and market-impact indicators (per-ticker price moves at 30s-120m horizons, volume ratios, VWAP, support/resistance, analyst and EPS actions). Filter with `--symbols`, `--date`/`--date-from`/`--date-to`, or `--updated-since` for deltas.
+
 ### news-removed
 
 Manage news removed
@@ -439,6 +445,12 @@ Manage trending tickers
 
 - **`benzinga-pp-cli trending-tickers get-ticker-trend-data`** - Retrieve trending data for specific tickers, including rank and change. Returns aggregated trend scores and activity levels across different time intervals.
 - **`benzinga-pp-cli trending-tickers get-ticker-trend-list-data`** - Retrieve a list of trending tickers based on various metrics. Returns securities ordered by trending score across different time intervals.
+
+### wiims
+
+Manage wiims (Why Is It Moving)
+
+- **`benzinga-pp-cli wiims`** - Why Is It Moving (WIIM): concise, structured explanations of why a security is moving right now, each tagged to a security (symbol, exchange, ISIN, CUSIP) with created/updated/expired timestamps. Filter with `--tickers`, `--date`/`--date-from`/`--date-to`, or `--updated-since`. Complements `why` with editorial context.
 
 
 ## Output Formats

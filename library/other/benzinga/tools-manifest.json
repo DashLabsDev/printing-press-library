@@ -2924,6 +2924,106 @@
           "description": "Number of results per page. Default: 1000. Maximum: 1000"
         }
       ]
+    },
+    {
+      "name": "news-quantified_get-newsquantified-data",
+      "description": "Quantitative news analytics with sentiment scores, relevance metrics, and market-impact indicators (per-ticker price moves at 30s-120m horizons, volume ratios, VWAP, support/resistance, analyst and EPS actions). Optional: page (default: 0), pageSize (default: 15, max 1000), updatedSince, symbols, date, dateFrom, dateTo.",
+      "method": "GET",
+      "path": "/api/v2/newsquantified",
+      "params": [
+        {
+          "name": "page",
+          "type": "int",
+          "location": "query",
+          "description": "Page number for pagination. Zero-indexed (0 = first page)."
+        },
+        {
+          "name": "pagesize",
+          "type": "int",
+          "location": "query",
+          "description": "Number of results per page. Maximum 1000. Returns most recent data first."
+        },
+        {
+          "name": "updated_since",
+          "type": "int",
+          "location": "query",
+          "description": "Unix timestamp in seconds (UTC). Returns data updated after this timestamp. Use for incremental updates."
+        },
+        {
+          "name": "symbols",
+          "type": "string",
+          "location": "query",
+          "description": "Comma-separated list of stock ticker symbols to filter results (e.g., AAPL,MSFT,TSLA)."
+        },
+        {
+          "name": "date",
+          "type": "string",
+          "location": "query",
+          "description": "Single date in YYYY-MM-DD format. Shorthand for date_from and date_to when they are the same."
+        },
+        {
+          "name": "date_from",
+          "type": "string",
+          "location": "query",
+          "description": "Start date in YYYY-MM-DD format. Returns data from this date forward."
+        },
+        {
+          "name": "date_to",
+          "type": "string",
+          "location": "query",
+          "description": "End date in YYYY-MM-DD format. Returns data up to and including this date."
+        }
+      ]
+    },
+    {
+      "name": "wiims_get-wiims",
+      "description": "Benzinga WIIM (Why Is It Moving) items: concise, structured explanations of why a security is moving right now, each tagged to a security (symbol, exchange, ISIN, CUSIP) with created/updated/expired timestamps. Optional: page (default: 0), pageSize (default: 15), tickers, updatedSince, date, dateFrom, dateTo.",
+      "method": "GET",
+      "path": "/api/v1/wiims",
+      "params": [
+        {
+          "name": "page",
+          "type": "int",
+          "location": "query",
+          "description": "Page offset for pagination."
+        },
+        {
+          "name": "pagesize",
+          "type": "int",
+          "location": "query",
+          "description": "Number of results returned per page."
+        },
+        {
+          "name": "tickers",
+          "type": "string",
+          "location": "query",
+          "description": "One or more ticker symbols separated by a comma to filter WIIM items (e.g., TSLA,NVDA)."
+        },
+        {
+          "name": "updated_since",
+          "type": "int",
+          "location": "query",
+          "description": "Unix timestamp in seconds (UTC). Returns WIIM items updated after this timestamp."
+        },
+        {
+          "name": "date",
+          "type": "string",
+          "location": "query",
+          "description": "Single date in YYYY-MM-DD format. Shorthand for date_from and date_to when they are the same."
+        },
+        {
+          "name": "date_from",
+          "type": "string",
+          "location": "query",
+          "description": "Start date in YYYY-MM-DD format. Use with date_to for range queries."
+        },
+        {
+          "name": "date_to",
+          "type": "string",
+          "location": "query",
+          "description": "End date in YYYY-MM-DD format. Use with date_from for range queries."
+        }
+      ]
     }
   ]
 }

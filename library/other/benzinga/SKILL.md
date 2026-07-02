@@ -189,6 +189,10 @@ These capabilities aren't available in any other tool for this API.
 - `benzinga-pp-cli news get` — This REST API returns structured data for news.
 - `benzinga-pp-cli news get-channels` — Returns a list of all available news channels that can be used to filter news items.
 
+**news-quantified** — Manage news quantified
+
+- `benzinga-pp-cli news-quantified` — Quantitative news analytics: sentiment, volume ratios, and per-ticker price reactions (30s–120m). Filter with `--symbols`, `--date`/`--date-from`/`--date-to`, `--updated-since`.
+
 **news-removed** — Manage news removed
 
 - `benzinga-pp-cli news-removed` — Returns the removed news data.
@@ -217,6 +221,10 @@ These capabilities aren't available in any other tool for this API.
 
 - `benzinga-pp-cli trending-tickers get-ticker-trend-data` — Retrieve trending data for specific tickers, including rank and change.
 - `benzinga-pp-cli trending-tickers get-ticker-trend-list-data` — Retrieve a list of trending tickers based on various metrics.
+
+**wiims** — Manage wiims (Why Is It Moving)
+
+- `benzinga-pp-cli wiims` — Why Is It Moving (WIIM): concise structured explanations of why a security is moving now, tagged to a security with created/updated/expired timestamps. Filter with `--tickers`, `--date`/`--date-from`/`--date-to`, `--updated-since`. Complements `why` with editorial context.
 
 
 ### Finding the right command

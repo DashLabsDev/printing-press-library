@@ -274,8 +274,10 @@ See README.md or the bundled SKILL.md for recipes.`,
 	rootCmd.AddCommand(newConsensusRatingsPromotedCmd(flags))
 	rootCmd.AddCommand(newErxGapsPromotedCmd(flags))
 	rootCmd.AddCommand(newMarketPromotedCmd(flags))
+	rootCmd.AddCommand(newNewsQuantifiedPromotedCmd(flags))
 	rootCmd.AddCommand(newNewsRemovedPromotedCmd(flags))
 	rootCmd.AddCommand(newShortinterestPromotedCmd(flags))
+	rootCmd.AddCommand(newWiimsPromotedCmd(flags))
 	rootCmd.AddCommand(newVersionCmd())
 
 	return rootCmd
