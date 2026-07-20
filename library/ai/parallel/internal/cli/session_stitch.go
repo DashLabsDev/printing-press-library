@@ -73,12 +73,17 @@ func newNovelSessionStitchCmd(flags *rootFlags) *cobra.Command {
 				return fmt.Errorf("stitch session: %w", err)
 			}
 
+			allMembers, err := db.ListResearchSessionMembers(sessionID)
+			if err != nil {
+				return fmt.Errorf("listing session members: %w", err)
+			}
+
 			hintIfUnsynced(cmd, db, "")
 			hintIfStale(cmd, db, "", flags.maxAge)
 
 			out := map[string]any{
 				"session_id": sessionID,
-				"members":    members,
+				"members":    allMembers,
 				"created_at": createdAt,
 			}
 			return flags.printJSON(cmd, out)

@@ -177,7 +177,7 @@ func New(cfg *config.Config, timeout time.Duration, rateLimit float64) *Client {
 		// CheckRedirect where Go's automatic stripping has already run.
 		if req.URL.Host == via[0].URL.Host {
 			if h, err := c.authHeader(req.Context()); err == nil && h != "" {
-				req.Header.Set("x-api-key", h)
+				c.applyAuthHeader(req, req.URL.Path, h)
 			}
 		} else {
 			// Cross-host hop: Go strips standard auth headers (Authorization,
@@ -620,9 +620,7 @@ func (c *Client) doInternal(ctx context.Context, method, path string, params map
 			req.URL.RawQuery = q.Encode()
 		}
 
-		if authHeader != "" {
-			req.Header.Set("x-api-key", authHeader)
-		}
+		c.applyAuthHeader(req, path, authHeader)
 		if c.Config != nil {
 			for k, v := range c.Config.Headers {
 				req.Header.Set(k, v)
@@ -788,7 +786,11 @@ func (c *Client) dryRun(method, targetURL, path string, params map[string]string
 		}
 	}
 	if authHeader != "" {
-		fmt.Fprintf(os.Stderr, "  %s: %s\n", "x-api-key", maskToken(authHeader))
+		headerName := "x-api-key"
+		if isAccountServicePath(path) || isAccountServicePath(targetURL) {
+			headerName = "Authorization"
+		}
+		fmt.Fprintf(os.Stderr, "  %s: %s\n", headerName, maskToken(authHeader))
 	}
 	fmt.Fprintf(os.Stderr, "\n(dry run - no request sent)\n")
 	return json.RawMessage(`{"dry_run": true}`), 0, nil
@@ -799,6 +801,29 @@ func (c *Client) ConfiguredTimeout() time.Duration {
 		return c.HTTPClient.Timeout
 	}
 	return 60 * time.Second
+}
+
+func isAccountServicePath(path string) bool {
+	p := strings.ToLower(path)
+	return strings.Contains(p, "/account/") || strings.HasPrefix(p, "account/")
+}
+
+func (c *Client) applyAuthHeader(req *http.Request, path string, authHeader string) {
+	if isAccountServicePath(path) || (req.URL != nil && isAccountServicePath(req.URL.Path)) {
+		token := strings.TrimSpace(authHeader)
+		if c.Config != nil && strings.TrimSpace(c.Config.AccessToken) != "" {
+			token = strings.TrimSpace(c.Config.AccessToken)
+		}
+		token = strings.TrimPrefix(token, "Bearer ")
+		token = strings.TrimPrefix(token, "bearer ")
+		if token != "" {
+			req.Header.Set("Authorization", "Bearer "+token)
+		}
+		return
+	}
+	if authHeader != "" {
+		req.Header.Set("x-api-key", authHeader)
+	}
 }
 
 func (c *Client) authHeader(ctx context.Context) (string, error) {

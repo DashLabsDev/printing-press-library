@@ -67,7 +67,7 @@ func (s *Store) UpsertResearchSession(sessionID, createdAt, notes string, member
 		if _, err := tx.Exec(
 			`INSERT INTO research_session_members (session_id, kind, ref_id, created_at)
 			 VALUES (?, ?, ?, ?)
-			 ON CONFLICT(session_id, kind, ref_id) DO UPDATE SET created_at = excluded.created_at`,
+			 ON CONFLICT(session_id, kind, ref_id) DO NOTHING`,
 			sessionID, m.Kind, m.RefID, createdAt,
 		); err != nil {
 			return fmt.Errorf("upsert research session member: %w", err)
@@ -271,7 +271,10 @@ func (s *Store) WalkTaskLineage(startRunID string) ([]TaskInteractionLink, error
 		if strings.TrimSpace(prev) == "" {
 			break
 		}
-		runID = s.resolveRunIDForInteraction(prev)
+		runID, err = s.resolveRunIDForInteraction(prev)
+		if err != nil {
+			return chain, err
+		}
 		if runID == "" {
 			break
 		}
@@ -323,23 +326,29 @@ func (s *Store) lookupTaskByRunID(runID string) (json.RawMessage, error) {
 	return json.RawMessage(data), nil
 }
 
-func (s *Store) resolveRunIDForInteraction(interactionID string) string {
+func (s *Store) resolveRunIDForInteraction(interactionID string) (string, error) {
 	var runID sql.NullString
-	_ = s.db.QueryRow(
+	err := s.db.QueryRow(
 		`SELECT run_id FROM tasks WHERE interaction_id = ? LIMIT 1`,
 		interactionID,
 	).Scan(&runID)
-	if runID.Valid && strings.TrimSpace(runID.String) != "" {
-		return runID.String
+	if err != nil && err != sql.ErrNoRows {
+		return "", err
 	}
-	_ = s.db.QueryRow(
+	if runID.Valid && strings.TrimSpace(runID.String) != "" {
+		return runID.String, nil
+	}
+	err = s.db.QueryRow(
 		`SELECT run_id FROM task_interactions WHERE previous_interaction_id = ? LIMIT 1`,
 		interactionID,
 	).Scan(&runID)
-	if runID.Valid {
-		return runID.String
+	if err != nil && err != sql.ErrNoRows {
+		return "", err
 	}
-	return ""
+	if runID.Valid {
+		return runID.String, nil
+	}
+	return "", nil
 }
 
 func nullIfEmpty(s string) any {
