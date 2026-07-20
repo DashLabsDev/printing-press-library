@@ -64,6 +64,9 @@ func newNovelCorpusBuildCmd(flags *rootFlags) *cobra.Command {
 			if err != nil {
 				return classifyAPIError(err, flags)
 			}
+			for _, w := range res.Warnings {
+				fmt.Fprintf(cmd.ErrOrStderr(), "Attenzione: %s\n", w)
+			}
 			st, _ := openGAStore(cmd.Context())
 			if st != nil {
 				defer st.Close()

@@ -79,6 +79,9 @@ func runGASearch(cmd *cobra.Command, flags *rootFlags, opts gaclient.SearchOptio
 	if err != nil {
 		return classifyAPIError(err, flags)
 	}
+	for _, w := range res.Warnings {
+		fmt.Fprintf(cmd.ErrOrStderr(), "Attenzione: %s\n", w)
+	}
 	// Best-effort persistence (offline search, watch, grep, stats build on this).
 	if st, serr := openGAStore(cmd.Context()); serr == nil {
 		persistProvvedimenti(st, res.Items)

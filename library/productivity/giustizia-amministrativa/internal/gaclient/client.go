@@ -2,6 +2,7 @@ package gaclient
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -216,10 +217,13 @@ func (c *Client) buildSearchURL(opts SearchOptions, cur int) string {
 	return BaseURL + formPath + "?" + v.Encode()
 }
 
-// SearchResult bundles the rows of a search with the reported total.
+// SearchResult bundles the rows of a search with the reported total. Warnings
+// carries non-fatal notices (a year skipped during a sweep) for the caller to
+// surface on stderr; results are still usable.
 type SearchResult struct {
-	Items []Provvedimento
-	Total int
+	Items    []Provvedimento
+	Total    int
+	Warnings []string
 }
 
 // Search runs a query and returns up to Limit results. It performs the session
@@ -274,20 +278,55 @@ func dedupKey(p Provvedimento) string {
 	return p.Schema + "|" + p.Nrg + "|" + p.NomeFile
 }
 
+// fatalSweepError reports whether an error must abort a whole sweep instead of
+// skipping the failing year: rate limiting (further years would only hit more
+// of it) and a cancelled/expired context.
+func fatalSweepError(ctx context.Context, err error) bool {
+	var rle *cliutil.RateLimitError
+	if errors.As(err, &rle) {
+		return true
+	}
+	return ctx.Err() != nil || errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded)
+}
+
 // searchSweep iterates the year filter from AnnoFrom to AnnoTo (inclusive),
 // running searchOnce per year and de-duplicating the union by dedupKey. Limit
 // applies per year. Total is the sum of per-year totals.
+//
+// A transient failure on one year (timeout, network) does not discard the years
+// already collected: that year is skipped and reported in Warnings. Rate limits
+// and a cancelled context abort the sweep, and an error is returned only when no
+// year succeeded at all.
 func (c *Client) searchSweep(ctx context.Context, opts SearchOptions) (*SearchResult, error) {
 	from, to := yearRange(opts.AnnoFrom, opts.AnnoTo)
-	res := &SearchResult{}
-	seen := map[string]bool{}
 	yearOpts := opts
 	yearOpts.AnnoFrom, yearOpts.AnnoTo = 0, 0
-	for y := from; y <= to; y++ {
+	return sweepYears(ctx, from, to, func(y int) (*SearchResult, error) {
 		yearOpts.Anno = y
-		part, err := c.searchOnce(ctx, yearOpts)
+		return c.searchOnce(ctx, yearOpts)
+	})
+}
+
+// sweepYears merges the per-year results of fetch over an inclusive year span,
+// applying the skip/abort policy described on searchSweep.
+func sweepYears(ctx context.Context, from, to int, fetch func(year int) (*SearchResult, error)) (*SearchResult, error) {
+	res := &SearchResult{}
+	seen := map[string]bool{}
+	var skipped []string
+	var lastErr error
+	for y := from; y <= to; y++ {
+		part, err := fetch(y)
 		if err != nil {
-			return nil, err
+			if fatalSweepError(ctx, err) {
+				if len(res.Items) == 0 {
+					return nil, err
+				}
+				res.Warnings = append(res.Warnings, fmt.Sprintf("sweep interrotto all'anno %d: %v; risultati parziali (anni %d-%d)", y, err, from, y-1))
+				return res, nil
+			}
+			lastErr = err
+			skipped = append(skipped, strconv.Itoa(y))
+			continue
 		}
 		res.Total += part.Total
 		for _, p := range part.Items {
@@ -298,6 +337,12 @@ func (c *Client) searchSweep(ctx context.Context, opts SearchOptions) (*SearchRe
 			seen[key] = true
 			res.Items = append(res.Items, p)
 		}
+	}
+	if len(skipped) > 0 {
+		if len(res.Items) == 0 {
+			return nil, lastErr
+		}
+		res.Warnings = append(res.Warnings, fmt.Sprintf("anni non recuperati: %s (ultimo errore: %v)", strings.Join(skipped, ", "), lastErr))
 	}
 	return res, nil
 }
