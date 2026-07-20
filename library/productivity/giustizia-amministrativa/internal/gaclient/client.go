@@ -307,6 +307,16 @@ func (c *Client) searchSweep(ctx context.Context, opts SearchOptions) (*SearchRe
 	})
 }
 
+// appendSkippedWarning records the years dropped by a transient failure, so a
+// gap in the swept range is never silent — including when the sweep later
+// aborts for a different reason.
+func appendSkippedWarning(warnings, skipped []string, lastErr error) []string {
+	if len(skipped) == 0 {
+		return warnings
+	}
+	return append(warnings, fmt.Sprintf("anni non recuperati: %s (ultimo errore: %v)", strings.Join(skipped, ", "), lastErr))
+}
+
 // sweepYears merges the per-year results of fetch over an inclusive year span,
 // applying the skip/abort policy described on searchSweep.
 func sweepYears(ctx context.Context, from, to int, fetch func(year int) (*SearchResult, error)) (*SearchResult, error) {
@@ -321,7 +331,8 @@ func sweepYears(ctx context.Context, from, to int, fetch func(year int) (*Search
 				if len(res.Items) == 0 {
 					return nil, err
 				}
-				res.Warnings = append(res.Warnings, fmt.Sprintf("sweep interrotto all'anno %d: %v; risultati parziali (anni %d-%d)", y, err, from, y-1))
+				res.Warnings = append(res.Warnings, fmt.Sprintf("sweep interrotto all'anno %d: %v; risultati parziali dagli anni %d-%d", y, err, from, y-1))
+				res.Warnings = appendSkippedWarning(res.Warnings, skipped, lastErr)
 				return res, nil
 			}
 			lastErr = err
@@ -338,12 +349,10 @@ func sweepYears(ctx context.Context, from, to int, fetch func(year int) (*Search
 			res.Items = append(res.Items, p)
 		}
 	}
-	if len(skipped) > 0 {
-		if len(res.Items) == 0 {
-			return nil, lastErr
-		}
-		res.Warnings = append(res.Warnings, fmt.Sprintf("anni non recuperati: %s (ultimo errore: %v)", strings.Join(skipped, ", "), lastErr))
+	if len(skipped) > 0 && len(res.Items) == 0 {
+		return nil, lastErr
 	}
+	res.Warnings = appendSkippedWarning(res.Warnings, skipped, lastErr)
 	return res, nil
 }
 

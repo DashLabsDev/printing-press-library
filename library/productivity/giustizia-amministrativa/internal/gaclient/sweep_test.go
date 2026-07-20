@@ -112,6 +112,31 @@ func TestSweepYearsAbortsOnRateLimit(t *testing.T) {
 	}
 }
 
+func TestSweepYearsReportsSkippedYearsWhenItLaterAborts(t *testing.T) {
+	// 2021 skipped (transient), 2022 aborts (rate limit): the abort must not
+	// hide the fact that 2021 is missing from the range too.
+	fetch := func(y int) (*SearchResult, error) {
+		switch y {
+		case 2021:
+			return nil, errors.New("timeout")
+		case 2022:
+			return nil, &cliutil.RateLimitError{URL: "https://x"}
+		}
+		return &SearchResult{Items: []Provvedimento{{Ecli: fmt.Sprintf("ECLI:%d", y)}}, Total: 5}, nil
+	}
+	res, err := sweepYears(context.Background(), 2020, 2025, fetch)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	joined := strings.Join(res.Warnings, " | ")
+	if !strings.Contains(joined, "2021") {
+		t.Errorf("the transiently skipped year vanished from the warnings: %q", joined)
+	}
+	if !strings.Contains(joined, "2022") {
+		t.Errorf("the aborting year is not reported: %q", joined)
+	}
+}
+
 func TestFatalSweepError(t *testing.T) {
 	// A transient per-year failure must not abort the sweep (the years already
 	// collected would be lost); rate limiting and a cancelled context must.

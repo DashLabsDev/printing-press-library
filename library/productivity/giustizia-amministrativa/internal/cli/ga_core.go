@@ -88,7 +88,10 @@ func runGASearch(cmd *cobra.Command, flags *rootFlags, opts gaclient.SearchOptio
 		_ = st.Close()
 	}
 	if wantsHumanTable(cmd.OutOrStdout(), flags) && res.Total > 0 {
-		fmt.Fprintf(cmd.ErrOrStderr(), "Trovati %d risultati (mostrati %d).\n", res.Total, len(res.Items))
+		// Total is the match count declared by the portal (summed per year in a
+		// sweep), not the number of rows returned: say so, or the two numbers
+		// look contradictory whenever Total exceeds --limit.
+		fmt.Fprintf(cmd.ErrOrStderr(), "Trovati %d risultati sul portale (mostrati %d).\n", res.Total, len(res.Items))
 	}
 	data, err := json.Marshal(res.Items)
 	if err != nil {
