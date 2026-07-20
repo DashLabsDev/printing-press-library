@@ -184,6 +184,7 @@ func New(cfg *config.Config, timeout time.Duration, rateLimit float64) *Client {
 			// Cookie) but not custom ones, so a custom API-key header would be
 			// forwarded verbatim to the redirect target. Delete it explicitly.
 			req.Header.Del("x-api-key")
+			req.Header.Del("Authorization")
 		}
 		return nil
 	}
@@ -306,6 +307,19 @@ func (c *Client) cacheKey(path string, params map[string]string) string {
 		if authHeader := c.Config.AuthHeader(); authHeader != "" {
 			authHash := sha256.Sum256([]byte(authHeader))
 			key += "|auth=" + hex.EncodeToString(authHash[:8])
+		}
+		// Account-service GETs authenticate with OAuth AccessToken, which can
+		// change independently of the product API key. Partition the cache by
+		// that identity so switching OAuth accounts cannot return stale data.
+		if isAccountServicePath(path) {
+			accountAuth := strings.TrimSpace(c.Config.AccessToken)
+			if accountAuth == "" {
+				accountAuth = strings.TrimSpace(c.Config.AuthHeader())
+			}
+			if accountAuth != "" {
+				authHash := sha256.Sum256([]byte(accountAuth))
+				key += "|account_auth=" + hex.EncodeToString(authHash[:8])
+			}
 		}
 		if c.Config.Path != "" {
 			key += "|config_path=" + c.Config.Path
