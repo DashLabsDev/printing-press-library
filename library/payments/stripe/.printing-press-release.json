@@ -2,17 +2,17 @@
   "schema_version": 1,
   "slug": "stripe",
   "cli_name": "stripe-pp-cli",
-  "version": "2026.7.2",
-  "released_at": "2026-07-08T23:15:22Z",
-  "source_commit": "220c1563d0375ec8741c4c377b4bb5a4317cbf6a",
+  "version": "2026.7.3",
+  "released_at": "2026-07-21T01:16:12Z",
+  "source_commit": "6cd824a9f12d8edb627d58652d71d8497053f21d",
   "printing_press_version": "4.1.0",
   "run_id": "20260509-093200",
   "changes": [
     {
-      "title": "feat: registry hygiene follow-ups (pp-first descriptions, expanded MCP validation, --validate for skills, npm publish auto-trigger)",
-      "pr": 675,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/675",
-      "commit": "220c1563d0375ec8741c4c377b4bb5a4317cbf6a"
+      "title": "fix(stripe): send write requests as form data",
+      "pr": 1020,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/1020",
+      "commit": "6cd824a9f12d8edb627d58652d71d8497053f21d"
     }
   ]
 }
