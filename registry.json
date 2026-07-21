@@ -164,6 +164,71 @@
       }
     },
     {
+      "name": "3cx-xapi",
+      "category": "social-and-messaging",
+      "api": "3CX XAPI",
+      "description": "Every 3CX Configuration API (XAPI) object in one Go binary, with a local mirror of your whole PBX, offline search, config diffing, and cross-entity auditing no 3CX tool has.",
+      "search_terms": [
+        "3cx-xapi",
+        "3CX XAPI",
+        "3cx-xapi-pp-cli",
+        "Every 3CX Configuration API (XAPI) object in one Go binary, with a local mirror of your whole PBX, offline search, config diffing, and cross-entity auditing no 3CX tool has.",
+        "Config integrity audit",
+        "audit",
+        "Flag every ring group, queue, inbound/outbound rule, and IVR destination that points at a deleted, disabled, or non-existent extension or DID.",
+        "Config snapshot and diff",
+        "diff",
+        "Capture the full PBX config to a local snapshot, then show exactly what changed between two points in time or two tenants.",
+        "Bulk provision from CSV",
+        "provision",
+        "Idempotently create extensions and users from a CSV, assigning groups and roles, with a dry-run plan and typed exit codes.",
+        "Queue and agent performance rollup",
+        "qrollup",
+        "One cross-queue table joining queue performance, agent-in-queue stats, abandoned calls, and SLA breaches over a time window.",
+        "Offline directory search",
+        "search",
+        "Instant full-text search across the mirrored config graph (users, groups, ring groups, queues, trunks, DIDs, contacts) by number, name, email, or extension.",
+        "Security posture report",
+        "posture",
+        "Consolidate blocklist, blacklisted numbers, anti-hacking settings, firewall state, failed-auth events, and the admin audit log into one attack-surface report.",
+        "Extension routing trace",
+        "trace",
+        "For one extension, show every inbound rule, ring group, queue, DID, and forwarding profile that routes to it.",
+        "Live state merge",
+        "changed",
+        "A single time-windowed feed merging activity log, event log, active calls, and system status into the state of the PBX now or since a given time."
+      ],
+      "path": "library/social-and-messaging/3cx-xapi",
+      "printer": "therichardgill",
+      "printer_name": "Richard Gill",
+      "creator": {
+        "handle": "therichardgill",
+        "name": "Richard Gill"
+      },
+      "contributors": [
+        {
+          "handle": "tmchow",
+          "name": "Trevin Chow"
+        }
+      ],
+      "mcp": {
+        "binary": "3cx-xapi-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 589,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "TCX_CLIENT_ID",
+          "TCX_CLIENT_SECRET"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "adguard-home",
       "category": "monitoring",
       "api": "AdGuard Home",
@@ -12925,6 +12990,12 @@
         "When a Paperclip endpoint requires companyId in the path (e.g. /api/companies/{companyId}/search), the CLI reads the first cached row from the local companies table and substitutes it automatically. Removes a manual --company flag for single-tenant deployments."
       ],
       "path": "library/project-management/paperclip-self-hosted",
+      "release": {
+        "cli_name": "paperclip-pp-cli",
+        "version": "2026.7.1",
+        "released_at": "2026-07-20T22:21:21Z",
+        "source_commit": "193cbef34a2c90008ea2e061c16cf26692129082"
+      },
       "printer": "mvanhorn",
       "printer_name": "cli-printing-press",
       "creator": {
