@@ -199,6 +199,12 @@
         "A single time-windowed feed merging activity log, event log, active calls, and system status into the state of the PBX now or since a given time."
       ],
       "path": "library/social-and-messaging/3cx-xapi",
+      "release": {
+        "cli_name": "3cx-xapi-pp-cli",
+        "version": "2026.7.1",
+        "released_at": "2026-07-21T00:35:40Z",
+        "source_commit": "f1fc926a6aaa069c9580bf8c1722919efbdb967a"
+      },
       "printer": "therichardgill",
       "printer_name": "Richard Gill",
       "creator": {
@@ -11662,6 +11668,41 @@
         "env_vars": [
           "NOTION_BEARER_AUTH"
         ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "npm",
+      "category": "developer-tools",
+      "api": "npm",
+      "description": "Research npm packages by metadata, downloads, maintainers, freshness, and dependency risk.",
+      "search_terms": [
+        "npm",
+        "npm-pp-cli",
+        "Research npm packages by metadata, downloads, maintainers, freshness, and dependency risk.",
+        "Package summary",
+        "package",
+        "Summarize an npm package with latest version, maintainers, dependencies, publish freshness, and last-month downloads.",
+        "Package comparison",
+        "compare",
+        "Compare npm packages by adoption, freshness, maintainers, and dependency surface.",
+        "Package risk scoring",
+        "risk",
+        "Score npm package maintenance and adoption risk with explicit signals."
+      ],
+      "path": "library/developer-tools/npm",
+      "printer": "hnshah",
+      "printer_name": "Hiten Shah",
+      "mcp": {
+        "binary": "npm-pp-mcp",
+        "transports": [
+          "stdio"
+        ],
+        "tool_count": 5,
+        "public_tool_count": 5,
+        "auth_type": "none",
+        "env_vars": [],
         "mcp_ready": "full",
         "spec_format": "openapi3"
       }
