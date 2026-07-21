@@ -4178,6 +4178,75 @@
       }
     },
     {
+      "name": "dataforseo",
+      "category": "marketing",
+      "api": "dataforseo",
+      "description": "Every DataForSEO endpoint, plus auto-mode routing, cost estimates, keyword pre-cleaning, and a local SQLite store no...",
+      "search_terms": [
+        "dataforseo",
+        "dataforseo-pp-cli",
+        "Keyword pre-cleaner with 40501 surfacer",
+        "keywords clean",
+        "Pre-clean keywords before sending to Google Ads volume so one bad keyword doesn't poison the whole batch, and surface task-level 40501 errors that DataForSEO hides behind a top-level 20000.",
+        "Only possible because the CLI inspects the response envelope per-task and short-circuits the request before sending if any keyword fails the >10-word / punctuation rules.",
+        "Auto-mode router (Live ↔ Standard)",
+        "keywords volume",
+        "Auto-pick the cost-optimal execution mode based on batch size via `--mode auto`. Batches of 5 or fewer go through Live (sync, premium); larger batches route through Standard (queued, ~3.3× cheaper) with a managed poll loop.",
+        "DataForSEO's Live vs Standard cost differential is the top community complaint; no competitor MCP routes automatically — they make the user pick mode every call.",
+        "Cost estimator with pre-call confirmation gate",
+        "cost estimate",
+        "Predict spend before any live API call using a static price table per endpoint family multiplied by the planned input size. Optional --confirm-over flag gates spending above a threshold.",
+        "DataForSEO's pricing varies 3.3× between Live and Standard and 30× across endpoint families; no other wrapper offers pre-call cost transparency.",
+        "Standard-mode task bundler with resumable local ledger",
+        "task bundle",
+        "Run the full Standard-mode lifecycle (task_post → tasks_ready poll → task_get → merge) as one command, with task IDs persisted to local SQLite so Ctrl-C or a laptop sleep doesn't lose the queue.",
+        "The task_post / tasks_ready / task_get triple is the largest UX gap in the official MCP; users self-host poll loops or use pingback callbacks they can't easily host.",
+        "Local SQLite store + offline FTS over past results",
+        "search",
+        "Every result-returning API call mirrors into local SQLite (keywords, serp_results, backlinks, ai_mentions) with FTS5 indexes; offline `search` runs FTS5 MATCH over snippets, URLs, anchor text, and AI-answer excerpts without re-billing.",
+        "Cross-entity local query no single API call provides; powers every delta tracker downstream.",
+        "Volume delta tracker",
+        "keywords delta",
+        "Joins the current Google Ads volume API response against the last stored value per keyword in local SQLite and outputs movers sorted by absolute delta.",
+        "Cross-source join only possible with local history.",
+        "Rank + SERP-feature delta over URL list",
+        "rank track",
+        "Parse a sitemap or URL→keyword map, call `serp/google/organic/live/advanced` per keyword, diff position + SERP features (AI Overview, featured snippet, knowledge panel, PAA) against last run, and flag movers and feature gains/losses.",
+        "Multi-endpoint local join (SERP API × URL→keyword map × historical rank) only possible with the local store; covers the Monday-morning rank-check ritual that costs $150-400/mo at Ahrefs/Semrush.",
+        "AI-visibility delta in LLM answers",
+        "ai-visibility track",
+        "Call AI Optimization family endpoints (gemini, chat_gpt, llm_mentions, claude, perplexity) for a brand × keyword grid, store per-LLM mentions/excerpts in SQLite, and diff week-over-week presence + mention count per LLM.",
+        "AI Optimization is a new family (36 paths) and no community wrapper diffs week-over-week; the local store enables it.",
+        "Backlinks-since-last-run",
+        "backlinks new",
+        "Snapshot `backlinks/summary` + `referring_domains` + `anchors` into local SQLite; on each run diff against the prior snapshot and surface newly-acquired referring domains with anchor text.",
+        "Diff against history only possible with the local snapshot; replaces $199+/mo Ahrefs queries."
+      ],
+      "path": "library/marketing/dataforseo",
+      "printer": "Mazzsterr",
+      "printer_name": "Mazzsterr",
+      "creator": {
+        "handle": "mazzsterr",
+        "name": "Mazzsterr"
+      },
+      "mcp": {
+        "binary": "dataforseo-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 0,
+        "public_tool_count": 0,
+        "auth_type": "basic",
+        "env_vars": [
+          "DATAFORSEO_LOGIN",
+          "DATAFORSEO_PASSWORD"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "defillama",
       "category": "other",
       "api": "Defillama",
@@ -12692,9 +12761,9 @@
       "path": "library/food-and-dining/ordertogo",
       "release": {
         "cli_name": "ordertogo-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.7.2",
+        "released_at": "2026-07-21T02:55:36Z",
+        "source_commit": "0d6d660a9847483e7e729aa396a421cf8cc047b8"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -17277,9 +17346,9 @@
       "path": "library/payments/stripe",
       "release": {
         "cli_name": "stripe-pp-cli",
-        "version": "2026.7.2",
-        "released_at": "2026-07-08T23:15:22Z",
-        "source_commit": "220c1563d0375ec8741c4c377b4bb5a4317cbf6a"
+        "version": "2026.7.3",
+        "released_at": "2026-07-21T01:16:12Z",
+        "source_commit": "6cd824a9f12d8edb627d58652d71d8497053f21d"
       },
       "printer": "crodorg",
       "printer_name": "Chris Rodriguez",
