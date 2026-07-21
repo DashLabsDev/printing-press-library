@@ -11692,6 +11692,12 @@
         "Score npm package maintenance and adoption risk with explicit signals."
       ],
       "path": "library/developer-tools/npm",
+      "release": {
+        "cli_name": "npm-pp-cli",
+        "version": "2026.7.1",
+        "released_at": "2026-07-21T00:48:09Z",
+        "source_commit": "af8be51971ffc7d69adf26b7b42eeccad04251d2"
+      },
       "printer": "hnshah",
       "printer_name": "Hiten Shah",
       "mcp": {
@@ -17281,6 +17287,12 @@
         "handle": "crodorg",
         "name": "Chris Rodriguez"
       },
+      "contributors": [
+        {
+          "handle": "cathrynlavery",
+          "name": "Cathryn Lavery"
+        }
+      ],
       "mcp": {
         "binary": "stripe-pp-mcp",
         "transports": [
