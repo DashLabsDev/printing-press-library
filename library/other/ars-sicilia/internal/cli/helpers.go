@@ -96,6 +96,7 @@ func (e *cliError) Error() string { return e.err.Error() }
 func (e *cliError) Unwrap() error { return e.err }
 
 func usageErr(err error) error     { return &cliError{code: 2, err: err} }
+func notFoundErr(err error) error  { return &cliError{code: 3, err: err} }
 func configErr(err error) error    { return &cliError{code: 10, err: err} }
 func rateLimitErr(err error) error { return &cliError{code: 7, err: err} }
 
@@ -678,6 +679,14 @@ func compactListFields(items []map[string]any) json.RawMessage {
 		"date": true,
 		// Versioning
 		"version": true,
+		// Signatories — enriched onto rows only when the caller explicitly
+		// asked for it (--con-firmatari); an explicit opt-in must not then be
+		// silently discarded by --compact/--agent, the CLI's own recommended
+		// mode. Kept even though it's an array of {nome, gruppo} objects: the
+		// final assembly loop below only checks keepFields[k], not scalar-ness
+		// — isCompactScalar only gates the frequency-based auto-extension,
+		// never a field already on this static allowlist.
+		"firmatari": true,
 	}
 	if len(items) > 0 {
 		keyCounts := map[string]int{}

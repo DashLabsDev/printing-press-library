@@ -22,6 +22,7 @@ func BuildQuery(arc Archive, params map[string]string, isisRaw string) string {
 	}
 	var fielded []string
 	var freeText []string
+	var exclude string
 
 	// Stable key order so identical inputs produce identical queries (helps
 	// session caching, dogfood reproducibility).
@@ -36,8 +37,14 @@ func BuildQuery(arc Archive, params map[string]string, isisRaw string) string {
 		if v == "" {
 			continue
 		}
+		// `escludi` is an exclusion term (ISIS NOT), not a positive criterion;
+		// it qualifies the whole expression below.
+		if k == "escludi" || k == "exclude" {
+			exclude = v
+			continue
+		}
 		if k == "testo" || k == "free" || k == "terms" || k == "q" {
-			freeText = append(freeText, v)
+			freeText = append(freeText, andJoinWords(v))
 			continue
 		}
 		field, ok := arc.FieldMap[k]
@@ -58,13 +65,66 @@ func BuildQuery(arc Archive, params map[string]string, isisRaw string) string {
 		// boolean operators (we don't try to detect this — keep it simple).
 		parts = append(parts, "("+strings.Join(freeText, " E ")+")")
 	}
-	if len(parts) == 0 {
-		return "all"
+
+	var expr string
+	switch len(parts) {
+	case 0:
+		expr = "all"
+	case 1:
+		expr = parts[0]
+	default:
+		expr = strings.Join(parts, " E ")
 	}
-	if len(parts) == 1 {
-		return parts[0]
+
+	// Apply the exclusion (ISIS NOT). We wrap the excluded value in parentheses
+	// so a multi-word term stays a single operand. Field-qualified exclusions
+	// (e.g. "ospedale.titol") are unreliable upstream, so the CLI flag documents
+	// plain-term exclusion; power users can still field-qualify via --isis-query.
+	if exclude != "" {
+		expr = fmt.Sprintf("(%s) NOT (%s)", expr, exclude)
 	}
-	return strings.Join(parts, " E ")
+	return expr
+}
+
+// andJoinWords makes a free-text value match documents containing ALL its
+// words. ISIS treats space-separated terms as ADJ (adjacency/phrase), so
+// "obiezione di coscienza" would only match that exact phrase — surprising for
+// a search flag. We join the words with the AND operator (E) instead. If the
+// value already uses a boolean operator or parentheses, the caller is writing
+// their own expression, so we pass it through verbatim.
+func andJoinWords(v string) string {
+	if strings.ContainsAny(v, "()") {
+		return v
+	}
+	fields := strings.Fields(v)
+	if len(fields) < 2 {
+		return v
+	}
+	for _, f := range fields {
+		if isISISOperator(f) {
+			return v
+		}
+	}
+	return strings.Join(fields, " E ")
+}
+
+// isISISOperator reports whether a token is an ISIS boolean/proximity operator
+// (any language variant). A trailing digit on proximity operators (NEAR3, ADJ2)
+// is tolerated.
+func isISISOperator(tok string) bool {
+	u := strings.ToUpper(strings.TrimRight(tok, "0123456789"))
+	switch u {
+	case "E", "AND", "ET", "UND",
+		"O", "OR", "OU", "ODER", "XOR",
+		"NOT", "NO", "ESCLUSO", "MENO", "EXCLU", "OHNE", "SANS",
+		"SAME", "SPARA", "MPARA", "GPARA", "NSAME",
+		"WITH", "SFRASE", "NWITH",
+		"LINE", "SRIGA", "NLINE",
+		"NEAR", "VICINO", "VOISINE", "NAHE",
+		"ADJ", "SEGUITO", "SUIVI", "GEFOLGT":
+		return true
+	}
+	return false
 }
 
 // quoteValue returns the value as-is for purely alphanumeric/whitespace

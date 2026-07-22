@@ -58,7 +58,7 @@ func newResocontiCercaCmd(flags *rootFlags) *cobra.Command {
 	}
 	cmd.Flags().IntVar(&flagLegisl, "legisl", 0, "Legislatura.")
 	cmd.Flags().IntVar(&flagAnno, "anno", 0, "Anno della seduta.")
-	cmd.Flags().StringVar(&flagData, "data", "", "Data seduta (YYYY-MM-DD).")
+	cmd.Flags().StringVar(&flagData, "data", "", "Data seduta (YYYY-MM-DD; range con YYYY-MM-DD:YYYY-MM-DD).")
 	cmd.Flags().IntVar(&flagNumero, "numero", 0, "Numero seduta.")
 	cmd.Flags().StringVar(&flagOratore, "oratore", "", "Oratore.")
 	cmd.Flags().StringVar(&flagArgomento, "argomento", "", "Argomento.")
@@ -66,5 +66,6 @@ func newResocontiCercaCmd(flags *rootFlags) *cobra.Command {
 	cmd.Flags().StringVar(&flagISIS, "isis-query", "", "Espressione ISIS grezza (escape hatch).")
 	cmd.Flags().IntVar(&flagLimit, "limit", 10, "Max risultati da scaricare.")
 	cmd.Flags().IntVar(&flagMaxPages, "max-pages", 0, "Pagine massime da scaricare (0 = auto da --limit).")
+	cmd.Flags().String("escludi", "", "Escludi i documenti che contengono questo termine (ISIS NOT).")
 	return cmd
 }

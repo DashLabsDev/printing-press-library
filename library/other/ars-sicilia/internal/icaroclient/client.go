@@ -85,6 +85,13 @@ type SearchOptions struct {
 	MaxPages int
 	// Limit is a max-records ceiling honored after collecting pages.
 	Limit int
+	// Truncated, when non-nil, is set by Search to report whether the archive
+	// held more matching records than are being returned — whether because
+	// Limit cut the set short or because MaxPages left later pages unread.
+	// Callers that render len(records) as a de facto total (deputato profilo,
+	// commissione dossier) use this to flag undercounts instead of silently
+	// presenting a capped count as complete.
+	Truncated *bool
 }
 
 // New constructs a Client with a fresh cookie jar and a 30 s default timeout.
@@ -125,13 +132,23 @@ func (c *Client) Search(ctx context.Context, arc Archive, opts SearchOptions) ([
 		maxPages = 1
 	}
 	var all []Record
+	lastPage, lastTotalPages := 0, 0
+	// droppedByLimit records whether Limit actually cut records off the set we
+	// fetched. It is tracked separately from pagination because the two hide
+	// different halves of the same question: stopping early leaves whole pages
+	// unread (lastPage < lastTotalPages), while Limit can also slice away rows
+	// of the LAST page — in which case no page is left unread and pagination
+	// alone reports nothing was dropped.
+	droppedByLimit := false
 	for page := 1; page <= maxPages; page++ {
 		rows, totalPages, err := c.fetchPage(ctx, arc, page)
 		if err != nil {
 			return all, err
 		}
 		all = append(all, rows...)
+		lastPage, lastTotalPages = page, totalPages
 		if opts.Limit > 0 && len(all) >= opts.Limit {
+			droppedByLimit = len(all) > opts.Limit
 			all = all[:opts.Limit]
 			break
 		}
@@ -140,7 +157,11 @@ func (c *Client) Search(ctx context.Context, arc Archive, opts SearchOptions) ([
 		}
 	}
 	if opts.Limit > 0 && len(all) > opts.Limit {
+		droppedByLimit = true
 		all = all[:opts.Limit]
+	}
+	if opts.Truncated != nil {
+		*opts.Truncated = droppedByLimit || lastPage < lastTotalPages
 	}
 	return all, nil
 }

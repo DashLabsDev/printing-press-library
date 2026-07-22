@@ -131,3 +131,67 @@ func TestBySlug_Unknown(t *testing.T) {
 		t.Errorf("BySlug(unknown) = %v, want nil", got)
 	}
 }
+
+// TestDataQualifiesOnDatpre covers the --data flag mapping added for
+// `deputato profilo --data`: on ddl and the atti-parlamentari archives the
+// presentation date is qualified on DATPRE (there is no dedicated data column
+// in the short-list, but DATPRE is queryable upstream).
+func TestDataQualifiesOnDatpre(t *testing.T) {
+	for _, slug := range []string{"ddl", "interrogazioni", "interpellanze", "mozioni", "odg", "risoluzioni"} {
+		arc := BySlug(slug)
+		if arc == nil {
+			t.Fatalf("BySlug(%q) nil", slug)
+		}
+		if arc.FieldMap["data"] != "DATPRE" {
+			t.Errorf("%s: FieldMap[data] = %q, want DATPRE", slug, arc.FieldMap["data"])
+		}
+	}
+}
+
+func TestBuildQuery_Escludi(t *testing.T) {
+	arc := Archive{
+		ID:       "233",
+		Slug:     "interrogazioni",
+		FieldMap: map[string]string{"legisl": "LEGISL"},
+	}
+	got := BuildQuery(arc, map[string]string{"legisl": "18", "testo": "sanità", "escludi": "ospedale"}, "")
+	want := "((18.LEGISL) E (sanità)) NOT (ospedale)"
+	if got != want {
+		t.Errorf("BuildQuery(escludi) = %q, want %q", got, want)
+	}
+}
+
+func TestBuildQuery_EscludiOnly(t *testing.T) {
+	arc := Archive{Slug: "ddl", FieldMap: map[string]string{}}
+	got := BuildQuery(arc, map[string]string{"escludi": "regole"}, "")
+	want := "(all) NOT (regole)"
+	if got != want {
+		t.Errorf("BuildQuery(escludi only) = %q, want %q", got, want)
+	}
+}
+
+func TestBuildQuery_FreeTextAND(t *testing.T) {
+	arc := Archive{Slug: "leggi", FieldMap: map[string]string{"legisl": "LEGISL"}}
+	got := BuildQuery(arc, map[string]string{"legisl": "18", "testo": "obiezione di coscienza"}, "")
+	want := "(18.LEGISL) E (obiezione E di E coscienza)"
+	if got != want {
+		t.Errorf("BuildQuery(multi-word testo) = %q, want %q", got, want)
+	}
+}
+
+func TestBuildQuery_FreeTextOperatorPassthrough(t *testing.T) {
+	arc := Archive{Slug: "x", FieldMap: map[string]string{}}
+	for _, v := range []string{"sanità NOT ospedale", "a OR b", "(a b) c"} {
+		got := BuildQuery(arc, map[string]string{"testo": v}, "")
+		if got != "("+v+")" {
+			t.Errorf("BuildQuery(testo=%q) = %q, want verbatim", v, got)
+		}
+	}
+}
+
+func TestBuildQuery_FreeTextSingleWord(t *testing.T) {
+	arc := Archive{Slug: "x", FieldMap: map[string]string{}}
+	if got := BuildQuery(arc, map[string]string{"testo": "rifiuti"}, ""); got != "(rifiuti)" {
+		t.Errorf("single word = %q, want (rifiuti)", got)
+	}
+}

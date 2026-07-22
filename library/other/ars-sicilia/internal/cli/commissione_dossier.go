@@ -7,7 +7,6 @@ package cli
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -50,10 +49,14 @@ type dossierSection struct {
 }
 
 type dossierReport struct {
-	Commissione string           `json:"commissione"`
-	Legisl      int              `json:"legisl,omitempty"`
-	Conteggio   map[string]int   `json:"conteggio"`
-	Sezioni     []dossierSection `json:"sezioni"`
+	Commissione string         `json:"commissione"`
+	Legisl      int            `json:"legisl,omitempty"`
+	Conteggio   map[string]int `json:"conteggio"`
+	// Troncato lists the section labels where Conteggio is a --limit cap,
+	// not the true total: the portal had more matching records than were
+	// fetched. Re-run with a higher --limit to see the rest.
+	Troncato []string         `json:"troncato,omitempty"`
+	Sezioni  []dossierSection `json:"sezioni"`
 }
 
 func runCommissioneDossier(cmd *cobra.Command, flags *rootFlags, arg string, legisl, perSection int) error {
@@ -93,10 +96,12 @@ func runCommissioneDossier(cmd *cobra.Command, flags *rootFlags, arg string, leg
 		if legisl > 0 {
 			params["legisl"] = itoa(legisl)
 		}
+		var truncated bool
 		recs, err := c.Search(ctx, *arc, icaro.SearchOptions{
-			Params:   params,
-			Limit:    perSection,
-			MaxPages: maxInt(1, (perSection+9)/10),
+			Params:    params,
+			Limit:     perSection,
+			MaxPages:  maxInt(1, (perSection+9)/10),
+			Truncated: &truncated,
 		})
 		if err != nil {
 			return
@@ -114,6 +119,9 @@ func runCommissioneDossier(cmd *cobra.Command, flags *rootFlags, arg string, leg
 		}
 		report.Sezioni = append(report.Sezioni, s)
 		report.Conteggio[label] = len(s.Risultati)
+		if truncated {
+			report.Troncato = append(report.Troncato, label)
+		}
 	}
 
 	pickKey := nameKey
@@ -124,8 +132,6 @@ func runCommissioneDossier(cmd *cobra.Command, flags *rootFlags, arg string, leg
 	section("sommari", "sommari", pickKey)
 	section("pareri", "pareri", "commissione")
 	if !isNumeric {
-		// Filter DDL by relatore/commissione name as free-text (no commission
-		// field in DDL archive); use the testo path.
 		section("ddl", "ddl_assegnati", "testo")
 	}
 
@@ -139,16 +145,22 @@ func runCommissioneDossier(cmd *cobra.Command, flags *rootFlags, arg string, leg
 
 	out := cmd.OutOrStdout()
 	if flags.asJSON || !isTerminal(out) {
-		enc := json.NewEncoder(out)
-		enc.SetIndent("", "  ")
-		return enc.Encode(report)
+		return printJSONFiltered(out, report, flags)
 	}
 	fmt.Fprintf(out, "Commissione: %s\n", report.Commissione)
 	if report.Legisl > 0 {
 		fmt.Fprintf(out, "Legislatura: %d\n\n", report.Legisl)
 	}
+	troncato := map[string]bool{}
+	for _, label := range report.Troncato {
+		troncato[label] = true
+	}
 	for _, s := range report.Sezioni {
-		fmt.Fprintf(out, "[%s] %d risultati\n", s.Tipo, len(s.Risultati))
+		suffix := ""
+		if troncato[s.Tipo] {
+			suffix = " (troncato, aumenta --limit)"
+		}
+		fmt.Fprintf(out, "[%s] %d risultati%s\n", s.Tipo, len(s.Risultati), suffix)
 		for _, r := range s.Risultati {
 			fmt.Fprintf(out, "  #%v  %v  %v\n", r["doc_id"], r["data"], r["titolo"])
 		}

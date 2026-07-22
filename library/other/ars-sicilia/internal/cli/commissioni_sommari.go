@@ -51,14 +51,15 @@ func newCommissioniSommariCmd(flags *rootFlags) *cobra.Command {
 		},
 	}
 	cmd.Flags().IntVar(&flagLegisl, "legisl", 0, "Legislatura.")
-	cmd.Flags().StringVar(&flagCodcom, "codcom", "", "Codice commissione.")
+	cmd.Flags().StringVar(&flagCodcom, "codcom", "", "Codice commissione 1-6 (PRIMA..SESTA); in alternativa usa --commissione.")
 	cmd.Flags().StringVar(&flagCommis, "commissione", "", "Nome commissione.")
-	cmd.Flags().StringVar(&flagData, "data", "", "Data seduta (YYYY-MM-DD).")
+	cmd.Flags().StringVar(&flagData, "data", "", "Data seduta (YYYY-MM-DD; range con YYYY-MM-DD:YYYY-MM-DD).")
 	cmd.Flags().StringVar(&flagPresid, "presidente", "", "Nome del presidente di seduta.")
 	cmd.Flags().StringVar(&flagArgom, "argomento", "", "Argomento (free-text).")
 	cmd.Flags().StringVar(&flagTesto, "testo", "", "Ricerca testuale.")
 	cmd.Flags().StringVar(&flagISIS, "isis-query", "", "Espressione ISIS grezza (escape hatch).")
 	cmd.Flags().IntVar(&flagLimit, "limit", 10, "Max risultati da scaricare.")
 	cmd.Flags().IntVar(&flagMaxPages, "max-pages", 0, "Pagine massime (0 = auto).")
+	cmd.Flags().String("escludi", "", "Escludi i documenti che contengono questo termine (ISIS NOT).")
 	return cmd
 }

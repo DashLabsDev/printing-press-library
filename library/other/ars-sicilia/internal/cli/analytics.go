@@ -7,8 +7,8 @@ package cli
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	"fmt"
+	"os"
 	"sort"
 	"strings"
 
@@ -82,28 +82,41 @@ func runAnalytics(cmd *cobra.Command, flags *rootFlags, typ, groupBy string, lim
 
 	out := cmd.OutOrStdout()
 
+	var rows []analyticsRow
 	switch groupBy {
 	case "cofirmatari":
-		rows, err := pairCofirmatari(ctx, db.DB(), typ, legisl, limit)
-		if err != nil {
-			return err
-		}
-		return emitAnalytics(out, flags, rows)
+		rows, err = pairCofirmatari(ctx, db.DB(), typ, legisl, limit)
 	case "oratore", "oratori":
-		rows, err := groupOratori(ctx, db.DB(), legisl, limit)
-		if err != nil {
-			return err
-		}
-		return emitAnalytics(out, flags, rows)
+		rows, err = groupOratori(ctx, db.DB(), legisl, limit)
 	case "anno":
-		rows, err := groupByAnno(ctx, db.DB(), typ, legisl, limit)
-		if err != nil {
-			return err
-		}
-		return emitAnalytics(out, flags, rows)
+		rows, err = groupByAnno(ctx, db.DB(), typ, legisl, limit)
 	default:
 		return fmt.Errorf("group-by %q non supportato. Disponibili: cofirmatari, oratore, anno", groupBy)
 	}
+	if err != nil {
+		return err
+	}
+	// Empty result: hint on stderr (keeps JSON/CSV on stdout clean). Be honest
+	// about *why* it is empty and whether a sync can fix it.
+	if len(rows) == 0 {
+		switch groupBy {
+		case "cofirmatari":
+			// The firmatari are not in the short-list; only the deep sync
+			// extracts them from each ddl's detail page.
+			fmt.Fprintf(os.Stderr,
+				"hint: --group-by cofirmatari richiede i firmatari estratti dalle schede di dettaglio dei ddl. Esegui `ars-sicilia-pp-cli sync --resources ddl --deep` (più lento) e riprova; una sync normale non li popola.\n")
+		case "oratore", "oratori":
+			// The speakers live only in the full transcript, which no sync
+			// currently fetches or parses.
+			fmt.Fprintf(os.Stderr,
+				"hint: --group-by oratore non è alimentato dalla sync (gli oratori compaiono solo nel testo integrale dei resoconti, non estratto nello store). Vedi 'Known Gaps' nel README. Funzionano invece --group-by cofirmatari (con `sync --deep`) e --group-by anno.\n")
+		default:
+			fmt.Fprintf(os.Stderr,
+				"hint: nessun dato per --type %s --group-by %s. Lo store locale potrebbe non essere sincronizzato: esegui `ars-sicilia-pp-cli sync --resources %s` e riprova.\n",
+				typ, groupBy, typ)
+		}
+	}
+	return emitAnalytics(out, flags, rows)
 }
 
 // pairCofirmatari estrae le coppie di firmatari in un archivio (default: ddl)
@@ -210,7 +223,11 @@ func groupOratori(ctx context.Context, db *sql.DB, legisl, limit int) ([]analyti
 	return result, nil
 }
 
-// groupByAnno conta documenti per anno in un archivio.
+// groupByAnno conta documenti per anno in un archivio. L'anno va estratto
+// con iterDateKey (non un substr SQL a larghezza fissa): le date nello store
+// hanno larghezza variabile — "D.M.YY" per ddl, "DD.MM.YYYY" per leggi — e un
+// substr(-4) mescola mese e anno sulle date a una cifra (es. "5.3.26" ->
+// "3.26", non l'anno).
 func groupByAnno(ctx context.Context, db *sql.DB, typ string, legisl, limit int) ([]analyticsRow, error) {
 	whereLegisl := ""
 	args := []any{typ}
@@ -218,30 +235,52 @@ func groupByAnno(ctx context.Context, db *sql.DB, typ string, legisl, limit int)
 		whereLegisl = "AND json_extract(data, '$.legisl') = ? "
 		args = append(args, fmt.Sprintf("%d", legisl))
 	}
-	q := `SELECT substr(json_extract(data, '$.data'), -4) AS anno, COUNT(*) AS n
+	q := `SELECT json_extract(data, '$.data') AS data
 		FROM resources
 		WHERE resource_type = ?
 		` + whereLegisl + `
-		  AND substr(json_extract(data, '$.data'), -4) != ''
-		GROUP BY anno ORDER BY n DESC LIMIT ` + fmt.Sprintf("%d", limit)
+		  AND json_extract(data, '$.data') IS NOT NULL
+		  AND json_extract(data, '$.data') != ''`
 	rows, err := db.QueryContext(ctx, q, args...)
 	if err != nil {
 		return nil, fmt.Errorf("query anno: %w", err)
 	}
 	defer rows.Close()
-	var result []analyticsRow
+
+	counts := map[string]int{}
 	for rows.Next() {
-		var anno sql.NullString
-		var n int
-		if err := rows.Scan(&anno, &n); err != nil {
+		var raw sql.NullString
+		if err := rows.Scan(&raw); err != nil {
 			continue
 		}
-		result = append(result, analyticsRow{Chiave: anno.String, Conteggio: n})
+		if y := yearOf(raw.String); y != "" {
+			counts[y]++
+		}
 	}
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("lettura righe anno: %w", err)
 	}
+	result := make([]analyticsRow, 0, len(counts))
+	for k, v := range counts {
+		result = append(result, analyticsRow{Chiave: k, Conteggio: v})
+	}
+	sort.SliceStable(result, func(i, j int) bool { return result[i].Conteggio > result[j].Conteggio })
+	if len(result) > limit {
+		result = result[:limit]
+	}
 	return result, nil
+}
+
+// yearOf extracts the 4-digit year from an ICaro date via the shared date
+// parsers (iterDateKey handles both the "D.M.YY"/"DD.MM.YYYY" short-list
+// form and the "DD mese YYYY" document-body form), returning "" when the
+// date doesn't parse to a sortable "YYYY-MM-DD" key.
+func yearOf(dateStr string) string {
+	key := iterDateKey(dateStr)
+	if len(key) >= 5 && key[4] == '-' {
+		return key[:4]
+	}
+	return ""
 }
 
 // splitFirmatari divide una stringa di firmatari sui separatori comuni
@@ -267,16 +306,18 @@ func splitFirmatari(s string) []string {
 }
 
 func emitAnalytics(w interface{ Write(p []byte) (int, error) }, flags *rootFlags, rows []analyticsRow) error {
-	// JSON default for non-TTY and explicit --json.
+	// JSON default for non-TTY and explicit --json. --csv wins over the
+	// piped-JSON fallback, same precedence as emitRecords for */cerca.
 	asJSON := flags.asJSON
 	if !asJSON {
 		// Best-effort: emit table by default, JSON when stdout looks piped.
-		asJSON = !isTerminal(w)
+		asJSON = !isTerminal(w) && !flags.csv
 	}
 	if asJSON {
-		enc := json.NewEncoder(w)
-		enc.SetIndent("", "  ")
-		return enc.Encode(rows)
+		return printJSONFiltered(w, rows, flags)
+	}
+	if flags.csv {
+		return writeAnalyticsCSV(w, rows)
 	}
 	if len(rows) == 0 {
 		fmt.Fprintln(w, "Nessun dato. Esegui prima `ars-sicilia-pp-cli sync`.")
@@ -284,6 +325,14 @@ func emitAnalytics(w interface{ Write(p []byte) (int, error) }, flags *rootFlags
 	}
 	for _, r := range rows {
 		fmt.Fprintf(w, "%6d   %s\n", r.Conteggio, r.Chiave)
+	}
+	return nil
+}
+
+func writeAnalyticsCSV(w interface{ Write(p []byte) (int, error) }, rows []analyticsRow) error {
+	fmt.Fprintln(w, "chiave,conteggio,note")
+	for _, r := range rows {
+		fmt.Fprintf(w, "%s,%d,%s\n", csvEscape(r.Chiave), r.Conteggio, csvEscape(r.Note))
 	}
 	return nil
 }

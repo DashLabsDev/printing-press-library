@@ -1,0 +1,11 @@
+{
+  "schema_version": 2,
+  "id": "ars-sicilia-analytics-empty-hint",
+  "applied_at": "2026-06-28",
+  "base_run_id": "20260528-181840",
+  "base_printing_press_version": "4.18.0",
+  "summary": "analytics emette un hint su stderr quando il risultato è vuoto, group-by-aware: per cofirmatari/oratore avvisa che NON sono alimentati dalla sync attuale (un sync non risolve); per anno suggerisce sync. stdout JSON/CSV resta pulito.",
+  "reason": "Onboarding + onestà: cofirmatari/oratore sono strutturalmente vuoti (firmatari/oratori non estratti nello store), un hint generico 'rifai sync' manderebbe l'utente in loop.",
+  "files": ["internal/cli/analytics.go"],
+  "validated_outcome": "cofirmatari su DB vuoto -> hint 'non alimentato dalla sync'; anno -> hint 'esegui sync'."
+}

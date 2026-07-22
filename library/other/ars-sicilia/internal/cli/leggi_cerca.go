@@ -53,5 +53,6 @@ func newLeggiCercaCmd(flags *rootFlags) *cobra.Command {
 	cmd.Flags().StringVar(&flagISIS, "isis-query", "", "Espressione ISIS grezza che bypassa la traduzione automatica dei flag (escape hatch power-user).")
 	cmd.Flags().IntVar(&flagLimit, "limit", 10, "Max risultati da scaricare.")
 	cmd.Flags().IntVar(&flagMaxPages, "max-pages", 0, "Pagine massime da scaricare (0 = auto da --limit).")
+	cmd.Flags().String("escludi", "", "Escludi i documenti che contengono questo termine (ISIS NOT).")
 	return cmd
 }

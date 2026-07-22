@@ -51,5 +51,7 @@ func newMozioniCercaCmd(flags *rootFlags) *cobra.Command {
 	cmd.Flags().StringVar(&flagISIS, "isis-query", "", "Espressione ISIS grezza (escape hatch).")
 	cmd.Flags().IntVar(&flagLimit, "limit", 10, "Max risultati da scaricare.")
 	cmd.Flags().IntVar(&flagMaxPages, "max-pages", 0, "Pagine massime da scaricare (0 = auto da --limit).")
+	cmd.Flags().String("escludi", "", "Escludi i documenti che contengono questo termine (ISIS NOT).")
+	cmd.Flags().Bool("con-firmatari", false, "Includi l'elenco completo dei firmatari per ogni risultato: apre il documento di ogni riga (una richiesta in piu' per riga, piu' lento). Senza questo flag la lista mostra solo il primo firmatario, come il portale.")
 	return cmd
 }
