@@ -1670,9 +1670,9 @@
       "path": "library/other/ars-sicilia",
       "release": {
         "cli_name": "ars-sicilia-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.7.2",
+        "released_at": "2026-07-22T23:44:43Z",
+        "source_commit": "a62175effa0fcba673c8a73b73c34a7a58b03f17"
       },
       "printer": "aborruso",
       "printer_name": "aborruso"
@@ -4223,6 +4223,12 @@
         "Diff against history only possible with the local snapshot; replaces $199+/mo Ahrefs queries."
       ],
       "path": "library/marketing/dataforseo",
+      "release": {
+        "cli_name": "dataforseo-pp-cli",
+        "version": "2026.7.1",
+        "released_at": "2026-07-21T05:40:08Z",
+        "source_commit": "14529fb037d1b0345280dba2013667e996eb228f"
+      },
       "printer": "Mazzsterr",
       "printer_name": "Mazzsterr",
       "creator": {
@@ -6501,6 +6507,12 @@
         "handle": "neektza",
         "name": "Nikica Jokic"
       },
+      "contributors": [
+        {
+          "handle": "shanegardner405-arch",
+          "name": "Shane Gardner"
+        }
+      ],
       "mcp": {
         "binary": "fireflies-pp-mcp",
         "transports": [
