@@ -8733,6 +8733,64 @@
       }
     },
     {
+      "name": "home-assistant",
+      "category": "devices",
+      "api": "Home Assistant",
+      "description": "Safe household actions, offline memory, and evidence-backed answers on top of the full Home Assistant control surface.",
+      "search_terms": [
+        "home-assistant",
+        "Home Assistant",
+        "home-assistant-pp-cli",
+        "Safe household actions, offline memory, and evidence-backed answers on top of the full Home Assistant control surface.",
+        "Verified household mode",
+        "mode run",
+        "Preview a scene or script, run it, and verify every resulting entity state.",
+        "Household exception check",
+        "house check",
+        "See open windows, unlocked locks, lights left on, low batteries, and unavailable safety devices in one answer.",
+        "Routine incident explanation",
+        "routine why",
+        "Reconstruct why an automation or script failed from traces, state changes, logbook entries, and errors.",
+        "Routine reference lint",
+        "routine lint",
+        "Find missing entities, unavailable services, disabled dependencies, ambiguous names, and stale routine references.",
+        "Routine impact graph",
+        "routine impact",
+        "See every automation, script, scene, helper, and service target affected by changing one entity or routine.",
+        "Mechanical household recap",
+        "house recap",
+        "Review factual household activity, routine failures, presence changes, openings, and unavailable time for a recent period.",
+        "Health hotspot grouping",
+        "health hotspots",
+        "Group recurring unavailable, stale, low-battery, and disconnecting entities into device, room, integration, and radio hotspots.",
+        "Standby energy finder",
+        "energy standby",
+        "Find devices drawing persistent power during explicit periods when related household states show inactivity."
+      ],
+      "path": "library/devices/home-assistant",
+      "printer": "Avanderheyde",
+      "printer_name": "avanderheyde",
+      "creator": {
+        "handle": "Avanderheyde",
+        "name": "avanderheyde"
+      },
+      "mcp": {
+        "binary": "home-assistant-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 18,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "HOME_ASSISTANT_BEARER_AUTH"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "hotel-goat",
       "category": "travel",
       "api": "Hotel GOAT",
@@ -9267,9 +9325,9 @@
       "path": "library/sales-and-crm/intercom",
       "release": {
         "cli_name": "intercom-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.7.2",
+        "released_at": "2026-07-24T23:53:50Z",
+        "source_commit": "d9a38adb198c39bd0f7a9ba69b6e7c528821a570"
       },
       "printer": "rob-coco",
       "printer_name": "Rob Zehner",
@@ -9440,9 +9498,9 @@
       "path": "library/health/janeapp",
       "release": {
         "cli_name": "janeapp-pp-cli",
-        "version": "2026.7.2",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.7.3",
+        "released_at": "2026-07-24T23:54:34Z",
+        "source_commit": "9b267a7c130bfce3103680e7d348db99dceb03ee"
       },
       "printer": "omarshahine",
       "printer_name": "Omar Shahine",
