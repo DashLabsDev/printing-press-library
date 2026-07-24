@@ -9277,10 +9277,17 @@
         "handle": "rob-coco",
         "name": "Rob Zehner"
       },
+      "contributors": [
+        {
+          "handle": "francobee",
+          "name": "Francis Battikha"
+        }
+      ],
       "mcp": {
         "binary": "intercom-pp-mcp",
         "transports": [
-          "stdio"
+          "stdio",
+          "http"
         ],
         "tool_count": 133,
         "public_tool_count": 0,
@@ -19263,9 +19270,9 @@
       "path": "library/travel/uk-train-goat",
       "release": {
         "cli_name": "uk-train-goat-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.7.2",
+        "released_at": "2026-07-24T23:52:48Z",
+        "source_commit": "7a042318377fae2cc8f4c75ca3ac1a62f2406c2e"
       },
       "printer": "ahujasachin92",
       "printer_name": "Sachin Ahuja",
