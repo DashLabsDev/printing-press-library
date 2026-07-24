@@ -6076,9 +6076,9 @@
       "path": "library/commerce/facebook-marketplace",
       "release": {
         "cli_name": "facebook-marketplace-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.7.2",
+        "released_at": "2026-07-24T21:48:16Z",
+        "source_commit": "4284da0c1dc87350730413e12d93e8467aff2676"
       },
       "printer": "cathrynlavery",
       "printer_name": "Cathryn Lavery",
@@ -6497,9 +6497,9 @@
       "path": "library/productivity/fireflies",
       "release": {
         "cli_name": "fireflies-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.7.2",
+        "released_at": "2026-07-22T23:47:18Z",
+        "source_commit": "1d8f5ec4082e340335925f347776a05c4e37e28d"
       },
       "printer": "neektza",
       "printer_name": "Nikica Jokic",
@@ -7304,9 +7304,9 @@
       "path": "library/productivity/giustizia-amministrativa",
       "release": {
         "cli_name": "giustizia-amministrativa-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.7.2",
+        "released_at": "2026-07-23T07:01:06Z",
+        "source_commit": "14a3685ce9929e28fe44aabd980d8bda8f53088b"
       },
       "printer": "aborruso",
       "printer_name": "aborruso",
@@ -12618,9 +12618,9 @@
       "path": "library/developer-tools/openipa",
       "release": {
         "cli_name": "openipa-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.7.2",
+        "released_at": "2026-07-22T23:47:53Z",
+        "source_commit": "c2650e8c0ce05232866619d68c3d68b5536c9576"
       },
       "printer": "aborruso",
       "printer_name": "aborruso",
@@ -20624,6 +20624,52 @@
         ],
         "mcp_ready": "full",
         "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "zameen",
+      "category": "commerce",
+      "api": "Zameen",
+      "description": "Search Zameen.com property listings from your terminal — real filters, an offline SQLite mirror, saved-search monitoring, and price-drop alerts no scraper offers.",
+      "search_terms": [
+        "zameen",
+        "zameen-pp-cli",
+        "Search Zameen.com property listings from your terminal — real filters, an offline SQLite mirror, saved-search monitoring, and price-drop alerts no scraper offers.",
+        "Saved-search cross-run diff",
+        "watch",
+        "Re-run a saved search and see exactly which listings are new and which dropped in price since last time.",
+        "Area price research",
+        "comps",
+        "Median price, price-per-Marla, and inventory count for an area or society, computed from your synced listings.",
+        "Below-market plot-file detector",
+        "deals",
+        "Ranks scanned listings by how far under the area's price-per-Marla they sit and flags below-market files.",
+        "Days-on-market / aging inventory",
+        "aging",
+        "Lists the longest-standing inventory by days-on-market, derived from each listing's update timestamp.",
+        "Agency inventory leaderboard",
+        "agencies",
+        "Ranks agencies by listing count and median asking price in an area, from your synced listings."
+      ],
+      "path": "library/commerce/zameen",
+      "printer": "qazmataz",
+      "printer_name": "qazmataz",
+      "creator": {
+        "handle": "qazmataz",
+        "name": "qazmataz"
+      },
+      "mcp": {
+        "binary": "zameen-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 1,
+        "public_tool_count": 1,
+        "auth_type": "none",
+        "env_vars": [],
+        "mcp_ready": "full",
+        "spec_format": "internal"
       }
     },
     {
