@@ -6,8 +6,6 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/mvanhorn/printing-press-library/library/productivity/granola/internal/store"
-	"github.com/spf13/cobra"
 	"net/url"
 	"os"
 	"regexp"
@@ -16,6 +14,9 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/mvanhorn/printing-press-library/library/productivity/granola/internal/store"
+	"github.com/spf13/cobra"
 )
 
 // unresolvedPathKeyRE matches `{key}` placeholders left in a sync path
@@ -159,13 +160,19 @@ Exit codes & warnings:
 			effectiveLatestOnly := latestOnly && since == ""
 
 			// Resolve --since into an RFC3339 timestamp
+			//
+			// PATCH(api-list-stage-matches-live-contract): normalize to UTC
+			// before formatting. time.RFC3339 on a local time renders a
+			// numeric offset ("2026-07-18T09:00:00-07:00"), which Granola's
+			// public API rejects with `updated_after: Invalid date`; the Z
+			// form is accepted. Verified live against /v1/notes.
 			sinceTS := ""
 			if since != "" {
 				ts, err := parseSinceDuration(since)
 				if err != nil {
 					return fmt.Errorf("invalid --since value %q: %w", since, err)
 				}
-				sinceTS = ts.Format(time.RFC3339)
+				sinceTS = granolaAPITimestamp(ts)
 			}
 
 			// Worker pool: produce resources, N workers consume
@@ -360,7 +367,10 @@ func syncResource(c interface {
 	sinceParam := syncResourceSinceParam(resource)
 	effectiveSince := sinceTS
 	if effectiveSince == "" && !lastSynced.IsZero() && !full {
-		effectiveSince = lastSynced.Format(time.RFC3339)
+		// PATCH(api-list-stage-matches-live-contract): UTC for the same
+		// reason as the --since path above; a stored local-zone checkpoint
+		// would otherwise 400 the whole resource on the next incremental run.
+		effectiveSince = granolaAPITimestamp(lastSynced)
 	}
 	// Resources whose list endpoint declares no temporal-filter parameter
 	// fall back to plain pagination — sending a synthetic since=... would
@@ -597,11 +607,29 @@ type paginationDefaults struct {
 
 // determinePaginationDefaults returns the pagination parameter names to use.
 // Values are detected from the API spec by the profiler at generation time.
+// granolaAPITimestamp renders a timestamp in the only RFC3339 shape Granola's
+// public API accepts.
+//
+// PATCH(api-list-stage-matches-live-contract): time.RFC3339 on a local-zone
+// time produces a numeric offset ("2026-07-18T09:00:00-07:00"), which the API
+// rejects with `updated_after: Invalid date`; the UTC Z form is accepted.
+// Verified live. Every call site that sends a temporal filter must route
+// through this helper — the failure is a whole-resource 400, not a bad row.
+func granolaAPITimestamp(ts time.Time) string {
+	return ts.UTC().Format(time.RFC3339)
+}
+
+// PATCH(api-list-stage-matches-live-contract): the generated default of 100
+// exceeded Granola's documented and enforced page_size ceiling of 30, so every
+// list request 400'd with `page_size: Number must be less than or equal to 30`
+// and the API sync path could never complete. Verified live against /v1/notes
+// and /v1/folders: 30 succeeds, 31 fails. A regen must re-read the ceiling from
+// the spec rather than restoring a generic default.
 func determinePaginationDefaults() paginationDefaults {
 	return paginationDefaults{
 		cursorParam: "cursor",
 		limitParam:  "page_size",
-		limit:       100,
+		limit:       30,
 	}
 }
 

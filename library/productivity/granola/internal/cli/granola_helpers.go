@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -108,8 +109,23 @@ func backfillDocumentsFromStore(c *granola.Cache) error {
 // openGranolaStore opens (or creates) the SQLite store and ensures the
 // granola-specific schema is in place.
 func openGranolaStore(ctx context.Context) (*store.Store, error) {
-	dbPath := defaultDBPath("granola-pp-cli")
-	if err := os.MkdirAll(strings.TrimSuffix(dbPath, "/data.db"), 0o755); err != nil {
+	return openGranolaStoreAt(ctx, "")
+}
+
+// openGranolaStoreAt opens the Granola domain store at an explicit path,
+// falling back to the default location when dbPath is empty.
+//
+// PATCH(api-list-stage-matches-live-contract): the sync commands expose a
+// --db flag, but it previously reached only the generated generic store, so a
+// caller pointing --db at a scratch database still had the domain tables
+// (meetings, attendees, transcript_segments, folder_memberships) written to
+// the default store. Honoring the override here keeps --db meaningful for the
+// tables the read commands actually consume.
+func openGranolaStoreAt(ctx context.Context, dbPath string) (*store.Store, error) {
+	if dbPath == "" {
+		dbPath = defaultDBPath("granola-pp-cli")
+	}
+	if err := os.MkdirAll(filepath.Dir(dbPath), 0o755); err != nil {
 		return nil, fmt.Errorf("creating data dir: %w", err)
 	}
 	s, err := store.OpenWithContext(ctx, dbPath)
