@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -213,8 +214,16 @@ func TestGetNote_NotFoundIsTyped(t *testing.T) {
 	}
 }
 
+// TestGetNote_UnauthorizedIsTyped also pins the 401/403 split. Both mean the
+// credential was rejected, so both keep matching ErrAPIUnauthorized (the CLI's
+// auth exit code and hint hang off that). Only 403 additionally matches
+// ErrAPIForbidden, which is what lets a caller iterating note ids skip the one
+// note it may not read instead of discarding a whole run.
 func TestGetNote_UnauthorizedIsTyped(t *testing.T) {
-	for _, status := range []int{http.StatusUnauthorized, http.StatusForbidden} {
+	for status, wantForbidden := range map[int]bool{
+		http.StatusUnauthorized: false,
+		http.StatusForbidden:    true,
+	} {
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(status)
 			_, _ = w.Write([]byte(`{"error":"unauthorized"}`))
@@ -226,6 +235,9 @@ func TestGetNote_UnauthorizedIsTyped(t *testing.T) {
 		}
 		if errors.Is(err, ErrNoteNotFound) {
 			t.Errorf("status %d must not classify as not-found", status)
+		}
+		if got := errors.Is(err, ErrAPIForbidden); got != wantForbidden {
+			t.Errorf("status %d: errors.Is(err, ErrAPIForbidden) = %v, want %v", status, got, wantForbidden)
 		}
 	}
 }
@@ -683,6 +695,171 @@ func TestBothPathsOnSameMeeting_NoPrimaryKeyCollision(t *testing.T) {
 		"API rows remained after the cache took ownership of this meeting's transcript")
 }
 
+// TestSharedMeetingKeepsAPIOwnershipAcrossCacheSync covers the collision the
+// two survival tests above never reach: a meeting BOTH paths know. They use
+// disjoint meeting ids, so the ON CONFLICT branch of the cache sync's meeting,
+// attendee, and membership writes never ran — and while those writes were
+// INSERT OR REPLACE, SQLite deleted the existing row and inserted a fresh one,
+// flipping row_source from 'api' to 'cache' and blanking every column only the
+// API carries. The row survived by count while its contents were destroyed.
+func TestSharedMeetingKeepsAPIOwnershipAcrossCacheSync(t *testing.T) {
+	ctx := context.Background()
+	db := openTestDB(t)
+	if _, err := SyncFromAPI(ctx, db, []APINote{decodeNote(t, noteDetailWithTranscriptJSON)}); err != nil {
+		t.Fatalf("SyncFromAPI: %v", err)
+	}
+
+	// The cache's view of the SAME meeting, which is what openGranolaCache's
+	// store backfill produces: title only, no summary, no calendar event, no
+	// valid_meeting flag. Every field below is weaker than what the API wrote.
+	cache := &Cache{
+		Documents: map[string]Document{"note_alpha": {
+			ID: "note_alpha", Title: "Quarterly planning sync",
+			People: &DocPeople{Attendees: []DocPerson{
+				// Same (meeting_id, email) key the API already owns: no name,
+				// plus an RSVP only the cache carries.
+				{Email: "ada@example.com", ResponseStatus: "accepted"},
+			}},
+		}},
+		Transcripts:           map[string][]TranscriptSegment{},
+		DocumentLists:         map[string][]string{"folder_roadmap": {"note_alpha"}},
+		DocumentListsMetadata: map[string]DocumentListMetadata{"folder_roadmap": {ID: "folder_roadmap", Title: "Roadmap"}},
+	}
+	if _, err := SyncFromCache(ctx, db, cache); err != nil {
+		t.Fatalf("SyncFromCache: %v", err)
+	}
+
+	var (
+		rowSource, notesMD, notesPlain, calEvent string
+		validMeeting                             int
+	)
+	if err := db.QueryRowContext(ctx, `SELECT row_source, notes_markdown, notes_plain,
+		calendar_event_id, valid_meeting FROM meetings WHERE id='note_alpha'`).Scan(
+		&rowSource, &notesMD, &notesPlain, &calEvent, &validMeeting); err != nil {
+		t.Fatalf("reading the shared meeting: %v", err)
+	}
+	if rowSource != RowSourceAPI {
+		t.Errorf("meeting row_source = %q, want %q: the cache sync took ownership of a row the API created, so the next API sync's scoped DELETE can no longer reach it", rowSource, RowSourceAPI)
+	}
+	if !strings.Contains(notesMD, "Agreed the quarterly milestones.") {
+		t.Errorf("notes_markdown = %q, want the API summary: a cache sync blanked a column only the API carries", notesMD)
+	}
+	if notesPlain == "" {
+		t.Error("notes_plain was blanked by the cache sync")
+	}
+	if calEvent != "evt_alpha_001" {
+		t.Errorf("calendar_event_id = %q, want evt_alpha_001", calEvent)
+	}
+	if validMeeting != 1 {
+		t.Errorf("valid_meeting = %d, want 1", validMeeting)
+	}
+
+	// Attendees share the (meeting_id, email) primary key, so the same REPLACE
+	// hazard applies: the API's resolved name must survive a nameless cache
+	// record, and the cache's RSVP must merge in without taking ownership.
+	var attRowSource, attName, attRSVP string
+	if err := db.QueryRowContext(ctx, `SELECT row_source, name, response_status
+		FROM attendees WHERE meeting_id='note_alpha' AND email='ada@example.com'`).Scan(
+		&attRowSource, &attName, &attRSVP); err != nil {
+		t.Fatalf("reading the shared attendee: %v", err)
+	}
+	if attRowSource != RowSourceAPI {
+		t.Errorf("attendee row_source = %q, want %q", attRowSource, RowSourceAPI)
+	}
+	if attName != "Ada Placeholder" {
+		t.Errorf("attendee name = %q, want the API-resolved name: a nameless cache record overwrote it", attName)
+	}
+	if attRSVP != "accepted" {
+		t.Errorf("attendee response_status = %q, want accepted: the cache's contribution should merge in", attRSVP)
+	}
+
+	// folder_memberships carries no payload beyond its key pair, so the only
+	// thing a REPLACE could destroy there is the ownership marker itself.
+	var memRowSource string
+	if err := db.QueryRowContext(ctx, `SELECT row_source FROM folder_memberships
+		WHERE folder_id='folder_roadmap' AND meeting_id='note_alpha'`).Scan(&memRowSource); err != nil {
+		t.Fatalf("reading the shared folder membership: %v", err)
+	}
+	if memRowSource != RowSourceAPI {
+		t.Errorf("folder membership row_source = %q, want %q", memRowSource, RowSourceAPI)
+	}
+	assertCount(t, db, `SELECT COUNT(*) FROM folder_memberships WHERE meeting_id='note_alpha'`, 2,
+		"the shared membership was duplicated rather than merged")
+}
+
+// TestSharedMeetingKeepsCacheOwnershipAcrossAPISync is the mirror direction:
+// a cache-created meeting keeps row_source='cache' and its cache-only columns
+// when an API sync touches the same id.
+func TestSharedMeetingKeepsCacheOwnershipAcrossAPISync(t *testing.T) {
+	ctx := context.Background()
+	db := openTestDB(t)
+	cache := &Cache{
+		Documents: map[string]Document{"note_alpha": {
+			ID: "note_alpha", Title: "Quarterly planning sync",
+			// workspace_id, creation_source and the RSVP are cache-only: the
+			// public API has no equivalent field to carry them.
+			WorkspaceID: "ws_cache_001", CreationSource: "granola_desktop",
+			ValidMeeting: true,
+			People: &DocPeople{Attendees: []DocPerson{
+				{Name: "Ada Placeholder", Email: "ada@example.com", ResponseStatus: "accepted"},
+			}},
+		}},
+		Transcripts:           map[string][]TranscriptSegment{},
+		DocumentLists:         map[string][]string{"folder_roadmap": {"note_alpha"}},
+		DocumentListsMetadata: map[string]DocumentListMetadata{"folder_roadmap": {ID: "folder_roadmap", Title: "Roadmap"}},
+	}
+	if _, err := SyncFromCache(ctx, db, cache); err != nil {
+		t.Fatalf("SyncFromCache: %v", err)
+	}
+	if _, err := SyncFromAPI(ctx, db, []APINote{decodeNote(t, noteDetailWithTranscriptJSON)}); err != nil {
+		t.Fatalf("SyncFromAPI: %v", err)
+	}
+
+	var rowSource, workspaceID, creationSource string
+	var validMeeting int
+	if err := db.QueryRowContext(ctx, `SELECT row_source, workspace_id, creation_source, valid_meeting
+		FROM meetings WHERE id='note_alpha'`).Scan(&rowSource, &workspaceID, &creationSource, &validMeeting); err != nil {
+		t.Fatalf("reading the shared meeting: %v", err)
+	}
+	if rowSource != RowSourceCache {
+		t.Errorf("meeting row_source = %q, want %q: the API sync took ownership of a row the cache created", rowSource, RowSourceCache)
+	}
+	if workspaceID != "ws_cache_001" {
+		t.Errorf("workspace_id = %q, want ws_cache_001: the API sync blanked a cache-only column", workspaceID)
+	}
+	if creationSource != "granola_desktop" {
+		t.Errorf("creation_source = %q, want granola_desktop", creationSource)
+	}
+	if validMeeting != 1 {
+		t.Errorf("valid_meeting = %d, want 1", validMeeting)
+	}
+
+	var attRowSource, attName, attRSVP string
+	if err := db.QueryRowContext(ctx, `SELECT row_source, name, response_status
+		FROM attendees WHERE meeting_id='note_alpha' AND email='ada@example.com'`).Scan(
+		&attRowSource, &attName, &attRSVP); err != nil {
+		t.Fatalf("reading the shared attendee: %v", err)
+	}
+	if attRowSource != RowSourceCache {
+		t.Errorf("attendee row_source = %q, want %q", attRowSource, RowSourceCache)
+	}
+	if attName != "Ada Placeholder" {
+		t.Errorf("attendee name = %q, want Ada Placeholder", attName)
+	}
+	if attRSVP != "accepted" {
+		t.Errorf("attendee response_status = %q, want accepted: the API carries no RSVP and must not blank one", attRSVP)
+	}
+
+	var memRowSource string
+	if err := db.QueryRowContext(ctx, `SELECT row_source FROM folder_memberships
+		WHERE folder_id='folder_roadmap' AND meeting_id='note_alpha'`).Scan(&memRowSource); err != nil {
+		t.Fatalf("reading the shared folder membership: %v", err)
+	}
+	if memRowSource != RowSourceCache {
+		t.Errorf("folder membership row_source = %q, want %q", memRowSource, RowSourceCache)
+	}
+}
+
 // TestEnsureSchema_AdditiveOnLegacyDatabase: EnsureSchema runs against
 // databases created before row_source existed. The new columns must be added
 // in place, existing rows backfilled to 'cache' (which is what they in fact
@@ -749,6 +926,101 @@ func TestEnsureSchema_AdditiveOnLegacyDatabase(t *testing.T) {
 	}
 	assertCount(t, db, `SELECT COUNT(*) FROM transcript_segments WHERE meeting_id='legacy_note'`, 1,
 		"legacy segment lost after an API sync")
+}
+
+// ---------------------------------------------------------------------------
+// Unparseable transcript timestamps.
+// ---------------------------------------------------------------------------
+
+// TestSyncFromCache_ReportsUnparseableTimestamps: isoToMillis returns 0 on a
+// parse failure and the read path treats start_ts_ms == 0 as "no timestamp",
+// so a timestamp format this CLI does not recognise degrades to a blank time
+// with no error anywhere. The sync must still store the segment, and must
+// count what it could not parse.
+func TestSyncFromCache_ReportsUnparseableTimestamps(t *testing.T) {
+	ctx := context.Background()
+	db := openTestDB(t)
+	cache := &Cache{
+		Documents: map[string]Document{"cache_note": {ID: "cache_note", Title: "Cache meeting"}},
+		Transcripts: map[string][]TranscriptSegment{"cache_note": {
+			// A shape ParseISO does not accept, as a live-API format change
+			// would produce.
+			{Source: "microphone", Text: "bad start", StartTimestamp: "07/01/2026 3:00 PM", EndTimestamp: "2026-06-01T10:00:10Z"},
+			// Empty timestamps are a normal, already-handled case and must not
+			// be counted as failures.
+			{Source: "system", Text: "no timestamps at all"},
+		}},
+	}
+	res, err := SyncFromCache(ctx, db, cache)
+	if err != nil {
+		t.Fatalf("one unparseable timestamp must not fail the sync: %v", err)
+	}
+	if res.Segments != 2 {
+		t.Errorf("segments = %d, want 2: the segment is still worth storing without its timestamp", res.Segments)
+	}
+	if res.UnparsedTimestamps != 1 {
+		t.Errorf("UnparsedTimestamps = %d, want 1", res.UnparsedTimestamps)
+	}
+	for _, want := range []string{"cache_note", "start_timestamp", "07/01/2026 3:00 PM"} {
+		if !strings.Contains(res.TimestampWarning, want) {
+			t.Errorf("TimestampWarning = %q, want it to name %q", res.TimestampWarning, want)
+		}
+	}
+	// And the failure really did land as the blank-on-read 0 the warning
+	// describes, so the message is not overstating the problem.
+	assertCount(t, db, `SELECT COUNT(*) FROM transcript_segments WHERE meeting_id='cache_note' AND start_ts_ms=0`, 2,
+		"unparseable and empty timestamps both store as 0")
+}
+
+// TestSyncFromAPI_ReportsUnparseableTimestamps is the same guard on the API
+// path, where a live format change is far more likely to appear first.
+func TestSyncFromAPI_ReportsUnparseableTimestamps(t *testing.T) {
+	ctx := context.Background()
+	db := openTestDB(t)
+	note := decodeNote(t, noteDetailWithTranscriptJSON)
+	note.Transcript[1].StartTime = "1751382030"
+
+	res, err := SyncFromAPI(ctx, db, []APINote{note})
+	if err != nil {
+		t.Fatalf("one unparseable timestamp must not fail the sync: %v", err)
+	}
+	if res.Segments != 3 {
+		t.Errorf("segments = %d, want 3", res.Segments)
+	}
+	if res.UnparsedTimestamps != 1 {
+		t.Errorf("UnparsedTimestamps = %d, want 1", res.UnparsedTimestamps)
+	}
+	for _, want := range []string{"note_alpha", "segment 1", "start_time", "1751382030"} {
+		if !strings.Contains(res.TimestampWarning, want) {
+			t.Errorf("TimestampWarning = %q, want it to name %q", res.TimestampWarning, want)
+		}
+	}
+}
+
+// TestSyncResults_SilentWhenEveryTimestampParses keeps the accounting from
+// becoming noise on a healthy sync.
+func TestSyncResults_SilentWhenEveryTimestampParses(t *testing.T) {
+	ctx := context.Background()
+	db := openTestDB(t)
+	apiRes, err := SyncFromAPI(ctx, db, []APINote{decodeNote(t, noteDetailWithTranscriptJSON)})
+	if err != nil {
+		t.Fatalf("SyncFromAPI: %v", err)
+	}
+	if apiRes.UnparsedTimestamps != 0 || apiRes.TimestampWarning != "" {
+		t.Errorf("clean API sync reported %d unparsed timestamps (%q)", apiRes.UnparsedTimestamps, apiRes.TimestampWarning)
+	}
+	cacheRes, err := SyncFromCache(ctx, db, &Cache{
+		Documents: map[string]Document{"cache_note": {ID: "cache_note", Title: "Cache meeting"}},
+		Transcripts: map[string][]TranscriptSegment{"cache_note": {
+			{Source: "microphone", Text: "cache line", StartTimestamp: "2026-06-01T10:00:00Z", EndTimestamp: "2026-06-01T10:00:10Z"},
+		}},
+	})
+	if err != nil {
+		t.Fatalf("SyncFromCache: %v", err)
+	}
+	if cacheRes.UnparsedTimestamps != 0 || cacheRes.TimestampWarning != "" {
+		t.Errorf("clean cache sync reported %d unparsed timestamps (%q)", cacheRes.UnparsedTimestamps, cacheRes.TimestampWarning)
+	}
 }
 
 func assertCount(t *testing.T, db *sql.DB, query string, want int, msg string) {

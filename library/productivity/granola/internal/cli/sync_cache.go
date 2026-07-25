@@ -35,6 +35,14 @@ type CacheSyncResult struct {
 	HydrateErr       error
 	StateWriteErr    error
 	Duration         time.Duration
+
+	// PATCH(api-detail-hydrate): transcript timestamps the store layer could
+	// not parse. Non-fatal like HydrateErr, but it must reach the operator:
+	// an unparseable timestamp is stored as 0 and reads back blank, so without
+	// this the only symptom of an upstream format change is transcripts that
+	// quietly lose their times.
+	UnparsedTimestamps int
+	TimestampWarning   string
 }
 
 // TotalRows is the headline count used by the auto-refresh provenance line.
@@ -91,6 +99,9 @@ The hydration is idempotent: re-running replaces every row.`,
 			if res.HydrateErr != nil {
 				summary["documents_fetch_error"] = res.HydrateErr.Error()
 			}
+			if res.UnparsedTimestamps > 0 {
+				summary["unparsed_timestamps"] = res.UnparsedTimestamps
+			}
 			b, _ := json.Marshal(summary)
 			fmt.Fprintln(cmd.OutOrStdout(), string(b))
 			// Surface the hydrate error as a non-fatal warning to stderr
@@ -102,6 +113,9 @@ The hydration is idempotent: re-running replaces every row.`,
 			}
 			if res.StateWriteErr != nil {
 				fmt.Fprintf(cmd.ErrOrStderr(), "warning: failed to write sync state: %v\n", res.StateWriteErr)
+			}
+			if res.TimestampWarning != "" {
+				fmt.Fprintf(cmd.ErrOrStderr(), "warning: %s\n", res.TimestampWarning)
 			}
 			return nil
 		},
@@ -158,6 +172,9 @@ func runCacheSync(ctx context.Context) (CacheSyncResult, error) {
 		DocumentsFetched: docsFetched,
 		HydrateErr:       hydrateErr,
 		Duration:         time.Since(started),
+
+		UnparsedTimestamps: sres.UnparsedTimestamps,
+		TimestampWarning:   sres.TimestampWarning,
 	}
 	// PATCH(encrypted-cache): record success so doctor can report
 	// "ok (last decrypted: <time>)" without itself decrypting.

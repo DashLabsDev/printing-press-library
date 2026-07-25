@@ -267,6 +267,12 @@ type SyncResult struct {
 	Workspaces   int `json:"workspaces"`
 	ChatThreads  int `json:"chat_threads"`
 	ChatMessages int `json:"chat_messages"`
+
+	// UnparsedTimestamps counts transcript segment timestamps this run could
+	// not parse; TimestampWarning is the operator-facing line describing them.
+	// Both are zero/empty on a healthy sync. See timestampFailures.
+	UnparsedTimestamps int    `json:"unparsed_timestamps,omitempty"`
+	TimestampWarning   string `json:"timestamp_warning,omitempty"`
 }
 
 // SyncFromCache pushes every row from cache into the SQLite store. Uses
@@ -290,6 +296,7 @@ func SyncFromCache(ctx context.Context, db *sql.DB, cache *Cache) (SyncResult, e
 			_ = tx.Rollback()
 		}
 	}()
+	var badTimestamps timestampFailures
 
 	// meetings + attendees + transcripts
 	for id, doc := range cache.Documents {
@@ -311,12 +318,36 @@ func SyncFromCache(ctx context.Context, db *sql.DB, cache *Cache) (SyncResult, e
 		if doc.ValidMeeting {
 			valid = 1
 		}
-		_, err := tx.ExecContext(ctx, `INSERT OR REPLACE INTO meetings(
+		// PATCH(api-detail-hydrate): merge instead of REPLACE. SQLite's
+		// REPLACE deletes the existing row and inserts a new one, so on a
+		// meeting both paths know it flipped row_source from 'api' to
+		// 'cache' and blanked every field only the API carries. That
+		// silently transferred ownership and discarded API data, breaking
+		// the documented "each path clears only the rows it owns"
+		// guarantee. ON CONFLICT DO UPDATE merges, and row_source is
+		// deliberately absent from the SET list so the creating path keeps
+		// ownership.
+		_, err := tx.ExecContext(ctx, `INSERT INTO meetings(
 			id, title, created_at, updated_at, started_at, ended_at, workspace_id,
 			calendar_event_id, deleted_at, notes_markdown, notes_plain,
 			transcript_available, recipes_applied, creation_source, valid_meeting,
 			row_source
-		) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+		) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+		ON CONFLICT(id) DO UPDATE SET
+			title                = COALESCE(NULLIF(excluded.title, ''), meetings.title),
+			created_at           = COALESCE(NULLIF(excluded.created_at, ''), meetings.created_at),
+			updated_at           = COALESCE(NULLIF(excluded.updated_at, ''), meetings.updated_at),
+			started_at           = COALESCE(NULLIF(excluded.started_at, ''), meetings.started_at),
+			ended_at             = COALESCE(NULLIF(excluded.ended_at, ''), meetings.ended_at),
+			workspace_id         = COALESCE(NULLIF(excluded.workspace_id, ''), meetings.workspace_id),
+			calendar_event_id    = COALESCE(NULLIF(excluded.calendar_event_id, ''), meetings.calendar_event_id),
+			deleted_at           = COALESCE(NULLIF(excluded.deleted_at, ''), meetings.deleted_at),
+			notes_markdown       = COALESCE(NULLIF(excluded.notes_markdown, ''), meetings.notes_markdown),
+			notes_plain          = COALESCE(NULLIF(excluded.notes_plain, ''), meetings.notes_plain),
+			transcript_available = MAX(excluded.transcript_available, meetings.transcript_available),
+			recipes_applied      = COALESCE(NULLIF(excluded.recipes_applied, ''), meetings.recipes_applied),
+			creation_source      = COALESCE(NULLIF(excluded.creation_source, ''), meetings.creation_source),
+			valid_meeting        = MAX(excluded.valid_meeting, meetings.valid_meeting)`,
 			id, doc.Title, doc.CreatedAt, doc.UpdatedAt, startedAt, endedAt,
 			doc.WorkspaceID, calEvent, deletedAt, doc.NotesMarkdown, doc.NotesPlain,
 			transcriptAvail, string(recipesJSON), doc.CreationSource, valid,
@@ -346,7 +377,13 @@ func SyncFromCache(ctx context.Context, db *sql.DB, cache *Cache) (SyncResult, e
 			}
 		}
 		for em, a := range emails {
-			_, err := tx.ExecContext(ctx, `INSERT OR REPLACE INTO attendees(meeting_id,email,name,response_status,row_source) VALUES (?,?,?,?,?)`, id, em, a.Name, a.ResponseStatus, RowSourceCache)
+			// PATCH(api-detail-hydrate): merge, never REPLACE — see the
+			// meetings upsert above. row_source stays out of the SET list
+			// so the creating path keeps ownership of the row.
+			_, err := tx.ExecContext(ctx, `INSERT INTO attendees(meeting_id,email,name,response_status,row_source) VALUES (?,?,?,?,?)
+			ON CONFLICT(meeting_id,email) DO UPDATE SET
+				name            = COALESCE(NULLIF(excluded.name, ''), attendees.name),
+				response_status = COALESCE(NULLIF(excluded.response_status, ''), attendees.response_status)`, id, em, a.Name, a.ResponseStatus, RowSourceCache)
 			if err != nil {
 				return res, fmt.Errorf("upsert attendee %s/%s: %w", id, em, err)
 			}
@@ -373,8 +410,8 @@ func SyncFromCache(ctx context.Context, db *sql.DB, cache *Cache) (SyncResult, e
 			return res, err
 		}
 		for i, seg := range segs {
-			startMs, _ := isoToMillis(seg.StartTimestamp)
-			endMs, _ := isoToMillis(seg.EndTimestamp)
+			startMs := badTimestamps.parse(seg.StartTimestamp, id, i, "start_timestamp")
+			endMs := badTimestamps.parse(seg.EndTimestamp, id, i, "end_timestamp")
 			// speaker_name / diarization_label stay NULL: the desktop cache
 			// never carried resolved speaker identity.
 			_, err := tx.ExecContext(ctx, `INSERT INTO transcript_segments(meeting_id,idx,source,text,start_ts_ms,end_ts_ms,confidence,row_source) VALUES (?,?,?,?,?,?,?,?)`,
@@ -403,7 +440,12 @@ func SyncFromCache(ctx context.Context, db *sql.DB, cache *Cache) (SyncResult, e
 	}
 	for fid, mids := range cache.DocumentLists {
 		for _, mid := range mids {
-			_, err := tx.ExecContext(ctx, `INSERT OR REPLACE INTO folder_memberships(folder_id,meeting_id,row_source) VALUES (?,?,?)`, fid, mid, RowSourceCache)
+			// PATCH(api-detail-hydrate): merge, never REPLACE — see above.
+			// The row carries no payload beyond its key pair, so an existing
+			// row is left entirely alone rather than having its ownership
+			// rewritten.
+			_, err := tx.ExecContext(ctx, `INSERT INTO folder_memberships(folder_id,meeting_id,row_source) VALUES (?,?,?)
+			ON CONFLICT(folder_id,meeting_id) DO NOTHING`, fid, mid, RowSourceCache)
 			if err != nil {
 				return res, fmt.Errorf("upsert folder membership %s/%s: %w", fid, mid, err)
 			}
@@ -500,6 +542,8 @@ func SyncFromCache(ctx context.Context, db *sql.DB, cache *Cache) (SyncResult, e
 		return res, err
 	}
 	committed = true
+	res.UnparsedTimestamps = badTimestamps.count
+	res.TimestampWarning = badTimestamps.warning()
 	return res, nil
 }
 
@@ -529,6 +573,11 @@ type APISyncResult struct {
 	Memberships int `json:"folder_memberships"`
 	Summaries   int `json:"summaries"`
 	Events      int `json:"calendar_events"`
+
+	// UnparsedTimestamps / TimestampWarning carry the same accounting
+	// SyncResult does — see those fields and timestampFailures.
+	UnparsedTimestamps int    `json:"unparsed_timestamps,omitempty"`
+	TimestampWarning   string `json:"timestamp_warning,omitempty"`
 }
 
 // SyncFromAPI hydrates per-note detail fetched from the public REST API into
@@ -563,12 +612,13 @@ func SyncFromAPI(ctx context.Context, db *sql.DB, notes []APINote) (APISyncResul
 		}
 	}()
 
+	var badTimestamps timestampFailures
 	for i := range notes {
 		n := &notes[i]
 		if n.ID == "" {
 			continue
 		}
-		if err := upsertAPINote(ctx, tx, n, &res); err != nil {
+		if err := upsertAPINote(ctx, tx, n, &res, &badTimestamps); err != nil {
 			return res, err
 		}
 	}
@@ -584,11 +634,13 @@ func SyncFromAPI(ctx context.Context, db *sql.DB, notes []APINote) (APISyncResul
 		return res, err
 	}
 	committed = true
+	res.UnparsedTimestamps = badTimestamps.count
+	res.TimestampWarning = badTimestamps.warning()
 	return res, nil
 }
 
 // upsertAPINote writes one note's detail across every domain table.
-func upsertAPINote(ctx context.Context, tx *sql.Tx, n *APINote, res *APISyncResult) error {
+func upsertAPINote(ctx context.Context, tx *sql.Tx, n *APINote, res *APISyncResult, bad *timestampFailures) error {
 	startedAt, endedAt := apiTimeWindow(n)
 	calEventID := ""
 	if n.CalendarEvent != nil {
@@ -649,7 +701,7 @@ func upsertAPINote(ctx context.Context, tx *sql.Tx, n *APINote, res *APISyncResu
 	if err := upsertAPIMemberships(ctx, tx, n, res); err != nil {
 		return err
 	}
-	return upsertAPITranscript(ctx, tx, n, res)
+	return upsertAPITranscript(ctx, tx, n, res, bad)
 }
 
 // upsertAPIAttendees reconciles the note's attendees[] with its
@@ -757,13 +809,13 @@ func upsertAPIMemberships(ctx context.Context, tx *sql.Tx, n *APINote, res *APIS
 //
 // A nil/empty transcript is a normal outcome — the note may have none, or the
 // caller may not have asked for include=transcript — and is not an error.
-func upsertAPITranscript(ctx context.Context, tx *sql.Tx, n *APINote, res *APISyncResult) error {
+func upsertAPITranscript(ctx context.Context, tx *sql.Tx, n *APINote, res *APISyncResult, bad *timestampFailures) error {
 	if err := clearSegmentsForRewrite(ctx, tx, n.ID, RowSourceAPI, len(n.Transcript) > 0); err != nil {
 		return err
 	}
 	for i, seg := range n.Transcript {
-		startMs, _ := isoToMillis(seg.StartTime)
-		endMs, _ := isoToMillis(seg.EndTime)
+		startMs := bad.parse(seg.StartTime, n.ID, i, "start_time")
+		endMs := bad.parse(seg.EndTime, n.ID, i, "end_time")
 		source := ""
 		var speakerName, label any
 		if seg.Speaker != nil {
@@ -857,6 +909,45 @@ func extractCalTime(raw json.RawMessage) string {
 		return inner.DateTime
 	}
 	return inner.Date
+}
+
+// timestampFailures accumulates transcript timestamps a sync could not parse.
+//
+// PATCH(api-detail-hydrate): both write paths used to call isoToMillis with
+// the error discarded (`startMs, _ := ...`). An unparseable timestamp becomes
+// 0, and the read path treats start_ts_ms == 0 as "no timestamp", so a format
+// change in the live API would silently render every segment blank with no
+// signal anywhere. Counting the failures and keeping the first one makes that
+// visible in the sync summary. Deliberately not fatal: one malformed segment
+// should not fail a whole sync, and per-segment reporting would drown the
+// summary on a large transcript.
+type timestampFailures struct {
+	count   int
+	example string
+}
+
+// parse converts an ISO timestamp to epoch millis, recording rather than
+// swallowing a parse failure. A failure still yields 0 — the segment is worth
+// storing without its timestamp — but it is now counted.
+func (f *timestampFailures) parse(value, meetingID string, idx int, field string) int64 {
+	ms, err := isoToMillis(value)
+	if err == nil {
+		return ms
+	}
+	f.count++
+	if f.example == "" {
+		f.example = fmt.Sprintf("meeting %s segment %d %s: %v", meetingID, idx, field, err)
+	}
+	return 0
+}
+
+// warning renders the operator-facing line, or "" when everything parsed.
+func (f *timestampFailures) warning() string {
+	if f.count == 0 {
+		return ""
+	}
+	return fmt.Sprintf("%d transcript timestamp(s) could not be parsed and were stored as 0, "+
+		"which reads back as no timestamp; first failure: %s", f.count, f.example)
 }
 
 func isoToMillis(s string) (int64, error) {

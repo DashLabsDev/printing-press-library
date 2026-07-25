@@ -205,6 +205,66 @@ func TestRunAPIHydrate_SkipsNotFoundNote(t *testing.T) {
 	assertQueryCount(t, db, `SELECT COUNT(*) FROM meetings WHERE id='note_gamma'`, 1)
 }
 
+// TestRunAPIHydrate_SkipsForbiddenNote: a 403 on ONE note's detail is a
+// verdict about that note (ownership changed, archived, outside the token's
+// scope), not about the credential — every other id in the run still fetches
+// fine. Treating it as fatal returned before SyncFromAPI ever ran, throwing
+// away every note already fetched, so it is skipped like a 404 instead.
+func TestRunAPIHydrate_SkipsForbiddenNote(t *testing.T) {
+	flags, _ := newHydrateEnv(t, notesListHandler(t,
+		[]string{"note_alpha", "note_forbidden", "note_gamma"},
+		map[string]func(http.ResponseWriter){
+			"note_alpha":     writeJSON(fixtureNoteAlphaDetail),
+			"note_forbidden": writeStatus(http.StatusForbidden, `{"error":"forbidden"}`),
+			"note_gamma":     writeJSON(fixtureNoteGammaDetail),
+		}))
+
+	res, err := runAPIHydrate(context.Background(), flags, apiHydrateOptions{})
+	if err != nil {
+		t.Fatalf("a 403 on one note must not fail the run: %v", err)
+	}
+	if res.Skipped != 1 {
+		t.Errorf("skipped = %d, want 1", res.Skipped)
+	}
+	if res.Meetings != 2 {
+		t.Errorf("meetings = %d, want 2 (the other notes must still hydrate)", res.Meetings)
+	}
+	if len(res.Warnings) != 1 ||
+		!strings.Contains(res.Warnings[0], "note_forbidden") ||
+		!strings.Contains(res.Warnings[0], "403") {
+		t.Errorf("warnings = %v, want one naming note_forbidden and its 403", res.Warnings)
+	}
+
+	db := openHydratedStore(t)
+	assertQueryCount(t, db, `SELECT COUNT(*) FROM meetings WHERE id='note_forbidden'`, 0)
+	assertQueryCount(t, db, `SELECT COUNT(*) FROM meetings WHERE id='note_alpha'`, 1)
+	assertQueryCount(t, db, `SELECT COUNT(*) FROM meetings WHERE id='note_gamma'`, 1)
+}
+
+// TestRunAPIHydrate_AbortsOnForbiddenList: the list stage is the other half of
+// the 403 split. There it means the token cannot list notes at all, so there
+// is nothing to skip past and the run aborts with the auth exit code.
+func TestRunAPIHydrate_AbortsOnForbiddenList(t *testing.T) {
+	flags, _ := newHydrateEnv(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusForbidden)
+		_, _ = w.Write([]byte(`{"error":"forbidden"}`))
+	})
+	db := openHydratedStore(t)
+
+	_, err := runAPIHydrate(context.Background(), flags, apiHydrateOptions{})
+	if err == nil {
+		t.Fatal("expected an error on a 403 from the list endpoint")
+	}
+	if !errors.Is(err, granola.ErrAPIUnauthorized) {
+		t.Errorf("error chain lost ErrAPIUnauthorized: %v", err)
+	}
+	var ce *cliError
+	if !errors.As(err, &ce) || ce.code != 4 {
+		t.Errorf("expected the auth exit code (4), got %v", err)
+	}
+	assertQueryCount(t, db, `SELECT COUNT(*) FROM meetings`, 0)
+}
+
 // TestRunAPIHydrate_AbortsOnUnauthorized: a 401 means the credential is bad,
 // so every remaining request would fail identically. The run aborts with an
 // auth error and writes nothing — a half-populated store that looks complete
@@ -296,6 +356,50 @@ func TestRunAPIHydrate_SurvivesSubsequentCacheSync(t *testing.T) {
 	assertQueryCount(t, db, `SELECT COUNT(*) FROM folder_memberships WHERE meeting_id='note_alpha'`, 1)
 	assertQueryCount(t, db, `SELECT COUNT(*) FROM attendees WHERE meeting_id='note_alpha'`, 2)
 	assertQueryCount(t, db, `SELECT COUNT(*) FROM meetings WHERE id='note_alpha'`, 1)
+}
+
+// TestRunAPIHydrate_SurfacesUnparseableTimestamps: a timestamp the store layer
+// cannot parse is written as 0, which the read path renders as no timestamp at
+// all. That degradation used to be invisible — the parse error was discarded
+// at the call site — so the sync now reports it as a warning and a count.
+func TestRunAPIHydrate_SurfacesUnparseableTimestamps(t *testing.T) {
+	badTimestampDetail := strings.Replace(fixtureNoteAlphaDetail,
+		`"start_time": "2026-07-01T15:00:00Z"`, `"start_time": "01 Jul 2026 15:00"`, 1)
+	if badTimestampDetail == fixtureNoteAlphaDetail {
+		t.Fatal("fixture no longer contains the timestamp this test rewrites")
+	}
+	flags, _ := newHydrateEnv(t, notesListHandler(t,
+		[]string{"note_alpha"},
+		map[string]func(http.ResponseWriter){"note_alpha": writeJSON(badTimestampDetail)}))
+
+	res, err := runAPIHydrate(context.Background(), flags, apiHydrateOptions{})
+	if err != nil {
+		t.Fatalf("an unparseable timestamp must not fail the run: %v", err)
+	}
+	if res.UnparsedTimestamps != 1 {
+		t.Errorf("UnparsedTimestamps = %d, want 1", res.UnparsedTimestamps)
+	}
+	if len(res.Warnings) != 1 || !strings.Contains(res.Warnings[0], "01 Jul 2026 15:00") {
+		t.Fatalf("warnings = %v, want one naming the unparseable value", res.Warnings)
+	}
+
+	// The operator-visible ndjson line must carry it too.
+	var buf strings.Builder
+	if err := writeAPIHydrateSummary(&buf, res); err != nil {
+		t.Fatal(err)
+	}
+	var summary map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(buf.String())), &summary); err != nil {
+		t.Fatalf("summary is not one ndjson object: %v (%q)", err, buf.String())
+	}
+	if summary["unparsed_timestamps"] != float64(1) {
+		t.Errorf("summary unparsed_timestamps = %v, want 1", summary["unparsed_timestamps"])
+	}
+
+	// The segment still landed; only its start timestamp is missing.
+	db := openHydratedStore(t)
+	assertQueryCount(t, db, `SELECT COUNT(*) FROM transcript_segments WHERE meeting_id='note_alpha'`, 2)
+	assertQueryCount(t, db, `SELECT COUNT(*) FROM transcript_segments WHERE meeting_id='note_alpha' AND start_ts_ms=0`, 1)
 }
 
 func TestWriteAPIHydrateSummary_Shape(t *testing.T) {

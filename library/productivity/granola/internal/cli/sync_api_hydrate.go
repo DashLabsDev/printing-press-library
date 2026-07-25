@@ -66,6 +66,10 @@ type apiHydrateResult struct {
 	Events      int
 	Warnings    []string
 	Duration    time.Duration
+
+	// UnparsedTimestamps counts transcript timestamps the store layer could
+	// not parse; the matching human-readable line is appended to Warnings.
+	UnparsedTimestamps int
 }
 
 // runAPIHydrate performs the two-stage public-API sync and writes the result
@@ -73,12 +77,18 @@ type apiHydrateResult struct {
 //
 // Failure policy, in order of how badly each failure generalises:
 //
-//   - 401/403 on any request aborts the whole run. The credential is bad, so
-//     every remaining request would fail identically; returning early means no
-//     partial store is written (SyncFromAPI never runs).
+//   - 401 on any request, and 403 on the LIST endpoint, abort the whole run.
+//     The credential cannot be used, so every remaining request would fail
+//     identically; returning early means no partial store is written
+//     (SyncFromAPI never runs).
 //   - 404 on a single note's detail is routine — the note was deleted between
 //     the list call and the detail call — so that id is skipped with a
 //     recorded warning and the rest of the page still hydrates.
+//   - 403 on a single note's detail is the same shape of verdict: the note is
+//     outside what this token may read (ownership changed, archived, another
+//     workspace) while the credential stays valid for every other id in the
+//     run. Skipping it keeps the notes already fetched instead of throwing the
+//     whole run away over one inaccessible note.
 //   - anything else aborts, because a silent partial sync that looks like a
 //     complete one is the failure mode this whole effort exists to remove.
 func runAPIHydrate(ctx context.Context, flags *rootFlags, opts apiHydrateOptions) (apiHydrateResult, error) {
@@ -123,10 +133,10 @@ func runAPIHydrate(ctx context.Context, flags *rootFlags, opts apiHydrateOptions
 			}
 			note, err := granola.GetNote(c, ref.ID, !opts.SkipTranscripts)
 			if err != nil {
-				if errors.Is(err, granola.ErrNoteNotFound) {
+				if reason := skippableNoteError(err); reason != "" {
 					res.Skipped++
 					res.Warnings = append(res.Warnings,
-						fmt.Sprintf("note %s: detail fetch returned 404, skipped", ref.ID))
+						fmt.Sprintf("note %s: detail fetch returned %s, skipped", ref.ID, reason))
 					continue
 				}
 				res.Duration = time.Since(started)
@@ -156,11 +166,34 @@ func runAPIHydrate(ctx context.Context, flags *rootFlags, opts apiHydrateOptions
 	res.Memberships = sres.Memberships
 	res.Summaries = sres.Summaries
 	res.Events = sres.Events
+	res.UnparsedTimestamps = sres.UnparsedTimestamps
+	if sres.TimestampWarning != "" {
+		res.Warnings = append(res.Warnings, sres.TimestampWarning)
+	}
 	res.Duration = time.Since(started)
 	if err != nil {
 		return res, err
 	}
 	return res, nil
+}
+
+// skippableNoteError reports whether a per-note detail failure is a verdict
+// about that one note rather than about the credential, returning the label
+// the recorded warning uses. An empty string means "abort the run".
+//
+// PATCH(api-detail-hydrate): 403 used to land here as a plain
+// ErrAPIUnauthorized and abort, discarding every note fetched so far in the
+// run. One note the token may not read is not a reason to throw away the rest,
+// so it is treated like a 404. 401 is deliberately absent: a rejected
+// credential fails every remaining request identically.
+func skippableNoteError(err error) string {
+	switch {
+	case errors.Is(err, granola.ErrNoteNotFound):
+		return "404"
+	case errors.Is(err, granola.ErrAPIForbidden):
+		return "403 (forbidden for this note)"
+	}
+	return ""
 }
 
 // hydrateError routes an auth rejection through the CLI's auth-error
@@ -191,6 +224,9 @@ func writeAPIHydrateSummary(w io.Writer, res apiHydrateResult) error {
 		"folder_memberships":  res.Memberships,
 		"summaries":           res.Summaries,
 		"calendar_events":     res.Events,
+	}
+	if res.UnparsedTimestamps > 0 {
+		summary["unparsed_timestamps"] = res.UnparsedTimestamps
 	}
 	if len(res.Warnings) > 0 {
 		summary["warnings"] = res.Warnings

@@ -42,6 +42,19 @@ var (
 	ErrNoteNotFound = errors.New("note not found")
 	// ErrAPIUnauthorized reports a 401/403 from the public API.
 	ErrAPIUnauthorized = errors.New("public API rejected the credential")
+	// ErrAPIForbidden narrows ErrAPIUnauthorized to the 403 half.
+	//
+	// PATCH(api-detail-hydrate): 403 answers a different question depending on
+	// what was requested. On the LIST endpoint it means the token cannot list
+	// notes at all, so aborting is right. On a single-resource GET it means
+	// "forbidden for THIS note" — ownership changed, the note was archived, or
+	// it sits outside the token's scope — while the credential remains valid
+	// for everything else in the run. A 403 error therefore matches BOTH this
+	// sentinel and ErrAPIUnauthorized: callers that can skip one item test for
+	// ErrAPIForbidden first, and every caller that only cares that the
+	// credential was rejected (exit code, auth hint) keeps working unchanged.
+	// 401 never matches this sentinel; it is fatal everywhere.
+	ErrAPIForbidden = errors.New("public API forbade access to this resource")
 )
 
 // APIGetter is the slice of *client.Client this file needs. Declaring it as
@@ -267,7 +280,9 @@ func ListNotesPage(c APIGetter, cursor string, pageSize int, extraParams map[str
 //
 // A 404 is returned as ErrNoteNotFound so the caller can skip that id and
 // keep going; 401/403 come back as ErrAPIUnauthorized so the caller can abort
-// before writing a partial store.
+// before writing a partial store. A 403 additionally matches ErrAPIForbidden,
+// which on this single-note endpoint is a verdict about the note rather than
+// the credential — see that sentinel's comment.
 func GetNote(c APIGetter, id string, withTranscript bool) (*APINote, error) {
 	if c == nil {
 		return nil, fmt.Errorf("nil api client")
@@ -314,13 +329,18 @@ func classifyPublicAPIError(err error, what string) error {
 			status = 403
 		}
 	}
-	// Two %w verbs so the result matches BOTH the sentinel (errors.Is) and
-	// the underlying *client.APIError (errors.As).
+	// Multiple %w verbs so the result matches BOTH the sentinels (errors.Is)
+	// and the underlying *client.APIError (errors.As).
 	switch status {
 	case 404:
 		return fmt.Errorf("%s: %w: %w", what, ErrNoteNotFound, err)
-	case 401, 403:
+	case 401:
 		return fmt.Errorf("%s: %w: %w", what, ErrAPIUnauthorized, err)
+	case 403:
+		// Carries the narrower sentinel too, so a caller working through a
+		// list of ids can skip the forbidden one instead of discarding the
+		// whole run. See ErrAPIForbidden.
+		return fmt.Errorf("%s: %w: %w: %w", what, ErrAPIUnauthorized, ErrAPIForbidden, err)
 	}
 	return fmt.Errorf("%s: %w", what, err)
 }
