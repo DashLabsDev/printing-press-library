@@ -155,7 +155,7 @@ If you kept a copy of `storage.dek` from before the migration, base64-encode its
 
 ## Quick Start
 
-Hydrate the local store first. On a current install that is `granola-pp-cli sync-api` with `GRANOLA_API_KEY` set; narrow repeat runs with `granola-pp-cli sync-api --since 7d`. On a pre-migration install, `granola-pp-cli sync` reads the desktop cache instead. Running both against the same store is safe in either order — each sync path clears only the rows it owns.
+Hydrate the local store first. On a current install that is `granola-pp-cli sync-api` with `GRANOLA_API_KEY` set; narrow repeat runs with `granola-pp-cli sync-api --since 7d`. On a pre-migration install, `granola-pp-cli sync` reads the desktop cache instead. Running both against the same store is safe in either order — each sync path clears only the rows it owns, and neither will replace a stored transcript with a smaller copy from the other source (upstream retention prunes older transcripts; this store outlives it). Preserved transcripts are reported as `preserved_transcripts` in the sync summary with a warning naming the meetings.
 
 Then read, offline and keyless:
 

@@ -7,6 +7,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
@@ -670,26 +671,36 @@ func TestCacheRowsSurviveAPISync(t *testing.T) {
 }
 
 // TestBothPathsOnSameMeeting_NoPrimaryKeyCollision: when both sources carry a
-// transcript for the same meeting, the later writer takes full ownership.
-// Without that, the (meeting_id, idx) primary key collides and the sync errors
-// out — or worse, leaves a mixed-provenance transcript with a stale tail.
+// transcript for the same meeting, exactly one of them ends up owning every
+// segment. Without that, the (meeting_id, idx) primary key collides and the
+// sync errors out — or worse, leaves a mixed-provenance transcript with a
+// stale tail.
+//
+// PATCH(transcript-retention-preserves-larger): the incoming cache transcript
+// here used to be SHORTER than the API's, which is now the preservation case
+// (TestLargerAPITranscriptSurvivesSmallerCacheSync covers it). Ownership
+// transfer is what this test is about, so the incoming copy is longer than the
+// three-segment API fixture.
 func TestBothPathsOnSameMeeting_NoPrimaryKeyCollision(t *testing.T) {
 	ctx := context.Background()
 	db := openTestDB(t)
 	if _, err := SyncFromAPI(ctx, db, []APINote{decodeNote(t, noteDetailWithTranscriptJSON)}); err != nil {
 		t.Fatalf("SyncFromAPI: %v", err)
 	}
-	// The cache now has a SHORTER transcript for the same meeting.
+	// The cache now has a LONGER transcript for the same meeting.
 	cache := &Cache{
 		Documents: map[string]Document{"note_alpha": {ID: "note_alpha", Title: "Quarterly planning sync"}},
 		Transcripts: map[string][]TranscriptSegment{"note_alpha": {
-			{Source: "microphone", Text: "only line", StartTimestamp: "2026-07-01T15:00:00Z", EndTimestamp: "2026-07-01T15:00:05Z"},
+			{Source: "microphone", Text: "line one", StartTimestamp: "2026-07-01T15:00:00Z", EndTimestamp: "2026-07-01T15:00:05Z"},
+			{Source: "system", Text: "line two", StartTimestamp: "2026-07-01T15:00:05Z", EndTimestamp: "2026-07-01T15:00:15Z"},
+			{Source: "microphone", Text: "line three", StartTimestamp: "2026-07-01T15:00:15Z", EndTimestamp: "2026-07-01T15:00:25Z"},
+			{Source: "system", Text: "line four", StartTimestamp: "2026-07-01T15:00:25Z", EndTimestamp: "2026-07-01T15:00:35Z"},
 		}},
 	}
 	if _, err := SyncFromCache(ctx, db, cache); err != nil {
 		t.Fatalf("SyncFromCache: %v", err)
 	}
-	assertCount(t, db, `SELECT COUNT(*) FROM transcript_segments WHERE meeting_id='note_alpha'`, 1,
+	assertCount(t, db, `SELECT COUNT(*) FROM transcript_segments WHERE meeting_id='note_alpha'`, 4,
 		"cache rewrite left a stale API tail on the same meeting")
 	assertCount(t, db, `SELECT COUNT(*) FROM transcript_segments WHERE meeting_id='note_alpha' AND row_source='api'`, 0,
 		"API rows remained after the cache took ownership of this meeting's transcript")
@@ -1021,6 +1032,247 @@ func TestSyncResults_SilentWhenEveryTimestampParses(t *testing.T) {
 	if cacheRes.UnparsedTimestamps != 0 || cacheRes.TimestampWarning != "" {
 		t.Errorf("clean cache sync reported %d unparsed timestamps (%q)", cacheRes.UnparsedTimestamps, cacheRes.TimestampWarning)
 	}
+}
+
+// ---------------------------------------------------------------------------
+// Transcript retention: a smaller incoming transcript must not delete a larger
+// one owned by the other path.
+// ---------------------------------------------------------------------------
+
+// cacheWithTranscript builds a minimal cache carrying one meeting and n
+// synthetic transcript segments for it.
+func cacheWithTranscript(id string, n int) *Cache {
+	base := time.Date(2026, 6, 1, 10, 0, 0, 0, time.UTC)
+	segs := make([]TranscriptSegment, 0, n)
+	for i := 0; i < n; i++ {
+		segs = append(segs, TranscriptSegment{
+			Source:         "microphone",
+			Text:           fmt.Sprintf("cache line %d", i),
+			StartTimestamp: base.Add(time.Duration(i) * time.Minute).Format(time.RFC3339),
+			EndTimestamp:   base.Add(time.Duration(i)*time.Minute + 30*time.Second).Format(time.RFC3339),
+		})
+	}
+	return &Cache{
+		Documents:   map[string]Document{id: {ID: id, Title: "Live captured meeting"}},
+		Transcripts: map[string][]TranscriptSegment{id: segs},
+	}
+}
+
+// apiNoteWithTranscript builds an APINote carrying n synthetic segments, the
+// shape a retention-pruned note comes back as.
+func apiNoteWithTranscript(id string, n int) APINote {
+	base := time.Date(2026, 6, 1, 10, 0, 0, 0, time.UTC)
+	note := APINote{
+		ID:        id,
+		Title:     "Live captured meeting",
+		CreatedAt: base.Format(time.RFC3339),
+		UpdatedAt: base.Add(time.Hour).Format(time.RFC3339),
+	}
+	for i := 0; i < n; i++ {
+		note.Transcript = append(note.Transcript, APITranscriptSegment{
+			Text:      fmt.Sprintf("api line %d", i),
+			StartTime: base.Add(time.Duration(i) * time.Minute).Format(time.RFC3339),
+			EndTime:   base.Add(time.Duration(i)*time.Minute + 30*time.Second).Format(time.RFC3339),
+			Speaker:   &APISpeaker{Source: "microphone"},
+		})
+	}
+	return note
+}
+
+// assertSingleProvenance fails when one meeting's transcript is a mix of both
+// paths' rows. Preserving a transcript must not degrade into interleaving.
+func assertSingleProvenance(t *testing.T, db *sql.DB, meetingID string) {
+	t.Helper()
+	var sources int
+	if err := db.QueryRow(
+		`SELECT COUNT(DISTINCT row_source) FROM transcript_segments WHERE meeting_id = ?`,
+		meetingID).Scan(&sources); err != nil {
+		t.Fatalf("provenance check for %s: %v", meetingID, err)
+	}
+	if sources > 1 {
+		t.Errorf("meeting %s holds segments from %d sources: a transcript must never mix provenance", meetingID, sources)
+	}
+}
+
+// TestLargerCacheTranscriptSurvivesSmallerAPISync is the data-loss case this
+// unit fixes. A meeting captured live and cache-synced in full is later pruned
+// upstream by Granola's transcript retention, so the API still returns a
+// non-empty — but much shorter — transcript. Treating "non-empty" as
+// "authoritative and complete" made the API sync delete the complete local copy
+// and replace it with the remnant.
+func TestLargerCacheTranscriptSurvivesSmallerAPISync(t *testing.T) {
+	ctx := context.Background()
+	db := openTestDB(t)
+	if _, err := SyncFromCache(ctx, db, cacheWithTranscript("note_alpha", 5)); err != nil {
+		t.Fatalf("SyncFromCache: %v", err)
+	}
+
+	res, err := SyncFromAPI(ctx, db, []APINote{apiNoteWithTranscript("note_alpha", 2)})
+	if err != nil {
+		t.Fatalf("SyncFromAPI: %v", err)
+	}
+
+	assertCount(t, db, `SELECT COUNT(*) FROM transcript_segments WHERE meeting_id='note_alpha'`, 5,
+		"the retention-pruned API transcript destroyed the larger cache-sourced one")
+	assertCount(t, db, `SELECT COUNT(*) FROM transcript_segments WHERE meeting_id='note_alpha' AND row_source='cache'`, 5,
+		"the preserved segments are no longer cache-owned")
+	assertSingleProvenance(t, db, "note_alpha")
+	if res.Segments != 0 {
+		t.Errorf("Segments = %d, want 0: nothing was written for the preserved meeting", res.Segments)
+	}
+	if res.PreservedTranscripts != 1 {
+		t.Errorf("PreservedTranscripts = %d, want 1", res.PreservedTranscripts)
+	}
+	for _, want := range []string{"note_alpha", "5", "2"} {
+		if !strings.Contains(res.PreservationWarning, want) {
+			t.Errorf("PreservationWarning = %q, want it to mention %q", res.PreservationWarning, want)
+		}
+	}
+}
+
+// TestLargerAPITranscriptSurvivesSmallerCacheSync is the mirror direction: the
+// desktop cache's copy of a meeting is the partial one (the local cache file
+// rolls over) while the API still holds the full transcript.
+func TestLargerAPITranscriptSurvivesSmallerCacheSync(t *testing.T) {
+	ctx := context.Background()
+	db := openTestDB(t)
+	if _, err := SyncFromAPI(ctx, db, []APINote{apiNoteWithTranscript("note_alpha", 6)}); err != nil {
+		t.Fatalf("SyncFromAPI: %v", err)
+	}
+
+	res, err := SyncFromCache(ctx, db, cacheWithTranscript("note_alpha", 1))
+	if err != nil {
+		t.Fatalf("SyncFromCache: %v", err)
+	}
+
+	assertCount(t, db, `SELECT COUNT(*) FROM transcript_segments WHERE meeting_id='note_alpha'`, 6,
+		"the partial cache transcript destroyed the larger API-sourced one")
+	assertCount(t, db, `SELECT COUNT(*) FROM transcript_segments WHERE meeting_id='note_alpha' AND row_source='api'`, 6,
+		"the preserved segments are no longer API-owned")
+	assertSingleProvenance(t, db, "note_alpha")
+	if res.Segments != 0 {
+		t.Errorf("Segments = %d, want 0: nothing was written for the preserved meeting", res.Segments)
+	}
+	if res.PreservedTranscripts != 1 {
+		t.Errorf("PreservedTranscripts = %d, want 1", res.PreservedTranscripts)
+	}
+	if !strings.Contains(res.PreservationWarning, "note_alpha") {
+		t.Errorf("PreservationWarning = %q, want it to name the meeting", res.PreservationWarning)
+	}
+}
+
+// TestEqualOrLargerIncomingTakesOwnership: preservation is only for the
+// shrinking case. An incoming transcript at least as complete as what is
+// stored still takes ownership of the whole meeting and fully replaces it —
+// anything less would strand a stale tail or collide on (meeting_id, idx).
+func TestEqualOrLargerIncomingTakesOwnership(t *testing.T) {
+	for _, tc := range []struct {
+		name     string
+		incoming int
+	}{
+		{"equal", 3},
+		{"larger", 7},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx := context.Background()
+			db := openTestDB(t)
+			if _, err := SyncFromCache(ctx, db, cacheWithTranscript("note_alpha", 3)); err != nil {
+				t.Fatalf("SyncFromCache: %v", err)
+			}
+
+			res, err := SyncFromAPI(ctx, db, []APINote{apiNoteWithTranscript("note_alpha", tc.incoming)})
+			if err != nil {
+				t.Fatalf("SyncFromAPI: %v", err)
+			}
+
+			assertCount(t, db,
+				`SELECT COUNT(*) FROM transcript_segments WHERE meeting_id='note_alpha' AND row_source='api'`,
+				tc.incoming, "the incoming transcript did not take ownership")
+			assertCount(t, db, `SELECT COUNT(*) FROM transcript_segments WHERE meeting_id='note_alpha' AND row_source='cache'`, 0,
+				"the replaced transcript left cache-owned rows behind")
+			assertSingleProvenance(t, db, "note_alpha")
+			if res.PreservedTranscripts != 0 || res.PreservationWarning != "" {
+				t.Errorf("reported %d preserved transcripts (%q) on a normal ownership transfer",
+					res.PreservedTranscripts, res.PreservationWarning)
+			}
+		})
+	}
+}
+
+// TestSameSourceShrinkingRewriteIsNotPreservation: a path replacing its OWN
+// earlier transcript with a shorter one is a normal rewrite — upstream edited,
+// re-transcribed, or pruned the note — and must not be mistaken for the
+// cross-source preservation case, which would freeze the store on the first
+// transcript it ever saw.
+func TestSameSourceShrinkingRewriteIsNotPreservation(t *testing.T) {
+	ctx := context.Background()
+	db := openTestDB(t)
+	if _, err := SyncFromAPI(ctx, db, []APINote{apiNoteWithTranscript("note_alpha", 5)}); err != nil {
+		t.Fatalf("seeding SyncFromAPI: %v", err)
+	}
+
+	res, err := SyncFromAPI(ctx, db, []APINote{apiNoteWithTranscript("note_alpha", 2)})
+	if err != nil {
+		t.Fatalf("SyncFromAPI: %v", err)
+	}
+	assertCount(t, db, `SELECT COUNT(*) FROM transcript_segments WHERE meeting_id='note_alpha'`, 2,
+		"an API rewrite of its own transcript left a stale tail")
+	if res.Segments != 2 {
+		t.Errorf("Segments = %d, want 2: a same-source rewrite must still write", res.Segments)
+	}
+	if res.PreservedTranscripts != 0 || res.PreservationWarning != "" {
+		t.Errorf("same-source shrink reported %d preserved transcripts (%q)",
+			res.PreservedTranscripts, res.PreservationWarning)
+	}
+
+	// Same guard on the cache path.
+	if _, err := SyncFromCache(ctx, db, cacheWithTranscript("cache_note", 4)); err != nil {
+		t.Fatalf("seeding SyncFromCache: %v", err)
+	}
+	cacheRes, err := SyncFromCache(ctx, db, cacheWithTranscript("cache_note", 1))
+	if err != nil {
+		t.Fatalf("SyncFromCache: %v", err)
+	}
+	assertCount(t, db, `SELECT COUNT(*) FROM transcript_segments WHERE meeting_id='cache_note'`, 1,
+		"a cache rewrite of its own transcript left a stale tail")
+	if cacheRes.PreservedTranscripts != 0 || cacheRes.PreservationWarning != "" {
+		t.Errorf("same-source cache shrink reported %d preserved transcripts (%q)",
+			cacheRes.PreservedTranscripts, cacheRes.PreservationWarning)
+	}
+}
+
+// TestEmptyIncomingTranscriptClearsOnlyItsOwnRows pins the pre-existing
+// behavior the retention rule must not disturb: a path with nothing to write
+// retires its own stale rows and leaves the other path's transcript alone,
+// without reporting a preservation (nothing was at risk).
+func TestEmptyIncomingTranscriptClearsOnlyItsOwnRows(t *testing.T) {
+	ctx := context.Background()
+	db := openTestDB(t)
+	if _, err := SyncFromCache(ctx, db, cacheWithTranscript("note_alpha", 3)); err != nil {
+		t.Fatalf("SyncFromCache: %v", err)
+	}
+
+	// An API note with no transcript at all for the same meeting.
+	res, err := SyncFromAPI(ctx, db, []APINote{apiNoteWithTranscript("note_alpha", 0)})
+	if err != nil {
+		t.Fatalf("SyncFromAPI: %v", err)
+	}
+	assertCount(t, db, `SELECT COUNT(*) FROM transcript_segments WHERE meeting_id='note_alpha' AND row_source='cache'`, 3,
+		"an empty API transcript cleared cache-owned rows")
+	if res.PreservedTranscripts != 0 || res.PreservationWarning != "" {
+		t.Errorf("empty incoming transcript reported %d preserved transcripts (%q)",
+			res.PreservedTranscripts, res.PreservationWarning)
+	}
+
+	// And a path with nothing to write still retires its OWN stale rows.
+	if _, err := SyncFromAPI(ctx, db, []APINote{apiNoteWithTranscript("api_note", 2)}); err != nil {
+		t.Fatalf("seeding SyncFromAPI: %v", err)
+	}
+	if _, err := SyncFromAPI(ctx, db, []APINote{apiNoteWithTranscript("api_note", 0)}); err != nil {
+		t.Fatalf("SyncFromAPI: %v", err)
+	}
+	assertCount(t, db, `SELECT COUNT(*) FROM transcript_segments WHERE meeting_id='api_note'`, 0,
+		"an empty API transcript did not retire the API's own stale rows")
 }
 
 func assertCount(t *testing.T, db *sql.DB, query string, want int, msg string) {

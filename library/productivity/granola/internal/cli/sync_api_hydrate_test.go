@@ -494,6 +494,63 @@ func readStoredSegments(t *testing.T, db *sql.DB, meetingID string) []granola.Tr
 	return out
 }
 
+// TestRunAPIHydrate_PreservesLargerCacheTranscript is the operator-visible
+// verification of the transcript-retention rule. Granola applies retention
+// upstream while this store is expected to outlive it, so a meeting captured
+// live and cache-synced in full comes back from the public API weeks later
+// pruned but still non-empty. The sync used to treat non-empty as complete and
+// replace the full local copy with the remnant, silently and with no count
+// anywhere in the summary.
+func TestRunAPIHydrate_PreservesLargerCacheTranscript(t *testing.T) {
+	flags, _ := newHydrateEnv(t, notesListHandler(t,
+		[]string{"note_alpha"},
+		map[string]func(http.ResponseWriter){"note_alpha": writeJSON(fixtureNoteAlphaDetail)}))
+
+	// Five cache-sourced segments against the fixture's surviving two.
+	segs := make([]granola.TranscriptSegment, 0, 5)
+	for i := 0; i < 5; i++ {
+		segs = append(segs, granola.TranscriptSegment{
+			Source:         "microphone",
+			Text:           "cache line",
+			StartTimestamp: "2026-07-01T15:00:00Z",
+			EndTimestamp:   "2026-07-01T15:00:10Z",
+		})
+	}
+	if _, err := granola.SyncFromCache(context.Background(), openHydratedStore(t), &granola.Cache{
+		Documents:   map[string]granola.Document{"note_alpha": {ID: "note_alpha", Title: "Quarterly planning sync"}},
+		Transcripts: map[string][]granola.TranscriptSegment{"note_alpha": segs},
+	}); err != nil {
+		t.Fatalf("SyncFromCache: %v", err)
+	}
+
+	res, err := runAPIHydrate(context.Background(), flags, apiHydrateOptions{})
+	if err != nil {
+		t.Fatalf("runAPIHydrate: %v", err)
+	}
+	db := openHydratedStore(t)
+	assertQueryCount(t, db, `SELECT COUNT(*) FROM transcript_segments WHERE meeting_id='note_alpha'`, 5)
+	assertQueryCount(t, db, `SELECT COUNT(*) FROM transcript_segments WHERE meeting_id='note_alpha' AND row_source='cache'`, 5)
+	if res.PreservedTranscripts != 1 {
+		t.Errorf("PreservedTranscripts = %d, want 1", res.PreservedTranscripts)
+	}
+	if len(res.Warnings) != 1 || !strings.Contains(res.Warnings[0], "note_alpha") {
+		t.Fatalf("warnings = %v, want one naming the preserved meeting", res.Warnings)
+	}
+
+	// The operator-visible ndjson line must carry it too.
+	var buf strings.Builder
+	if err := writeAPIHydrateSummary(&buf, res); err != nil {
+		t.Fatal(err)
+	}
+	var summary map[string]any
+	if err := json.Unmarshal([]byte(strings.TrimSpace(buf.String())), &summary); err != nil {
+		t.Fatalf("summary is not one ndjson object: %v (%q)", err, buf.String())
+	}
+	if summary["preserved_transcripts"] != float64(1) {
+		t.Errorf("summary preserved_transcripts = %v, want 1", summary["preserved_transcripts"])
+	}
+}
+
 func assertQueryCount(t *testing.T, db *sql.DB, query string, want int) {
 	t.Helper()
 	var got int

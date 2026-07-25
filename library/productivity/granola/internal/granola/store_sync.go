@@ -273,6 +273,13 @@ type SyncResult struct {
 	// Both are zero/empty on a healthy sync. See timestampFailures.
 	UnparsedTimestamps int    `json:"unparsed_timestamps,omitempty"`
 	TimestampWarning   string `json:"timestamp_warning,omitempty"`
+
+	// PreservedTranscripts counts meetings whose stored transcript this run
+	// left alone because the other sync path's copy was larger;
+	// PreservationWarning names them. Same non-fatal reporting channel as the
+	// timestamp fields. See transcriptPreservations.
+	PreservedTranscripts int    `json:"preserved_transcripts,omitempty"`
+	PreservationWarning  string `json:"preservation_warning,omitempty"`
 }
 
 // SyncFromCache pushes every row from cache into the SQLite store. Uses
@@ -297,6 +304,7 @@ func SyncFromCache(ctx context.Context, db *sql.DB, cache *Cache) (SyncResult, e
 		}
 	}()
 	var badTimestamps timestampFailures
+	var keptTranscripts transcriptPreservations
 
 	// meetings + attendees + transcripts
 	for id, doc := range cache.Documents {
@@ -401,13 +409,16 @@ func SyncFromCache(ctx context.Context, db *sql.DB, cache *Cache) (SyncResult, e
 		// the cache holds no transcript at all, deleting their segments and
 		// inserting nothing.
 		//
-		// When the cache DOES have a transcript for this meeting it takes
-		// ownership of every segment (an unscoped delete) — the rewrite would
-		// otherwise collide with API rows on the (meeting_id, idx) primary key
-		// or leave a mixed-provenance tail. When it has none, only cache-owned
-		// rows are dropped so the API transcript survives.
-		if err := clearSegmentsForRewrite(ctx, tx, id, RowSourceCache, len(segs) > 0); err != nil {
+		// PATCH(transcript-retention-preserves-larger): and when the cache's
+		// copy is smaller than the API's, this meeting is skipped outright
+		// rather than allowed to take ownership. See prepareSegmentRewrite.
+		preserved, err := prepareSegmentRewrite(ctx, tx, id, RowSourceCache, len(segs))
+		if err != nil {
 			return res, err
+		}
+		if preserved > 0 {
+			keptTranscripts.record(id, preserved, len(segs))
+			continue
 		}
 		for i, seg := range segs {
 			startMs := badTimestamps.parse(seg.StartTimestamp, id, i, "start_timestamp")
@@ -544,24 +555,113 @@ func SyncFromCache(ctx context.Context, db *sql.DB, cache *Cache) (SyncResult, e
 	committed = true
 	res.UnparsedTimestamps = badTimestamps.count
 	res.TimestampWarning = badTimestamps.warning()
+	res.PreservedTranscripts = keptTranscripts.count()
+	res.PreservationWarning = keptTranscripts.warning()
 	return res, nil
 }
 
-// clearSegmentsForRewrite drops the transcript segments a sync path is about
-// to replace. When takeOwnership is true the path has real segments to write
-// and clears every row for the meeting regardless of provenance; otherwise it
-// clears only its own rows so the other path's transcript survives.
-func clearSegmentsForRewrite(ctx context.Context, tx *sql.Tx, meetingID, owner string, takeOwnership bool) error {
-	var err error
-	if takeOwnership {
-		_, err = tx.ExecContext(ctx, `DELETE FROM transcript_segments WHERE meeting_id = ?`, meetingID)
-	} else {
-		_, err = tx.ExecContext(ctx, `DELETE FROM transcript_segments WHERE meeting_id = ? AND row_source = ?`, meetingID, owner)
+// prepareSegmentRewrite decides what happens to a meeting's stored transcript
+// when owner is about to write incoming segments for it, and performs the
+// delete half of that decision.
+//
+// The return value is the number of segments preserved: 0 means "go ahead and
+// write", and any positive value means the store already holds a LARGER
+// transcript from the other path, nothing was deleted, and the caller must
+// skip this meeting entirely.
+//
+// PATCH(transcript-retention-preserves-larger): the rule used to be "any
+// non-empty incoming transcript is authoritative", which ran an unscoped
+// per-meeting DELETE and rewrote the meeting from the incoming payload. That
+// treats non-empty as complete, and it is not: Granola applies transcript
+// retention upstream, while this local store is expected to outlive it. A
+// meeting captured live and cache-synced with hundreds of segments comes back
+// from the public API weeks later pruned to a handful — still non-empty — and
+// the sync destroyed the complete local copy to store the remnant.
+//
+// Three cases, in the order they are decided:
+//
+//   - incoming == 0: nothing to write, so only this path's own stale rows are
+//     retired and the other path's transcript survives untouched. Unchanged.
+//   - the other path holds MORE segments than are incoming: preserve. Deleting
+//     is the destructive half, so declining to delete is the whole fix; the
+//     caller skips its own smaller write, because writing it on top would
+//     either collide on the (meeting_id, idx) primary key or leave one
+//     meeting's transcript interleaved across two sources.
+//   - otherwise (incoming is at least as complete, or the other path holds
+//     nothing at all): take ownership of the meeting and rewrite it, exactly as
+//     before. A path replacing its OWN earlier transcript always lands here
+//     whatever the size change, because the count is scoped to the other
+//     source — a shrinking same-source rewrite is a normal upstream edit, not
+//     a cross-source conflict.
+func prepareSegmentRewrite(ctx context.Context, tx *sql.Tx, meetingID, owner string, incoming int) (int, error) {
+	if incoming == 0 {
+		if _, err := tx.ExecContext(ctx,
+			`DELETE FROM transcript_segments WHERE meeting_id = ? AND row_source = ?`, meetingID, owner); err != nil {
+			return 0, fmt.Errorf("clear segments %s: %w", meetingID, err)
+		}
+		return 0, nil
 	}
-	if err != nil {
-		return fmt.Errorf("clear segments %s: %w", meetingID, err)
+	var other int
+	if err := tx.QueryRowContext(ctx,
+		`SELECT COUNT(*) FROM transcript_segments WHERE meeting_id = ? AND row_source <> ?`,
+		meetingID, owner).Scan(&other); err != nil {
+		return 0, fmt.Errorf("count foreign segments %s: %w", meetingID, err)
 	}
-	return nil
+	if other > incoming {
+		return other, nil
+	}
+	if _, err := tx.ExecContext(ctx,
+		`DELETE FROM transcript_segments WHERE meeting_id = ?`, meetingID); err != nil {
+		return 0, fmt.Errorf("clear segments %s: %w", meetingID, err)
+	}
+	return 0, nil
+}
+
+// transcriptPreservations accumulates the meetings prepareSegmentRewrite told
+// a sync path to skip because the other path's stored transcript was larger.
+//
+// PATCH(transcript-retention-preserves-larger): the point of the accounting is
+// that the outcome cannot be silent. Skipping a write is the right call, but a
+// sync that reports "500 segments" one week and nothing the next, with no line
+// explaining why, is indistinguishable from a broken sync. Deliberately not
+// fatal, and deliberately shaped like timestampFailures: one count plus one
+// operator-facing line, on the same non-fatal channel.
+type transcriptPreservations struct {
+	meetings []string
+	kept     int
+	skipped  int
+}
+
+// record notes one preserved meeting: kept is the segment count that stayed in
+// the store, incoming the smaller count this path did not write.
+func (p *transcriptPreservations) record(meetingID string, kept, incoming int) {
+	p.meetings = append(p.meetings, meetingID)
+	p.kept += kept
+	p.skipped += incoming
+}
+
+// count is the number of meetings whose stored transcript was preserved.
+func (p *transcriptPreservations) count() int { return len(p.meetings) }
+
+// preservationWarningMaxIDs bounds how many meeting ids the warning names. A
+// full non-incremental sync can touch hundreds of meetings, and an unbounded
+// id list would turn one warning line into a wall of text.
+const preservationWarningMaxIDs = 10
+
+// warning renders the operator-facing line, or "" when nothing was preserved.
+func (p *transcriptPreservations) warning() string {
+	if len(p.meetings) == 0 {
+		return ""
+	}
+	ids, more := p.meetings, ""
+	if len(ids) > preservationWarningMaxIDs {
+		ids = ids[:preservationWarningMaxIDs]
+		more = fmt.Sprintf(" (+%d more)", len(p.meetings)-preservationWarningMaxIDs)
+	}
+	return fmt.Sprintf("%d transcript(s) were kept as stored because the other sync source holds a larger copy: "+
+		"%d stored segment(s) preserved, %d incoming segment(s) not written. "+
+		"This is expected when upstream transcript retention has pruned a meeting this store still has in full. "+
+		"Meetings: %s%s", len(p.meetings), p.kept, p.skipped, strings.Join(ids, ", "), more)
 }
 
 // APISyncResult summarizes a SyncFromAPI run.
@@ -578,6 +678,11 @@ type APISyncResult struct {
 	// SyncResult does — see those fields and timestampFailures.
 	UnparsedTimestamps int    `json:"unparsed_timestamps,omitempty"`
 	TimestampWarning   string `json:"timestamp_warning,omitempty"`
+
+	// PreservedTranscripts / PreservationWarning carry the same accounting
+	// SyncResult does — see those fields and transcriptPreservations.
+	PreservedTranscripts int    `json:"preserved_transcripts,omitempty"`
+	PreservationWarning  string `json:"preservation_warning,omitempty"`
 }
 
 // SyncFromAPI hydrates per-note detail fetched from the public REST API into
@@ -613,12 +718,13 @@ func SyncFromAPI(ctx context.Context, db *sql.DB, notes []APINote) (APISyncResul
 	}()
 
 	var badTimestamps timestampFailures
+	var keptTranscripts transcriptPreservations
 	for i := range notes {
 		n := &notes[i]
 		if n.ID == "" {
 			continue
 		}
-		if err := upsertAPINote(ctx, tx, n, &res, &badTimestamps); err != nil {
+		if err := upsertAPINote(ctx, tx, n, &res, &badTimestamps, &keptTranscripts); err != nil {
 			return res, err
 		}
 	}
@@ -636,11 +742,13 @@ func SyncFromAPI(ctx context.Context, db *sql.DB, notes []APINote) (APISyncResul
 	committed = true
 	res.UnparsedTimestamps = badTimestamps.count
 	res.TimestampWarning = badTimestamps.warning()
+	res.PreservedTranscripts = keptTranscripts.count()
+	res.PreservationWarning = keptTranscripts.warning()
 	return res, nil
 }
 
 // upsertAPINote writes one note's detail across every domain table.
-func upsertAPINote(ctx context.Context, tx *sql.Tx, n *APINote, res *APISyncResult, bad *timestampFailures) error {
+func upsertAPINote(ctx context.Context, tx *sql.Tx, n *APINote, res *APISyncResult, bad *timestampFailures, kept *transcriptPreservations) error {
 	startedAt, endedAt := apiTimeWindow(n)
 	calEventID := ""
 	if n.CalendarEvent != nil {
@@ -701,7 +809,7 @@ func upsertAPINote(ctx context.Context, tx *sql.Tx, n *APINote, res *APISyncResu
 	if err := upsertAPIMemberships(ctx, tx, n, res); err != nil {
 		return err
 	}
-	return upsertAPITranscript(ctx, tx, n, res, bad)
+	return upsertAPITranscript(ctx, tx, n, res, bad, kept)
 }
 
 // upsertAPIAttendees reconciles the note's attendees[] with its
@@ -809,9 +917,20 @@ func upsertAPIMemberships(ctx context.Context, tx *sql.Tx, n *APINote, res *APIS
 //
 // A nil/empty transcript is a normal outcome — the note may have none, or the
 // caller may not have asked for include=transcript — and is not an error.
-func upsertAPITranscript(ctx context.Context, tx *sql.Tx, n *APINote, res *APISyncResult, bad *timestampFailures) error {
-	if err := clearSegmentsForRewrite(ctx, tx, n.ID, RowSourceAPI, len(n.Transcript) > 0); err != nil {
+//
+// PATCH(transcript-retention-preserves-larger): so is a SHORTER one. Upstream
+// transcript retention prunes older notes, and this store is expected to
+// outlive it, so a note that comes back with fewer segments than the cache
+// path already stored is skipped rather than allowed to overwrite the fuller
+// local copy. See prepareSegmentRewrite.
+func upsertAPITranscript(ctx context.Context, tx *sql.Tx, n *APINote, res *APISyncResult, bad *timestampFailures, kept *transcriptPreservations) error {
+	preserved, err := prepareSegmentRewrite(ctx, tx, n.ID, RowSourceAPI, len(n.Transcript))
+	if err != nil {
 		return err
+	}
+	if preserved > 0 {
+		kept.record(n.ID, preserved, len(n.Transcript))
+		return nil
 	}
 	for i, seg := range n.Transcript {
 		startMs := bad.parse(seg.StartTime, n.ID, i, "start_time")

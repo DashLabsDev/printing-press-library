@@ -70,6 +70,12 @@ type apiHydrateResult struct {
 	// UnparsedTimestamps counts transcript timestamps the store layer could
 	// not parse; the matching human-readable line is appended to Warnings.
 	UnparsedTimestamps int
+
+	// PATCH(transcript-retention-preserves-larger): PreservedTranscripts
+	// counts meetings whose stored transcript this run left alone because the
+	// cache path holds a larger copy than upstream retention still serves.
+	// The matching human-readable line is appended to Warnings.
+	PreservedTranscripts int
 }
 
 // domainRows totals the rows this stage wrote into the tables the read
@@ -191,6 +197,10 @@ func runAPIHydrate(ctx context.Context, flags *rootFlags, opts apiHydrateOptions
 	if sres.TimestampWarning != "" {
 		res.Warnings = append(res.Warnings, sres.TimestampWarning)
 	}
+	res.PreservedTranscripts = sres.PreservedTranscripts
+	if sres.PreservationWarning != "" {
+		res.Warnings = append(res.Warnings, sres.PreservationWarning)
+	}
 	res.Duration = time.Since(started)
 	if err != nil {
 		return res, err
@@ -248,6 +258,9 @@ func writeAPIHydrateSummary(w io.Writer, res apiHydrateResult) error {
 	}
 	if res.UnparsedTimestamps > 0 {
 		summary["unparsed_timestamps"] = res.UnparsedTimestamps
+	}
+	if res.PreservedTranscripts > 0 {
+		summary["preserved_transcripts"] = res.PreservedTranscripts
 	}
 	if len(res.Warnings) > 0 {
 		summary["warnings"] = res.Warnings

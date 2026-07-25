@@ -288,6 +288,8 @@ Run `granola-pp-cli sync-api`. It pages the notes list, then fetches each note's
 
 The two sync paths do not clobber each other. Each clears only the rows it owns, so running `sync` and `sync-api` against the same store is safe in either order.
 
+Transcripts get one extra guard. Granola applies transcript retention upstream, so an older meeting can come back from the API pruned to a handful of segments while this store still holds the full recording from the cache path. A sync never replaces a transcript with a **smaller** copy from the other source — it keeps what is stored, skips that meeting, and reports it as `preserved_transcripts` in the sync summary plus a `warning:` line naming the meetings. A path rewriting its own earlier transcript is unaffected, whatever the size change.
+
 ### 3. Read with no key
 
 Once hydrated, every read command works offline with no credentials. `granola-pp-cli transcript get <id> --json` returns byte-identical output with and without `GRANOLA_API_KEY` set.

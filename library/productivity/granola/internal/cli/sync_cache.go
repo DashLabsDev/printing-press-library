@@ -43,6 +43,14 @@ type CacheSyncResult struct {
 	// quietly lose their times.
 	UnparsedTimestamps int
 	TimestampWarning   string
+
+	// PATCH(transcript-retention-preserves-larger): meetings whose stored
+	// transcript this sync left alone because the API path holds a larger
+	// copy. Non-fatal like the fields above, and reported for the same
+	// reason: a sync that quietly writes fewer segments than last time is
+	// indistinguishable from a broken one without a line saying why.
+	PreservedTranscripts int
+	PreservationWarning  string
 }
 
 // TotalRows is the headline count used by the auto-refresh provenance line.
@@ -102,6 +110,9 @@ The hydration is idempotent: re-running replaces every row.`,
 			if res.UnparsedTimestamps > 0 {
 				summary["unparsed_timestamps"] = res.UnparsedTimestamps
 			}
+			if res.PreservedTranscripts > 0 {
+				summary["preserved_transcripts"] = res.PreservedTranscripts
+			}
 			b, _ := json.Marshal(summary)
 			fmt.Fprintln(cmd.OutOrStdout(), string(b))
 			// Surface the hydrate error as a non-fatal warning to stderr
@@ -116,6 +127,9 @@ The hydration is idempotent: re-running replaces every row.`,
 			}
 			if res.TimestampWarning != "" {
 				fmt.Fprintf(cmd.ErrOrStderr(), "warning: %s\n", res.TimestampWarning)
+			}
+			if res.PreservationWarning != "" {
+				fmt.Fprintf(cmd.ErrOrStderr(), "warning: %s\n", res.PreservationWarning)
 			}
 			return nil
 		},
@@ -175,6 +189,9 @@ func runCacheSync(ctx context.Context) (CacheSyncResult, error) {
 
 		UnparsedTimestamps: sres.UnparsedTimestamps,
 		TimestampWarning:   sres.TimestampWarning,
+
+		PreservedTranscripts: sres.PreservedTranscripts,
+		PreservationWarning:  sres.PreservationWarning,
 	}
 	// PATCH(encrypted-cache): record success so doctor can report
 	// "ok (last decrypted: <time>)" without itself decrypting.
