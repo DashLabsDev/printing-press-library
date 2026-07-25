@@ -346,6 +346,8 @@ Opt out with `--no-refresh` for a single command, `GRANOLA_NO_AUTO_REFRESH=1` fo
 
 Neither leg pokes Granola desktop into pulling from Granola servers. The cache leg is bounded by whatever the desktop has already pulled; the api leg is bounded by what Granola's servers have already published for the note.
 
+The api leg runs both stages the `sync-api` command runs — the note list, then the per-note detail that populates `meetings`, `attendees`, `transcript_segments`, and `folder_memberships` — but it is bounded so it can run ahead of every command: one page of notes changed since its last successful refresh, not your whole account. Run `granola-pp-cli sync-api` once on a new install to backfill history; auto-refresh keeps it current from there.
+
 ## Health Check
 
 ```bash

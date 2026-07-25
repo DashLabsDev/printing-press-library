@@ -72,6 +72,15 @@ type apiHydrateResult struct {
 	UnparsedTimestamps int
 }
 
+// domainRows totals the rows this stage wrote into the tables the read
+// commands query. Summaries and Events are deliberately excluded: both are
+// per-note markers written onto the meetings row (notes_markdown /
+// calendar_event_id), not rows of their own, so counting them would inflate
+// the auto-refresh provenance line past what actually landed.
+func (r apiHydrateResult) domainRows() int {
+	return r.Meetings + r.Attendees + r.Segments + r.Folders + r.Memberships
+}
+
 // runAPIHydrate performs the two-stage public-API sync and writes the result
 // into the Granola domain tables.
 //
@@ -130,6 +139,18 @@ func runAPIHydrate(ctx context.Context, flags *rootFlags, opts apiHydrateOptions
 		for _, ref := range listPage.Notes {
 			if ref.ID == "" {
 				continue
+			}
+			// PATCH(autorefresh-api-hydrates-domain-tables): the detail
+			// fetches are the expensive part (one request per note), and the
+			// HTTP client carries its own per-request timeout rather than
+			// this context. Checking here is what lets the auto-refresh
+			// deadline actually bound a page's worth of fetches instead of
+			// only firing between pages.
+			select {
+			case <-ctx.Done():
+				res.Duration = time.Since(started)
+				return res, ctx.Err()
+			default:
 			}
 			note, err := granola.GetNote(c, ref.ID, !opts.SkipTranscripts)
 			if err != nil {

@@ -359,6 +359,8 @@ When both are available, both refresh routines fire (cache first, then api). Whe
 
 **Freshness ceiling.** Neither leg pokes Granola desktop into pulling from Granola servers. The cache leg is bounded by whatever the desktop has already pulled; the api leg is bounded by what Granola's servers have already published for the note. If a meeting just ended, give it a moment before expecting a transcript.
 
+**Refresh scope.** The api leg runs both stages the `sync-api` command runs — the note list, then the per-note detail that populates `meetings`, `attendees`, `transcript_segments`, and `folder_memberships` — but it is bounded so it can run ahead of every command: one page of notes changed since its last successful refresh, not your whole account. Run `granola-pp-cli sync-api` once on a new install to backfill history; auto-refresh keeps it current from there.
+
 **Provenance line.** When stderr is a TTY and you are not in `--agent` / `--json` / `--compact` / `--quiet` mode, a one-liner like `auto-refresh: cache=ok (1.2s, 47 rows)  api=ok (820ms, 12 rows)` lands on stderr after the refresh. Agent and JSON consumers see no chatter on stdout.
 
 **Failures are non-fatal.** A refresh that fails prints `cache=failed: <short reason>` on stderr and the command proceeds against whatever data is already in the store. Run `granola-pp-cli doctor` to investigate persistent refresh failures.
