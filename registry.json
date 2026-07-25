@@ -6076,9 +6076,9 @@
       "path": "library/commerce/facebook-marketplace",
       "release": {
         "cli_name": "facebook-marketplace-pp-cli",
-        "version": "2026.7.2",
-        "released_at": "2026-07-24T21:48:16Z",
-        "source_commit": "4284da0c1dc87350730413e12d93e8467aff2676"
+        "version": "2026.7.3",
+        "released_at": "2026-07-25T04:43:02Z",
+        "source_commit": "b3a6332f33440410ae221f7cbcf30b5adfc8bc70"
       },
       "printer": "cathrynlavery",
       "printer_name": "Cathryn Lavery",
@@ -8169,6 +8169,10 @@
         {
           "handle": "jeffreydebolt",
           "name": "Jeff DeBolt"
+        },
+        {
+          "handle": "mvanhorn",
+          "name": "Matt Van Horn"
         }
       ],
       "mcp": {
@@ -8768,6 +8772,12 @@
         "Find devices drawing persistent power during explicit periods when related household states show inactivity."
       ],
       "path": "library/devices/home-assistant",
+      "release": {
+        "cli_name": "home-assistant-pp-cli",
+        "version": "2026.7.1",
+        "released_at": "2026-07-24T23:56:45Z",
+        "source_commit": "7753aa608886945c0c7e40eb968e639083497b28"
+      },
       "printer": "Avanderheyde",
       "printer_name": "avanderheyde",
       "creator": {
