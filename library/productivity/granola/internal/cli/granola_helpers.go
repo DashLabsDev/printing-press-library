@@ -130,7 +130,7 @@ func (v *granolaRead) Cache() *granola.Cache {
 // safestorage decrypt failure: "refresh refused for encrypted source" tells
 // the user nothing actionable, whereas "run sync" does.
 func errNoLocalGranolaData() error {
-	return notFoundErr(fmt.Errorf("no local Granola data available - run `granola-pp-cli sync api` (or `sync cache`) first"))
+	return notFoundErr(fmt.Errorf("no local Granola data available - run `granola-pp-cli sync-api` (or `granola-pp-cli sync` for a desktop-cache install) first"))
 }
 
 // Documents returns the union of store meetings and cache documents, keyed

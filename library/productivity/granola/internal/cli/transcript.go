@@ -133,7 +133,7 @@ func loadTranscript(ctx context.Context, id, dataSource string) ([]granola.Trans
 			return segs, src, nil
 		}
 		if dataSource == "local" || !v.hasCache() {
-			return nil, "", notFoundErr(fmt.Errorf("no transcript for %s in the local store; run `granola-pp-cli sync api` (or `sync cache`) first", id))
+			return nil, "", notFoundErr(fmt.Errorf("no transcript for %s in the local store; run `granola-pp-cli sync-api` (or `granola-pp-cli sync` for a desktop-cache install) first", id))
 		}
 	}
 	ic, err := granola.NewInternalClient()
