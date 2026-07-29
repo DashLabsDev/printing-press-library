@@ -11425,9 +11425,9 @@
       "path": "library/media-and-entertainment/movie-goat",
       "release": {
         "cli_name": "movie-goat-pp-cli",
-        "version": "2026.7.2",
-        "released_at": "2026-07-08T23:15:22Z",
-        "source_commit": "220c1563d0375ec8741c4c377b4bb5a4317cbf6a"
+        "version": "2026.7.3",
+        "released_at": "2026-07-29T06:13:03Z",
+        "source_commit": "dd926e4c931eff7d3a02b4b7ca88259140af84c7"
       },
       "printer": "tmchow",
       "printer_name": "Trevin Chow",
@@ -17592,9 +17592,9 @@
       "path": "library/media-and-entertainment/substack",
       "release": {
         "cli_name": "substack-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.7.2",
+        "released_at": "2026-07-29T06:12:24Z",
+        "source_commit": "df91a2c415cf2ce0ed288b248f1fbb8bb2a7177e"
       },
       "printer": "chirantan",
       "printer_name": "Chirantan Rajhans",
