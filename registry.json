@@ -11435,6 +11435,12 @@
         "handle": "tmchow",
         "name": "Trevin Chow"
       },
+      "contributors": [
+        {
+          "handle": "giuseppebisemi",
+          "name": "Giuseppe Bisemi"
+        }
+      ],
       "mcp": {
         "binary": "movie-goat-pp-mcp",
         "transports": [
@@ -15696,6 +15702,12 @@
         "Full-text search your local mirror of draws and credit events by kind, status, or parameters without any API call."
       ],
       "path": "library/ai/sculptok",
+      "release": {
+        "cli_name": "sculptok-pp-cli",
+        "version": "2026.7.1",
+        "released_at": "2026-07-29T02:47:52Z",
+        "source_commit": "14f584d6820fe91895cd1d892a0350b44a587b69"
+      },
       "printer": "vcolombo",
       "printer_name": "Vincent Colombo",
       "contributors": [
@@ -17598,6 +17610,10 @@
         {
           "handle": "tmchow",
           "name": "Trevin Chow"
+        },
+        {
+          "handle": "MBemera",
+          "name": "Matthew Bright"
         }
       ],
       "mcp": {
