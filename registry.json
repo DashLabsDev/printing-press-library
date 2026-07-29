@@ -8155,9 +8155,9 @@
       "path": "library/productivity/granola",
       "release": {
         "cli_name": "granola-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.7.2",
+        "released_at": "2026-07-25T23:13:09Z",
+        "source_commit": "da762648a30146ce996224cf459c4e052e7b6924"
       },
       "printer": "dstevens",
       "printer_name": "Damien Stevens",
@@ -15659,6 +15659,62 @@
         "auth_type": "api_key",
         "env_vars": [
           "SCRAPEDO_API_KEY"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
+      "name": "sculptok",
+      "category": "ai",
+      "api": "Sculptok",
+      "description": "SculptOK AI depth-map, relief, STL and 3D generation CLI",
+      "search_terms": [
+        "sculptok",
+        "sculptok-pp-cli",
+        "SculptOK AI depth-map, relief, STL and 3D generation CLI",
+        "One-command depth-map generate",
+        "generate depthmap",
+        "Turn a local image into SculptOK depth-map candidates in one command: upload, submit, auto-poll to completion, and download the results.",
+        "One-command image-to-STL",
+        "generate stl",
+        "Convert a local image straight to a printable STL with full thickness, width, invert, and scale control, polled to completion and saved.",
+        "One-command 3D model generate",
+        "generate threed",
+        "Generate a 3D model from a local image at basic, standard, or high precision, polled and downloaded automatically.",
+        "Credit-cost preflight estimator",
+        "cost",
+        "Estimate exactly how many credits a draw or a whole batch would cost and compare it against your live balance before spending anything.",
+        "Spend analytics by kind and day",
+        "analytics",
+        "Aggregate your locally synced credit events by action type to see where credits actually went.",
+        "Reconcile credits against jobs",
+        "reconcile",
+        "Cross-check synced credit charges against produced draw jobs to surface credits spent with no matching result.",
+        "Offline job search",
+        "search",
+        "Full-text search your local mirror of draws and credit events by kind, status, or parameters without any API call."
+      ],
+      "path": "library/ai/sculptok",
+      "printer": "vcolombo",
+      "printer_name": "Vincent Colombo",
+      "contributors": [
+        {
+          "handle": "vcolombo",
+          "name": "Vincent Colombo"
+        }
+      ],
+      "mcp": {
+        "binary": "sculptok-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 8,
+        "public_tool_count": 0,
+        "auth_type": "api_key",
+        "env_vars": [
+          "SCULPTOK_API_KEY"
         ],
         "mcp_ready": "full",
         "spec_format": "internal"
