@@ -20357,6 +20357,61 @@
       }
     },
     {
+      "name": "wordpress",
+      "category": "developer-tools",
+      "api": "WordPress",
+      "description": "WP-CLI-grade control over any WordPress site through plain HTTPS — no SSH, no server-side plugin, one static binary.",
+      "search_terms": [
+        "wordpress",
+        "wordpress-pp-cli",
+        "WP-CLI-grade control over any WordPress site through plain HTTPS — no SSH, no server-side plugin, one static binary.",
+        "Fleet rollup",
+        "fleet",
+        "See core version, pending updates, admin-account count and sync age for every site you manage, in one table.",
+        "REST reachability diagnosis",
+        "diagnose",
+        "Say in one command why a site's REST API is failing: path-based block, app-layer filter, bot challenge, renamed prefix, or stripped Authorization header.",
+        "Credential capability audit",
+        "caps",
+        "Report what your credentials are actually allowed to do on each route, with zero writes.",
+        "REST visibility gap",
+        "schema",
+        "Find out why a post type, field, or meta key is missing from the REST surface.",
+        "Editorial queue with age",
+        "queue",
+        "See drafts, pending, and scheduled posts bucketed by how long they have been sitting in that state.",
+        "Content hygiene audit",
+        "audit",
+        "Find posts and pages missing a featured image, a real category, an excerpt, or tags.",
+        "Orphaned media",
+        "orphans",
+        "List media files that no post or page references and that are nobody's featured image."
+      ],
+      "path": "library/developer-tools/wordpress",
+      "printer": "bobeglz",
+      "printer_name": "bobe",
+      "creator": {
+        "handle": "bobeglz",
+        "name": "bobe"
+      },
+      "mcp": {
+        "binary": "wordpress-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 174,
+        "public_tool_count": 32,
+        "auth_type": "api_key",
+        "env_vars": [
+          "WORDPRESS_USER",
+          "WORDPRESS_APP_PASSWORD"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "worten",
       "category": "commerce",
       "api": "Worten Reverse Engineered",
