@@ -84,6 +84,13 @@ func SaveTable(ctx context.Context, db *sql.DB, table *Table) error {
 	if table == nil {
 		return errors.New("nil table")
 	}
+	observationCount := 0
+	for _, row := range table.Rows {
+		observationCount += len(row.Values)
+	}
+	if len(table.Rows) == 0 || observationCount == 0 {
+		return fmt.Errorf("refusing to replace %q with an empty dataset", table.Dataset.Key)
+	}
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		return err

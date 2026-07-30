@@ -870,6 +870,13 @@ func remainingBalance(principal, annualRate float64, years, paidMonths int) floa
 		payment*(math.Pow(1+rate, float64(paidMonths))-1)/rate
 }
 
+func breakEvenValues(month int) (bool, any, any) {
+	if month <= 0 {
+		return false, nil, nil
+	}
+	return true, month, float64(month) / 12
+}
+
 func newBuyVsRentCmd(flags *rootFlags) *cobra.Command {
 	assumptions := buyRentAssumptions{
 		DownPayment: 20, TermYears: 30, HorizonYears: 10, Appreciation: 3,
@@ -920,11 +927,13 @@ func newBuyVsRentCmd(flags *rootFlags) *cobra.Command {
 					breakEvenMonth = month
 				}
 			}
+			breakEvenReached, breakEvenMonthValue, breakEvenYearValue := breakEvenValues(breakEvenMonth)
 			return emitMarket(cmd, flags, map[string]any{
 				"region": zhvi.DisplayName(), "data_date": date.Format("2006-01-02"),
 				"typical_home_value": homePrice, "typical_monthly_rent": monthlyRent,
-				"monthly_principal_interest": payment, "break_even_month": breakEvenMonth,
-				"break_even_year":        float64(breakEvenMonth) / 12,
+				"monthly_principal_interest": payment, "break_even_reached": breakEvenReached,
+				"break_even_month":       breakEvenMonthValue,
+				"break_even_year":        breakEvenYearValue,
 				"horizon_owner_net_cost": finalOwnerNetCost, "horizon_rent_cost": finalRentCost,
 				"assumptions": assumptions,
 				"caveat":      "Scenario model using regional typical values; excludes opportunity cost, tax deductions, HOA, PMI, utilities, and property-specific conditions.",
