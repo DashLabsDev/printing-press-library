@@ -43,7 +43,7 @@ This installs the CLI only — no skill.
 
 ### Pre-built binary
 
-Download a pre-built binary for your platform from the [latest release](https://github.com/mvanhorn/printing-press-library/releases/tag/judgeme-current). On macOS, clear the Gatekeeper quarantine: `xattr -d com.apple.quarantine <binary>`. On Unix, mark it executable: `chmod +x <binary>`.
+Download the matching binary and `checksums.txt` from the [latest release](https://github.com/mvanhorn/printing-press-library/releases/tag/judgeme-current) into the same directory. Verify the binary before running it (`shasum -a 256 -c checksums.txt --ignore-missing` on macOS or `sha256sum -c checksums.txt --ignore-missing` on Linux). After verification, macOS users can clear the Gatekeeper quarantine with `xattr -d com.apple.quarantine <binary>`; on Unix, mark the binary executable with `chmod +x <binary>`.
 
 <!-- pp-hermes-install-anchor -->
 ## Install for Hermes
