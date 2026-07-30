@@ -83,6 +83,27 @@ func TestNormalizedBodyHashCollapsesSyndicatedFormatting(t *testing.T) {
 	}
 }
 
+func TestDecodeJudgeMeReviewPublicationFallback(t *testing.T) {
+	tests := []struct {
+		name      string
+		raw       string
+		published bool
+	}{
+		{name: "explicit published field", raw: `{"id":1,"published":true}`, published: true},
+		{name: "explicit field remains authoritative", raw: `{"id":1,"published":false,"curated":"ok"}`, published: false},
+		{name: "curated ok fallback", raw: `{"id":1,"curated":"ok"}`, published: true},
+		{name: "curated spam fallback", raw: `{"id":1,"curated":"spam"}`, published: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			row := mustJudgeMeReview(t, tt.raw)
+			if row.Published != tt.published {
+				t.Fatalf("Published = %v, want %v", row.Published, tt.published)
+			}
+		})
+	}
+}
+
 func TestReplaceJudgeMeReviewCorpusAddsDocumentedColumnsAtomically(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "reviews.db")
 	db, err := store.OpenWithContext(context.Background(), path)
