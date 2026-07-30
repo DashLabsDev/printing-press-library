@@ -3852,6 +3852,12 @@
         "Leaderboard of chefs by dish count, average rating, average price, and cuisines on the current menu."
       ],
       "path": "library/food-and-dining/cookunity",
+      "release": {
+        "cli_name": "cookunity-pp-cli",
+        "version": "2026.7.1",
+        "released_at": "2026-07-30T06:18:25Z",
+        "source_commit": "96e8ef5649686a8c4551111384e78a91c4a878aa"
+      },
       "printer": "gcole326",
       "printer_name": "Greg Cole",
       "creator": {
@@ -9791,6 +9797,54 @@
           "JUDGE_ME_SHOP_DOMAIN"
         ],
         "mcp_ready": "full"
+      }
+    },
+    {
+      "name": "judgeme",
+      "category": "marketing",
+      "api": "Judge.me",
+      "description": "A completeness-verified Judge.me review corpus with explicit populations and syndication-aware exports.",
+      "search_terms": [
+        "judgeme",
+        "Judge.me",
+        "judgeme-pp-cli",
+        "A completeness-verified Judge.me review corpus with explicit populations and syndication-aware exports.",
+        "Completeness-safe mirror",
+        "sync",
+        "Mirror the complete review corpus and refuse success when unique IDs do not equal Judge.me's live count.",
+        "Filtered corpus export",
+        "reviews export",
+        "Export explicit published, hidden, pending, or all populations as JSON or CSV.",
+        "Population census",
+        "reviews populations",
+        "Count storefront-visible and internal moderation populations with unambiguous labels.",
+        "Syndication clusters",
+        "reviews syndication",
+        "Find identical normalized review bodies attached to multiple products.",
+        "Unique-body view",
+        "reviews unique-bodies",
+        "Return one deterministic representative per normalized review body while retaining source row counts."
+      ],
+      "path": "library/marketing/judgeme",
+      "printer": "cathrynlavery",
+      "printer_name": "Cathryn Lavery",
+      "creator": {
+        "handle": "cathrynlavery",
+        "name": "Cathryn Lavery"
+      },
+      "mcp": {
+        "binary": "judgeme-pp-mcp",
+        "transports": [
+          "stdio"
+        ],
+        "tool_count": 34,
+        "public_tool_count": 1,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
       }
     },
     {
