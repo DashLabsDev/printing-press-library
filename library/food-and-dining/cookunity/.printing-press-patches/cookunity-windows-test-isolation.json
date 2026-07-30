@@ -1,0 +1,10 @@
+{
+  "schema_version": 2,
+  "id": "cookunity-windows-test-isolation",
+  "applied_at": "2026-07-29",
+  "base_run_id": "20260729-213315-cab6f4f7",
+  "base_printing_press_version": "4.29.0",
+  "summary": "Patched generated test helpers to set USERPROFILE (and XDG_DATA_HOME) alongside HOME so path isolation works on Windows.",
+  "reason": "Go resolves the home dir via USERPROFILE on Windows; generated helpers set only HOME, leaking to the real profile. Filed as a generator retro.",
+  "files": ["internal/cli/teach_test.go", "internal/learn/journal_test.go", "internal/learn/teach_log_test.go", "internal/mcp/tools_test.go", "internal/cliutil/credentials_test.go", "internal/cliutil/paths_test.go", "internal/cliutil/credentials_perms_test.go"]
+}
