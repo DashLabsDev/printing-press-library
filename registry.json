@@ -3824,6 +3824,57 @@
       }
     },
     {
+      "name": "cookunity",
+      "category": "food-and-dining",
+      "api": "CookUnity",
+      "description": "Mirror CookUnity's full weekly menu into a local database so you can plan meals offline — filter by macros, diet, and budget, and diff the menu week over week, none of which the web app can do.",
+      "search_terms": [
+        "cookunity",
+        "cookunity-pp-cli",
+        "Mirror CookUnity's full weekly menu into a local database so you can plan meals offline — filter by macros, diet, and budget, and diff the menu week over week, none of which the web app can do.",
+        "Macro-constrained meal planner",
+        "plan",
+        "Auto-build a set of meals that collectively hit your protein, calorie, budget, and diet targets — offline, in one command.",
+        "Week-over-week menu drift",
+        "drift",
+        "See exactly which meals were added, removed, or repriced between two weekly menus.",
+        "Best-value leaderboard",
+        "value",
+        "Rank meals by nutritional value per dollar (protein-per-dollar, calories-per-dollar) computed from the local mirror.",
+        "Favorites on this week's menu",
+        "favorites",
+        "Show which of your favorited meals are actually on the current week's menu.",
+        "Meal comparison",
+        "compare",
+        "Side-by-side macro, price, chef, and allergen comparison of two or more meals.",
+        "Chef roster analytics",
+        "chefs",
+        "Leaderboard of chefs by dish count, average rating, average price, and cuisines on the current menu."
+      ],
+      "path": "library/food-and-dining/cookunity",
+      "printer": "gcole326",
+      "printer_name": "Greg Cole",
+      "creator": {
+        "handle": "gcole326",
+        "name": "Greg Cole"
+      },
+      "mcp": {
+        "binary": "cookunity-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 3,
+        "public_tool_count": 0,
+        "auth_type": "api_key",
+        "env_vars": [
+          "COOKUNITY_TOKEN"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "copper",
       "category": "sales-and-crm",
       "api": "Copper",
@@ -13262,6 +13313,12 @@
         "Print the offline previous_interaction_id follow-up chain for a run."
       ],
       "path": "library/ai/parallel",
+      "release": {
+        "cli_name": "parallel-pp-cli",
+        "version": "2026.7.1",
+        "released_at": "2026-07-30T06:16:57Z",
+        "source_commit": "d5baa370eae472477a837bade6de778a86c1fe6d"
+      },
       "printer": "SomSamantray",
       "printer_name": "Som Samantray",
       "creator": {
