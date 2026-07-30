@@ -5,6 +5,7 @@
 package cli
 
 import (
+	"fmt"
 	"sort"
 
 	"github.com/mvanhorn/printing-press-library/library/food-and-dining/cookunity/internal/types"
@@ -130,6 +131,15 @@ Run 'cookunity-pp-cli sync' first to populate the local store.`,
 			}
 			if len(selected) == 0 {
 				result["note"] = "no meals matched the constraints; loosen --diet/--calories-max or run 'cookunity-pp-cli sync' for the target week"
+			} else if proteinMin > 0 && totalProt < proteinMin {
+				// Selection is a greedy heuristic (highest-protein first, then
+				// best value), not an exhaustive optimizer, so it can miss the
+				// target when --count or --budget bind before enough protein is
+				// gathered. Report this honestly rather than implying no
+				// feasible plan exists.
+				result["note"] = fmt.Sprintf(
+					"reached %.0fg of the %.0fg protein target within the --count/--budget limits (greedy heuristic). Raise --count or --budget, or lower --protein-min, to get closer.",
+					round1(totalProt), proteinMin)
 			}
 			return flags.printJSON(cmd, result)
 		},

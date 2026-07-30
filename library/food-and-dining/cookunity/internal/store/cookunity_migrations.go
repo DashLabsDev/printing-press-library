@@ -11,12 +11,19 @@ import (
 	"fmt"
 )
 
-// ReplaceMeals atomically replaces the entire current-week `meals` table with
-// items in a single transaction: every prior row is deleted and every new meal
-// inserted under one commit. Either the whole new week lands or nothing changes,
-// so an interrupted sync can never expose a mix of old and new weeks. Returns
-// the number of meals stored.
-func (s *Store) ReplaceMeals(items []json.RawMessage) (int, error) {
+// SyncMeals atomically replaces the entire current-week `meals` table AND writes
+// the per-week `meal_snapshots` rows for deliveryDate in a single transaction:
+// every prior meals row is deleted, every new meal inserted, and every snapshot
+// upserted under one commit. Either the whole sync lands or nothing changes, so
+// an interrupted sync can never expose a mix of old and new weeks nor a menu
+// that disagrees with its snapshot. Returns the number of meals stored.
+func (s *Store) SyncMeals(deliveryDate string, items []json.RawMessage) (int, error) {
+	// DDL runs outside the data transaction; CREATE TABLE IF NOT EXISTS is
+	// idempotent and cheap.
+	if err := s.EnsureMealSnapshots(); err != nil {
+		return 0, err
+	}
+
 	s.writeMu.Lock()
 	defer s.writeMu.Unlock()
 	tx, err := s.db.Begin()
@@ -45,12 +52,51 @@ func (s *Store) ReplaceMeals(items []json.RawMessage) (int, error) {
 		if err := s.upsertMealsTx(tx, storageID, obj, item); err != nil {
 			return 0, fmt.Errorf("insert typed meal %s: %w", storageID, err)
 		}
+		// Snapshot in the SAME transaction so history can never diverge from
+		// the current menu on an interrupt.
+		if _, err := tx.Exec(
+			`INSERT INTO "meal_snapshots" ("delivery_date","meal_id","name","final_price","calories","data")
+			 VALUES (?,?,?,?,?,?)
+			 ON CONFLICT("delivery_date","meal_id") DO UPDATE SET
+			   "name"=excluded."name","final_price"=excluded."final_price",
+			   "calories"=excluded."calories","data"=excluded."data",
+			   "synced_at"=CURRENT_TIMESTAMP`,
+			deliveryDate, snapshotID(obj), snapshotStr(obj, "name"),
+			snapshotFloat(obj, "finalPrice"), snapshotInt(obj, "calories"), string(item),
+		); err != nil {
+			return 0, fmt.Errorf("snapshot meal %s: %w", storageID, err)
+		}
 		stored++
 	}
 	if err := tx.Commit(); err != nil {
 		return 0, err
 	}
 	return stored, nil
+}
+
+func snapshotID(obj map[string]any) string {
+	if v, ok := obj["id"]; ok {
+		return ResourceIDString(v)
+	}
+	return ""
+}
+func snapshotStr(obj map[string]any, k string) string {
+	if v, ok := obj[k].(string); ok {
+		return v
+	}
+	return ""
+}
+func snapshotFloat(obj map[string]any, k string) float64 {
+	if v, ok := obj[k].(float64); ok {
+		return v
+	}
+	return 0
+}
+func snapshotInt(obj map[string]any, k string) int {
+	if v, ok := obj[k].(float64); ok {
+		return int(v)
+	}
+	return 0
 }
 
 // EnsureMealSnapshots lazily creates the per-week snapshot table. Safe to call

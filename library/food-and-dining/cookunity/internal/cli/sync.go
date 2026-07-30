@@ -10,7 +10,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -118,10 +117,6 @@ func runCookunitySync(ctx context.Context, flags *rootFlags, date, dbPath string
 	}
 	defer db.Close()
 
-	if err := db.EnsureMealSnapshots(); err != nil {
-		return 0, dbPath, err
-	}
-
 	items := make([]json.RawMessage, 0, len(meals))
 	for _, m := range meals {
 		raw, err := json.Marshal(m)
@@ -131,30 +126,22 @@ func runCookunitySync(ctx context.Context, flags *rootFlags, date, dbPath string
 		items = append(items, json.RawMessage(raw))
 	}
 
-	// Replace the entire current-week `meals` table in a single transaction
-	// (clear + insert-all under one commit). This is atomic: an interrupted
-	// sync either leaves the prior week fully intact or lands the new week
-	// fully — never a mix of two weeks. FetchMenu has already rejected any
-	// incomplete cluster fetch, so `items` is the complete week or the sync
-	// aborted before reaching here.
-	stored, err := db.ReplaceMeals(items)
+	// Replace the current-week `meals` table AND write the per-week snapshots in
+	// a single transaction. This is atomic: an interrupted sync either leaves
+	// the prior week fully intact or lands the new week fully — never a mix of
+	// two weeks and never a menu that disagrees with its snapshot. FetchMenu has
+	// already rejected any incomplete cluster fetch, so `items` is the complete
+	// week or the sync aborted before reaching here.
+	stored, err := db.SyncMeals(date, items)
 	if err != nil {
 		return 0, dbPath, fmt.Errorf("storing meals: %w", err)
 	}
 
-	// Historical per-week snapshots (used only by `drift`) are written after
-	// the current week is committed. These are keyed by (delivery_date, id)
-	// and are additive, so a partial write here degrades only drift history,
-	// never the current menu.
-	for _, m := range meals {
-		raw, err := json.Marshal(m)
-		if err != nil {
-			continue
-		}
-		if err := db.UpsertMealSnapshot(date, strconv.Itoa(m.Id), m.Name, m.FinalPrice, m.Calories, json.RawMessage(raw)); err != nil {
-			return stored, dbPath, err
-		}
-	}
+	// SaveSyncState records advisory metadata only (last-synced time + count for
+	// the staleness hint). It is intentionally outside the data transaction: if
+	// an interrupt lands between the commit above and here, the data is fully
+	// consistent and only the "last synced" hint lags by one run, which the next
+	// sync corrects. It never affects query correctness.
 	if err := db.SaveSyncState("meals", date, stored); err != nil {
 		return stored, dbPath, err
 	}
