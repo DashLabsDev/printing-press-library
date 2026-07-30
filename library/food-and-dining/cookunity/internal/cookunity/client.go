@@ -147,18 +147,21 @@ func (c *Client) FetchMenu(ctx context.Context, date string) ([]Meal, error) {
 			return nil, fmt.Errorf("fetching cluster %s: %w", cl.params["filterBy"], cerr)
 		}
 		if cstatus == http.StatusUnauthorized || cstatus == http.StatusForbidden {
-			// Auth failure on a cluster means the token expired mid-sync;
-			// abort rather than silently returning a partial/empty menu that
-			// would wipe the local catalog.
+			// Auth failure on a cluster means the token expired mid-sync.
 			return nil, fmt.Errorf("unauthorized (HTTP %d) fetching cluster %s: the CookUnity token expired mid-sync — re-copy it into COOKUNITY_TOKEN", cstatus, cl.params["filterBy"])
 		}
 		if cstatus != http.StatusOK {
-			// A single non-auth cluster failure shouldn't abort the whole sync.
-			continue
+			// Reject the whole fetch on ANY cluster failure. Silently skipping
+			// a failed cluster would return a partial menu that the caller
+			// treats as complete, corrupting both the current table and the
+			// per-week snapshot (drift would then report the missing cluster's
+			// meals as "removed"). A complete menu or an error, never a
+			// partial success.
+			return nil, fmt.Errorf("cluster %s returned HTTP %d; menu is incomplete — not syncing a partial menu, re-run 'sync'", cl.params["filterBy"], cstatus)
 		}
 		var cnode any
 		if err := json.Unmarshal(cbody, &cnode); err != nil {
-			continue
+			return nil, fmt.Errorf("parsing cluster %s: %w (menu is incomplete — not syncing a partial menu)", cl.params["filterBy"], err)
 		}
 		for _, props := range collectMealProperties(cnode) {
 			m := flattenMeal(props, date)

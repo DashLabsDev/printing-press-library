@@ -129,21 +129,31 @@ func runCookunitySync(ctx context.Context, flags *rootFlags, date, dbPath string
 			continue
 		}
 		items = append(items, json.RawMessage(raw))
-		if err := db.UpsertMealSnapshot(date, strconv.Itoa(m.Id), m.Name, m.FinalPrice, m.Calories, json.RawMessage(raw)); err != nil {
-			return 0, dbPath, err
-		}
 	}
 
-	// Upsert the just-fetched week FIRST, then drop stale rows from prior
-	// delivery dates. Ordering it this way keeps the `meals` table non-empty
-	// at every point: a crash or error mid-sync leaves the previous catalog
-	// (or a superset) intact rather than an empty table.
-	stored, _, err := db.UpsertBatch("meals", items)
+	// Replace the entire current-week `meals` table in a single transaction
+	// (clear + insert-all under one commit). This is atomic: an interrupted
+	// sync either leaves the prior week fully intact or lands the new week
+	// fully — never a mix of two weeks. FetchMenu has already rejected any
+	// incomplete cluster fetch, so `items` is the complete week or the sync
+	// aborted before reaching here.
+	stored, err := db.ReplaceMeals(items)
 	if err != nil {
 		return 0, dbPath, fmt.Errorf("storing meals: %w", err)
 	}
-	if _, err := db.DB().ExecContext(ctx, `DELETE FROM "meals" WHERE "delivery_date" != ?`, date); err != nil {
-		return stored, dbPath, fmt.Errorf("pruning stale meals: %w", err)
+
+	// Historical per-week snapshots (used only by `drift`) are written after
+	// the current week is committed. These are keyed by (delivery_date, id)
+	// and are additive, so a partial write here degrades only drift history,
+	// never the current menu.
+	for _, m := range meals {
+		raw, err := json.Marshal(m)
+		if err != nil {
+			continue
+		}
+		if err := db.UpsertMealSnapshot(date, strconv.Itoa(m.Id), m.Name, m.FinalPrice, m.Calories, json.RawMessage(raw)); err != nil {
+			return stored, dbPath, err
+		}
 	}
 	if err := db.SaveSyncState("meals", date, stored); err != nil {
 		return stored, dbPath, err

@@ -11,6 +11,48 @@ import (
 	"fmt"
 )
 
+// ReplaceMeals atomically replaces the entire current-week `meals` table with
+// items in a single transaction: every prior row is deleted and every new meal
+// inserted under one commit. Either the whole new week lands or nothing changes,
+// so an interrupted sync can never expose a mix of old and new weeks. Returns
+// the number of meals stored.
+func (s *Store) ReplaceMeals(items []json.RawMessage) (int, error) {
+	s.writeMu.Lock()
+	defer s.writeMu.Unlock()
+	tx, err := s.db.Begin()
+	if err != nil {
+		return 0, err
+	}
+	defer tx.Rollback()
+
+	if _, err := tx.Exec(`DELETE FROM "meals"`); err != nil {
+		return 0, fmt.Errorf("clearing meals: %w", err)
+	}
+	stored := 0
+	for _, item := range items {
+		obj, err := DecodeJSONObject(item)
+		if err != nil {
+			continue
+		}
+		id := ExtractResourceID("meals", obj)
+		if id == "" {
+			continue
+		}
+		storageID := resourceStorageID("meals", id, obj)
+		if err := s.upsertGenericResourceTx(tx, "meals", storageID, item); err != nil {
+			return 0, fmt.Errorf("insert meal %s: %w", storageID, err)
+		}
+		if err := s.upsertMealsTx(tx, storageID, obj, item); err != nil {
+			return 0, fmt.Errorf("insert typed meal %s: %w", storageID, err)
+		}
+		stored++
+	}
+	if err := tx.Commit(); err != nil {
+		return 0, err
+	}
+	return stored, nil
+}
+
 // EnsureMealSnapshots lazily creates the per-week snapshot table. Safe to call
 // repeatedly.
 func (s *Store) EnsureMealSnapshots() error {

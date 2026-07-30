@@ -57,28 +57,65 @@ Run 'cookunity-pp-cli sync' first to populate the local store.`,
 				diet: diet, cuisine: cuisine, maxCalories: caloriesMax,
 				excludeAllergen: excludeAllg, inStockOnly: true,
 			})
-			// Rank by protein-per-dollar, highest first.
-			sort.SliceStable(eligible, func(i, j int) bool {
-				return proteinPerDollar(eligible[i]) > proteinPerDollar(eligible[j])
-			})
-
 			var (
 				selected  []types.Meal
 				totalCals int
 				totalProt float64
 				totalCost float64
+				picked    = make(map[int]bool)
 			)
-			for _, m := range eligible {
+			// add appends a meal if it fits the count and budget limits and
+			// hasn't already been picked; reports whether it was added.
+			add := func(m types.Meal) bool {
+				if picked[m.Id] {
+					return false
+				}
 				if count > 0 && len(selected) >= count {
-					break
+					return false
 				}
 				if budget > 0 && totalCost+m.FinalPrice > budget {
-					continue
+					return false
 				}
+				picked[m.Id] = true
 				selected = append(selected, m)
 				totalCals += m.Calories
 				totalProt += m.Protein
 				totalCost += m.FinalPrice
+				return true
+			}
+
+			// Phase 1 — satisfy the protein target. When --protein-min is set,
+			// front-load the highest-protein meals so the target actually
+			// constrains selection, adding until the total reaches the target
+			// or the count/budget limits bind.
+			if proteinMin > 0 {
+				byProtein := make([]types.Meal, len(eligible))
+				copy(byProtein, eligible)
+				sort.SliceStable(byProtein, func(i, j int) bool {
+					return byProtein[i].Protein > byProtein[j].Protein
+				})
+				for _, m := range byProtein {
+					if totalProt >= proteinMin {
+						break
+					}
+					if count > 0 && len(selected) >= count {
+						break
+					}
+					add(m)
+				}
+			}
+
+			// Phase 2 — fill any remaining slots by protein-per-dollar (value).
+			byValue := make([]types.Meal, len(eligible))
+			copy(byValue, eligible)
+			sort.SliceStable(byValue, func(i, j int) bool {
+				return proteinPerDollar(byValue[i]) > proteinPerDollar(byValue[j])
+			})
+			for _, m := range byValue {
+				if count > 0 && len(selected) >= count {
+					break
+				}
+				add(m)
 			}
 
 			result := map[string]any{
@@ -99,7 +136,7 @@ Run 'cookunity-pp-cli sync' first to populate the local store.`,
 	}
 
 	cmd.Flags().StringVar(&dbPath, "db", "", "Database path (default: standard local path)")
-	cmd.Flags().Float64Var(&proteinMin, "protein-min", 0, "Target minimum total protein grams (reported; selection maximizes protein)")
+	cmd.Flags().Float64Var(&proteinMin, "protein-min", 0, "Minimum total protein grams the plan should reach; front-loads high-protein meals to hit it (0 = value-ranked only)")
 	cmd.Flags().IntVar(&caloriesMax, "calories-max", 0, "Maximum calories per meal (0 = no cap)")
 	cmd.Flags().IntVar(&count, "count", 8, "Number of meals to select")
 	cmd.Flags().Float64Var(&budget, "budget", 0, "Maximum total price across selected meals (0 = no cap)")
