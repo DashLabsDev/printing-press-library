@@ -31,5 +31,5 @@
     "internal/mcp/tools_test.go",
     "tools-manifest.json"
   ],
-  "validated_outcome": "Unit tests prove repeated-page detection, count-mismatch refusal, normalized body hashing, atomic SQLite replacement, private-token header placement, CLI mutation gating, MCP mutation gating, and population filtering. Live count verification is recorded in the publication proof."
+  "validated_outcome": "Unit tests prove repeated-page detection, count-mismatch refusal, normalized body hashing, atomic SQLite replacement, private-token header placement, CLI mutation gating, MCP mutation gating, population filtering, and the curated publication fallback when published is absent. Live verification confirmed that published is present and agrees with curated on the sampled account response, then matched the full corpus and published counts after the fallback was added."
 }

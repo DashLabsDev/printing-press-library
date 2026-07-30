@@ -545,12 +545,16 @@ func decodeJudgeMeReview(raw json.RawMessage) (judgeMeReview, error) {
 		return judgeMeReview{}, errors.New("review has no id")
 	}
 	body := scalarString(obj["body"])
+	published := scalarBool(obj["published"])
+	if _, present := obj["published"]; !present {
+		published = scalarString(obj["curated"]) == "ok"
+	}
 	return judgeMeReview{
 		ID:                id,
 		Body:              body,
 		BodyHash:          normalizedBodyHash(body),
 		Rating:            scalarInt(obj["rating"]),
-		Published:         scalarBool(obj["published"]),
+		Published:         published,
 		Hidden:            scalarBool(obj["hidden"]),
 		ProductExternalID: scalarString(obj["product_external_id"]),
 		ProductHandle:     scalarString(obj["product_handle"]),
