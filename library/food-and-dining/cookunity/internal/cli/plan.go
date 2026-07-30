@@ -164,27 +164,34 @@ Run 'cookunity-pp-cli sync' first to populate the local store.`,
 				}
 			}
 
+			// Derive one rounded protein total and base BOTH the displayed
+			// values and meets_protein on it, so the reported total, the target
+			// status, and the note can never contradict each other (a raw total
+			// a hair under the target that rounds up now reads as met, matching
+			// the displayed figure).
+			roundedProt := round1(totalProt)
+			meetsProtein := proteinMin == 0 || roundedProt >= proteinMin
+
 			result := map[string]any{
 				"meals":            selected,
 				"count":            len(selected),
 				"total_calories":   totalCals,
-				"total_protein":    round1(totalProt),
+				"total_protein":    roundedProt,
 				"total_cost":       round2(totalCost),
 				"protein_target":   proteinMin,
-				"protein_achieved": round1(totalProt),
-				"meets_protein":    proteinMin == 0 || totalProt >= proteinMin,
+				"protein_achieved": roundedProt,
+				"meets_protein":    meetsProtein,
 			}
 			if len(selected) == 0 {
 				result["note"] = "no meals matched the constraints; loosen --diet/--calories-max or run 'cookunity-pp-cli sync' for the target week"
-			} else if proteinMin > 0 && totalProt < proteinMin {
-				// Selection is a greedy heuristic (highest-protein first, then
-				// best value), not an exhaustive optimizer, so it can miss the
-				// target when --count or --budget bind before enough protein is
-				// gathered. Report this honestly rather than implying no
-				// feasible plan exists.
+			} else if proteinMin > 0 && !meetsProtein {
+				// Selection is a greedy heuristic with a local-search swap pass,
+				// not an exhaustive optimizer, so it can fall short when --count
+				// or --budget bind before enough protein is gathered. Report the
+				// shortfall honestly rather than implying no feasible plan exists.
 				result["note"] = fmt.Sprintf(
-					"reached %.0fg of the %.0fg protein target within the --count/--budget limits (greedy heuristic). Raise --count or --budget, or lower --protein-min, to get closer.",
-					round1(totalProt), proteinMin)
+					"fell short of the %gg protein target (best plan found: %gg within the --count/--budget limits). Raise --count or --budget, or lower --protein-min.",
+					proteinMin, roundedProt)
 			}
 			return flags.printJSON(cmd, result)
 		},
