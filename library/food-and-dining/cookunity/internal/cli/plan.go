@@ -119,6 +119,51 @@ Run 'cookunity-pp-cli sync' first to populate the local store.`,
 				add(m)
 			}
 
+			// Phase 3 — local-search improvement. A pure greedy pass can leave
+			// the protein target unmet even when a feasible plan exists (e.g.
+			// phase 1 spent the budget on expensive high-protein picks). While
+			// under target, repeatedly swap a lower-protein selected meal for a
+			// higher-protein eligible one whenever the swap raises total protein
+			// and stays within budget. This recovers feasible combinations the
+			// greedy ordering misses, hill-climbing until the target is reached
+			// or no improving swap remains.
+			if proteinMin > 0 && totalProt < proteinMin {
+				byProteinDesc := make([]types.Meal, len(eligible))
+				copy(byProteinDesc, eligible)
+				sort.SliceStable(byProteinDesc, func(i, j int) bool {
+					return byProteinDesc[i].Protein > byProteinDesc[j].Protein
+				})
+				for improved := true; improved && totalProt < proteinMin; {
+					improved = false
+					for _, cand := range byProteinDesc {
+						if picked[cand.Id] {
+							continue
+						}
+						for si := range selected {
+							sel := selected[si]
+							if cand.Protein <= sel.Protein {
+								continue
+							}
+							newCost := totalCost - sel.FinalPrice + cand.FinalPrice
+							if budget > 0 && newCost > budget {
+								continue
+							}
+							picked[sel.Id] = false
+							picked[cand.Id] = true
+							totalProt += cand.Protein - sel.Protein
+							totalCals += cand.Calories - sel.Calories
+							totalCost = newCost
+							selected[si] = cand
+							improved = true
+							break
+						}
+						if improved {
+							break
+						}
+					}
+				}
+			}
+
 			result := map[string]any{
 				"meals":            selected,
 				"count":            len(selected),

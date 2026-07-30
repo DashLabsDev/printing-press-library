@@ -4,7 +4,7 @@
   "applied_at": "2026-07-30",
   "base_run_id": "20260729-213315-cab6f4f7",
   "base_printing_press_version": "4.29.0",
-  "summary": "Addressed Greptile PR review (P1): reject incomplete cluster fetches (client), fully atomic sync via store.SyncMeals (meals + per-week snapshots committed in one transaction; SaveSyncState is advisory-only metadata), and a two-phase plan that front-loads high-protein meals to reach --protein-min with an honest heuristic note when count/budget bind first.",
-  "reason": "Public-library code review (PR #1628) flagged partial-menu corruption, non-atomic sync state, and a non-constraining protein target.",
+  "summary": "Greptile PR review hardening: reject incomplete cluster fetches (client); store.SyncMeals commits meals + per-week snapshots + sync-state metadata in ONE transaction (fully atomic sync); plan uses two-phase greedy plus a local-search swap phase to reach --protein-min within count/budget, with an honest note when genuinely infeasible.",
+  "reason": "Public-library code review (PR #1628): partial-menu corruption, non-atomic sync state, and a non-constraining/feasibility-missing protein target.",
   "files": ["internal/cookunity/client.go", "internal/store/cookunity_migrations.go", "internal/cli/sync.go", "internal/cli/plan.go"]
 }

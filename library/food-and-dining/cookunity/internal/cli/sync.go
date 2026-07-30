@@ -132,18 +132,13 @@ func runCookunitySync(ctx context.Context, flags *rootFlags, date, dbPath string
 	// two weeks and never a menu that disagrees with its snapshot. FetchMenu has
 	// already rejected any incomplete cluster fetch, so `items` is the complete
 	// week or the sync aborted before reaching here.
+	// SyncMeals commits the current meals table, the per-week snapshots, AND the
+	// sync-state metadata in a single transaction, so an interrupted sync can
+	// never leave the catalog, its history, or the recorded sync metadata
+	// inconsistent with each other.
 	stored, err := db.SyncMeals(date, items)
 	if err != nil {
 		return 0, dbPath, fmt.Errorf("storing meals: %w", err)
-	}
-
-	// SaveSyncState records advisory metadata only (last-synced time + count for
-	// the staleness hint). It is intentionally outside the data transaction: if
-	// an interrupt lands between the commit above and here, the data is fully
-	// consistent and only the "last synced" hint lags by one run, which the next
-	// sync corrects. It never affects query correctness.
-	if err := db.SaveSyncState("meals", date, stored); err != nil {
-		return stored, dbPath, err
 	}
 	return stored, dbPath, nil
 }

@@ -9,6 +9,7 @@ package store
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 )
 
 // SyncMeals atomically replaces the entire current-week `meals` table AND writes
@@ -67,6 +68,17 @@ func (s *Store) SyncMeals(deliveryDate string, items []json.RawMessage) (int, er
 			return 0, fmt.Errorf("snapshot meal %s: %w", storageID, err)
 		}
 		stored++
+	}
+	// Write the sync-state metadata in the SAME transaction so the recorded
+	// last-synced count/timestamp can never lag the committed catalog data.
+	if _, err := tx.Exec(
+		`INSERT INTO sync_state (resource_type, last_cursor, last_synced_at, total_count)
+		 VALUES (?, ?, ?, ?)
+		 ON CONFLICT(resource_type) DO UPDATE SET last_cursor = excluded.last_cursor,
+		 last_synced_at = excluded.last_synced_at, total_count = excluded.total_count`,
+		"meals", deliveryDate, time.Now().UTC().Format(time.RFC3339), stored,
+	); err != nil {
+		return 0, fmt.Errorf("recording sync state: %w", err)
 	}
 	if err := tx.Commit(); err != nil {
 		return 0, err
