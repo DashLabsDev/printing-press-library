@@ -13231,6 +13231,59 @@
       }
     },
     {
+      "name": "parallel",
+      "category": "ai",
+      "api": "Parallel",
+      "description": "Agent-native Parallel web research with a local SQLite memory no other Parallel CLI keeps.",
+      "search_terms": [
+        "parallel",
+        "parallel-pp-cli",
+        "Agent-native Parallel web research with a local SQLite memory no other Parallel CLI keeps.",
+        "Research session stitch",
+        "session stitch",
+        "Bind search, extract, and task/findall runs into one local session chain for agent resume.",
+        "Balance-aware run cost guard",
+        "tasks guard",
+        "Refuse Task creates when prepaid balance is below a threshold.",
+        "Stale monitor event digest",
+        "monitors digest",
+        "Mechanical per-monitor event counts and top titles since a duration window.",
+        "Cross-run research recall",
+        "research recall",
+        "FTS across local searches, extracts, and task summaries with typed hit IDs.",
+        "FindAll to Task Group promote",
+        "findall promote",
+        "Turn FindAll candidates into a Task Group enrichment job.",
+        "Prepaid burn vs runs",
+        "balance burn",
+        "Diff local balance snapshots against local run volume over a window.",
+        "Task interaction lineage",
+        "tasks lineage",
+        "Print the offline previous_interaction_id follow-up chain for a run."
+      ],
+      "path": "library/ai/parallel",
+      "printer": "SomSamantray",
+      "printer_name": "Som Samantray",
+      "creator": {
+        "handle": "SomSamantray",
+        "name": "Som Samantray"
+      },
+      "mcp": {
+        "binary": "parallel-pp-mcp",
+        "transports": [
+          "stdio"
+        ],
+        "tool_count": 39,
+        "public_tool_count": 0,
+        "auth_type": "api_key",
+        "env_vars": [
+          "PARALLEL_API_KEY"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "passage",
       "category": "media-and-entertainment",
       "api": "passage",
@@ -20388,6 +20441,12 @@
         "List media files that no post or page references and that are nobody's featured image."
       ],
       "path": "library/developer-tools/wordpress",
+      "release": {
+        "cli_name": "wordpress-pp-cli",
+        "version": "2026.7.1",
+        "released_at": "2026-07-29T06:17:13Z",
+        "source_commit": "f48197a34ad453256195e0795aeebdc17a073202"
+      },
       "printer": "bobeglz",
       "printer_name": "bobe",
       "creator": {
