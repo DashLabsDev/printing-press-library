@@ -4140,6 +4140,12 @@
         "Compare two models field by field across the full specification table."
       ],
       "path": "library/devices/crestron",
+      "release": {
+        "cli_name": "crestron-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-06T07:34:55Z",
+        "source_commit": "c4948ab6806e6346acfcad5a70c134ad3bd4ba84"
+      },
       "printer": "Drummerms",
       "printer_name": "drummerms",
       "creator": {
@@ -16894,7 +16900,7 @@
       "search_terms": [
         "shopper",
         "shopper-pp-cli",
-        "The first CLI for Shopper — every catalog, cart, and delivery surface plus a local price/basket history the web app throws away each cycle.",
+        "Every Shopper storefront in one CLI — catalog, cart, delivery schedule, charge calendar, and spend analytics no web UI surfaces.",
         "Charge & Edit Calendar",
         "charge-calendar",
         "Every upcoming cycle's charge date, edit-lock deadline, and delivery date in one timeline so you never miss an edit window or get surprised by a charge.",
@@ -16911,7 +16917,10 @@
         "Flags products you buy that were discontinued, silently swapped, or kept their price while shrinking the pack, surfacing the real R$/kg or R$/L change.",
         "Cashback Threshold Optimizer",
         "cashback optimize",
-        "Computes the cheapest set of items to add (or whether to wait) to cross the next cashback tier, favoring things you'll need anyway."
+        "Computes the cheapest set of items to add (or whether to wait) to cross the next cashback tier, favoring things you'll need anyway.",
+        "Cross-Store Checkout Preview",
+        "checkout preview",
+        "Aggregates cart totals, next delivery date, charge date, minimum-order status, and accepted payment types into one pre-checkout view before you open the browser."
       ],
       "path": "library/commerce/shopper",
       "release": {
@@ -16932,11 +16941,11 @@
           "stdio",
           "http"
         ],
-        "tool_count": 21,
+        "tool_count": 22,
         "public_tool_count": 0,
         "auth_type": "bearer_token",
         "env_vars": [
-          "SHOPPER_TOKEN"
+          "PRINTING_PRESS_CLIENT_PROFILE"
         ],
         "mcp_ready": "full",
         "spec_format": "internal"
