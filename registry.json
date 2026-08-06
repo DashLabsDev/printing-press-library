@@ -17045,6 +17045,63 @@
       }
     },
     {
+      "name": "simplefin",
+      "category": "payments",
+      "api": "SimpleFIN",
+      "description": "Pull every bank, card, and brokerage account through SimpleFIN into a local SQLite ledger — with net worth, cash flow, recurring-charge detection, and holdings gain/loss no single bank app can show.",
+      "search_terms": [
+        "simplefin",
+        "simplefin-pp-cli",
+        "Pull every bank, card, and brokerage account through SimpleFIN into a local SQLite ledger — with net worth, cash flow, recurring-charge detection, and holdings gain/loss no single bank app can show.",
+        "Net worth + trajectory",
+        "networth",
+        "Total net worth across every institution, with a balance trajectory over time no bank app can show.",
+        "Cash flow analysis",
+        "cashflow",
+        "Income vs outflow by month and top-spend merchants across all accounts.",
+        "Recurring/subscription detection",
+        "recurring",
+        "Surfaces subscriptions and regular obligations by detecting repeated payees with regular cadence.",
+        "Holdings gain/loss",
+        "portfolio",
+        "Investment positions with market value vs cost basis and total gain/loss across brokerages.",
+        "Rules-based categorization",
+        "categorize",
+        "Assigns categories to transactions with deterministic keyword/regex rules (the protocol has none).",
+        "Ledger/plaintext export",
+        "export",
+        "Exports the local ledger to ledger, beancount, csv, or qif for plaintextaccounting tools.",
+        "Content-based dedup",
+        "reconcile",
+        "Finds and merges duplicate transactions created by SimpleFIN's unstable, mirrored IDs using content hashing.",
+        "Recent activity since last check",
+        "since",
+        "What's new across all accounts since a date or your last sync — new transactions and balance changes, neutrally framed."
+      ],
+      "path": "library/payments/simplefin",
+      "printer": "twidtwid",
+      "printer_name": "Todd Dailey",
+      "creator": {
+        "handle": "twidtwid",
+        "name": "Todd Dailey"
+      },
+      "mcp": {
+        "binary": "simplefin-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 2,
+        "public_tool_count": 0,
+        "auth_type": "api_key",
+        "env_vars": [
+          "SIMPLEFIN_ACCESS_URL"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "skool",
       "category": "media-and-entertainment",
       "api": "Skool",
@@ -19930,6 +19987,12 @@
         "Validate V0_API_KEY and API reachability with a live check."
       ],
       "path": "library/ai/v0",
+      "release": {
+        "cli_name": "v0-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-06T07:39:41Z",
+        "source_commit": "ba9335cf07168ca181d004704662c266a350f86c"
+      },
       "printer": "SomSamantray",
       "printer_name": "Som Samantray",
       "creator": {
