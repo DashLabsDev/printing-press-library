@@ -17134,9 +17134,9 @@
       "path": "library/productivity/slack",
       "release": {
         "cli_name": "slack-pp-cli",
-        "version": "2026.7.2",
-        "released_at": "2026-07-08T23:15:22Z",
-        "source_commit": "220c1563d0375ec8741c4c377b4bb5a4317cbf6a"
+        "version": "2026.8.1",
+        "released_at": "2026-08-06T07:38:29Z",
+        "source_commit": "39d4278e16c5956e7e0b3aeaf0050a6699c408d0"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
