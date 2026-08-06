@@ -4112,6 +4112,57 @@
       }
     },
     {
+      "name": "crestron",
+      "category": "devices",
+      "api": "Crestron",
+      "description": "Every Crestron product, spec sheet, and firmware release — searchable offline, with fleet-wide currency checks the website cannot do.",
+      "search_terms": [
+        "crestron",
+        "crestron-pp-cli",
+        "Every Crestron product, spec sheet, and firmware release — searchable offline, with fleet-wide currency checks the website cannot do.",
+        "Fleet firmware status",
+        "fleet status",
+        "Check every model in your installed fleet against current firmware in one command.",
+        "Release-note full-text search",
+        "search",
+        "Search every firmware release note and change log at once for a term.",
+        "Release-note diff",
+        "firmware diff",
+        "Show what changed between two firmware versions for a model.",
+        "Submittal package builder",
+        "submittal",
+        "Download every documentation asset for a list of models into per-model folders with a coverage report.",
+        "Lifecycle and replacement trace",
+        "lifecycle",
+        "Report whether a model is still sellable and trace its replacement chain.",
+        "Spec table comparison",
+        "specs compare",
+        "Compare two models field by field across the full specification table."
+      ],
+      "path": "library/devices/crestron",
+      "printer": "Drummerms",
+      "printer_name": "drummerms",
+      "creator": {
+        "handle": "Drummerms",
+        "name": "drummerms"
+      },
+      "mcp": {
+        "binary": "crestron-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 13,
+        "public_tool_count": 0,
+        "auth_type": "cookie",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "partial",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "customer-io",
       "category": "marketing",
       "api": "Customer.io",
@@ -6620,9 +6671,9 @@
       "path": "library/travel/flight-goat",
       "release": {
         "cli_name": "flight-goat-pp-cli",
-        "version": "2026.7.3",
-        "released_at": "2026-07-13T08:32:42Z",
-        "source_commit": "ceca5e2352dee41e4ad77ceb1428e283dd0bb29b"
+        "version": "2026.8.1",
+        "released_at": "2026-08-06T02:25:14Z",
+        "source_commit": "e95d13162c28de41ef7b090ec11b2fbf21076bf3"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
