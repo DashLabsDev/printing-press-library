@@ -838,9 +838,9 @@
       "path": "library/travel/alaska-airlines",
       "release": {
         "cli_name": "alaska-airlines-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.8.1",
+        "released_at": "2026-08-06T07:40:43Z",
+        "source_commit": "b03cc01aff2a9b582ec6c85b9180af83e1101550"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -11909,6 +11909,53 @@
       }
     },
     {
+      "name": "nejm",
+      "category": "health",
+      "api": "New England Journal of Medicine",
+      "description": "Browse, search, and triage New England Journal of Medicine articles from the terminal, backed by a local corpus and a browser-compatible transport that clears Cloudflare.",
+      "search_terms": [
+        "nejm",
+        "New England Journal of Medicine",
+        "nejm-pp-cli",
+        "Browse, search, and triage New England Journal of Medicine articles from the terminal, backed by a local corpus and a browser-compatible transport that clears Cloudflare.",
+        "Time-windowed new articles",
+        "since",
+        "List new NEJM articles published within a specified time window.",
+        "Current-issue reading digest",
+        "digest",
+        "Generate a reading digest of the current issue.",
+        "Personal reading list",
+        "reading-list",
+        "Manage a personal reading list of NEJM articles.",
+        "Specialty and type trends",
+        "trends",
+        "Show specialty and type trends across NEJM publications.",
+        "Open-access finder",
+        "open-access",
+        "Find open-access articles in NEJM."
+      ],
+      "path": "library/health/nejm",
+      "printer": "laci141",
+      "printer_name": "laci141",
+      "creator": {
+        "handle": "laci141",
+        "name": "laci141"
+      },
+      "mcp": {
+        "binary": "nejm-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 2,
+        "public_tool_count": 2,
+        "auth_type": "none",
+        "env_vars": [],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "netlify",
       "category": "cloud",
       "api": "netlify",
@@ -11999,6 +12046,52 @@
         "auth_type": "none",
         "env_vars": [],
         "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
+      "name": "notebooklm",
+      "category": "ai",
+      "api": "Gemini Notebook (NotebookLM)",
+      "description": "Unofficial Go CLI for Gemini Notebook — notebooks, sources, chat, Studio artifacts, SQLite cache, and MCP via batchexecute RPC with Chrome session auth.",
+      "search_terms": [
+        "notebooklm",
+        "Gemini Notebook (NotebookLM)",
+        "notebooklm-pp-cli",
+        "Unofficial Go CLI for Gemini Notebook — notebooks, sources, chat, Studio artifacts, SQLite cache, and MCP via batchexecute RPC with Chrome session auth.",
+        "Chrome session auth",
+        "auth login",
+        "Import Google session cookies from Chrome without manual DevTools copying.",
+        "Offline notebook search",
+        "search",
+        "Search synced notebooks locally by title or id without another API round-trip.",
+        "Grounded chat with citations",
+        "chat ask",
+        "Ask questions against notebook sources via streamed batchexecute RPC.",
+        "Studio quiz generation",
+        "studio generate-quiz",
+        "Kick off NotebookLM Studio quiz artifact generation and optionally wait for completion.",
+        "Doctor health gate",
+        "doctor",
+        "Validate config, cookie presence, and session bootstrap tokens before live calls."
+      ],
+      "path": "library/ai/notebooklm",
+      "printer": "SomSamantray",
+      "printer_name": "Som Samantray",
+      "creator": {
+        "handle": "SomSamantray",
+        "name": "Som Samantray"
+      },
+      "mcp": {
+        "binary": "notebooklm-pp-mcp",
+        "transports": [
+          "stdio"
+        ],
+        "tool_count": 0,
+        "public_tool_count": 0,
+        "auth_type": "cookie",
+        "env_vars": [],
+        "mcp_ready": "yes",
         "spec_format": "internal"
       }
     },
@@ -15816,6 +15909,71 @@
       }
     },
     {
+      "name": "scientific-consensus",
+      "category": "other",
+      "api": "Scientific Consensus",
+      "description": "Aggregate PubMed, OpenAlex, Crossref, and Europe PMC into evidence summaries, consensus scores, and study-design pyramids no single search tool produces.",
+      "search_terms": [
+        "scientific-consensus",
+        "Scientific Consensus",
+        "scientific-consensus-pp-cli",
+        "Aggregate PubMed, OpenAlex, Crossref, and Europe PMC into evidence summaries, consensus scores, and study-design pyramids no single search tool produces.",
+        "Consensus engine",
+        "consensus",
+        "Answer 'what does the evidence say about X' with a Consensus Score, Confidence Score, and Evidence Strength across all sources.",
+        "Evidence engine + pyramid",
+        "evidence",
+        "Classify retrieved studies by design (meta-analysis to case report) and render the evidence pyramid for a topic.",
+        "Claim comparison",
+        "compare",
+        "Run two consensus analyses side-by-side to compare competing claims or interventions.",
+        "Research gap detector",
+        "gaps",
+        "Identify understudied populations, missing long-term/replication/RCT studies, and future directions for a topic.",
+        "Controversy detector",
+        "controversies",
+        "Surface conflicting studies, contradictory conclusions, and rapidly changing evidence for a topic.",
+        "Emerging topics",
+        "emerging",
+        "Detect the fastest-growing research areas and exploding publication trends.",
+        "Topic drift",
+        "drift",
+        "Compare a field's topic distribution between two year windows to spot emerging and fading subtopics.",
+        "Reproducibility signals",
+        "reproducibility",
+        "Estimate reproducibility by detecting replication studies, sample sizes, and pre-registration cues.",
+        "Study quality estimate",
+        "quality",
+        "Estimate overall study quality from design, venue prestige, sample-size cues, and citation mass.",
+        "Funding analysis",
+        "funding",
+        "Analyze funding patterns and funder concentration for a research topic.",
+        "Topic watch",
+        "watch",
+        "Monitor a topic and report major new publications since the last run."
+      ],
+      "path": "library/other/scientific-consensus",
+      "printer": "laci141",
+      "printer_name": "laci141",
+      "creator": {
+        "handle": "laci141",
+        "name": "laci141"
+      },
+      "mcp": {
+        "binary": "scientific-consensus-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 10,
+        "public_tool_count": 10,
+        "auth_type": "none",
+        "env_vars": [],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "scrape-creators",
       "category": "developer-tools",
       "api": "Scrape Creators",
@@ -17079,6 +17237,12 @@
         "What's new across all accounts since a date or your last sync — new transactions and balance changes, neutrally framed."
       ],
       "path": "library/payments/simplefin",
+      "release": {
+        "cli_name": "simplefin-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-06T07:41:28Z",
+        "source_commit": "58eff51e947984f781132fdd16eee86eb5afc18e"
+      },
       "printer": "twidtwid",
       "printer_name": "Todd Dailey",
       "creator": {
