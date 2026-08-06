@@ -10,7 +10,7 @@ import (
 	mcptools "github.com/mvanhorn/printing-press-library/library/ai/notebooklm/internal/mcp"
 )
 
-var version = "0.2.0-dev"
+var version = "2026.8.1"
 
 func main() {
 	s := server.NewMCPServer(
