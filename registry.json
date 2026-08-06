@@ -3646,6 +3646,39 @@
       }
     },
     {
+      "name": "conductor",
+      "category": "developer-tools",
+      "api": "Conductor Cloud",
+      "description": "Conductor Cloud API client with bounded coding-agent launch, monitor, steering, and reporting workflows.",
+      "search_terms": [
+        "conductor",
+        "Conductor Cloud",
+        "conductor-pp-cli",
+        "Conductor Cloud API client with bounded coding-agent launch, monitor, steering, and reporting workflows.",
+        "Launch",
+        "Create a workspace and first session, send a brief, and return the Conductor deep link.",
+        "Monitor",
+        "Poll a session until real completion while streaming only new transcript events.",
+        "Steer",
+        "Send follow-up guidance to an existing Conductor session with a clear delivery receipt.",
+        "Run",
+        "Launch, monitor, and collect the final transcript and deep link with explicit timeout rules.",
+        "Plan and implement",
+        "plan-implement",
+        "Keep a planner or reviewer session separate from the implementation session in one workspace.",
+        "Daily report",
+        "daily-report",
+        "Return recent Conductor session rows and mechanical activity totals from transcript search."
+      ],
+      "path": "library/developer-tools/conductor",
+      "printer": "colegr",
+      "printer_name": "Cole Grolmus",
+      "creator": {
+        "handle": "colegr",
+        "name": "Cole Grolmus"
+      }
+    },
+    {
       "name": "conduyt-crm",
       "category": "sales-and-crm",
       "api": "Conduyt CRM",
@@ -16925,9 +16958,9 @@
       "path": "library/commerce/shopper",
       "release": {
         "cli_name": "shopper-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.8.1",
+        "released_at": "2026-08-06T07:36:15Z",
+        "source_commit": "580bd1c42822a7490b9fe3d47845cc3b965caef6"
       },
       "printer": "educrvz",
       "printer_name": "educrvz",
@@ -17077,7 +17110,26 @@
       "search_terms": [
         "slack",
         "slack-pp-cli",
-        "Send messages, search conversations, monitor channels, and manage your Slack workspace from the terminal"
+        "Every Slack read your token can make, mirrored to local SQLite so your history outlives Slack's own retention wall.",
+        "Archive Recall",
+        "Find messages in your local archive, including ones Slack has already hidden behind the 90-day retention wall.",
+        "Archive Coverage",
+        "Show what date range your local mirror actually holds per channel, and where the gaps are.",
+        "Catch-up",
+        "catchup",
+        "See what happened while you were away: new volume per channel, messages that mention you, and threads still waiting on your reply.",
+        "Stale Thread Radar",
+        "threads stale",
+        "List threads across the archive where the last reply is not yours and nobody has answered since.",
+        "Channel Health",
+        "health",
+        "Compare your channels by messages per day, distinct posters, median first-reply latency, and days idle.",
+        "User Activity",
+        "users activity",
+        "Profile where one person posts, which threads they carry, and when they were last seen.",
+        "Identity Card",
+        "users whois",
+        "Turn an opaque Slack ID, handle, or email into one card with shared channels, timezone, DND state, and last-seen."
       ],
       "path": "library/productivity/slack",
       "release": {
@@ -17092,18 +17144,27 @@
         "handle": "mvanhorn",
         "name": "Matt Van Horn"
       },
+      "contributors": [
+        {
+          "handle": "ChrisGutierrezNet",
+          "name": "Chris G. | AI Automation"
+        }
+      ],
       "mcp": {
         "binary": "slack-pp-mcp",
         "transports": [
-          "stdio"
+          "stdio",
+          "http"
         ],
-        "tool_count": 66,
-        "public_tool_count": 0,
-        "auth_type": "api_key",
+        "tool_count": 91,
+        "public_tool_count": 29,
+        "auth_type": "bearer_token",
         "env_vars": [
-          "SLACK_BOT_TOKEN"
+          "SLACK_BOT_TOKEN",
+          "SLACK_USER_TOKEN"
         ],
-        "mcp_ready": "full"
+        "mcp_ready": "full",
+        "spec_format": "internal"
       }
     },
     {
@@ -19832,6 +19893,62 @@
         ],
         "mcp_ready": "full",
         "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "v0",
+      "category": "ai",
+      "api": "v0",
+      "description": "Generate and iterate on web apps with v0 from the terminal: create chats from prompts, stream agent output, sync history to a local SQLite mirror, and track credit spend across models.",
+      "search_terms": [
+        "v0",
+        "v0-pp-cli",
+        "Generate and iterate on web apps with v0 from the terminal: create chats from prompts, stream agent output, sync history to a local SQLite mirror, and track credit spend across models.",
+        "Credit spend analytics",
+        "spend",
+        "Aggregate v0 credit cost and token usage from the synced message mirror, grouped by chat, day, or model.",
+        "Streaming capture",
+        "chats stream",
+        "Create a chat and stream the SSE response live, rendering each event and recording model attribution for spend analytics.",
+        "Tail chat generation",
+        "messages tail",
+        "Poll a chat until the newest assistant message finishes, with --follow for continuous watching.",
+        "Chat file tree",
+        "chats files",
+        "Render a chat's generated source files as an indented directory tree.",
+        "Preview URL helper",
+        "chats preview",
+        "Print only the live preview URL for a chat, ready for embedding or scripting.",
+        "Offline search",
+        "search",
+        "Full-text search over synced chats and messages without hitting the API.",
+        "Local sync mirror",
+        "sync",
+        "Cursor-paginated sync of chats and messages into a local SQLite mirror for offline search and spend analytics.",
+        "Auth diagnostics",
+        "doctor",
+        "Validate V0_API_KEY and API reachability with a live check."
+      ],
+      "path": "library/ai/v0",
+      "printer": "SomSamantray",
+      "printer_name": "Som Samantray",
+      "creator": {
+        "handle": "SomSamantray",
+        "name": "Som Samantray"
+      },
+      "mcp": {
+        "binary": "v0-pp-mcp",
+        "transports": [
+          "stdio"
+        ],
+        "tool_count": 41,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
       }
     },
     {
