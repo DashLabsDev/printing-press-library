@@ -4879,6 +4879,12 @@
         "handle": "mvanhorn",
         "name": "Matt Van Horn"
       },
+      "contributors": [
+        {
+          "handle": "rogilvy",
+          "name": "Robert Ogilvy"
+        }
+      ],
       "mcp": {
         "binary": "dominos-pp-mcp",
         "transports": [
@@ -8212,9 +8218,9 @@
       "path": "library/productivity/granola",
       "release": {
         "cli_name": "granola-pp-cli",
-        "version": "2026.7.2",
-        "released_at": "2026-07-25T23:13:09Z",
-        "source_commit": "da762648a30146ce996224cf459c4e052e7b6924"
+        "version": "2026.8.1",
+        "released_at": "2026-08-05T05:51:22Z",
+        "source_commit": "bb6d20448f2e221e88b248f33c5cbb87d5d7adf9"
       },
       "printer": "dstevens",
       "printer_name": "Damien Stevens",
@@ -21103,6 +21109,12 @@
         "Show formulas, datasets, freshness behavior, and caveats for compound commands."
       ],
       "path": "library/other/zillow",
+      "release": {
+        "cli_name": "zillow-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-01T04:21:09Z",
+        "source_commit": "44426fab98ef7b9572a02e14db6990ab670d2799"
+      },
       "printer": "veltri-23",
       "printer_name": "Hunter Veltri",
       "creator": {
