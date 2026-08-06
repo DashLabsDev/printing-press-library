@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.1 - 2026-08-06
+
+- fix(table-reservation-goat): fetch OpenTable availability bodies after loadingFinished with bounded retry (#1555).
+
 ## 2026.7.6 - 2026-07-20
 
 - fix(table-reservation-goat): Tock attach-mode booking on the modern SPA layout (#1514).
