@@ -12076,6 +12076,12 @@
         "Validate config, cookie presence, and session bootstrap tokens before live calls."
       ],
       "path": "library/ai/notebooklm",
+      "release": {
+        "cli_name": "notebooklm-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-06T07:42:32Z",
+        "source_commit": "0501b5489ef52eefd8573df934d8a18ac88cb7e3"
+      },
       "printer": "SomSamantray",
       "printer_name": "Som Samantray",
       "creator": {
@@ -14092,9 +14098,12 @@
         "Cross-source content diff",
         "source compare",
         "For an episode resolvable on multiple sources, fetch all available adapters and diff segment count, token count, distinct speakers, label confidence.",
-        "Bilingual zh-Hans + en aligned transcript",
-        "episode get --bilingual",
-        "yt-dlp dual-language auto-subs, greedy nearest-neighbor alignment, emits one markdown file with paired Chinese + auto-translated English per turn.",
+        "Non-English transcript fetch",
+        "episode get --lang",
+        "Fetch YouTube auto-subs in any single language yt-dlp knows (e.g. --lang it) instead of the historical English-only path. One code per fetch; rolling-cue de-dup applies to space-tokenized languages.",
+        "Spend-free paid-source availability probe",
+        "episode info --probe",
+        "Asks spoken.md's search endpoint whether it actually has the episode, instead of showing only a static cost estimate. Works with the demo key; no transcript fetch, no spend.",
         "Per-service cookie freshness table",
         "auth services",
         "One-row-per-service table of cookie age, expiry, last-fetch result, with remediation hint when stale.",
@@ -14122,6 +14131,10 @@
         {
           "handle": "tmchow",
           "name": "Trevin Chow"
+        },
+        {
+          "handle": "giuseppebisemi",
+          "name": "Giuseppe Bisemi"
         }
       ],
       "mcp": {
@@ -18660,9 +18673,9 @@
       "path": "library/food-and-dining/table-reservation-goat",
       "release": {
         "cli_name": "table-reservation-goat-pp-cli",
-        "version": "2026.7.6",
-        "released_at": "2026-07-20T16:29:06Z",
-        "source_commit": "7273626283faf13b8dc27a4debf4de684069ae05"
+        "version": "2026.8.1",
+        "released_at": "2026-08-06T07:45:23Z",
+        "source_commit": "574dd4c2338db05e5578a8dc3a0c47c6c63dbd91"
       },
       "printer": "pejmanjohn",
       "printer_name": "Pejman Pour-Moezzi",
