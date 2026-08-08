@@ -14117,9 +14117,9 @@
       "path": "library/media-and-entertainment/podcast-goat",
       "release": {
         "cli_name": "podcast-goat-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.8.1",
+        "released_at": "2026-08-07T19:11:19Z",
+        "source_commit": "6b54aabb7d86feaa8a84b991b8c515dddc24f057"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -17757,6 +17757,12 @@
         "handle": "rob-coco",
         "name": "Rob Zehner"
       },
+      "contributors": [
+        {
+          "handle": "giuseppebisemi",
+          "name": "Giuseppe Bisemi"
+        }
+      ],
       "mcp": {
         "binary": "spotify-pp-mcp",
         "transports": [
