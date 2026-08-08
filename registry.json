@@ -16038,6 +16038,10 @@
         {
           "handle": "tmchow",
           "name": "Trevin Chow"
+        },
+        {
+          "handle": "giuseppebisemi",
+          "name": "Giuseppe Bisemi"
         }
       ],
       "mcp": {
@@ -17747,9 +17751,9 @@
       "path": "library/media-and-entertainment/spotify",
       "release": {
         "cli_name": "spotify-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.8.1",
+        "released_at": "2026-08-08T01:02:19Z",
+        "source_commit": "d75b6f734d199820273256253be504710516a25f"
       },
       "printer": "rob-coco",
       "printer_name": "Rob Zehner",
