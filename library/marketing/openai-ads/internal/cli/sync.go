@@ -2315,9 +2315,15 @@ func syncOneParent(
 				}
 			} else if humanFriendly {
 				outcome.reason = "fetch_error"
+				// A transport/timeout/non-access HTTP failure leaves this
+				// parent's children missing from the mirror. Record it as a
+				// real failure so the aggregator cannot report a successful
+				// sync over an incomplete local store.
+				rep.failure = fmt.Errorf("fetching %s for parent %s: %w", dep.Name, parentID, err)
 				fmt.Fprintf(os.Stderr, "\n  %s: error for parent %s: %v\n", dep.Name, parentID, err)
 			} else {
 				outcome.reason = "fetch_error"
+				rep.failure = fmt.Errorf("fetching %s for parent %s: %w", dep.Name, parentID, err)
 				// Non-warning failures were previously silent in JSON mode —
 				// operators only saw the missing rows. Emit a structured
 				// sync_error so the API body and status are inspectable.

@@ -2833,12 +2833,15 @@ func wrapWithProvenance(data json.RawMessage, prov DataProvenance) (json.RawMess
 // The resolver already knows the app name on the happy path; name is only
 // used for the conservative fallback when the resolved data directory fails.
 func defaultDBPath(name string) string {
+	// Each Ads API key is scoped to one ad account, so the local mirror is
+	// keyed by credential to keep accounts isolated. See account_scope.go.
+	dbFile := scopedDBFilename()
 	dir, err := cliutil.DataDir()
 	if err != nil {
 		if home, homeErr := os.UserHomeDir(); homeErr == nil {
-			return filepath.Join(home, ".local", "share", name, "data.db")
+			return filepath.Join(home, ".local", "share", name, dbFile)
 		}
-		return "data.db"
+		return dbFile
 	}
-	return filepath.Join(dir, "data.db")
+	return filepath.Join(dir, dbFile)
 }
