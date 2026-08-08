@@ -12,14 +12,14 @@
     "type": "bearer_token",
     "api_key_available": true
   },
-  "source_fingerprint": "782cff1fc514c48c42eba34b5b870b949103d26dd2f1384823c30baef8c288f8",
+  "source_fingerprint": "8e23b885f987689aa57f88e65aa0f0b9a79d57907b23bd8a4fc66b565ba24033",
   "source_files": {
     "cmd/openai-ads-pp-cli/main.go": "6746fd56b4696b2bf900b9245bc0789635b1d2546b78a5704f60f3abc30dce43",
     "cmd/openai-ads-pp-mcp/main.go": "cb2f087b88c33467c93ff321abbbf18286953fbb0c23ea2f6e3bfc3ac4bec66d",
     "go.mod": "e61bbf230542e51214f7f2414518d29d6a4f1cc4976159eb350563b1649b0bd7",
     "go.sum": "f1d2244e10982358d582a8268b72b5190d4a49b50212bece15f435786aa7b1f0",
     "internal/cache/cache.go": "9c682d5739230865617e3792b0f5fe5fe36479f3cb23c5d69211b90c91015651",
-    "internal/cli/account_scope.go": "228948d3e2601aa0171fbf172d790f98b1a089934832459659931d040b8256a1",
+    "internal/cli/account_scope.go": "92e7b816619911e72628a6a349e65f0525a39cdb86b6491e596eaf077f28a397",
     "internal/cli/ad-account.go": "5afbf4d4e159ab9ba2cdc4ef0f38795603d9b169aad86ea7686559c63bbde88b",
     "internal/cli/ad-account_activate-method.go": "1a9fd84cebc25be60b851e2cfda6f9cfce5463dceedb9d1dd42bf9843b369f85",
     "internal/cli/ad-account_get-insights-method.go": "90aa3a8a9ba6d76aac8b3d41b1cff315bb797c866f3a7e24208fc9100aefaafc",
