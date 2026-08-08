@@ -276,6 +276,10 @@ See README.md or the bundled SKILL.md for recipes.`,
 		if _, err := cliutil.SetHomeOverride(flags.homePath); err != nil {
 			return err
 		}
+		// Mirror --config into local-store path resolution so the account-scoped
+		// database is derived from the same credentials the API client will use.
+		// See internal/cli/account_scope.go.
+		setActiveConfigPath(flags.configPath)
 		if flags.deliverSpec != "" {
 			sink, err := ParseDeliverSink(flags.deliverSpec)
 			if err != nil {

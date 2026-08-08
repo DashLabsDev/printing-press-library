@@ -4,9 +4,37 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"strings"
+	"sync"
 
 	"github.com/mvanhorn/printing-press-library/library/marketing/openai-ads/internal/config"
 )
+
+// activeConfigPath mirrors the resolved --config flag so local-store path
+// resolution can load the same credentials the API client will authenticate
+// with. It is set once from the root PersistentPreRunE, alongside the existing
+// --home override, and read by accountScopeSuffix.
+//
+// A package-level value is used deliberately: defaultDBPath is called from 16
+// generated call sites that have no access to rootFlags, and threading a new
+// parameter through all of them would mean editing generated code that regen
+// would overwrite.
+var (
+	activeConfigPathMu sync.RWMutex
+	activeConfigPath   string
+)
+
+// setActiveConfigPath records the --config value for account scoping.
+func setActiveConfigPath(path string) {
+	activeConfigPathMu.Lock()
+	activeConfigPath = path
+	activeConfigPathMu.Unlock()
+}
+
+func configPathForScope() string {
+	activeConfigPathMu.RLock()
+	defer activeConfigPathMu.RUnlock()
+	return activeConfigPath
+}
 
 // accountScopeSuffix returns a short, non-reversible discriminator derived from
 // the *effective* Ads credential, or "" when no credential is resolvable.
@@ -17,13 +45,13 @@ import (
 // read, mix, and extend the previous account's campaigns, ads, and snapshot
 // history under the same data.db.
 //
-// The credential is resolved through config.Load so that every supported auth
-// path participates in scoping, not just the environment variable: a token
-// persisted by 'auth set-token' into the credentials file authenticates API
-// requests just as an env var does, and must therefore select the same
-// account-scoped database. config.Load applies the documented precedence
-// (credentials file first, environment override last), so this mirrors exactly
-// what the API client will send.
+// The credential is resolved through config.Load using the same config path the
+// command itself will use, so every supported auth path participates in
+// scoping: an environment variable, a token persisted by 'auth set-token' into
+// the credentials file, and an explicit --config pointing at another account's
+// credentials all select their own database. config.Load applies the documented
+// precedence (credentials file first, environment override last), so this
+// mirrors exactly what the API client will send.
 //
 // The suffix is a truncated SHA-256 of the credential: it never reveals the
 // key, and it is stable for as long as that key is in use. Rotating a key
@@ -40,11 +68,11 @@ func accountScopeSuffix() string {
 }
 
 // effectiveAdsCredential returns the Ads API key the client would actually
-// authenticate with, or "" when none is configured. Failures to load config
-// are non-fatal: an unscoped database is the pre-existing behavior and is
+// authenticate with, or "" when none is configured. Failures to load config are
+// non-fatal: an unscoped database is the pre-existing behavior and is
 // preferable to blocking every local command on a config parse error.
 func effectiveAdsCredential() string {
-	cfg, err := config.Load("")
+	cfg, err := config.Load(configPathForScope())
 	if err != nil || cfg == nil {
 		return ""
 	}
