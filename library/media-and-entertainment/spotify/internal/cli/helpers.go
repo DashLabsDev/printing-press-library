@@ -918,6 +918,8 @@ var envelopeMetadataArrayKeys = map[string]bool{
 	"warnings": true, "Warnings": true,
 }
 
+const maxNestedListEnvelopeDepth = 32
+
 func extractPaginatedObjectArray(raw json.RawMessage) ([]json.RawMessage, bool) {
 	var items []json.RawMessage
 	// Empty fallback arrays are deliberately ignored: without an object item,
@@ -1007,6 +1009,19 @@ func printJSONFiltered(w io.Writer, v any, flags *rootFlags) error {
 		return err
 	}
 	return printOutputWithFlags(w, json.RawMessage(raw), flags)
+}
+
+// printJSONFilteredMeta is printJSONFiltered for a caller that knows its own
+// provenance. A hand-written command that reports the outcome of a live API
+// call must use this: printJSONFiltered routes through printOutputWithFlags,
+// whose "local" default is an assumption for callers with nothing to report,
+// and stamping that on a live mutation tells an agent the opposite of the truth.
+func printJSONFilteredMeta(w io.Writer, v any, flags *rootFlags, agentMeta map[string]any) error {
+	raw, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	return printOutputWithFlagsMeta(w, json.RawMessage(raw), flags, agentMeta)
 }
 
 // wrapAgentOutput gives --agent callers one parseable top-level envelope for
@@ -1149,7 +1164,7 @@ func filterFieldsRec(data json.RawMessage, paths [][]string) json.RawMessage {
 		// json.Unmarshal otherwise accepts into a []json.RawMessage as a
 		// nil slice and would coerce to `[]`.
 		if !matchedAny {
-			if pending, foundArray := filterListEnvelopeFields(obj, paths); foundArray {
+			if pending, foundArray := filterListEnvelopeFields(obj, paths, 0); foundArray {
 				filtered = pending
 			}
 		}
@@ -1160,7 +1175,7 @@ func filterFieldsRec(data json.RawMessage, paths [][]string) json.RawMessage {
 	return data
 }
 
-func filterListEnvelopeFields(obj map[string]json.RawMessage, paths [][]string) (map[string]json.RawMessage, bool) {
+func filterListEnvelopeFields(obj map[string]json.RawMessage, paths [][]string, depth int) (map[string]json.RawMessage, bool) {
 	pending := map[string]json.RawMessage{}
 	foundArray := false
 	for k, v := range obj {
@@ -1174,24 +1189,25 @@ func filterListEnvelopeFields(obj map[string]json.RawMessage, paths [][]string) 
 			pending[k] = filterFieldsRec(v, paths)
 			continue
 		}
-		if k == "_embedded" {
-			if nested, ok := filterNestedListEnvelopeFields(v, paths); ok {
-				foundArray = true
-				pending[k] = nested
-				continue
-			}
+		if nested, ok := filterNestedListEnvelopeFields(v, paths, depth); ok {
+			foundArray = true
+			pending[k] = nested
+			continue
 		}
 		pending[k] = v
 	}
 	return pending, foundArray
 }
 
-func filterNestedListEnvelopeFields(data json.RawMessage, paths [][]string) (json.RawMessage, bool) {
+func filterNestedListEnvelopeFields(data json.RawMessage, paths [][]string, depth int) (json.RawMessage, bool) {
+	if depth >= maxNestedListEnvelopeDepth {
+		return nil, false
+	}
 	var obj map[string]json.RawMessage
 	if err := json.Unmarshal(data, &obj); err != nil {
 		return nil, false
 	}
-	filtered, found := filterListEnvelopeFields(obj, paths)
+	filtered, found := filterListEnvelopeFields(obj, paths, depth+1)
 	if !found {
 		return nil, false
 	}
@@ -1228,6 +1244,45 @@ func camelToKebab(s string) string {
 }
 
 // printOutputWithFlags routes output through the right format based on flags.
+// agentEnvelopeApplies reports whether printOutputWithFlagsMeta will add the
+// agent provenance envelope. Callers that build their own envelope must consult
+// this rather than re-deriving the condition: a caller that wraps unconditionally
+// and then prints through this path emits two nested envelopes, and the outer one
+// carries whatever meta the printer was handed rather than the caller's real
+// provenance.
+func agentEnvelopeApplies(flags *rootFlags) bool {
+	return flags.agent && flags.asJSON && !flags.csv && !flags.plain && !flags.quiet
+}
+
+// provenanceMeta projects a DataProvenance into the agent envelope's meta map,
+// so a caller that already knows the true source does not fall back to the
+// printer's assumed one. It is the single meta builder: wrapWithProvenance
+// calls it too, so the agent-envelope meta and the provenance-envelope meta
+// cannot drift apart field by field (they already had, over `freshness`).
+// Every field of DataProvenance that is meant to reach the caller belongs
+// here and nowhere else.
+func provenanceMeta(prov DataProvenance) map[string]any {
+	meta := map[string]any{"source": prov.Source}
+	if prov.SyncedAt != nil {
+		meta["synced_at"] = prov.SyncedAt.UTC().Format(time.RFC3339)
+	}
+	if prov.Reason != "" {
+		meta["reason"] = prov.Reason
+	}
+	if prov.ResourceType != "" {
+		meta["resource_type"] = prov.ResourceType
+	}
+	if prov.Freshness != nil {
+		meta["freshness"] = prov.Freshness
+	}
+	return meta
+}
+
+// printOutputWithFlags is the provenance-less entry point: callers that have no
+// DataProvenance to report get "local", the conservative label for output the
+// printer cannot attribute to a live call. Callers that DO know their
+// provenance must use printOutputWithFlagsMeta with provenanceMeta instead —
+// this default is an assumption, not a fact about the data.
 func printOutputWithFlags(w io.Writer, data json.RawMessage, flags *rootFlags) error {
 	return printOutputWithFlagsMeta(w, data, flags, map[string]any{"source": "local"})
 }
@@ -1243,7 +1298,7 @@ func printOutputWithFlagsMeta(w io.Writer, data json.RawMessage, flags *rootFlag
 	} else if flags.compact {
 		data = compactFields(data)
 	}
-	if flags.agent && flags.asJSON && !flags.csv && !flags.plain && !flags.quiet {
+	if agentEnvelopeApplies(flags) {
 		wrapped, err := wrapAgentOutput(data, agentMeta)
 		if err != nil {
 			return err
@@ -1328,6 +1383,10 @@ func compactListFields(items []map[string]any) json.RawMessage {
 		// Identity
 		"id": true, "name": true, "title": true, "identifier": true,
 		"code": true, "slug": true, "key": true,
+		// `which --agent` match items are {entry, score}: entry carries the
+		// command and description the score refers to. Dropping it leaves a
+		// list of bare scores, so it rides the identity allowlist.
+		"entry": true,
 		// Categorization
 		"status": true, "state": true, "type": true, "kind": true, "priority": true,
 		// Communication
@@ -1408,7 +1467,7 @@ func isCompactScalar(v any) bool {
 // under `--agent`/`--compact` is a silent loss; agents who want to omit them
 // can pass `--select` to specify only the fields they need.
 func compactObjectFields(obj map[string]any) json.RawMessage {
-	if compacted, ok := compactListEnvelopeObject(obj); ok {
+	if compacted, ok := compactListEnvelopeObject(obj, 0); ok {
 		result, _ := json.Marshal(compacted)
 		return result
 	}
@@ -1422,7 +1481,15 @@ func compactObjectFields(obj map[string]any) json.RawMessage {
 	return result
 }
 
-func compactListEnvelopeObject(obj map[string]any) (map[string]any, bool) {
+// compactListEnvelopeObject is the --compact counterpart of
+// filterListEnvelopeFields and must stay in lockstep with it: ANY
+// object-valued sibling is a descent candidate (`{"artists":{"items":[...]}}`,
+// `{"_embedded":{"items":[...]}}`), not just a hardcoded wrapper key, bounded
+// by maxNestedListEnvelopeDepth. The foundArray guard keeps the behavior
+// fail-closed: an object with no array anywhere in reach reports false and the
+// caller falls back to the plain blocklist strip, so descent can never turn
+// into a passthrough of an unrelated payload.
+func compactListEnvelopeObject(obj map[string]any, depth int) (map[string]any, bool) {
 	out := map[string]any{}
 	foundArray := false
 	for k, v := range obj {
@@ -1438,12 +1505,10 @@ func compactListEnvelopeObject(obj map[string]any) (map[string]any, bool) {
 			out[k] = compacted
 			continue
 		}
-		if nested, ok := v.(map[string]any); ok && k == "_embedded" {
-			if compacted, ok := compactListEnvelopeObject(nested); ok {
-				foundArray = true
-				out[k] = compacted
-				continue
-			}
+		if compacted, ok := compactNestedListEnvelopeObject(v, depth); ok {
+			foundArray = true
+			out[k] = compacted
+			continue
 		}
 		out[k] = v
 	}
@@ -1451,6 +1516,20 @@ func compactListEnvelopeObject(obj map[string]any) (map[string]any, bool) {
 		return nil, false
 	}
 	return out, true
+}
+
+// compactNestedListEnvelopeObject descends one level into an object-valued
+// sibling, mirroring filterNestedListEnvelopeFields. It shares the same depth
+// bound so a pathologically nested payload cannot drive unbounded recursion.
+func compactNestedListEnvelopeObject(v any, depth int) (map[string]any, bool) {
+	if depth >= maxNestedListEnvelopeDepth {
+		return nil, false
+	}
+	nested, ok := v.(map[string]any)
+	if !ok {
+		return nil, false
+	}
+	return compactListEnvelopeObject(nested, depth+1)
 }
 
 func compactObjectArrayValue(v any) (any, bool) {
@@ -2138,19 +2217,7 @@ func assertLiveJSONBody(data json.RawMessage) error {
 // (e.g. {"results": [...]}, {"data": [...]}) are unwrapped first so the
 // output shape is the same regardless of the API's wrapper key.
 func wrapWithProvenance(data json.RawMessage, prov DataProvenance) (json.RawMessage, error) {
-	meta := map[string]any{"source": prov.Source}
-	if prov.SyncedAt != nil {
-		meta["synced_at"] = prov.SyncedAt.UTC().Format(time.RFC3339)
-	}
-	if prov.Reason != "" {
-		meta["reason"] = prov.Reason
-	}
-	if prov.ResourceType != "" {
-		meta["resource_type"] = prov.ResourceType
-	}
-	if prov.Freshness != nil {
-		meta["freshness"] = prov.Freshness
-	}
+	meta := provenanceMeta(prov)
 	var results any
 	if json.Valid(data) {
 		results = json.RawMessage(unwrapSingleKeyArray(data))
