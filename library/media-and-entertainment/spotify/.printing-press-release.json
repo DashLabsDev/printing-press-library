@@ -2,17 +2,17 @@
   "schema_version": 1,
   "slug": "spotify",
   "cli_name": "spotify-pp-cli",
-  "version": "2026.7.1",
-  "released_at": "2026-07-08T18:21:21Z",
-  "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0",
-  "printing_press_version": "4.5.2",
-  "run_id": "20260512-184940",
+  "version": "2026.8.1",
+  "released_at": "2026-08-08T01:02:19Z",
+  "source_commit": "d75b6f734d199820273256253be504710516a25f",
+  "printing_press_version": "4.27.1",
+  "run_id": "20260707-145126",
   "changes": [
     {
-      "title": "fix(catalog): require Go 1.26.5 across published modules",
-      "pr": 1467,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/1467",
-      "commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+      "title": "fix(spotify): send the required type on live search; wrap provenance once; return full single-object resources; descend nested --select",
+      "pr": 1625,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/1625",
+      "commit": "d75b6f734d199820273256253be504710516a25f"
     }
   ]
 }
