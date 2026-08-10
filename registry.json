@@ -4165,6 +4165,12 @@
         "Review version dependencies, crate owners, reverse dependencies, and download signals for ecosystem analysis."
       ],
       "path": "library/developer-tools/crates-io",
+      "release": {
+        "cli_name": "crates-io-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-10T02:40:22Z",
+        "source_commit": "87c0a43b0a92ffb2d94a60d3e18e17b49b86fb15"
+      },
       "printer": "sdhilip200",
       "printer_name": "Dhilip Subramanian",
       "creator": {
@@ -21675,6 +21681,12 @@
         "handle": "justinwfu",
         "name": "Justin"
       },
+      "contributors": [
+        {
+          "handle": "giuseppebisemi",
+          "name": "Giuseppe Bisemi"
+        }
+      ],
       "mcp": {
         "binary": "youtube-pp-mcp",
         "transports": [
