@@ -12889,6 +12889,43 @@
       }
     },
     {
+      "name": "open-library",
+      "category": "media-and-entertainment",
+      "api": "Open Library",
+      "description": "Read-only Open Library recipes for book search, ISBN edition lookup, author works, work metadata, bounded editions, and subject browsing with source/rate-limit caveats.",
+      "search_terms": [
+        "open-library",
+        "Open Library",
+        "open-library-pp-cli",
+        "Read-only Open Library recipes for book search, ISBN edition lookup, author works, work metadata, bounded editions, and subject browsing with source/rate-limit caveats.",
+        "Compact book/work search",
+        "book",
+        "Searches Open Library's preferred search endpoint and returns compact ranked work candidates with author, edition, ISBN, language, and source URL fields.",
+        "ISBN edition resolver",
+        "isbn",
+        "Resolves ISBN-10 or ISBN-13 values to edition metadata without account actions or borrowing flows.",
+        "Author works sampler",
+        "author",
+        "Searches author records or accepts an Open Library author ID, then fetches a bounded works sample for bibliography-building agents.",
+        "Work and editions metadata",
+        "work, editions",
+        "Fetches canonical work JSON and bounded edition lists from documented Open Library work APIs.",
+        "Subject discovery with caveats",
+        "subjects",
+        "Fetches subject works and optional facets while clearly marking the Subjects API as experimental.",
+        "Source/rate posture",
+        "sources, doctor",
+        "Reports keyless auth, optional contact-bearing User-Agent configuration, documented rate limits, and anti-bulk non-goals."
+      ],
+      "path": "library/media-and-entertainment/open-library",
+      "printer": "sdhilip200",
+      "printer_name": "Dhilip Subramanian",
+      "creator": {
+        "handle": "sdhilip200",
+        "name": "Dhilip Subramanian"
+      }
+    },
+    {
       "name": "open-meteo",
       "category": "other",
       "api": "Open-Meteo",
@@ -19405,9 +19442,9 @@
       "path": "library/media-and-entertainment/ticketmaster",
       "release": {
         "cli_name": "ticketmaster-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.8.1",
+        "released_at": "2026-08-10T03:11:45Z",
+        "source_commit": "d7e2595312340e5875b4d37a0bba088252b73725"
       },
       "printer": "omarshahine",
       "printer_name": "Omar Shahine",
