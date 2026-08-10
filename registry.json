@@ -6395,9 +6395,9 @@
       "path": "library/productivity/fathom",
       "release": {
         "cli_name": "fathom-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.8.1",
+        "released_at": "2026-08-10T02:45:35Z",
+        "source_commit": "b530fa841c1866356093e18b00131dc689c3da33"
       },
       "printer": "neektza",
       "printer_name": "Nikica Jokic",
@@ -18412,6 +18412,12 @@
         "handle": "maxswinguy",
         "name": "Maxime Delavergne"
       },
+      "contributors": [
+        {
+          "handle": "giuseppebisemi",
+          "name": "Giuseppe Bisemi"
+        }
+      ],
       "mcp": {
         "binary": "substack-reader-pp-mcp",
         "transports": [
