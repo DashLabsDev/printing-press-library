@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.1 - 2026-08-10
+
+- feat(ars-sicilia): /bd/ backend for sitting archives + stralcio navigation, per-law results, phrase search (#1574).
+
 ## 2026.7.2 - 2026-07-22
 
 - feat(ars-sicilia): ISIS date/codcom filters, --escludi, profilo exit fix (#1400).
