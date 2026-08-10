@@ -1670,9 +1670,9 @@
       "path": "library/other/ars-sicilia",
       "release": {
         "cli_name": "ars-sicilia-pp-cli",
-        "version": "2026.7.2",
-        "released_at": "2026-07-22T23:44:43Z",
-        "source_commit": "a62175effa0fcba673c8a73b73c34a7a58b03f17"
+        "version": "2026.8.1",
+        "released_at": "2026-08-10T02:51:29Z",
+        "source_commit": "be69bc31bf3685f874112905fa90b0471ed09568"
       },
       "printer": "aborruso",
       "printer_name": "aborruso"
@@ -8479,6 +8479,12 @@
         "Pairs open Grants.gov calls with historically awarded NIH RePORTER and NSF grants so applicants can benchmark typical award sizes for a topic before applying."
       ],
       "path": "library/health/grants",
+      "release": {
+        "cli_name": "grants-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-10T03:06:35Z",
+        "source_commit": "1dcdf980e27beaaea5b5ddc408d269b52cefdeaf"
+      },
       "printer": "laci141",
       "printer_name": "laci141",
       "creator": {
@@ -11744,9 +11750,9 @@
       "path": "library/media-and-entertainment/movie-goat",
       "release": {
         "cli_name": "movie-goat-pp-cli",
-        "version": "2026.7.3",
-        "released_at": "2026-07-29T06:13:03Z",
-        "source_commit": "dd926e4c931eff7d3a02b4b7ca88259140af84c7"
+        "version": "2026.8.1",
+        "released_at": "2026-08-10T03:01:17Z",
+        "source_commit": "a4bc6578f4ebb68687bd7c5b991217d207d25aa3"
       },
       "printer": "tmchow",
       "printer_name": "Trevin Chow",
@@ -17570,9 +17576,9 @@
       "path": "library/productivity/slack",
       "release": {
         "cli_name": "slack-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-06T07:38:29Z",
-        "source_commit": "39d4278e16c5956e7e0b3aeaf0050a6699c408d0"
+        "version": "2026.8.2",
+        "released_at": "2026-08-10T02:56:26Z",
+        "source_commit": "b18d6b5276f3c19f3ca0da7c7d983bf13263a176"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -18402,9 +18408,9 @@
       "path": "library/media-and-entertainment/substack-reader",
       "release": {
         "cli_name": "substack-reader-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-20T16:26:43Z",
-        "source_commit": "80867fe8953f97af3fb69ea88f3bc09eda4d6c59"
+        "version": "2026.8.1",
+        "released_at": "2026-08-10T02:49:52Z",
+        "source_commit": "69654fe831295ceb8cdce62de28ab96db7a990cb"
       },
       "printer": "maxswinguy",
       "printer_name": "Maxime Delavergne",
@@ -19388,7 +19394,13 @@
         "Render a markdown 'what's on' report grouped by night → venue → events with classification labels and price bands, suitable for newsletter, Obsidian, iMessage, or agent context.",
         "Price-band distribution",
         "events price-bands",
-        "Bucket events by priceRanges.min into <$50 / $50-100 / $100-200 / $200+ bands and report count + sample events per band, grouped by classification."
+        "Bucket events by priceRanges.min into <$50 / $50-100 / $100-200 / $200+ bands and report count + sample events per band, grouped by classification.",
+        "Real presale window planner",
+        "events presales",
+        "Query sales.presales directly, classify each window as upcoming, open, or ended, and filter by how soon it opens.",
+        "Safe checkout handoff",
+        "events checkout",
+        "Select an open or named official presale URL, fall back to the event purchase page, and require --launch before opening a browser."
       ],
       "path": "library/media-and-entertainment/ticketmaster",
       "release": {
@@ -19403,6 +19415,12 @@
         "handle": "omarshahine",
         "name": "Omar Shahine"
       },
+      "contributors": [
+        {
+          "handle": "Avanderheyde",
+          "name": "Alderik"
+        }
+      ],
       "mcp": {
         "binary": "ticketmaster-pp-mcp",
         "transports": [
