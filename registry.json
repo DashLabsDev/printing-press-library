@@ -5499,6 +5499,12 @@
         "Read the latest available speed-test results for a network as structured output."
       ],
       "path": "library/devices/eero",
+      "release": {
+        "cli_name": "eero-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-10T02:12:34Z",
+        "source_commit": "ad701f58418e6434a58f06909bb7ef33b998a354"
+      },
       "printer": "erikrogne",
       "printer_name": "Erik Rogne",
       "creator": {
@@ -13115,6 +13121,47 @@
       "creator": {
         "handle": "rvdlaar",
         "name": "Rick van de Laar"
+      }
+    },
+    {
+      "name": "opensky",
+      "category": "travel",
+      "api": "Opensky Network",
+      "description": "Public OpenSky Network API (https://opensky-network.org/api).",
+      "search_terms": [
+        "opensky",
+        "Opensky Network",
+        "opensky-pp-cli",
+        "Public OpenSky Network API (https://opensky-network.org/api).",
+        "Bare-invocation time windows",
+        "flights get-departures",
+        "begin/end default to the last hour on every /flights/* command (OpenSky requires the window and anonymous access caps it at 1h), so live queries work with zero epoch math. Override with --begin/--end.",
+        "Empty-window 404 handling",
+        "flights get-aircraft-trajectory",
+        "OpenSky answers HTTP 404 with an empty array when a window has no flights; the CLI treats that as an empty result (exit 0) instead of the generic resource-not-found error.",
+        "No-auth live tracking",
+        "states",
+        "Live ADS-B state vectors over any bounding box with no API key; --icao24 filters to one transponder for a single-aircraft view."
+      ],
+      "path": "library/travel/opensky",
+      "printer": "veltri-23",
+      "printer_name": "Hunter Veltri",
+      "creator": {
+        "handle": "mvanhorn",
+        "name": "Hunter Veltri"
+      },
+      "mcp": {
+        "binary": "opensky-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 3,
+        "public_tool_count": 3,
+        "auth_type": "none",
+        "env_vars": [],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
       }
     },
     {
@@ -21343,9 +21390,9 @@
       "path": "library/commerce/yahoo-finance",
       "release": {
         "cli_name": "yahoo-finance-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.8.1",
+        "released_at": "2026-08-10T02:27:51Z",
+        "source_commit": "4ca369b52ca93bf8c38a8aa408d3fbf730d98882"
       },
       "printer": "tmchow",
       "printer_name": "Trevin Chow",
