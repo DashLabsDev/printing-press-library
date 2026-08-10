@@ -4145,6 +4145,47 @@
       }
     },
     {
+      "name": "crates-io",
+      "category": "developer-tools",
+      "api": "Crates Io Registry",
+      "description": "Read-only endpoints for crates.io ecosystem intelligence.",
+      "search_terms": [
+        "crates-io",
+        "Crates Io Registry",
+        "crates-io-pp-cli",
+        "Read-only endpoints for crates.io ecosystem intelligence.",
+        "Crate search",
+        "crates search",
+        "Search crates.io for Rust packages with bounded result counts for dependency discovery.",
+        "Crate metadata lookup",
+        "crates get",
+        "Inspect crate metadata, versions, keywords, and categories from the public registry API.",
+        "Dependency and owner intelligence",
+        "crates dependencies list-version",
+        "Review version dependencies, crate owners, reverse dependencies, and download signals for ecosystem analysis."
+      ],
+      "path": "library/developer-tools/crates-io",
+      "printer": "sdhilip200",
+      "printer_name": "Dhilip Subramanian",
+      "creator": {
+        "handle": "sdhilip200",
+        "name": "Dhilip Subramanian"
+      },
+      "mcp": {
+        "binary": "crates-io-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 7,
+        "public_tool_count": 7,
+        "auth_type": "none",
+        "env_vars": [],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "crestron",
       "category": "devices",
       "api": "Crestron",
@@ -18693,6 +18734,12 @@
         "Resolve spot names to spotIds via FTS over the locally-synced taxonomy, with no network."
       ],
       "path": "library/other/surfline",
+      "release": {
+        "cli_name": "surfline-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-10T02:38:28Z",
+        "source_commit": "4b637271dfbf6a6b907d0e0152ae75f8fba2feef"
+      },
       "printer": "Shoffner",
       "printer_name": "Shoffner",
       "creator": {
