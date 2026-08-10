@@ -5473,6 +5473,55 @@
       }
     },
     {
+      "name": "eero",
+      "category": "devices",
+      "api": "eero",
+      "description": "Inspect an eero mesh network from the terminal with agent-friendly output for networks, nodes, connected devices, diagnostics, and speed tests.",
+      "search_terms": [
+        "eero",
+        "eero-pp-cli",
+        "Inspect an eero mesh network from the terminal with agent-friendly output for networks, nodes, connected devices, diagnostics, and speed tests.",
+        "Set EERO_SESSION_TOKEN to an eero session token, or use auth login --chrome with a browser profile that is already signed in.",
+        "Network health snapshot",
+        "network",
+        "One agent-friendly read combines network status, speed summary, client count, node count, DNS, and feature settings.",
+        "Eero inventory",
+        "eero list",
+        "List all eero nodes in a network with compact agent-friendly output.",
+        "Connected-device inventory",
+        "device list",
+        "List connected client devices for a network, with filters and compact JSON for downstream automation.",
+        "Diagnostic report lookup",
+        "diagnostics",
+        "Fetch the latest diagnostic report for a network through the same authenticated CLI surface.",
+        "Speed-test history lookup",
+        "speed-test",
+        "Read the latest available speed-test results for a network as structured output."
+      ],
+      "path": "library/devices/eero",
+      "printer": "erikrogne",
+      "printer_name": "Erik Rogne",
+      "creator": {
+        "handle": "erikrogne",
+        "name": "Erik Rogne"
+      },
+      "mcp": {
+        "binary": "eero-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 11,
+        "public_tool_count": 0,
+        "auth_type": "cookie",
+        "env_vars": [
+          "EERO_SESSION_TOKEN"
+        ],
+        "mcp_ready": "partial",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "elevenlabs",
       "category": "ai",
       "api": "ElevenLabs",
@@ -16024,9 +16073,9 @@
       "path": "library/developer-tools/scrape-creators",
       "release": {
         "cli_name": "scrape-creators-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.8.1",
+        "released_at": "2026-08-08T01:25:25Z",
+        "source_commit": "81efaa4583e8ac3b180e0358dbee991a9cfb204c"
       },
       "printer": "adrianhorning08",
       "printer_name": "Adrian Horning",
@@ -17751,9 +17800,9 @@
       "path": "library/media-and-entertainment/spotify",
       "release": {
         "cli_name": "spotify-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-08T01:02:19Z",
-        "source_commit": "d75b6f734d199820273256253be504710516a25f"
+        "version": "2026.8.2",
+        "released_at": "2026-08-10T02:11:44Z",
+        "source_commit": "67f0559d018efc0f2655582d57991386d436ac3e"
       },
       "printer": "rob-coco",
       "printer_name": "Rob Zehner",
