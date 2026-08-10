@@ -2,17 +2,17 @@
   "schema_version": 1,
   "slug": "slack",
   "cli_name": "slack-pp-cli",
-  "version": "2026.8.1",
-  "released_at": "2026-08-06T07:38:29Z",
-  "source_commit": "39d4278e16c5956e7e0b3aeaf0050a6699c408d0",
+  "version": "2026.8.2",
+  "released_at": "2026-08-10T02:56:26Z",
+  "source_commit": "b18d6b5276f3c19f3ca0da7c7d983bf13263a176",
   "printing_press_version": "4.29.0",
   "run_id": "20260801-150754-271fdf29",
   "changes": [
     {
-      "title": "feat(slack): reprint slack under Printing Press v4.29.0",
-      "pr": 1652,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/1652",
-      "commit": "39d4278e16c5956e7e0b3aeaf0050a6699c408d0"
+      "title": "feat(slack): add canvases resource (create, read, edit, delete, share)",
+      "pr": 1605,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/1605",
+      "commit": "b18d6b5276f3c19f3ca0da7c7d983bf13263a176"
     }
   ]
 }
