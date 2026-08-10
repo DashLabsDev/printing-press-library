@@ -12787,6 +12787,43 @@
       }
     },
     {
+      "name": "open-food-facts",
+      "category": "food-and-dining",
+      "api": "Open Food Facts",
+      "description": "Read-only Open Food Facts recipes for barcode product lookup, structured search, nutrition summaries, allergen and ingredient inspection, bounded comparison, category samples, and source posture checks.",
+      "search_terms": [
+        "open-food-facts",
+        "Open Food Facts",
+        "open-food-facts-pp-cli",
+        "Read-only Open Food Facts recipes for barcode product lookup, structured search, nutrition summaries, allergen and ingredient inspection, bounded comparison, category samples, and source posture checks.",
+        "Barcode product lookup",
+        "product",
+        "Fetches one Open Food Facts v3 product record and returns compact identity, labels, countries, nutrition, allergen, data-quality, image, and source URL fields.",
+        "Bounded structured search",
+        "search",
+        "Uses the documented v2 structured search endpoint with category, brand, country, label, nutrition-grade, page, and page-size controls.",
+        "Nutrition summary",
+        "nutrition",
+        "Extracts key nutriments, serving basis, Nutri-Score, NOVA, Eco-Score, source URL, and data-quality tags for one barcode.",
+        "Ingredient and allergen inspection",
+        "allergens",
+        "Reports ingredient text, ingredient analysis tags, allergens, traces, additives, and voluntary-data caveats.",
+        "Small product comparison",
+        "compare",
+        "Compares two to five barcode records while preserving per-barcode lookup errors and successful product output.",
+        "Source and rate posture",
+        "sources, doctor",
+        "Reports read-only auth, custom User-Agent configuration, documented rate limits, anti-bulk non-goals, and local configuration."
+      ],
+      "path": "library/food-and-dining/open-food-facts",
+      "printer": "sdhilip200",
+      "printer_name": "Dhilip Subramanian",
+      "creator": {
+        "handle": "sdhilip200",
+        "name": "Dhilip Subramanian"
+      }
+    },
+    {
       "name": "open-meteo",
       "category": "other",
       "api": "Open-Meteo",
@@ -13144,6 +13181,12 @@
         "Live ADS-B state vectors over any bounding box with no API key; --icao24 filters to one transponder for a single-aircraft view."
       ],
       "path": "library/travel/opensky",
+      "release": {
+        "cli_name": "opensky-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-10T02:32:13Z",
+        "source_commit": "9150163f543bcc15cda697fb96ee8bfb6f614503"
+      },
       "printer": "veltri-23",
       "printer_name": "Hunter Veltri",
       "creator": {
