@@ -7,6 +7,7 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -51,11 +52,13 @@ func newNovelDeputatoProfiloCmd(flags *rootFlags) *cobra.Command {
 type profileItem struct {
 	Tipo     string `json:"tipo"`
 	Archivio string `json:"archivio"`
-	DocID    int    `json:"doc_id"`
-	Numero   string `json:"numero,omitempty"`
-	Data     string `json:"data,omitempty"`
-	Titolo   string `json:"titolo"`
-	URL      string `json:"url,omitempty"`
+	// omitempty perché i record del backend /bd/ (resoconti) non hanno un
+	// DocID Icaro: meglio assente che un fuorviante doc_id: 0 (vedi emitRecords).
+	DocID  int    `json:"doc_id,omitempty"`
+	Numero string `json:"numero,omitempty"`
+	Data   string `json:"data,omitempty"`
+	Titolo string `json:"titolo"`
+	URL    string `json:"url,omitempty"`
 }
 
 type profileReport struct {
@@ -115,6 +118,13 @@ func runDeputatoProfilo(cmd *cobra.Command, flags *rootFlags, name string, legis
 			Truncated: &truncated,
 		})
 		if err != nil {
+			// Un archivio che non risponde non deve far cadere il report, ma un
+			// valore che l'utente ha scritto male non e' un archivio giu': se lo
+			// si scarta come gli altri, il report finisce in «nessun atto trovato
+			// … verifica il nome», che accusa la cosa sbagliata.
+			if invalido := new(icaro.InvalidParamError); errors.As(err, &invalido) {
+				return usageErr(err)
+			}
 			continue
 		}
 		archivesContacted++
@@ -154,6 +164,9 @@ func runDeputatoProfilo(cmd *cobra.Command, flags *rootFlags, name string, legis
 				MaxPages:  maxInt(1, (perArchive+9)/10),
 				Truncated: &truncated,
 			})
+			if invalido := new(icaro.InvalidParamError); errors.As(err, &invalido) {
+				return usageErr(err)
+			}
 			if err == nil {
 				archivesContacted++
 				for _, r := range recs {

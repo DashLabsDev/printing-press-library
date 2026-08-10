@@ -185,3 +185,117 @@ func TestParseIterFromBody_NoNumeroHeader(t *testing.T) {
 		}
 	}
 }
+
+// Il numero di seduta veniva tagliato via insieme al resto della riga: è il
+// solo posto in cui il portale dichiara in quale seduta un ddl è stato votato,
+// e senza di esso la data dell'evento si confonde con la data in cui la
+// notizia è stata scritta — che è quasi sempre il giorno dopo.
+func TestParseIterSeduta(t *testing.T) {
+	// Casi reali: "Seduta" maiuscolo (leg. XVIII) e minuscolo (leg. XVII, ddl
+	// 290). Il vecchio taglio a case fisso lasciava il secondo dentro al titolo.
+	body := "x Attuale 11 mar 2026 Respinto dall' Aula Seduta n. 236 AULA " +
+		"Storico 07 mag 2019 Esaminato in Aula seduta n. 114 AULA " +
+		"24 set 2018 Assegnato per esame Commissione PRIMA"
+	ev := parseIterFromBody(body)
+	if len(ev) != 3 {
+		t.Fatalf("eventi = %d, want 3: %+v", len(ev), ev)
+	}
+	if ev[0].Seduta != 236 {
+		t.Errorf("seduta maiuscola: got %d, want 236", ev[0].Seduta)
+	}
+	if ev[1].Seduta != 114 {
+		t.Errorf("seduta minuscola: got %d, want 114 (il taglio era case-sensitive)", ev[1].Seduta)
+	}
+	if strings.Contains(ev[1].Titolo, "114") || strings.Contains(ev[1].Titolo, "seduta") {
+		t.Errorf("titolo %q: i metadati di seduta vanno nel campo, non nel testo", ev[1].Titolo)
+	}
+	if ev[2].Seduta != 0 {
+		t.Errorf("evento senza seduta dichiarata: got %d, want 0", ev[2].Seduta)
+	}
+}
+
+// Il numero di seduta È l'id della scheda del resoconto: verificato su leg.
+// XVII (114 → 07/05/2019, 150 → 06/11/2019) e XVIII (267 → 28/07/2026). Una
+// seduta inesistente risponde 404, quindi un URL costruito o risolve o fallisce
+// in modo visibile — mai una pagina vuota spacciata per buona. È l'URL che
+// finisce nel campo `url` degli eventi d'aula, al posto della scheda del ddl.
+func TestResocontoSchedaURL(t *testing.T) {
+	if got := resocontoSchedaURL(17, 150); !strings.HasSuffix(got, "/bd/resoconti/scheda/17/150") {
+		t.Errorf("url = %q, want .../bd/resoconti/scheda/17/150", got)
+	}
+	// Senza numero di seduta non si inventa un link: meglio nessun URL che uno
+	// che porta altrove.
+	if got := resocontoSchedaURL(17, 0); got != "" {
+		t.Errorf("seduta ignota: url = %q, want stringa vuota", got)
+	}
+	if got := resocontoSchedaURL(0, 150); got != "" {
+		t.Errorf("legislatura ignota: url = %q, want stringa vuota", got)
+	}
+}
+
+// L'Aula tiene una seduta per data: due numeri diversi sulla stessa data
+// vogliono dire che almeno uno è sbagliato, e la fonte non dice quale. È il
+// caso reale del ddl 199 della XVII, dove la votazione finale del 19 feb 2020
+// è data in «Seduta n. 179» mentre la 179 è del 26 febbraio.
+func TestSedutePerDataIncoerenti(t *testing.T) {
+	evs := []iterEvent{
+		{Data: "04 feb 2020", Seduta: 173, sedutaAula: true},
+		{Data: "19 feb 2020", Seduta: 179, sedutaAula: true},
+		{Data: "19 feb 2020", Seduta: 178, sedutaAula: true},
+	}
+	got := sedutePerDataIncoerenti(evs)
+	if !got["19 feb 2020"] {
+		t.Error("due sedute d'Aula sulla stessa data: la data va segnalata")
+	}
+	if got["04 feb 2020"] {
+		t.Error("data con una sola seduta: nessuna incoerenza da segnalare")
+	}
+	// Lo stesso numero ripetuto sulla stessa data non è un conflitto: due
+	// passaggi dell'iter nella medesima seduta sono la norma.
+	ripetuta := []iterEvent{
+		{Data: "22 lug 2026", Seduta: 266, sedutaAula: true},
+		{Data: "22 lug 2026", Seduta: 266, sedutaAula: true},
+	}
+	if len(sedutePerDataIncoerenti(ripetuta)) != 0 {
+		t.Error("stessa seduta due volte: nessuna incoerenza")
+	}
+	// Le sedute di commissione hanno una numerazione propria e non entrano nel
+	// confronto: una commissione n. 25 e un'Aula n. 178 nello stesso giorno
+	// sono due cose diverse, non un conflitto.
+	miste := []iterEvent{
+		{Data: "19 feb 2020", Seduta: 178, sedutaAula: true},
+		{Data: "19 feb 2020", Seduta: 25},
+	}
+	if len(sedutePerDataIncoerenti(miste)) != 0 {
+		t.Error("seduta di commissione: numerazione indipendente, nessun conflitto")
+	}
+}
+
+// Le due numerazioni — sedute d'Aula e sedute di commissione — sono
+// indipendenti, e solo il marcatore che segue il numero dice a quale serie
+// appartiene. Sbagliarlo produce un link che risolve e mostra il documento
+// sbagliato, che è peggio di un link rotto.
+func TestSedutaDaAzione(t *testing.T) {
+	cases := []struct {
+		in       string
+		want     int
+		wantAula bool
+	}{
+		{"Esaminato in Aula Seduta n. 267 AULA", 267, true},
+		{"Esaminato in Aula seduta n.114 AULA", 114, true},
+		{"Annunziato Seduta n. 52 AULA", 52, true},
+		// Fase "aula" per il testo, ma la seduta citata è di commissione:
+		// è il caso che generava il link sbagliato.
+		{"Esitato per Aula (epa) Seduta n. 260 0400 Commissione QUARTA", 260, false},
+		{"Esaminato in commissione Seduta n. 35 0400 Commissione QUARTA", 35, false},
+		// Il portale emette davvero questa riga, virgolette comprese.
+		{`Abbinamento con ddl 49 Seduta"""""""""""""" n. 35 0400 Commissione QUARTA`, 35, false},
+		{"Assegnato per esame Commissione PRIMA", 0, false},
+	}
+	for _, c := range cases {
+		got, gotAula := sedutaDaAzione(c.in)
+		if got != c.want || gotAula != c.wantAula {
+			t.Errorf("sedutaDaAzione(%q) = (%d, %v), want (%d, %v)", c.in, got, gotAula, c.want, c.wantAula)
+		}
+	}
+}

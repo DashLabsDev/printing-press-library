@@ -9,6 +9,12 @@ import (
 	"golang.org/x/net/html"
 )
 
+// docNoRe cattura il numero di documento stabile dal permalink che la pagina
+// di dettaglio costruisce in JavaScript. La short list non lo espone (lì c'è
+// solo `showDoc(N)`, cioè la posizione nella sessione), quindi il permalink si
+// può dare su `get` e non sulle righe di ricerca.
+var docNoRe = regexp.MustCompile(`docno\((\d+)\)`)
+
 // ParseShortList walks the `<ul id="shortListTable">` block, skips the header
 // `<li class="intestazione">` and returns one Record per data row. It also
 // extracts the total page count from the pagination block ("Pagina N di M").
@@ -52,6 +58,14 @@ func ParseDoc(body string, arc Archive, docID int) (Doc, error) {
 	doc := Doc{
 		DocID:  docID,
 		Fields: map[string]string{},
+	}
+	// Il numero di documento stabile non è in nessun campo della scheda: sta
+	// nello script che alimenta il bottone «Link diretto al documento», come
+	// `icaQuery=docno(9513)`. Si legge dall'HTML grezzo e non dall'albero
+	// perché è dentro il testo di uno <script>, dove non ci sono nodi da
+	// visitare.
+	if m := docNoRe.FindStringSubmatch(body); m != nil {
+		doc.DocNo, _ = strconv.Atoi(m[1])
 	}
 	// The doc page renders every field as a labeled block (see
 	// labeledBlocks). Lift them all into Fields — callers get "Firmatari",

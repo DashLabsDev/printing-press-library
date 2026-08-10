@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 
 	icaro "github.com/mvanhorn/printing-press-library/library/other/ars-sicilia/internal/icaroclient"
@@ -51,22 +52,49 @@ func newNovelDdlIterCmd(flags *rootFlags) *cobra.Command {
 }
 
 type iterEvent struct {
-	Fase      string `json:"fase"`
-	Data      string `json:"data,omitempty"`
-	Sede      string `json:"sede,omitempty"`
-	Titolo    string `json:"titolo,omitempty"`
-	Oratori   string `json:"oratori,omitempty"`
+	Fase   string `json:"fase"`
+	Data   string `json:"data,omitempty"`
+	Sede   string `json:"sede,omitempty"`
+	Titolo string `json:"titolo,omitempty"`
+	// Seduta è il numero della seduta in cui l'evento è avvenuto, quando il
+	// portale lo dichiara. Prima veniva tagliato via insieme al resto della
+	// riga (vedi parseIterFromBody): senza, dall'iter non si può risalire alla
+	// seduta in cui un ddl è stato votato, che è la domanda più frequente su
+	// un atto — e la data dell'evento da sola si confonde con la data in cui
+	// la notizia è stata scritta, che è quasi sempre il giorno dopo.
+	Seduta  int    `json:"seduta,omitempty"`
+	Oratori string `json:"oratori,omitempty"`
+	// URL è la fonte PIÙ SPECIFICA che si conosce per questo evento: per un
+	// passaggio in Aula di cui si sa la seduta, la scheda del resoconto; per
+	// tutti gli altri, la scheda dell'atto da cui l'evento è stato letto.
+	// `legge cronologia` popola già questo campo per-evento; `ddl iter`
+	// ripeteva la stessa scheda su ogni riga perché è da lì che li parsa.
+	// Il numero di seduta è l'id della scheda del resoconto (verificato su
+	// leg. XVII e XVIII; una seduta inesistente risponde 404, non una pagina
+	// vuota), quindi l'URL si costruisce senza una richiesta in più.
 	URL       string `json:"url,omitempty"`
 	ArchiveID string `json:"archive_id,omitempty"`
 	DocID     int    `json:"doc_id,omitempty"`
+	// sedutaAula distingue la seduta d'Aula da quella di commissione: le due
+	// numerazioni sono indipendenti, quindi solo il marcatore del portale dice
+	// a quale serie appartiene il numero. Non esce nel JSON — serve al
+	// chiamante per decidere se esiste un resoconto da linkare, e chi legge
+	// l'output lo deduce dalla presenza dell'URL.
+	sedutaAula bool
 }
 
 type iterReport struct {
-	Legisl int         `json:"legisl"`
-	Numero int         `json:"numero"`
-	Titolo string      `json:"titolo,omitempty"`
-	Eventi []iterEvent `json:"eventi"`
-	Note   string      `json:"note,omitempty"`
+	Legisl int    `json:"legisl"`
+	Numero int    `json:"numero"`
+	Titolo string `json:"titolo,omitempty"`
+	// URL è la scheda dell'atto di cui si racconta la storia: il ddl per
+	// `ddl iter`, la legge per `legge cronologia`. Stava solo dentro ogni
+	// evento, ripetuta identica, e nella radice del report — dove uno la
+	// cerca — non c'era.
+	URL      string       `json:"url,omitempty"`
+	Stralcio *stralcioOut `json:"stralcio,omitempty"`
+	Eventi   []iterEvent  `json:"eventi"`
+	Note     string       `json:"note,omitempty"`
 }
 
 func runDdlIter(cmd *cobra.Command, flags *rootFlags, legisl, numero int) error {
@@ -99,6 +127,11 @@ func runDdlIter(cmd *cobra.Command, flags *rootFlags, legisl, numero int) error 
 		return emitIter(cmd, flags, report)
 	}
 	report.Titolo = recs[0].Title
+	report.URL = recs[0].URL
+	// Se il ddl è uno stralcio, dirlo prima della cronologia: l'iter di uno
+	// stralcio comincia a metà storia, e senza il rimando al ddl base si legge
+	// come un atto nato dal nulla.
+	report.Stralcio = stralcioDaTesti(numero, recs[0].Excerpt)
 	report.Eventi = append(report.Eventi, iterEvent{
 		Fase:      "presentazione",
 		Data:      recs[0].Fields["Data"],
@@ -114,10 +147,37 @@ func runDdlIter(cmd *cobra.Command, flags *rootFlags, legisl, numero int) error 
 	// con fallback sul corpo del documento solo se quel campo manca. Vedi
 	// docIterEvents.
 	if doc, derr := c.GetDoc(ctx, *arc, recs[0].DocID); derr == nil {
-		for _, ev := range docIterEvents(doc) {
+		// La scheda porta "Riferimenti", più affidabile dell'excerpt della
+		// short-list (che il portale a volte restituisce vuoto).
+		if s := stralcioDaTesti(numero, doc.Fields["Riferimenti"]); s != nil {
+			report.Stralcio = s
+		}
+		evs := docIterEvents(doc)
+		// L'Aula tiene una seduta per data, quindi due eventi che dichiarano
+		// la stessa data con numeri di seduta diversi non possono avere
+		// entrambi il numero giusto: vedi sedutePerDataIncoerenti.
+		incoerenti := sedutePerDataIncoerenti(evs)
+		avvisaSedutaIncoerente(cmd, legisl, incoerenti)
+		for _, ev := range evs {
 			ev.URL = recs[0].URL
 			ev.ArchiveID = arc.ID
 			ev.DocID = recs[0].DocID
+			// Solo l'Aula ha resoconti: i lavori di commissione producono
+			// sommari, che stanno su un altro archivio e non su questa rotta.
+			// La discriminante è il marcatore del portale (sedutaAula), NON la
+			// fase dell'evento: "Esitato per Aula (epa) Seduta n. 260 0400
+			// Commissione QUARTA" è un evento di fase aula che cita una seduta
+			// di commissione, e linkarne il resoconto porterebbe alla seduta
+			// d'Aula n. 260, che è un'altra cosa.
+			// Dove il resoconto esiste è la fonte giusta dell'evento e prende
+			// il posto della scheda del ddl, che resta nella radice del report.
+			if ev.sedutaAula && !incoerenti[ev.Data] {
+				if u := resocontoSchedaURL(legisl, ev.Seduta); u != "" {
+					ev.URL = u
+					ev.ArchiveID = ""
+					ev.DocID = 0
+				}
+			}
 			report.Eventi = append(report.Eventi, ev)
 		}
 	}
@@ -230,7 +290,10 @@ func parseIterFromBody(body string) []iterEvent {
 			actEnd = locs[i+1][0]
 		}
 		action := region[loc[1]:actEnd]
-		if s := strings.Index(action, "Seduta"); s >= 0 {
+		// Il numero di seduta si legge PRIMA di tagliare: è l'unico posto in
+		// cui il portale lo dichiara, e prima finiva nel pezzo scartato.
+		seduta, sedutaAula := sedutaDaAzione(action)
+		if s := indiceSeduta(action); s >= 0 {
 			action = action[:s]
 		}
 		action = strings.Join(strings.Fields(action), " ")
@@ -241,13 +304,124 @@ func parseIterFromBody(body string) []iterEvent {
 			action = fmt.Sprintf("Promulgata legge regionale n. %s/%s", m[2], m[1])
 		}
 		events = append(events, iterEvent{
-			Fase:   classifyIterFase(action),
-			Data:   fmt.Sprintf("%s %s %s", dd, mon, yyyy),
-			Sede:   iterSede(action),
-			Titolo: action,
+			Fase:       classifyIterFase(action),
+			Data:       fmt.Sprintf("%s %s %s", dd, mon, yyyy),
+			Sede:       iterSede(action),
+			Titolo:     action,
+			Seduta:     seduta,
+			sedutaAula: sedutaAula,
 		})
 	}
 	return events
+}
+
+// reSeduta matches the portal's sitting reference inside an iter step, plus
+// the marker that follows it. The case-insensitive flag is deliberate: the
+// portal writes both "Seduta n. 64" and "seduta n. 114", and the old
+// fixed-case cut left the lowercase form inside the event title — same data,
+// two renderings, depending on chance. The quote run in the character class
+// is not decorative: the portal really does emit
+// `Seduta"""""""""""""" n. 35` on some rows.
+//
+// The trailing group is what tells an Aula sitting from a committee one:
+//
+//	Seduta n. 261 AULA                      -> Aula
+//	Seduta n. 260 0400 Commissione QUARTA   -> IV Committee
+//
+// The two numbering series are independent, so the marker cannot be guessed
+// from the event phase: "Esitato per Aula (epa) Seduta n. 260 0400 Commissione
+// QUARTA" classifies as an aula event but cites a COMMITTEE sitting, and
+// building a resoconto URL from it lands on the unrelated Aula sitting n. 260
+// — a link that resolves and shows the wrong document.
+var reSeduta = regexp.MustCompile(`(?i)\bseduta"*\s+n\.?\s*(\d+)\s*([a-z0-9]*)`)
+
+// indiceSeduta returns where the sitting metadata starts in an iter action, or
+// -1. Case-insensitive counterpart of the old strings.Index(action, "Seduta").
+func indiceSeduta(action string) int {
+	if loc := reSeduta.FindStringIndex(action); loc != nil {
+		return loc[0]
+	}
+	return -1
+}
+
+// sedutaDaAzione extracts the sitting number from an iter action and reports
+// whether it was an Aula sitting (as opposed to a committee one). Returns
+// (0, false) when the portal declared no sitting.
+func sedutaDaAzione(action string) (int, bool) {
+	m := reSeduta.FindStringSubmatch(action)
+	if m == nil {
+		return 0, false
+	}
+	n, err := strconv.Atoi(m[1])
+	if err != nil {
+		return 0, false
+	}
+	return n, strings.EqualFold(m[2], "AULA")
+}
+
+// resocontoSchedaURL builds the /bd/ sitting-record URL from legislature and
+// sitting number. The sitting number IS the scheda id: verified on leg. XVII
+// (n. 114 → 07/05/2019, n. 149/150 → 05-06/11/2019) and leg. XVIII (n. 267 →
+// 28/07/2026); a non-existent sitting returns 404 rather than an empty page,
+// so a constructed URL either resolves or fails visibly.
+func resocontoSchedaURL(legisl, seduta int) string {
+	if legisl <= 0 || seduta <= 0 {
+		return ""
+	}
+	return fmt.Sprintf("%s/bd/resoconti/scheda/%d/%d", icaro.DefaultBaseURL, legisl, seduta)
+}
+
+// sedutePerDataIncoerenti riporta le date in cui gli eventi d'Aula di questo
+// iter dichiarano numeri di seduta diversi, con i numeri in gioco.
+//
+// L'Aula tiene una sola seduta per data — l'archivio resoconti ne indicizza una
+// per giorno — quindi due numeri sulla stessa data non possono essere entrambi
+// giusti, e la fonte non dice quale lo sia. Succede davvero: l'iter del ddl 199
+// della XVII dà la votazione finale come «19 feb 2020 — Approvato
+// dall'Assemblea — Seduta n. 179», ma la 179 è del 26 febbraio; il voto sta nel
+// resoconto della 178, che è quella del 19 (verificato sul resoconto stesso,
+// «XVII LEGISLATURA 178a SEDUTA 19 febbraio 2020 … L'Assemblea approva»).
+//
+// Su quelle date il link al resoconto non si costruisce: un URL che risolve
+// mostrando il documento sbagliato è peggio dell'assenza del link, ed è la
+// stessa ragione per cui non si linka la seduta di commissione citata da un
+// evento di fase aula. La data resta nell'evento, ed è quella la chiave con cui
+// trovare la seduta vera.
+func sedutePerDataIncoerenti(evs []iterEvent) map[string]bool {
+	numeriPerData := map[string]map[int]bool{}
+	for _, ev := range evs {
+		if !ev.sedutaAula || ev.Seduta <= 0 {
+			continue
+		}
+		if numeriPerData[ev.Data] == nil {
+			numeriPerData[ev.Data] = map[int]bool{}
+		}
+		numeriPerData[ev.Data][ev.Seduta] = true
+	}
+	out := map[string]bool{}
+	for data, numeri := range numeriPerData {
+		if len(numeri) > 1 {
+			out[data] = true
+		}
+	}
+	return out
+}
+
+// avvisaSedutaIncoerente dice su stderr perché il link manca e come arrivare
+// comunque alla seduta: senza l'avviso l'assenza dell'URL su alcuni eventi e
+// non su altri sembra un bug della CLI invece di un dato incoerente a monte.
+func avvisaSedutaIncoerente(cmd *cobra.Command, legisl int, incoerenti map[string]bool) {
+	if len(incoerenti) == 0 {
+		return
+	}
+	date := make([]string, 0, len(incoerenti))
+	for d := range incoerenti {
+		date = append(date, d)
+	}
+	sort.Strings(date)
+	fmt.Fprintf(cmd.ErrOrStderr(),
+		"hint: la fonte dichiara numeri di seduta d'Aula diversi per la stessa data (%s), e l'Aula ne tiene una sola al giorno: almeno uno dei numeri è sbagliato. Su quegli eventi il link al resoconto è omesso invece di puntare al giorno sbagliato — trova la seduta vera con `resoconti cerca --legisl %d --data <data>`.\n",
+		strings.Join(date, ", "), legisl)
 }
 
 // docIterEvents reads a DDL's iter timeline. It prefers the page's labeled
