@@ -12816,6 +12816,12 @@
         "Reports read-only auth, custom User-Agent configuration, documented rate limits, anti-bulk non-goals, and local configuration."
       ],
       "path": "library/food-and-dining/open-food-facts",
+      "release": {
+        "cli_name": "open-food-facts-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-10T02:34:07Z",
+        "source_commit": "c6cf81b9251e865caaba5a1406359856a6cf74a1"
+      },
       "printer": "sdhilip200",
       "printer_name": "Dhilip Subramanian",
       "creator": {
@@ -18650,6 +18656,63 @@
         ],
         "mcp_ready": "full",
         "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "surfline",
+      "category": "other",
+      "api": "Surfline",
+      "description": "Every Surfline forecast, scriptable from your terminal — plus multi-spot ranking, a local forecast journal, and cron-able alerts no Surfline tool has.",
+      "search_terms": [
+        "surfline",
+        "surfline-pp-cli",
+        "Every Surfline forecast, scriptable from your terminal — plus multi-spot ranking, a local forecast journal, and cron-able alerts no Surfline tool has.",
+        "Dawn-patrol one-shot",
+        "now",
+        "One spot's next few hours as a paddle/no-paddle line readout: swell, wind, tide and rating joined per hour.",
+        "Multi-spot rank",
+        "rank",
+        "Score and sort several spots best-first on a transparent sum of wave, wind and swell optimalScore.",
+        "Optimal-window scanner",
+        "windows",
+        "Emit only the contiguous time blocks where wave, wind and swell optimalScore are all good, daylight-only.",
+        "Raw conditions dump",
+        "raw",
+        "Pipe-friendly table/JSON of min/max/optimalScore/humanRelation plus swell components and wind directionType/gust, no rating editorializing.",
+        "Scriptable alert rules",
+        "alert run",
+        "Store swell/wind/tide threshold rules locally; alert run fetches a fresh forecast, evaluates them, prints matches and sets an exit code for cron.",
+        "Buoy vs forecast cross-check",
+        "buoy-check",
+        "Show nearby-buoy observed swell against the spot's wave forecast for the same window, side by side.",
+        "Forecast-history journal",
+        "journal show",
+        "Snapshot the current forecast into local SQLite and review a spot's snapshots over time.",
+        "Offline spot search",
+        "search",
+        "Resolve spot names to spotIds via FTS over the locally-synced taxonomy, with no network."
+      ],
+      "path": "library/other/surfline",
+      "printer": "Shoffner",
+      "printer_name": "Shoffner",
+      "creator": {
+        "handle": "Shoffner",
+        "name": "Shoffner"
+      },
+      "mcp": {
+        "binary": "surfline-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 15,
+        "public_tool_count": 0,
+        "auth_type": "api_key",
+        "env_vars": [
+          "SURFLINE_ACCESS_TOKEN"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
       }
     },
     {
