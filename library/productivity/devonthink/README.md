@@ -2,7 +2,7 @@
 
 **Local-first DEVONthink automation with safer shell workflows than raw AppleScript or MCP alone.**
 
-This CLI treats DEVONthink as a local knowledge database, not a cloud API. It wraps core record/search operations, adds a SQLite mirror for repeatable analysis, and provides stable inventory, graph, batch, and ledger contracts for higher-level maintenance plugins.
+Use DEVONthink as the local source of truth while giving agents and scripts stable, compact CLI output. The CLI wraps the official local MCP surface, adds search scopes, inventory export, context packing, local mirrors, and safety-oriented workflow primitives.
 
 ## Install
 
@@ -121,23 +121,14 @@ Default operation uses local macOS automation and requires no API key. Optional 
 ## Quick Start
 
 ```bash
-# Check local runtime readiness without touching DEVONthink.
+# Check local runtime readiness without touching DEVONthink content.
 devonthink-pp-cli runtime doctor --json
-
-# Preview the stable inventory contract consumed by maintenance workflows.
-devonthink-pp-cli inventory export --format maintenance --query "kind:document" --limit 500 --output devonthink-inventory.json
 
 # Find records while keeping agent output compact.
 devonthink-pp-cli records search "kind:pdf" --limit 5 --agent --select uuid,name,item_link
 
-# Scope a normal search to a Smart Group by UUID, exact name, or DEVONthink path.
-devonthink-pp-cli records search "tags:waiting/rueckerstattung" --smart-group "Offene Rückerstattungen" --agent --select uuid,name,item_link,tags,databaseName
-
 # Capture the current GUI selection as a repeatable workflow seed.
 devonthink-pp-cli selection snapshot --agent
-
-# Build a bounded evidence packet for local reasoning.
-devonthink-pp-cli context pack --query "project alpha" --token-budget 6000 --agent
 
 ```
 
@@ -145,137 +136,78 @@ devonthink-pp-cli context pack --query "project alpha" --token-budget 6000 --age
 
 These capabilities aren't available in any other tool for this API.
 
+### Agent-native plumbing
+- **`records search`** — Scope a normal DEVONthink query to a Smart Group by UUID, exact name, or DEVONthink path while preserving normal search output.
+
+  _Use this when a downstream tool needs a stable dynamic search scope without treating Smart Groups as workflow policy._
+
+  ```bash
+  devonthink-pp-cli records search "tags:waiting/rueckerstattung" --smart-group "Offene Rückerstattungen" --agent --select uuid,name,item_link,tags,databaseName
+  ```
+- **`inventory export`** — Export DEVONthink databases, groups, tags, and document metadata for maintenance plugins.
+
+  _Use this when structure-audit or inbox-triage tooling needs a stable local inventory contract._
+
+  ```bash
+  devonthink-pp-cli inventory export --format maintenance --query "kind:document" --limit 500 --agent --select databases,documents
+  ```
+- **`mcp call`** — Call DEVONthink's official local MCP tools from scripts when the local MCP server is enabled.
+
+  _Use this when the official MCP exposes a new read tool before the CLI adds a first-class command._
+
+  ```bash
+  devonthink-pp-cli mcp call search_records --args '{"query":"kind:pdf","limit":5}' --agent
+  ```
+
 ### Local state that compounds
 - **`context pack`** — Build a compact evidence packet from records, selections, highlights, links, and related items.
 
   _Use this when an agent needs enough DEVONthink context to reason without dumping whole documents._
 
   ```bash
-  devonthink-pp-cli context pack --query "project alpha" --token-budget 6000 --agent --select markdown,records
+  devonthink-pp-cli context pack --query "project alpha" --token-budget 6000 --agent
   ```
 - **`graph audit`** — Detect orphans, broken links, unresolved wiki links, weak hubs, and tag-only clusters.
 
   _Use this when DEVONthink should behave like a maintained knowledge graph instead of a folder pile._
 
   ```bash
-  devonthink-pp-cli graph audit --database Research --agent --select issues,type,count,samples
+  devonthink-pp-cli graph audit --limit 50 --agent
   ```
-- **`mirror search`** — Query a local SQLite mirror for repeatable fast analysis without repeated app calls.
 
-  _Use this for repeated analysis, dashboards, and low-token agent workflows._
+### Local safety
+- **`privacy audit`** — Preview database scope, content-size budget, and cloud/MCP exposure before a handoff.
+
+  _Use this before exporting or sharing DEVONthink-derived context with another tool._
 
   ```bash
-  devonthink-pp-cli mirror search "tag:tax" --limit 20 --agent --select uuid,name,path
+  devonthink-pp-cli privacy audit --query "kind:pdf" --agent
   ```
-
-### Local-first safety
-- **`privacy audit`** — Preview what a workflow may expose before content leaves the local machine.
-
-  _Use this before sending DEVONthink-derived context to an external model or shared MCP endpoint._
-
-  ```bash
-  devonthink-pp-cli privacy audit --query "invoice" --limit 10 --agent
-  ```
-- **`agent-context`** — Emit an agent contract that enforces local-machine and own-LAN DEVONthink access only.
-
-  _Use this before handing DEVONthink access to an agent that must avoid remote control paths._
-
-  ```bash
-  devonthink-pp-cli agent-context --local-only --agent
-  ```
-
-### Safe automation
 - **`batch plan`** — Stage multi-record edits as validated dry-run plans before applying them.
 
-  _Use this for multi-record writes where each target must be checked before mutation._
+  _Use this when a script needs reviewable intent before any DEVONthink mutation._
 
   ```bash
-  devonthink-pp-cli batch plan --from selection --add-tag reviewed --move-to /Archive --agent
-  ```
-- **`ledger list`** — Review CLI-driven mutation plans, applies, target proofs, and rollback hints.
-
-  _Use this to audit or explain what recent automation did to DEVONthink._
-
-  ```bash
-  devonthink-pp-cli ledger list --since 7d --agent --select time,action,count,status
-  ```
-- **`selection snapshot`** — Turn the current GUI selection into a reusable JSON workflow seed.
-
-  _Use this when the human has curated records in the GUI and wants an agent-safe handoff._
-
-  ```bash
-  devonthink-pp-cli selection snapshot --note "review these PDFs" --agent
-  ```
-
-### Agent-native plumbing
-- **`inventory export`** — Export DEVONthink databases, groups, tags, and document metadata for maintenance plugins.
-
-  _Use this when structure-audit or inbox-triage tooling needs a stable local inventory contract._
-
-  ```bash
-  devonthink-pp-cli inventory export --format maintenance --query "kind:document" --limit 500 --output devonthink-inventory.json --agent --select databases,documents
-  ```
-- **`mcp call`** — Call DEVONthink's official local MCP tools from scripts when the local MCP server is enabled.
-
-  _Use this when the official MCP exposes a new tool before the CLI has a promoted command._
-
-  ```bash
-  devonthink-pp-cli mcp call search_records --args '{"query":"kind:pdf","limit":5}' --agent
+  devonthink-pp-cli batch plan --dry-run --agent
   ```
 
 ## Recipes
 
-
-### Compact search for an agent
-
-```bash
-devonthink-pp-cli records search "tags:review AND kind:pdf" --limit 10 --agent --select uuid,name,item_link,tags
-```
-
-Returns only the fields an agent needs to pick the next record.
-
 ### Search within a Smart Group
 
 ```bash
-devonthink-pp-cli records search "tags:waiting/rueckerstattung" \
-  --smart-group "Offene Rückerstattungen" \
-  --agent \
-  --select uuid,name,item_link,tags,databaseName
+devonthink-pp-cli records search "tags:waiting/rueckerstattung" --smart-group "Offene Rückerstattungen" --agent --select uuid,name,item_link,tags,databaseName
 ```
 
-Smart Groups are search scopes only. They do not define action workflow policy; downstream maintenance tools should still apply their own review and transition rules.
+Scopes a normal query to a Smart Group and returns normal search rows plus meta.scope.
 
 ### Feed the maintenance plugin
 
 ```bash
-devonthink-pp-cli inventory export --format maintenance --query "kind:document" --limit 500 --output devonthink-inventory.json --agent --select databases.name,documents.name,documents.tags
+devonthink-pp-cli inventory export --format maintenance --query "kind:document" --limit 500 --agent --select databases.name,documents.name,documents.tags
 ```
 
-Produces the stable inventory JSON that structure-audit and inbox-triage workflows can consume.
-
-### Create a local evidence packet
-
-```bash
-devonthink-pp-cli context pack --query "family invoices" --token-budget 5000 --agent --select markdown,records.item_link
-```
-
-Builds a bounded context bundle without dumping entire records.
-
-### Plan a safe tag cleanup
-
-```bash
-devonthink-pp-cli batch plan --query "tags:todo" --add-tag reviewed --dry-run --agent
-```
-
-Stages a batch change for review before any record is mutated.
-
-### Audit graph health
-
-```bash
-devonthink-pp-cli graph audit --database Research --agent --select issues,type,count,samples
-```
-
-Finds link and organization gaps from the local mirror.
+Produces stable inventory JSON for structure-audit and inbox-triage workflows.
 
 ## Usage
 
@@ -464,11 +396,6 @@ Static request headers can be configured under `headers`; per-command header ove
 **Not found errors (exit code 3)**
 - Check the resource ID is correct
 - Run the `list` command to see available items
-
-### API-specific
-- **doctor reports DEVONthink is not running** — Open DEVONthink locally, then rerun devonthink-pp-cli doctor.
-- **MCP passthrough commands fail** — Enable DEVONthink Settings > AI > MCP and verify the local endpoint or use native CLI commands instead.
-- **mirror search returns no rows** — Run devonthink-pp-cli mirror sync before querying the local mirror.
 
 ## Sources & Inspiration
 

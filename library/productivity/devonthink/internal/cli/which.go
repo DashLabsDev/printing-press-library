@@ -27,16 +27,13 @@ type whichEntry struct {
 // `--help`; `which` exists to resolve a natural-language capability
 // query to one of the commands the skill says matter most.
 var whichIndex = []whichEntry{
+	{Command: "records search", Description: "Scope a normal DEVONthink query to a Smart Group by UUID, exact name, or DEVONthink path while preserving normal search output.", Group: "Agent-native plumbing", WhyItMatters: "Use this when a downstream tool needs a stable dynamic search scope without treating Smart Groups as workflow policy."},
 	{Command: "context pack", Description: "Build a compact evidence packet from records, selections, highlights, links, and related items.", Group: "Local state that compounds", WhyItMatters: "Use this when an agent needs enough DEVONthink context to reason without dumping whole documents."},
-	{Command: "privacy audit", Description: "Preview what a workflow may expose before content leaves the local machine.", Group: "Local-first safety", WhyItMatters: "Use this before sending DEVONthink-derived context to an external model or shared MCP endpoint."},
-	{Command: "batch plan", Description: "Stage multi-record edits as validated dry-run plans before applying them.", Group: "Safe automation", WhyItMatters: "Use this for multi-record writes where each target must be checked before mutation."},
+	{Command: "privacy audit", Description: "Preview database scope, content-size budget, and cloud/MCP exposure before a handoff.", Group: "Local safety", WhyItMatters: "Use this before exporting or sharing DEVONthink-derived context with another tool."},
+	{Command: "batch plan", Description: "Stage multi-record edits as validated dry-run plans before applying them.", Group: "Local safety", WhyItMatters: "Use this when a script needs reviewable intent before any DEVONthink mutation."},
 	{Command: "inventory export", Description: "Export DEVONthink databases, groups, tags, and document metadata for maintenance plugins.", Group: "Agent-native plumbing", WhyItMatters: "Use this when structure-audit or inbox-triage tooling needs a stable local inventory contract."},
 	{Command: "graph audit", Description: "Detect orphans, broken links, unresolved wiki links, weak hubs, and tag-only clusters.", Group: "Local state that compounds", WhyItMatters: "Use this when DEVONthink should behave like a maintained knowledge graph instead of a folder pile."},
-	{Command: "mirror search", Description: "Query a local SQLite mirror for repeatable fast analysis without repeated app calls.", Group: "Local state that compounds", WhyItMatters: "Use this for repeated analysis, dashboards, and low-token agent workflows."},
-	{Command: "mcp call", Description: "Call DEVONthink's official local MCP tools from scripts when the local MCP server is enabled.", Group: "Agent-native plumbing", WhyItMatters: "Use this when the official MCP exposes a new tool before the CLI has a promoted command."},
-	{Command: "ledger list", Description: "Review CLI-driven mutation plans, applies, target proofs, and rollback hints.", Group: "Safe automation", WhyItMatters: "Use this to audit or explain what recent automation did to DEVONthink."},
-	{Command: "selection snapshot", Description: "Turn the current GUI selection into a reusable JSON workflow seed.", Group: "Safe automation", WhyItMatters: "Use this when the human has curated records in the GUI and wants an agent-safe handoff."},
-	{Command: "agent-context", Description: "Emit an agent contract that enforces local-machine and own-LAN DEVONthink access only.", Group: "Local-first safety", WhyItMatters: "Use this before handing DEVONthink access to an agent that must avoid remote control paths."},
+	{Command: "mcp call", Description: "Call DEVONthink's official local MCP tools from scripts when the local MCP server is enabled.", Group: "Agent-native plumbing", WhyItMatters: "Use this when the official MCP exposes a new read tool before the CLI adds a first-class command."},
 }
 
 // whichMatch pairs an index entry with its ranking score for a query.

@@ -6,15 +6,23 @@
       "name": "DEVONthink official MCP server",
       "url": "https://www.devontechnologies.com/blog/20260526-devonthink-mcp-server",
       "language": "Swift",
+      "install_method": "",
       "stars": 0,
-      "command_count": 59
+      "last_updated": "",
+      "command_count": 59,
+      "has_json_output": false,
+      "has_auth_support": false
     },
     {
       "name": "Rowdy/DEVONthink-ai-maintenance",
       "url": "https://github.com/Rowdy/DEVONthink-ai-maintenance",
       "language": "Codex plugin",
+      "install_method": "",
       "stars": 0,
-      "command_count": 0
+      "last_updated": "",
+      "command_count": 0,
+      "has_json_output": false,
+      "has_auth_support": false
     }
   ],
   "gaps": [
@@ -163,12 +171,6 @@
     "display_name": "DEVONthink",
     "headline": "Local-first DEVONthink automation with safer shell workflows than raw AppleScript or MCP alone.",
     "value_prop": "Use DEVONthink as the local source of truth while giving agents and scripts stable, compact CLI output. The CLI wraps the official local MCP surface, adds search scopes, inventory export, context packing, local mirrors, and safety-oriented workflow primitives.",
-    "when_to_use": "Use this CLI for local DEVONthink inventory, scoped record search, context packs, and read-only maintenance handoffs. It is designed for this Mac or the user's own LAN, not internet-hosted DEVONthink access.",
-    "anti_triggers": [
-      "Do not use this CLI to access DEVONthink over the public internet.",
-      "Do not treat Smart Groups as action workflow policy; they are search scopes only.",
-      "Do not directly edit files inside DEVONthink database packages."
-    ],
     "quickstart": [
       {
         "command": "devonthink-pp-cli runtime doctor --json",
@@ -182,6 +184,12 @@
         "command": "devonthink-pp-cli selection snapshot --agent",
         "comment": "Capture the current GUI selection as a repeatable workflow seed."
       }
+    ],
+    "when_to_use": "Use this CLI for local DEVONthink inventory, scoped record search, context packs, and read-only maintenance handoffs. It is designed for this Mac or the user's own LAN, not internet-hosted DEVONthink access.",
+    "anti_triggers": [
+      "Do not use this CLI to access DEVONthink over the public internet.",
+      "Do not treat Smart Groups as action workflow policy; they are search scopes only.",
+      "Do not directly edit files inside DEVONthink database packages."
     ],
     "recipes": [
       {

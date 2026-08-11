@@ -146,16 +146,13 @@ func newRootCmd(flags *rootFlags) *cobra.Command {
 		Long: `Devonthink CLI — Local-first DEVONthink automation with safer shell workflows than raw AppleScript or MCP alone.
 
 Highlights (not in the official API docs):
+  • records search   Scope a normal DEVONthink query to a Smart Group by UUID, exact name, or DEVONthink path while preserving normal search output.
   • context pack   Build a compact evidence packet from records, selections, highlights, links, and related items.
-  • privacy audit   Preview what a workflow may expose before content leaves the local machine.
+  • privacy audit   Preview database scope, content-size budget, and cloud/MCP exposure before a handoff.
   • batch plan   Stage multi-record edits as validated dry-run plans before applying them.
   • inventory export   Export DEVONthink databases, groups, tags, and document metadata for maintenance plugins.
   • graph audit   Detect orphans, broken links, unresolved wiki links, weak hubs, and tag-only clusters.
-  • mirror search   Query a local SQLite mirror for repeatable fast analysis without repeated app calls.
   • mcp call   Call DEVONthink's official local MCP tools from scripts when the local MCP server is enabled.
-  • ledger list   Review CLI-driven mutation plans, applies, target proofs, and rollback hints.
-  • selection snapshot   Turn the current GUI selection into a reusable JSON workflow seed.
-  • agent-context   Emit an agent contract that enforces local-machine and own-LAN DEVONthink access only.
 
 Agent mode: add --agent to any command for JSON output + non-interactive mode.
 Health check: run 'devonthink-pp-cli doctor' to verify auth and connectivity.
