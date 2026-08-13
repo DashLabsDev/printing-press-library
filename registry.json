@@ -4814,6 +4814,12 @@
         "Recent message digest for a channel: author, timestamp, type, and content, newest first. Read-only."
       ],
       "path": "library/productivity/discord",
+      "release": {
+        "cli_name": "discord-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-13T05:15:04Z",
+        "source_commit": "4df503c2ccf26c9413111e99d5f78695fa616334"
+      },
       "printer": "mvanhorn",
       "printer_name": "Hunter Veltri",
       "creator": {
@@ -20576,6 +20582,12 @@
         "Predict which firewall policy would match a hypothetical packet before making a live change."
       ],
       "path": "library/devices/unifi",
+      "release": {
+        "cli_name": "unifi-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-13T04:55:45Z",
+        "source_commit": "8ab48dcb195d13bf6bc209e8ccddd649feab656b"
+      },
       "printer": "phoenix-server",
       "printer_name": "Ricardo Cabral",
       "creator": {
