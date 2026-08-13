@@ -17615,9 +17615,9 @@
       "path": "library/media-and-entertainment/skool",
       "release": {
         "cli_name": "skool-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.8.1",
+        "released_at": "2026-08-13T00:38:49Z",
+        "source_commit": "5bb91e97bd0c34f6e6882460b7fd49d075571a92"
       },
       "printer": "quoxientzero",
       "printer_name": "Zain Haseeb",
@@ -18172,6 +18172,12 @@
         "Emit a ready-to-paste stackstac/odc-stac Python snippet for matched scenes."
       ],
       "path": "library/maps/stac",
+      "release": {
+        "cli_name": "stac-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-10T04:07:30Z",
+        "source_commit": "06fb37aeb1702fa0fc7664e67945c30a593f7988"
+      },
       "printer": "ghltshubh",
       "printer_name": "ghltshubh",
       "creator": {
@@ -19134,6 +19140,10 @@
         {
           "handle": "teebs4140",
           "name": "Dylan Thibault"
+        },
+        {
+          "handle": "wbell2000",
+          "name": "William Bell"
         }
       ],
       "mcp": {
