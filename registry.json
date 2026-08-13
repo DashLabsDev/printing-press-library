@@ -6115,6 +6115,48 @@
       }
     },
     {
+      "name": "exa",
+      "category": "ai",
+      "api": "Exa",
+      "description": "Every Exa search API feature, plus local history, spend tracking, and diffing no other Exa tool has.",
+      "search_terms": [
+        "exa",
+        "exa-pp-cli",
+        "Every Exa search API feature, plus local history, spend tracking, and diffing no other Exa tool has.",
+        "Spend report",
+        "spend",
+        "See cumulative API spend across every Exa call, broken down by day and resource.",
+        "Monitor run diff",
+        "monitor diff",
+        "Compare two synced monitor runs and see exactly which URLs are new, gone, or unchanged.",
+        "Entity report",
+        "Build a first-seen / last-seen / mention-count timeline for any company or person across your synced searches and webset items.",
+        "Webset new",
+        "List items added to a live webset since your last sync, so you only see what changed."
+      ],
+      "path": "library/ai/exa",
+      "printer": "SomSamantray",
+      "printer_name": "Som Samantray",
+      "creator": {
+        "handle": "SomSamantray",
+        "name": "Som Samantray"
+      },
+      "mcp": {
+        "binary": "exa-pp-mcp",
+        "transports": [
+          "stdio"
+        ],
+        "tool_count": 58,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "exchangerate-api",
       "category": "payments",
       "api": "Exchangerate Api",
@@ -19122,9 +19164,9 @@
       "path": "library/food-and-dining/table-reservation-goat",
       "release": {
         "cli_name": "table-reservation-goat-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-06T07:45:23Z",
-        "source_commit": "574dd4c2338db05e5578a8dc3a0c47c6c63dbd91"
+        "version": "2026.8.2",
+        "released_at": "2026-08-13T00:56:04Z",
+        "source_commit": "861082669f3a088a9ce0824526111624cc9bf7df"
       },
       "printer": "pejmanjohn",
       "printer_name": "Pejman Pour-Moezzi",
