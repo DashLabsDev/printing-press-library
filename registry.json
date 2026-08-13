@@ -4792,6 +4792,51 @@
       }
     },
     {
+      "name": "discord",
+      "category": "productivity",
+      "api": "Discord",
+      "description": "Preview of the Discord v10 HTTP API specification. See https://discord.com/developers/docs for more details.",
+      "search_terms": [
+        "discord",
+        "discord-pp-cli",
+        "Preview of the Discord v10 HTTP API specification. See https://discord.com/developers/docs for more details.",
+        "Guild snapshot",
+        "guild snapshot <guild_id>",
+        "One-call-batch guild inventory: name, member count, sorted channel tree with category labels, and role list with color and mentionable flags. Built for audits and agent-driven guild reports.",
+        "Whois identity card",
+        "whois <user_id> [--guild <id>]",
+        "Resolve a user id into a card: username, display name, bot flag, account creation date derived from the snowflake, plus guild nick, roles, and join date when --guild is given.",
+        "Catch-up digest",
+        "catch-up [--guild <id>] [--since 24h]",
+        "Per-channel new-message volume inside the window across every guild the bot can see (or one guild). Reads only; never marks anything read.",
+        "Channel history digest",
+        "channel history <channel_id> [--limit N]",
+        "Recent message digest for a channel: author, timestamp, type, and content, newest first. Read-only."
+      ],
+      "path": "library/productivity/discord",
+      "printer": "mvanhorn",
+      "printer_name": "Hunter Veltri",
+      "creator": {
+        "handle": "mvanhorn",
+        "name": "Hunter Veltri"
+      },
+      "mcp": {
+        "binary": "discord-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 242,
+        "public_tool_count": 22,
+        "auth_type": "api_key",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "dnsmadeeasy",
       "category": "developer-tools",
       "api": "Dnsmadeeasy",
@@ -6135,6 +6180,12 @@
         "List items added to a live webset since your last sync, so you only see what changed."
       ],
       "path": "library/ai/exa",
+      "release": {
+        "cli_name": "exa-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-13T00:57:19Z",
+        "source_commit": "69574b9c5825aef1671685ef22924faaac408237"
+      },
       "printer": "SomSamantray",
       "printer_name": "Som Samantray",
       "creator": {
@@ -16342,31 +16393,49 @@
         "scrape-creators",
         "Scrape Creators",
         "scrape-creators-pp-cli",
-        "Every Scrape Creators endpoint across 28 platforms, plus a local store with offline transcript search, cross-platform joins, and ad-library diffing no other Scrape Creators tool ships.",
+        "Every Scrape Creators endpoint across 28 platforms, with credit-aware comment mining and a local corpus no other Scrape Creators tool has.",
+        "Cost-aware thread completion",
+        "comments thread",
+        "Fetch one post's complete comment threads, automatically picking the cheaper route between the 15-credit flat include_replies call and 1-credit per-comment reply calls (don't trust child_comment_count to decide: it's unreliable).",
+        "Reply-gap audit",
+        "comments coverage",
+        "Rank synced posts by how many comments the API reported versus how many actually landed in your local store — ground truth where the API's child_comment_count is unreliable as a thread filter.",
+        "Pre-flight credit estimator",
+        "account estimate",
+        "Project the credit cost of a planned run against your live balance and exit non-zero if it would exhaust the budget.",
         "Cross-platform presence matrix",
         "creator find",
-        "Given one handle, see which of 12 creator platforms (TikTok, Instagram, YouTube, Twitter, Threads, Bluesky, Pinterest, Twitch, TruthSocial, Snapchat, Kwai, GitHub) the handle exists on, with follower counts side-by-side.",
+        "Given one handle, see which of 12 creator platforms the creator is on with follower counts side-by-side.",
+        "Transcript full-text search",
+        "transcripts search",
+        "FTS5 full-text search across every platform transcript you've synced — nine resource types spanning YouTube, TikTok, Instagram, Facebook, LinkedIn, Rumble, and more.",
+        "Brand ad campaign monitor",
+        "ads monitor",
+        "Snapshot a brand's live ads across Facebook, TikTok, Google, and LinkedIn ad libraries; on rerun, diff new ads versus ones that disappeared.",
+        "Bulk comment sweep",
+        "comments sweep",
+        "Pull recent posts for a handle and their comments in one command, stopping cleanly at a credit budget you set.",
+        "Comment corpus FTS",
+        "comments search",
+        "Full-text search across every synced comment and reply, offline.",
+        "Credit burn projection",
+        "account budget",
+        "See how fast you're spending API credits and how many days remain at the current pace.",
         "Multi-creator comparison",
         "creator compare",
         "Compare two or more creators side-by-side on follower count, engagement rate, and content volume.",
         "Engagement spike detector",
         "content spikes",
         "Surface the videos that performed far above a creator's own baseline — the ones that actually went viral.",
-        "Transcript full-text search",
-        "transcripts search",
-        "FTS5 full-text search across every transcript you've synced — YouTube, TikTok, Instagram, Facebook, LinkedIn, and Rumble.",
         "Trend triangulation",
         "trends triangulate",
-        "Snapshot a hashtag or topic across platforms in one call to see which platform it's rising fastest on.",
+        "Snapshot a hashtag or topic across platforms in one call to see which platform it is biggest on.",
         "Follower growth tracker",
         "creator track",
-        "Append a follower snapshot per run across every synced platform, then read the growth trajectory over time.",
-        "Brand ad campaign monitor",
-        "ads monitor",
-        "Snapshot a brand's live ads across Facebook, TikTok, Google, and LinkedIn ad libraries; on rerun, diff new ads vs. ones that disappeared.",
-        "Credit burn projection",
-        "account budget",
-        "See how fast you're spending API credits and how many days remain at the current pace, computed from the API's credit balance and daily usage history."
+        "Append a follower snapshot per run on a chosen platform, then read the growth trajectory over time.",
+        "UGC tag watcher",
+        "creator tagged",
+        "Snapshot the posts a creator or brand is tagged in and diff new mentions on rerun."
       ],
       "path": "library/developer-tools/scrape-creators",
       "release": {
@@ -16397,11 +16466,11 @@
           "stdio",
           "http"
         ],
-        "tool_count": 164,
+        "tool_count": 178,
         "public_tool_count": 0,
         "auth_type": "api_key",
         "env_vars": [
-          "SCRAPECREATORS_API_KEY"
+          "PRINTING_PRESS_CLIENT_PROFILE"
         ],
         "mcp_ready": "full",
         "spec_format": "openapi3"
@@ -20476,6 +20545,57 @@
         ],
         "mcp_ready": "full",
         "spec_format": "internal"
+      }
+    },
+    {
+      "name": "unifi",
+      "category": "devices",
+      "api": "UniFi",
+      "description": "Every UniFi Network API operation, plus drift detection, topology, and rule prediction no other UniFi tool has.",
+      "search_terms": [
+        "unifi",
+        "unifi-pp-cli",
+        "Every UniFi Network API operation, plus drift detection, topology, and rule prediction no other UniFi tool has.",
+        "Device topology tree",
+        "topology",
+        "See the physical device tree (gateway to switches to APs) built entirely from local mirror data, no live crawl needed.",
+        "Config drift detection",
+        "drift",
+        "Show what changed in site config (networks, firewall, wifi, DNS) since the last sync snapshot.",
+        "Newcomer detection",
+        "newcomer",
+        "List devices and clients first seen since a given sync, for spotting new hardware joining the network.",
+        "Port audit",
+        "port-audit",
+        "Review port utilization and PoE status across every switch on a site in one table.",
+        "Guest network report",
+        "guest report",
+        "Summarize guest network usage: active vouchers and connected guest clients, from local data.",
+        "Firewall rule prediction",
+        "rule-predict",
+        "Predict which firewall policy would match a hypothetical packet before making a live change."
+      ],
+      "path": "library/devices/unifi",
+      "printer": "phoenix-server",
+      "printer_name": "Ricardo Cabral",
+      "creator": {
+        "handle": "phoenix-server",
+        "name": "Ricardo Cabral"
+      },
+      "mcp": {
+        "binary": "unifi-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 73,
+        "public_tool_count": 0,
+        "auth_type": "api_key",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
       }
     },
     {
