@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.2 - 2026-08-13
+
+- fix(table-reservation-goat): restore OpenTable availability and Charlotte resolution (#1686).
+
 ## 2026.8.1 - 2026-08-06
 
 - fix(table-reservation-goat): fetch OpenTable availability bodies after loadingFinished with bounded retry (#1555).
