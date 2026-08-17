@@ -258,7 +258,9 @@ See README.md or the bundled SKILL.md for recipes.`,
 	rootCmd.AddCommand(newNovelAnalyticsCmd(flags))
 	rootCmd.AddCommand(newNovelCommissioneCmd(flags))
 	rootCmd.AddCommand(newNovelDeputatoCmd(flags))
+	rootCmd.AddCommand(newNovelGruppiCmd(flags))
 	rootCmd.AddCommand(newNovelLeggeCmd(flags))
+	rootCmd.AddCommand(newNovelNovitaCmd(flags))
 	rootCmd.AddCommand(newVersionCliCmd())
 
 	return rootCmd
