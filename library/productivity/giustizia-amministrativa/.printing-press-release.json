@@ -2,17 +2,17 @@
   "schema_version": 1,
   "slug": "giustizia-amministrativa",
   "cli_name": "giustizia-amministrativa-pp-cli",
-  "version": "2026.7.2",
-  "released_at": "2026-07-23T07:01:06Z",
-  "source_commit": "14a3685ce9929e28fe44aabd980d8bda8f53088b",
+  "version": "2026.8.1",
+  "released_at": "2026-08-17T05:47:06Z",
+  "source_commit": "d6b74e6df2b2c66612e1f6e29433c0c0aae531e6",
   "printing_press_version": "4.24.0",
   "run_id": "20260621-094103",
   "changes": [
     {
-      "title": "feat(giustizia-amministrativa): archive workflow — get --front-matter, corpus build --skip-existing/--plan, search --anno-from/--anno-to",
-      "pr": 1372,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/1372",
-      "commit": "14a3685ce9929e28fe44aabd980d8bda8f53088b"
+      "title": "fix(cli): bump golang.org/x/text to v0.39.0 in affected published CLIs",
+      "pr": 1636,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/1636",
+      "commit": "d6b74e6df2b2c66612e1f6e29433c0c0aae531e6"
     }
   ]
 }
