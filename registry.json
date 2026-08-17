@@ -856,6 +856,42 @@
       ]
     },
     {
+      "name": "algolia",
+      "category": "developer-tools",
+      "api": "algolia",
+      "description": "Every Algolia feature, plus offline search and a local database no other Algolia tool has.",
+      "search_terms": [
+        "algolia",
+        "algolia-pp-cli",
+        "Cross-index search",
+        "find",
+        "Search across every synced index in one shot, with each hit labeled by its source index.",
+        "Settings diff",
+        "Field-level comparison of settings between two indices (or a settings file vs an index).",
+        "Stale rules report",
+        "rules stale",
+        "Find rules that reference attributes missing from the index's searchable attributes or that can never match.",
+        "API key ACL report",
+        "apikeys report",
+        "Audit all API keys: write-capable, unrestricted, and expired keys grouped by ACL, with last-use from synced logs.",
+        "Search regression check",
+        "search check",
+        "Assert that a query returns expected objectIDs, with a typed exit code for CI pipelines.",
+        "Unsearchable-records report",
+        "objects gaps",
+        "List records missing attributes required by the index's searchable settings — records search can never return.",
+        "Records diff between indices",
+        "objects diff",
+        "Compare records of two indices (added/removed/changed by objectID) to verify prod/staging parity.",
+        "Logs error digest",
+        "logs errors",
+        "Aggregate synced log entries by error code and link failed tasks for a digest of what went wrong."
+      ],
+      "path": "library/developer-tools/algolia",
+      "printer": "SomSamantray",
+      "printer_name": "Som Samantray"
+    },
+    {
       "name": "allrecipes",
       "category": "food-and-dining",
       "api": "Allrecipes",
@@ -2870,6 +2906,58 @@
           "BREEZEDOC_API_TOKEN",
           "BREEZEDOC_BEARER_TOKEN",
           "BREEZEDOC_BEARER_AUTH"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "browserbase",
+      "category": "cloud",
+      "api": "Browserbase",
+      "description": "Every Browserbase cloud feature, plus session lifecycle control, local history, and usage analytics no other tool has.",
+      "search_terms": [
+        "browserbase",
+        "browserbase-pp-cli",
+        "Every Browserbase cloud feature, plus session lifecycle control, local history, and usage analytics no other tool has.",
+        "Orphaned-session sweeper",
+        "sessions orphans",
+        "Find running sessions that were never released (keepAlive orphans) and the runtime they're burning, then optionally stop them in batch. Requires `sync` first — an unsynced store returns an empty scan.",
+        "Safe session runner",
+        "sessions run",
+        "Create a session, print its connect URL, and guarantee it is released on completion, timeout, or interrupt.",
+        "Batch fetcher",
+        "fetch batch",
+        "Fetch a list of URLs with rate-limit pacing and a resumable checkpoint, so large scrape jobs survive interruptions.",
+        "Project digest",
+        "projects digest",
+        "See everything that ran in a project this week — sessions, agent runs, and downloads grouped by day — from the local store. Requires `sync` first; an unsynced store returns an empty digest.",
+        "Agent-run diff",
+        "agents runs diff",
+        "Compare two agent runs structurally — message sequences and final structured results — to see what changed between prompt iterations.",
+        "Usage trend",
+        "Track per-project browserMinutes and proxyBytes over sync history and spot quota creep before the bill arrives. Requires `sync` first; an unsynced store returns an empty trend.",
+        "Web activity history",
+        "web history",
+        "Review past fetch and search calls with cached results, and re-emit a cached response without re-hitting the API. Requires `sync` first; an unsynced store returns an empty history."
+      ],
+      "path": "library/cloud/browserbase",
+      "printer": "SomSamantray",
+      "printer_name": "Som Samantray",
+      "creator": {
+        "handle": "SomSamantray",
+        "name": "Som Samantray"
+      },
+      "mcp": {
+        "binary": "browserbase-pp-mcp",
+        "transports": [
+          "stdio"
+        ],
+        "tool_count": 51,
+        "public_tool_count": 0,
+        "auth_type": "api_key",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
         ],
         "mcp_ready": "full",
         "spec_format": "openapi3"
@@ -9559,6 +9647,68 @@
       }
     },
     {
+      "name": "iclasspro",
+      "category": "productivity",
+      "api": "iClassPro",
+      "description": "The only iClassPro tool that remembers yesterday — a queryable local mirror of any gym's catalog, with the search and filter surface the portal keeps to itself.",
+      "search_terms": [
+        "iclasspro",
+        "iclasspro-pp-cli",
+        "The only iClassPro tool that remembers yesterday — a queryable local mirror of any gym's catalog, with the search and filter surface the portal keeps to itself.",
+        "Openings watcher",
+        "watch",
+        "Get told the moment a spot frees up in a class or camp that is currently full.",
+        "Catalog drift",
+        "drift",
+        "See what changed between syncs: classes and camps added, removed, retimed, or newly marked deleted.",
+        "Registration windows",
+        "opens-soon",
+        "Find registration that has not opened yet or is about to close, across every synced class and camp.",
+        "Calendar export",
+        "calendar",
+        "Export synced camps and classes to an RFC 5545 calendar file, one event per session.",
+        "Tenant capability probe",
+        "tenant",
+        "Report which surfaces an account actually exposes: open, sign-in-gated, or plan-gated.",
+        "Fill-rate trend",
+        "fill-rate",
+        "Show how fast classes are filling over time, by class or by program.",
+        "Cross-tenant compare",
+        "compare",
+        "Compare the same kind of program across several gyms at once.",
+        "Catalog lint",
+        "lint",
+        "Flag catalog quality problems: missing descriptions or images, expired registration windows, deleted-but-listed programs.",
+        "Read-only Office Portal access",
+        "admin capabilities",
+        "Read an explicit allow-list of authenticated staff resources without mutation, export, or response caching."
+      ],
+      "path": "library/productivity/iclasspro",
+      "printer": "bobeglz",
+      "printer_name": "bobe",
+      "creator": {
+        "handle": "bobeglz",
+        "name": "bobe"
+      },
+      "mcp": {
+        "binary": "iclasspro-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 15,
+        "public_tool_count": 15,
+        "auth_type": "none",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE",
+          "ICLASSPRO_STAFF_USERNAME",
+          "ICLASSPRO_STAFF_PASSWORD"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "icloud",
       "category": "media-and-entertainment",
       "api": "Apple iCloud",
@@ -9604,6 +9754,53 @@
           "name": "Trevin Chow"
         }
       ]
+    },
+    {
+      "name": "ifood",
+      "category": "food-and-dining",
+      "api": "iFood",
+      "description": "Agent-ready iFood grocery quoting with browser-owned authentication and confirmation-gated cart planning.",
+      "search_terms": [
+        "ifood",
+        "ifood-pp-cli",
+        "Agent-ready iFood grocery quoting with browser-owned authentication and confirmation-gated cart planning.",
+        "Browser-safe workflow plan",
+        "browser plan",
+        "Emit the complete browser-owned quotation and cart workflow without exporting credentials.",
+        "Three-market quotation validator",
+        "browser validate-quote",
+        "Validate complete product observations from at least three markets meeting a configurable rating floor.",
+        "Confirmation-gated cart plan",
+        "browser cart-plan",
+        "Produce the exact selected merchant, products, quantities, and expected total before any cart interaction.",
+        "Cross-market grocery quote",
+        "quote",
+        "Compare requested grocery terms across eligible markets and return complete price estimates.",
+        "Preview-first cart builder",
+        "cart build",
+        "Resolve product terms into an exact read-only cart-item preview."
+      ],
+      "path": "library/food-and-dining/ifood",
+      "printer": "matheuscoelhomalta",
+      "printer_name": "Matheus Coêlho",
+      "creator": {
+        "handle": "matheuscoelhomalta",
+        "name": "Matheus Coêlho"
+      },
+      "mcp": {
+        "binary": "ifood-pp-mcp",
+        "transports": [
+          "stdio"
+        ],
+        "tool_count": 4,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
     },
     {
       "name": "ikon",
@@ -14425,6 +14622,60 @@
       }
     },
     {
+      "name": "pinecone",
+      "category": "ai",
+      "api": "Pinecone",
+      "description": "Every Pinecone API feature, plus local sync, snapshot history, and text-first search no other Pinecone tool has.",
+      "search_terms": [
+        "pinecone",
+        "pinecone-pp-cli",
+        "Every Pinecone API feature, plus local sync, snapshot history, and text-first search no other Pinecone tool has.",
+        "Text query (embed→query pipe)",
+        "text-query",
+        "Search a dense index with a natural-language query — embeds the text via Pinecone Inference, then queries the index — without managing vectors yourself.",
+        "Index snapshot + diff",
+        "snapshot",
+        "Capture a point-in-time state of any index (per-namespace vector counts, dimension, metric, host) into local SQLite, then diff against prior snapshots to see exactly what changed.",
+        "Stale-chunk pruning",
+        "prune",
+        "Find vectors whose local metadata timestamps are older than a threshold and delete them in batches — dry-run by default, with --apply to commit.",
+        "Cross-index cascade search",
+        "cascade",
+        "Run one semantic query across multiple indexes and merge the ranked results (deduped by vector ID, best score wins) into a single agent-ready list.",
+        "Usage / growth projection",
+        "usage",
+        "Compute vector-count growth and per-namespace distribution shifts from snapshot history, with a projection to a future horizon.",
+        "Vector payload validation",
+        "check-vectors",
+        "Validate a vectors JSON file against the index schema — dimension, duplicate/empty IDs, sparse/dense shape — before you upsert and burn write units on a rejected batch.",
+        "Backup/restore coverage report",
+        "coverage",
+        "Join backups, backup schedules, and restore jobs into a per-index protection matrix showing which indexes are backed up, scheduled, and restorable."
+      ],
+      "path": "library/ai/pinecone",
+      "printer": "SomSamantray",
+      "printer_name": "Som Samantray",
+      "creator": {
+        "handle": "SomSamantray",
+        "name": "Som Samantray"
+      },
+      "mcp": {
+        "binary": "pinecone-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 95,
+        "public_tool_count": 1,
+        "auth_type": "api_key",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "pipedrive",
       "category": "sales-and-crm",
       "api": "Pipedrive",
@@ -16457,6 +16708,12 @@
         "Per-file digest of a batch STT job with typed exit codes for cron alerting"
       ],
       "path": "library/ai/sarvam",
+      "release": {
+        "cli_name": "sarvam-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-17T04:54:13Z",
+        "source_commit": "0a906add60dac1fb38425341607c1bb73a2e6307"
+      },
       "printer": "SomSamantray",
       "printer_name": "Som Samantray"
     },
