@@ -3154,6 +3154,52 @@
       }
     },
     {
+      "name": "cfpb-complaints",
+      "category": "other",
+      "api": "Cfpb Consumer Complaints",
+      "description": "Search published CFPB consumer complaint records and aggregations.",
+      "search_terms": [
+        "cfpb-complaints",
+        "Cfpb Consumer Complaints",
+        "cfpb-complaints-pp-cli",
+        "Search published CFPB consumer complaint records and aggregations.",
+        "Company pulse",
+        "Summarize complaint volume, products, issues, responses, timeliness, narrative availability, and a prior-window delta for one company.",
+        "Cohort-safe peer comparison",
+        "compare companies",
+        "Compare companies inside one explicit cohort while labeling counts as non-market-adjusted complaint volume.",
+        "Emerging-theme delta",
+        "emerging themes",
+        "Rank mechanical product and issue count changes between current and baseline windows without semantic or causal claims.",
+        "Narrative evidence packet",
+        "narratives packet",
+        "Select a newest-first bounded packet of published narratives with complaint IDs, exact cohort dates, and availability caveats.",
+        "Change watch",
+        "watch changes",
+        "Compare the latest bounded cohort with a locally persisted prior observation and report newly observed complaint IDs and categories."
+      ],
+      "path": "library/other/cfpb-complaints",
+      "printer": "Avanderheyde",
+      "printer_name": "avanderheyde",
+      "creator": {
+        "handle": "Avanderheyde",
+        "name": "avanderheyde"
+      },
+      "mcp": {
+        "binary": "cfpb-complaints-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 1,
+        "public_tool_count": 1,
+        "auth_type": "none",
+        "env_vars": [],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "chrome-history",
       "category": "productivity",
       "api": "Chrome History",
@@ -15614,6 +15660,57 @@
       }
     },
     {
+      "name": "productive",
+      "category": "productivity",
+      "api": "Productive",
+      "description": "Full Productive.io v2 API client — list/get across ~48 resource types, generic create/update/delete, 11 report types, and a local sync/search/export/tail data layer, plus first-class revenue-recognition commands (recognized-revenue, invoiced, reconcile, aging).",
+      "search_terms": [
+        "productive",
+        "productive-pp-cli",
+        "Full Productive.io v2 API client — list/get across ~48 resource types, generic create/update/delete, 11 report types, and a local sync/search/export/tail data layer, plus first-class revenue-recognition commands (recognized-revenue, invoiced, reconcile, aging).",
+        "Recognized revenue by budget × month",
+        "recognized-revenue",
+        "Pull recognized (earned) revenue grouped by budget and month across a date range in one call.",
+        "Invoiced by budget × month",
+        "invoiced",
+        "Net finalized invoiced amount attributed per budget per month, drafts reported separately.",
+        "Reconcile recognized vs invoiced",
+        "reconcile",
+        "Join recognized revenue and invoiced amounts per budget×month and flag the deltas.",
+        "Bulk raw export for reconciliation workflows",
+        "export",
+        "Stream full paginated pulls of any resource to JSONL or JSON (auto-paginated, no memory pressure).",
+        "Offline sync, SQL and search",
+        "sync",
+        "Mirror any resource into local SQLite, then query it with SQL and full-text search offline.",
+        "AR aging / unpaid invoices",
+        "aging",
+        "Bucket unpaid invoice amounts by age past their due date."
+      ],
+      "path": "library/productivity/productive",
+      "printer": "dericknwq",
+      "printer_name": "Derick Ng",
+      "creator": {
+        "handle": "dericknwq",
+        "name": "Derick Ng"
+      },
+      "mcp": {
+        "binary": "productive-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 85,
+        "public_tool_count": 0,
+        "auth_type": "api_key",
+        "env_vars": [
+          "PRODUCTIVE_API_TOKEN"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "pushover",
       "category": "social-and-messaging",
       "api": "Pushover",
@@ -16663,6 +16760,54 @@
         ],
         "mcp_ready": "full",
         "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "roblox",
+      "category": "social-and-messaging",
+      "api": "Roblox",
+      "description": "Investigate Roblox's fragmented public web data from one agent-friendly CLI.",
+      "search_terms": [
+        "roblox",
+        "roblox-pp-cli",
+        "Investigate Roblox's fragmented public web data from one agent-friendly CLI.",
+        "User investigation bundle",
+        "investigate user",
+        "Assemble a public Roblox user's identity, avatar, groups, badges, inventory visibility, and thumbnails in one result.",
+        "Group due diligence",
+        "investigate group",
+        "Resolve a Roblox group, its owner, roles, and other public context in one command.",
+        "Creator catalog footprint",
+        "catalog creator-footprint",
+        "Summarize a Roblox creator's public games, bundles, and catalog-facing identity in one result.",
+        "Game ecosystem map",
+        "ecosystem game",
+        "Build a game-centered view of public universe details, creator context, media, and related badges.",
+        "Relationship overlap",
+        "network overlap",
+        "Find shared public groups and relationship records between two locally synced Roblox users."
+      ],
+      "path": "library/social-and-messaging/roblox",
+      "printer": "krMaynard",
+      "printer_name": "Kieran Maynard",
+      "creator": {
+        "handle": "krMaynard",
+        "name": "Kieran Maynard"
+      },
+      "mcp": {
+        "binary": "roblox-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 227,
+        "public_tool_count": 171,
+        "auth_type": "cookie",
+        "env_vars": [
+          "ROBLOX_COOKIES"
+        ],
+        "mcp_ready": "partial",
+        "spec_format": "internal"
       }
     },
     {
@@ -19756,9 +19901,9 @@
       "path": "library/food-and-dining/table-reservation-goat",
       "release": {
         "cli_name": "table-reservation-goat-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-13T00:56:04Z",
-        "source_commit": "861082669f3a088a9ce0824526111624cc9bf7df"
+        "version": "2026.8.3",
+        "released_at": "2026-08-17T05:44:48Z",
+        "source_commit": "2e3441b7fd93249a8f5bf36d8cc245d01d1218e8"
       },
       "printer": "pejmanjohn",
       "printer_name": "Pejman Pour-Moezzi",
