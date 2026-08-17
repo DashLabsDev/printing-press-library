@@ -10104,6 +10104,12 @@
         "Compare two field windows and surface taxa that newly appeared, returned, or changed materially."
       ],
       "path": "library/other/inaturalist",
+      "release": {
+        "cli_name": "inaturalist-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-17T09:21:49Z",
+        "source_commit": "17b148a96f2f78359fc18a2bee3259f6403e8910"
+      },
       "printer": "Avanderheyde",
       "printer_name": "avanderheyde",
       "creator": {
@@ -22871,6 +22877,43 @@
       "creator": {
         "handle": "Amit-Tabibi",
         "name": "Amit"
+      }
+    },
+    {
+      "name": "woot",
+      "category": "commerce",
+      "api": "Woot",
+      "description": "Search Woot's live All Deals catalog with filters, prices, offline full-text search, and read-only GraphQL access.",
+      "search_terms": [
+        "woot",
+        "woot-pp-cli",
+        "Search Woot's live All Deals catalog with filters, prices, offline full-text search, and read-only GraphQL access.",
+        "Woot All Deals Search",
+        "deals",
+        "Scan Woot's paged All Deals results and filter live offers by keyword.",
+        "Uses the same frontend searchOffers paging, category, price, and page filters that Woot's All Deals UI uses."
+      ],
+      "path": "library/commerce/woot",
+      "printer": "TheFabulousMoolah",
+      "printer_name": "Matthew Vassallo",
+      "creator": {
+        "handle": "TheFabulousMoolah",
+        "name": "Matthew Vassallo"
+      },
+      "mcp": {
+        "binary": "woot-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 1,
+        "public_tool_count": 0,
+        "auth_type": "api_key",
+        "env_vars": [
+          "D24QG5ZSX8XDC4_CLOUDFRONT_API_KEY"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
       }
     },
     {
