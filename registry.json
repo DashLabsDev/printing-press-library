@@ -1468,6 +1468,12 @@
         "Esporta i risultati di una ricerca come file CSV lato server (fino a 500 record)."
       ],
       "path": "library/other/aol-puglia",
+      "release": {
+        "cli_name": "aol-puglia-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-17T09:20:00Z",
+        "source_commit": "74481218e937b287f820083d970333e956d6bbcd"
+      },
       "printer": "aborruso",
       "printer_name": "aborruso",
       "creator": {
@@ -10071,6 +10077,53 @@
         "env_vars": [],
         "mcp_ready": "partial",
         "spec_format": "internal"
+      }
+    },
+    {
+      "name": "inaturalist",
+      "category": "other",
+      "api": "iNaturalist",
+      "description": "Explore iNaturalist's full API, plus privacy-safe field briefings and identification progress that ordinary endpoint wrappers miss.",
+      "search_terms": [
+        "inaturalist",
+        "inaturalist-pp-cli",
+        "Explore iNaturalist's full API, plus privacy-safe field briefings and identification progress that ordinary endpoint wrappers miss.",
+        "Nearby highlights",
+        "Get a transparent, recent wildlife briefing for an area without exposing observation coordinates.",
+        "Nature scavenger hunt",
+        "hunt create",
+        "Create a factual, balanced nature scavenger-hunt checklist from taxa actually observed nearby.",
+        "Current identification status",
+        "observations id-status",
+        "See which of an observer's recent observations are identified, need IDs, disagree, or have no taxon.",
+        "Identification changes since sync",
+        "observations id-changes",
+        "Report observations that became identified, changed, withdrew, or still need IDs since a previous privacy-safe sync.",
+        "Seasonal shift briefing",
+        "nearby seasonal-shift",
+        "Compare two field windows and surface taxa that newly appeared, returned, or changed materially."
+      ],
+      "path": "library/other/inaturalist",
+      "printer": "Avanderheyde",
+      "printer_name": "avanderheyde",
+      "creator": {
+        "handle": "Avanderheyde",
+        "name": "avanderheyde"
+      },
+      "mcp": {
+        "binary": "inaturalist-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 105,
+        "public_tool_count": 0,
+        "auth_type": "api_key",
+        "env_vars": [
+          "INATURALIST_API_TOKEN"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
       }
     },
     {
