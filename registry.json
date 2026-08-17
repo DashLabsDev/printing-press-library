@@ -15818,6 +15818,65 @@
       }
     },
     {
+      "name": "raindrop",
+      "category": "productivity",
+      "api": "Raindrop Io",
+      "description": "Complete Raindrop.io control plus offline search, safe cleanup, and durable knowledge workflows.",
+      "search_terms": [
+        "raindrop",
+        "Raindrop Io",
+        "raindrop-pp-cli",
+        "Complete Raindrop.io control plus offline search, safe cleanup, and durable knowledge workflows.",
+        "Offline Library",
+        "sync",
+        "Mirror bookmarks, collections, tags and highlights for instant offline search.",
+        "Inbox Review",
+        "Process Unsorted bookmarks in resumable, bounded review sessions.",
+        "Change History",
+        "changes",
+        "Show field-level bookmark changes between sync snapshots.",
+        "Tag Health",
+        "Discover case variants, near-duplicates, singleton tags and merge candidates.",
+        "Duplicate Plans",
+        "duplicates plan",
+        "Choose canonical bookmarks while preserving tags, notes and highlights.",
+        "Revisit Queue",
+        "revisit",
+        "Resurface useful forgotten bookmarks without repeating recent suggestions.",
+        "Related Bookmarks",
+        "related",
+        "Find explainable related bookmarks offline using text, tags and domains.",
+        "Highlight Digests",
+        "highlights digest",
+        "Create deduplicated Markdown or JSONL study digests from highlights.",
+        "Durable Triage",
+        "workflow status",
+        "Run crash-safe bounded triage queues with retry and manual-review states."
+      ],
+      "path": "library/productivity/raindrop",
+      "printer": "srijits",
+      "printer_name": "srijits",
+      "creator": {
+        "handle": "srijits",
+        "name": "srijits"
+      },
+      "mcp": {
+        "binary": "raindrop-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 54,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "rappi",
       "category": "food-and-dining",
       "api": "Rappi",
