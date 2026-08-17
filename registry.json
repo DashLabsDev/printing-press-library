@@ -1373,9 +1373,9 @@
       "path": "library/food-and-dining/anylist",
       "release": {
         "cli_name": "anylist-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.8.1",
+        "released_at": "2026-08-17T04:47:01Z",
+        "source_commit": "d48f568519d15ae3dd84e0d01a169adfbea94036"
       },
       "printer": "jeeves",
       "printer_name": "Jeeves",
@@ -1939,6 +1939,61 @@
         "public_tool_count": 2,
         "auth_type": "none",
         "env_vars": [],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
+      "name": "averusa",
+      "category": "devices",
+      "api": "AVer USA",
+      "description": "Every AVer USA manual, spec sheet, and white paper in a local, type-filtered catalog — with spec comparison and link audits no AVer site offers.",
+      "search_terms": [
+        "averusa",
+        "AVer USA",
+        "averusa-pp-cli",
+        "Every AVer USA manual, spec sheet, and white paper in a local, type-filtered catalog — with spec comparison and link audits no AVer site offers.",
+        "Model spec comparison",
+        "compare",
+        "Side-by-side spec fields for two or more AVer models from their datasheets, ready for bid comparisons and RFP tables. Spec fields come from datasheet PDFs extracted by `harvest --with-specs`.",
+        "Single-model spec dump",
+        "specs",
+        "One model's full spec fields as clean text or JSON for spec-compliance tables and agent pipelines. Fields come from datasheet PDFs extracted by `harvest --with-specs`.",
+        "Doc link audit",
+        "docs audit",
+        "HEAD-checks every document URL in the catalog and flags 404s and soft-404 shells, caching last-checked status locally.",
+        "Offline job bag",
+        "docs pack",
+        "Batch-download every document for a model into one offline folder with stable <model>-<type> names, with a --dry-run preview. Downloads need entityIds, which `harvest` resolves at sync time.",
+        "What's-new diff",
+        "whats-new",
+        "List documents and products added or updated since the last sync, filterable by age.",
+        "Doc coverage matrix",
+        "coverage",
+        "Per-model doc-type availability matrix for a category, flagging which models are missing manuals, spec sheets, or white papers.",
+        "Current vs discontinued",
+        "products status",
+        "Flag which models AVer lists as discontinued, filterable by category."
+      ],
+      "path": "library/devices/averusa",
+      "printer": "Drummerms",
+      "printer_name": "drummerms",
+      "creator": {
+        "handle": "Drummerms",
+        "name": "drummerms"
+      },
+      "mcp": {
+        "binary": "averusa-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 5,
+        "public_tool_count": 5,
+        "auth_type": "none",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
         "mcp_ready": "full",
         "spec_format": "internal"
       }
@@ -10679,6 +10734,44 @@
       }
     },
     {
+      "name": "lever",
+      "category": "job-boards",
+      "api": "Lever Postings",
+      "description": "Public Lever postings API (https://api.lever.co/v0/postings). Every Lever customer exposes an open job board at api.",
+      "search_terms": [
+        "lever",
+        "Lever Postings",
+        "lever-pp-cli",
+        "Public Lever postings API (https://api.lever.co/v0/postings). Every Lever customer exposes an open job board at api.",
+        "Generic company",
+        "postings list <company>",
+        "Single CLI serves any company that publishes through Lever (leverdemo, palantir, etc.) — company is a positional argument, not a hardcoded prefix.",
+        "Company-scoped offline sync",
+        "sync <company>",
+        "sync <company> fetches all open postings and persists them under a company-scoped store key (postings:<company>); --data-source local reads are isolated per company, so synced boards never mix."
+      ],
+      "path": "library/job-boards/lever",
+      "printer": "veltri-23",
+      "printer_name": "Hunter Veltri",
+      "creator": {
+        "handle": "veltri-23",
+        "name": "Hunter Veltri"
+      },
+      "mcp": {
+        "binary": "lever-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 2,
+        "public_tool_count": 2,
+        "auth_type": "none",
+        "env_vars": [],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "lightroom-classic",
       "category": "media-and-entertainment",
       "api": "Lightroom Classic",
@@ -16327,6 +16420,45 @@
         "mcp_ready": "full",
         "spec_format": "openapi3"
       }
+    },
+    {
+      "name": "sarvam",
+      "category": "ai",
+      "api": "Sarvam AI",
+      "description": "Every Sarvam AI model on your terminal — translate, speak, transcribe, chat, and extract documents in 22 Indian languages, with a local history that compounds",
+      "search_terms": [
+        "sarvam",
+        "Sarvam AI",
+        "sarvam-pp-cli",
+        "Every Sarvam AI model on your terminal — translate, speak, transcribe, chat, and extract documents in 22 Indian languages, with a local history that compounds",
+        "Voice auditioning",
+        "voices preview",
+        "Generate one sample sentence across every TTS speaker and hear them all side by side",
+        "Conversation resume",
+        "chat resume",
+        "Continue a past chat thread from local history with full context",
+        "Batch job retry",
+        "stt-job retry",
+        "Re-run only the failed files of a batch STT job with one command",
+        "Pronunciation spot-check",
+        "pron-check",
+        "Verify a term's TTS pronunciation via a speech round-trip (TTS then STT)",
+        "Subtitle export",
+        "subs",
+        "Emit .srt/.vtt subtitles from timestamped transcriptions in local history",
+        "Extraction schema library",
+        "docai schema list",
+        "Save, list, and diff doc-ai extraction schemas locally",
+        "Folder extraction run",
+        "docai batch",
+        "Run a saved extraction schema over a folder of documents with job pacing",
+        "Batch job report",
+        "stt-job report",
+        "Per-file digest of a batch STT job with typed exit codes for cron alerting"
+      ],
+      "path": "library/ai/sarvam",
+      "printer": "SomSamantray",
+      "printer_name": "Som Samantray"
     },
     {
       "name": "scientific-consensus",
