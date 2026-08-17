@@ -366,9 +366,9 @@
       "path": "library/developer-tools/agent-capture",
       "release": {
         "cli_name": "agent-capture-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-17T08:05:15Z",
+        "source_commit": "ba10f29591fbda62d3286618c00607a9ef9a46e5"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -1674,6 +1674,12 @@
         "handle": "mvanhorn",
         "name": "Matt Van Horn"
       },
+      "contributors": [
+        {
+          "handle": "tmchow",
+          "name": "Trevin Chow"
+        }
+      ],
       "mcp": {
         "binary": "archive-is-pp-mcp",
         "transports": [
