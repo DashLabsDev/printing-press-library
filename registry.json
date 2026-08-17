@@ -14978,9 +14978,9 @@
       "path": "library/project-management/plane",
       "release": {
         "cli_name": "plane-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.8.1",
+        "released_at": "2026-08-17T06:34:11Z",
+        "source_commit": "54781b70c7c5dab20bed7ea3cc916650deba19c8"
       },
       "printer": "sidorovanthon",
       "printer_name": "Anton Sidorov aka anticodeguy",
@@ -16322,9 +16322,9 @@
       "path": "library/food-and-dining/recipe-goat",
       "release": {
         "cli_name": "recipe-goat-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T05:47:06Z",
-        "source_commit": "d6b74e6df2b2c66612e1f6e29433c0c0aae531e6"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T07:22:02Z",
+        "source_commit": "137903c8a5e540709858fdd7a731ce911e284098"
       },
       "printer": "tmchow",
       "printer_name": "Trevin Chow",
@@ -21742,6 +21742,12 @@
         "handle": "SomSamantray",
         "name": "Som Samantray"
       },
+      "contributors": [
+        {
+          "handle": "tmchow",
+          "name": "Trevin Chow"
+        }
+      ],
       "mcp": {
         "binary": "v0-pp-mcp",
         "transports": [
