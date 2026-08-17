@@ -9684,6 +9684,12 @@
         "Read an explicit allow-list of authenticated staff resources without mutation, export, or response caching."
       ],
       "path": "library/productivity/iclasspro",
+      "release": {
+        "cli_name": "iclasspro-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-17T04:57:10Z",
+        "source_commit": "dfe5ca2dde57b8767403425bf45eca381779d6d5"
+      },
       "printer": "bobeglz",
       "printer_name": "bobe",
       "creator": {
