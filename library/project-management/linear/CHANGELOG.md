@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.1 - 2026-08-17
+
+- fix(linear): issues list --state active wrongly includes duplicate-closed issues (#1691).
+
 ## 2026.7.4 - 2026-07-14
 
 - fix(linear): support reliable agent issue reads (#1500).
