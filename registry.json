@@ -16951,9 +16951,9 @@
       "path": "library/developer-tools/scrape-creators",
       "release": {
         "cli_name": "scrape-creators-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-08T01:25:25Z",
-        "source_commit": "81efaa4583e8ac3b180e0358dbee991a9cfb204c"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T05:35:03Z",
+        "source_commit": "beb9430257048a263fc1eb3c922a5fce406bfe31"
       },
       "printer": "adrianhorning08",
       "printer_name": "Adrian Horning",
@@ -20335,6 +20335,48 @@
         "mcp_ready": "full",
         "spec_format": "openapi3"
       }
+    },
+    {
+      "name": "tiimo",
+      "category": "productivity",
+      "api": "tiimo",
+      "description": "Your Tiimo plan, finally exportable, queryable, and yours.",
+      "search_terms": [
+        "tiimo",
+        "tiimo-pp-cli",
+        "Export",
+        "Stream a paginated resource straight to JSON or JSONL. Use backup for a whole-planner snapshot and feed for calendar or spreadsheet formats.",
+        "Calendar feed",
+        "feed",
+        "Generate a subscribable read-only iCalendar file of your Tiimo activities.",
+        "Local backup",
+        "backup",
+        "Write every mirrored record - activities, to-dos, tags, routines, calendars - to one portable JSON snapshot. This is the whole-planner export Tiimo does not offer.",
+        "Plan-versus-actual drift",
+        "drift",
+        "Show which activities consistently start late, overrun, or spend the most time paused.",
+        "Checklist stall points",
+        "stalls",
+        "Find the exact checklist step where a multi-step routine tends to break down.",
+        "Routine adherence",
+        "adherence",
+        "Completion rate for each recurring activity over a window.",
+        "Overlap detection",
+        "overlaps",
+        "List activities that are double-booked against each other.",
+        "Free-gap finder",
+        "gaps",
+        "Find the unscheduled windows in a day that are at least a given length.",
+        "Rolling window",
+        "rolling",
+        "A true rolling multi-day view starting from today.",
+        "Day capacity",
+        "capacity",
+        "Committed versus free minutes per day, broken down by time-of-day bucket."
+      ],
+      "path": "library/productivity/tiimo",
+      "printer": "vcolombo",
+      "printer_name": "Vincent Colombo"
     },
     {
       "name": "tiktok-shop",
