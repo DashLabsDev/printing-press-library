@@ -8928,6 +8928,12 @@
         "Renamed the auto-scaffolded 'greenhouse-job-board-jobs' resource to 'jobs' to fix an engine shadow-rename caused by the 'jobs/' cobra conflict. Recorded in .printing-press-patches/001-rename-jobs-resource.json so regens preserve it."
       ],
       "path": "library/other/greenhouse",
+      "release": {
+        "cli_name": "greenhouse-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-17T05:32:23Z",
+        "source_commit": "027475398124c04c592c623b988764520536b63e"
+      },
       "printer": "veltri-23",
       "printer_name": "Hunter Veltri",
       "creator": {
