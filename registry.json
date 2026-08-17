@@ -139,9 +139,9 @@
       "path": "library/auth/1password",
       "release": {
         "cli_name": "1password-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "cathrynlavery",
       "printer_name": "Cathryn Lavery",
@@ -533,9 +533,9 @@
       "path": "library/other/air-quality",
       "release": {
         "cli_name": "air-quality-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "sdhilip200",
       "printer_name": "Dhilip Subramanian",
@@ -1283,9 +1283,9 @@
       "path": "library/marketing/amplitude",
       "release": {
         "cli_name": "amplitude-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "debgotwired",
       "printer_name": "Deb Mukherjee",
@@ -1437,6 +1437,53 @@
         "env_vars": [
           "ANYLIST_ACCESS_TOKEN"
         ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
+      "name": "aol-puglia",
+      "category": "other",
+      "api": "Albo Online Sanità Puglia",
+      "description": "Accesso pubblico all'Albo Pretorio Online delle 13 aziende sanitarie pugliesi: ricerca atti, download allegati, esportazione CSV. Zero config: autenticazione OAuth2 automatica.",
+      "search_terms": [
+        "aol-puglia",
+        "Albo Online Sanità Puglia",
+        "aol-puglia-pp-cli",
+        "Accesso pubblico all'Albo Pretorio Online delle 13 aziende sanitarie pugliesi: ricerca atti, download allegati, esportazione CSV. Zero config: autenticazione OAuth2 automatica.",
+        "Auto-auth OAuth2",
+        "doctor",
+        "Il CLI ottiene automaticamente un token OAuth2 client_credentials pubblico senza che l'utente debba configurare credenziali.",
+        "Elenco aziende sanitarie",
+        "orgs",
+        "Lista le 13 aziende sanitarie pugliesi con i valori esatti da usare nei flag --azienda.",
+        "Ricerca atti paginata",
+        "atti search",
+        "Ricerca per parola chiave, data, proponente, CIG su bandi, concorsi, delibere e determine.",
+        "Download allegati",
+        "atti download-allegato",
+        "Scarica PDF e altri allegati decodificando automaticamente il base64 restituito dall'API.",
+        "Esportazione CSV",
+        "fileexport",
+        "Esporta i risultati di una ricerca come file CSV lato server (fino a 500 record)."
+      ],
+      "path": "library/other/aol-puglia",
+      "printer": "aborruso",
+      "printer_name": "aborruso",
+      "creator": {
+        "handle": "aborruso",
+        "name": "aborruso"
+      },
+      "mcp": {
+        "binary": "aol-puglia-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 7,
+        "public_tool_count": 7,
+        "auth_type": "auto-oauth2",
+        "env_vars": [],
         "mcp_ready": "full",
         "spec_format": "internal"
       }
@@ -1973,9 +2020,9 @@
       "path": "library/commerce/autotempest",
       "release": {
         "cli_name": "autotempest-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "richardadonnell",
       "printer_name": "richardadonnell",
@@ -2151,9 +2198,9 @@
       "path": "library/developer-tools/azure-devops",
       "release": {
         "cli_name": "azure-devops-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "davbebawy",
       "printer_name": "David Bebawy",
@@ -2670,9 +2717,9 @@
       "path": "library/media-and-entertainment/boardgamegeek",
       "release": {
         "cli_name": "boardgamegeek-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "coopdogGGs",
       "printer_name": "Ryan Cooper",
@@ -2857,9 +2904,9 @@
       "path": "library/marketing/braze",
       "release": {
         "cli_name": "braze-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "debgotwired",
       "printer_name": "Deb Mukherjee",
@@ -3101,9 +3148,9 @@
       "path": "library/productivity/calendly",
       "release": {
         "cli_name": "calendly-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "debgotwired",
       "printer_name": "Deb Mukherjee",
@@ -3357,9 +3404,9 @@
       "path": "library/developer-tools/claude-agent-sdk-python-docs",
       "release": {
         "cli_name": "claude-agent-sdk-python-docs-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "nikships",
       "printer_name": "Nik",
@@ -3634,9 +3681,9 @@
       "path": "library/cloud/cloudflare",
       "release": {
         "cli_name": "cloudflare-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "cathrynlavery",
       "printer_name": "Cathryn Lavery",
@@ -4063,9 +4110,9 @@
       "path": "library/ai/context-dev",
       "release": {
         "cli_name": "context-dev-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "cathrynlavery",
       "printer_name": "Cathryn Lavery",
@@ -4181,9 +4228,9 @@
       "path": "library/sales-and-crm/copper",
       "release": {
         "cli_name": "copper-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "kmorebetter",
       "printer_name": "Kerry Morrison",
@@ -4581,9 +4628,9 @@
       "path": "library/commerce/daraz",
       "release": {
         "cli_name": "daraz-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "qazmataz",
       "printer_name": "Hamza Qazi",
@@ -5594,9 +5641,9 @@
       "path": "library/health/drug-enforcement",
       "release": {
         "cli_name": "drug-enforcement-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "laci141",
       "printer_name": "laci141",
@@ -6198,9 +6245,9 @@
       "path": "library/productivity/etherpad",
       "release": {
         "cli_name": "etherpad-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "JohnMcLear",
       "printer_name": "John McLear",
@@ -7568,9 +7615,9 @@
       "path": "library/other/fred",
       "release": {
         "cli_name": "fred-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "LukeTheoJohnson",
       "printer_name": "Luke J",
@@ -7752,9 +7799,9 @@
       "path": "library/sales-and-crm/gainsight",
       "release": {
         "cli_name": "gainsight-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "debgotwired",
       "printer_name": "Deb Mukherjee",
@@ -7919,9 +7966,9 @@
       "path": "library/developer-tools/github-intel",
       "release": {
         "cli_name": "github-intel-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "hnshah",
       "printer_name": "Hiten Shah",
@@ -8058,9 +8105,9 @@
       "path": "library/devices/gl-inet",
       "release": {
         "cli_name": "gl-inet-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.8.1",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "paulbockewitz",
       "printer_name": "Paul Bockewitz",
@@ -8108,9 +8155,9 @@
       "path": "library/sales-and-crm/gladly",
       "release": {
         "cli_name": "gladly-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "debgotwired",
       "printer_name": "Deb Mukherjee",
@@ -8328,9 +8375,9 @@
       "path": "library/marketing/google-ad-manager",
       "release": {
         "cli_name": "google-ad-manager-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "stellato",
       "printer_name": "Greg Stellato",
@@ -9091,9 +9138,9 @@
       "path": "library/commerce/grubhub",
       "release": {
         "cli_name": "grubhub-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "vcolombo",
       "printer_name": "Vincent Colombo",
@@ -9379,9 +9426,9 @@
       "path": "library/sales-and-crm/help-scout",
       "release": {
         "cli_name": "help-scout-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "debgotwired",
       "printer_name": "Deb Mukherjee",
@@ -9996,9 +10043,9 @@
       "path": "library/travel/ikon",
       "release": {
         "cli_name": "ikon-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "stellato",
       "printer_name": "Greg Stellato",
@@ -10248,9 +10295,9 @@
       "path": "library/other/intervals-icu",
       "release": {
         "cli_name": "intervals-icu-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "milosm",
       "printer_name": "Milos Mladenovic",
@@ -10306,9 +10353,9 @@
       "path": "library/developer-tools/isitagentready",
       "release": {
         "cli_name": "isitagentready-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "bobeglz",
       "printer_name": "bobe",
@@ -10565,9 +10612,9 @@
       "path": "library/marketing/judge-me",
       "release": {
         "cli_name": "judge-me-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "cathrynlavery",
       "printer_name": "Cathryn Lavery",
@@ -10729,9 +10776,9 @@
       "path": "library/payments/kalshi",
       "release": {
         "cli_name": "kalshi-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "tmchow",
       "printer_name": "Trevin Chow",
@@ -10790,9 +10837,9 @@
       "path": "library/marketing/kdpnichefinder",
       "release": {
         "cli_name": "kdpnichefinder-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "vcolombo",
       "printer_name": "Vincent Colombo",
@@ -11008,9 +11055,9 @@
       "path": "library/other/lda-gov",
       "release": {
         "cli_name": "lda-gov-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "mherzog4",
       "printer_name": "Mherzog4",
@@ -11270,9 +11317,9 @@
       "path": "library/project-management/linear",
       "release": {
         "cli_name": "linear-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-17T09:11:29Z",
+        "source_commit": "4f33aaa88eac8ad612fcebb6592b73fdd1fca68f"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -11350,9 +11397,9 @@
       "path": "library/social-and-messaging/linq",
       "release": {
         "cli_name": "linq-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "cathrynlavery",
       "printer_name": "Cathryn Lavery",
@@ -11465,9 +11512,9 @@
       "path": "library/social-and-messaging/luma",
       "release": {
         "cli_name": "luma-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "richardadonnell",
       "printer_name": "richardadonnell",
@@ -11942,9 +11989,9 @@
       "path": "library/media-and-entertainment/metacritic",
       "release": {
         "cli_name": "metacritic-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "coopdogGGs",
       "printer_name": "Ryan Cooper",
@@ -12080,9 +12127,9 @@
       "path": "library/ai/mixlayer",
       "release": {
         "cli_name": "mixlayer-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "cathrynlavery",
       "printer_name": "Cathryn Lavery",
@@ -12779,9 +12826,9 @@
       "path": "library/other/nhc",
       "release": {
         "cli_name": "nhc-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.8.1",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "abe238",
       "printer_name": "Abe Diaz (@abe238)",
@@ -12873,9 +12920,9 @@
       "path": "library/productivity/notion",
       "release": {
         "cli_name": "notion-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:12:07Z",
+        "source_commit": "55bd5bbc33b008abfde4d02b1b4f63be376004f7"
       },
       "printer": "neektza",
       "printer_name": "Nikica Jokic",
@@ -14111,9 +14158,9 @@
       "path": "library/health/oura",
       "release": {
         "cli_name": "oura-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "coopdogGGs",
       "printer_name": "ryanc00per",
@@ -14573,9 +14620,9 @@
       "path": "library/media-and-entertainment/paul-graham",
       "release": {
         "cli_name": "paul-graham-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "debgotwired",
       "printer_name": "Deb Mukherjee",
@@ -14973,9 +15020,9 @@
       "path": "library/sales-and-crm/pipedrive",
       "release": {
         "cli_name": "pipedrive-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "debgotwired",
       "printer_name": "Deb Mukherjee",
@@ -15197,9 +15244,9 @@
       "path": "library/media-and-entertainment/podcastindex",
       "release": {
         "cli_name": "podcastindex-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "adbonnet",
       "printer_name": "adbonnet",
@@ -15455,9 +15502,9 @@
       "path": "library/other/policy-intel",
       "release": {
         "cli_name": "policy-intel-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "sdhilip200",
       "printer_name": "Dhilip Subramanian",
@@ -17213,9 +17260,9 @@
       "path": "library/sales-and-crm/salesloft",
       "release": {
         "cli_name": "salesloft-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "debgotwired",
       "printer_name": "Deb Mukherjee",
@@ -17330,9 +17377,9 @@
       "path": "library/other/scientific-consensus",
       "release": {
         "cli_name": "scientific-consensus-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "laci141",
       "printer_name": "laci141",
@@ -17502,6 +17549,55 @@
       }
     },
     {
+      "name": "screener",
+      "category": "other",
+      "api": "Screener.in",
+      "description": "Every Screener.in feature, plus offline search, screen intersections, and a local fundamentals mirror no other tool has.",
+      "search_terms": [
+        "screener",
+        "Screener.in",
+        "screener-pp-cli",
+        "Company compare",
+        "compare",
+        "See two to four companies' fundamentals side by side (valuation, margins, growth, insider activity) without tab-switching.",
+        "Quarterly trend",
+        "qtrend",
+        "Spot whether a company's quarterly profit/sales growth is accelerating or deteriorating, with YOY change and margin drift computed automatically.",
+        "Screen overlap",
+        "overlap",
+        "Find companies that appear in two or more stock screens in one command, replacing spreadsheet dedup.",
+        "Screen rank",
+        "rank",
+        "Re-score a screen's companies with a composite of fundamentals (P/E, ROCE, growth), sorted by what matters to you.",
+        "Insider flow",
+        "insider-flow",
+        "Answer 'who is net buying the most this month?' with per-company insider buy/sell aggregation."
+      ],
+      "path": "library/other/screener",
+      "printer": "SomSamantray",
+      "printer_name": "Som Samantray",
+      "contributors": [
+        {
+          "handle": "SomSamantray",
+          "name": "Som Samantray"
+        }
+      ],
+      "mcp": {
+        "binary": "screener-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 11,
+        "public_tool_count": 11,
+        "auth_type": "cookie",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "partial"
+      }
+    },
+    {
       "name": "sculptok",
       "category": "ai",
       "api": "Sculptok",
@@ -17535,9 +17631,9 @@
       "path": "library/ai/sculptok",
       "release": {
         "cli_name": "sculptok-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "vcolombo",
       "printer_name": "Vincent Colombo",
@@ -18228,9 +18324,9 @@
       "path": "library/other/shelters",
       "release": {
         "cli_name": "shelters-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "abe238",
       "printer_name": "Abe Diaz (@abe238)",
@@ -18298,9 +18394,9 @@
       "path": "library/commerce/shipsgo",
       "release": {
         "cli_name": "shipsgo-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "WerkstoffClub",
       "printer_name": "WerkstoffClub",
@@ -19261,9 +19357,9 @@
       "path": "library/maps/stac",
       "release": {
         "cli_name": "stac-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "ghltshubh",
       "printer_name": "ghltshubh",
@@ -19951,9 +20047,9 @@
       "path": "library/productivity/supermemory-admin",
       "release": {
         "cli_name": "supermemory-admin-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "hnshah",
       "printer_name": "Hiten Shah",
@@ -20054,9 +20150,9 @@
       "path": "library/other/surfline",
       "release": {
         "cli_name": "surfline-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "Shoffner",
       "printer_name": "Shoffner",
@@ -20198,9 +20294,9 @@
       "path": "library/productivity/sutra-fitness",
       "release": {
         "cli_name": "sutra-fitness-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "adam-birddog",
       "printer_name": "adam-birddog",
@@ -20988,9 +21084,9 @@
       "path": "library/productivity/toodledo",
       "release": {
         "cli_name": "toodledo-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "wwilson1017",
       "printer_name": "wwilson1017",
@@ -21535,9 +21631,9 @@
       "path": "library/other/ufo-goat",
       "release": {
         "cli_name": "ufo-goat-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "davemorin",
       "printer_name": "Dave Morin",
@@ -21704,9 +21800,9 @@
       "path": "library/other/us-data",
       "release": {
         "cli_name": "us-data-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "sdhilip200",
       "printer_name": "Dhilip Subramanian",
@@ -22035,9 +22131,9 @@
       "path": "library/cloud/vercel-admin",
       "release": {
         "cli_name": "vercel-admin-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "hnshah",
       "printer_name": "hnshah",
@@ -22656,9 +22752,9 @@
       "path": "library/devices/withings",
       "release": {
         "cli_name": "withings-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:21:18Z",
+        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
       },
       "printer": "stellato",
       "printer_name": "Greg Stellato",
