@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026.8.1 - 2026-08-17
+
+- Baseline release metadata added for this published CLI.
+
 ## Unreleased (local amend, 2026-07-16)
 
 Guest planning surface beyond search/shortlist — listing detail hydrate, calendar, host inquiry, verification.

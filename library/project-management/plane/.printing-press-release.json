@@ -2,17 +2,17 @@
   "schema_version": 1,
   "slug": "plane",
   "cli_name": "plane-pp-cli",
-  "version": "2026.8.1",
-  "released_at": "2026-08-17T06:34:11Z",
-  "source_commit": "54781b70c7c5dab20bed7ea3cc916650deba19c8",
+  "version": "2026.8.2",
+  "released_at": "2026-08-17T07:57:07Z",
+  "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e",
   "printing_press_version": "4.29.0",
   "run_id": "20260724-124302-67128fc0",
   "changes": [
     {
-      "title": "feat(plane): reprint at engine 4.29.0 with publish evidence (R6/R7 preserved)",
-      "pr": 1471,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/1471",
-      "commit": "54781b70c7c5dab20bed7ea3cc916650deba19c8"
+      "title": "fix(catalog): align Go fallback docs with toolchain floor",
+      "pr": 1735,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/1735",
+      "commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
     }
   ]
 }
