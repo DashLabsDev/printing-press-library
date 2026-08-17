@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.2 - 2026-08-17
+
+- fix(recipe-goat): document recipe stack in agent surfaces (#1733).
+
 ## 2026.8.1 - 2026-08-17
 
 - fix(cli): bump golang.org/x/text to v0.39.0 in affected published CLIs (#1636).

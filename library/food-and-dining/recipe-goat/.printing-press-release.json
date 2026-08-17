@@ -2,16 +2,16 @@
   "schema_version": 1,
   "slug": "recipe-goat",
   "cli_name": "recipe-goat-pp-cli",
-  "version": "2026.8.1",
-  "released_at": "2026-08-17T05:47:06Z",
-  "source_commit": "d6b74e6df2b2c66612e1f6e29433c0c0aae531e6",
+  "version": "2026.8.2",
+  "released_at": "2026-08-17T07:22:02Z",
+  "source_commit": "137903c8a5e540709858fdd7a731ce911e284098",
   "printing_press_version": "3.6.0",
   "changes": [
     {
-      "title": "fix(cli): bump golang.org/x/text to v0.39.0 in affected published CLIs",
-      "pr": 1636,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/1636",
-      "commit": "d6b74e6df2b2c66612e1f6e29433c0c0aae531e6"
+      "title": "fix(recipe-goat): document recipe stack in agent surfaces",
+      "pr": 1733,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/1733",
+      "commit": "137903c8a5e540709858fdd7a731ce911e284098"
     }
   ]
 }
