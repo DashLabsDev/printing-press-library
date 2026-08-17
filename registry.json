@@ -8913,6 +8913,42 @@
       }
     },
     {
+      "name": "greenhouse",
+      "category": "other",
+      "api": "Greenhouse",
+      "description": "Greenhouse Job Board CLI — query any company's public Greenhouse job board from the command line. Generic board_token, no auth required, 4 operations covering jobs, departments, and offices.",
+      "search_terms": [
+        "greenhouse",
+        "greenhouse-pp-cli",
+        "Greenhouse Job Board CLI — query any company's public Greenhouse job board from the command line. Generic board_token, no auth required, 4 operations covering jobs, departments, and offices.",
+        "Generic board_token",
+        "jobs list <board_token>",
+        "Single CLI serves any company that uses Greenhouse Job Board (Stripe, Anthropic, Airbnb, Notion, Figma, etc.) — board_token is a positional argument, not a hardcoded prefix.",
+        "Engine Resource Rename",
+        "Renamed the auto-scaffolded 'greenhouse-job-board-jobs' resource to 'jobs' to fix an engine shadow-rename caused by the 'jobs/' cobra conflict. Recorded in .printing-press-patches/001-rename-jobs-resource.json so regens preserve it."
+      ],
+      "path": "library/other/greenhouse",
+      "printer": "veltri-23",
+      "printer_name": "Hunter Veltri",
+      "creator": {
+        "handle": "veltri-23",
+        "name": "Hunter Veltri"
+      },
+      "mcp": {
+        "binary": "greenhouse-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 35,
+        "public_tool_count": 4,
+        "auth_type": "none",
+        "env_vars": [],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "grubhub",
       "category": "commerce",
       "api": "Grubhub",
@@ -15854,6 +15890,12 @@
         "Run crash-safe bounded triage queues with retry and manual-review states."
       ],
       "path": "library/productivity/raindrop",
+      "release": {
+        "cli_name": "raindrop-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-17T05:31:07Z",
+        "source_commit": "12ebdd5a0c0ae4c0dceb554ccff47300d2703c8c"
+      },
       "printer": "srijits",
       "printer_name": "srijits",
       "creator": {
