@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.4 - 2026-08-17
+
+- feat(linear): sync prunes upstream deletions and supports incremental crawls (#1693).
+
 ## 2026.8.3 - 2026-08-17
 
 - feat(linear): user-definable state groups with a single resolver (#1692).
