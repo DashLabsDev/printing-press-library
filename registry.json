@@ -1565,6 +1565,12 @@
         "handle": "kjmagnan1s",
         "name": "Kevin Magnan"
       },
+      "contributors": [
+        {
+          "handle": "kriptoburak",
+          "name": "Burak Bayır"
+        }
+      ],
       "mcp": {
         "binary": "apify-pp-mcp",
         "transports": [
@@ -11774,6 +11780,12 @@
       },
       "printer": "sdhilip200",
       "printer_name": "Dhilip Subramanian",
+      "contributors": [
+        {
+          "handle": "bobeglz",
+          "name": "bobeglz"
+        }
+      ],
       "mcp": {
         "binary": "meta-ads-pp-mcp",
         "transports": [
@@ -20375,6 +20387,12 @@
         "Committed versus free minutes per day, broken down by time-of-day bucket."
       ],
       "path": "library/productivity/tiimo",
+      "release": {
+        "cli_name": "tiimo-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-17T05:43:40Z",
+        "source_commit": "1935de78e22e7a4f2a5d6edc8cf758ebdc652afd"
+      },
       "printer": "vcolombo",
       "printer_name": "Vincent Colombo"
     },
