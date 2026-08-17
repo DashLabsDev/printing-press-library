@@ -1664,9 +1664,9 @@
       "path": "library/media-and-entertainment/archive-is",
       "release": {
         "cli_name": "archive-is-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:08:08Z",
+        "source_commit": "483f29a460717757113a6cbfab7b29c0c5056ae7"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -8662,9 +8662,9 @@
       "path": "library/marketing/google-search-console",
       "release": {
         "cli_name": "google-search-console-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T08:06:59Z",
+        "source_commit": "e3c649d26a0a3972dd1d41a44487d17227a0ddb5"
       },
       "printer": "bossriceshark",
       "printer_name": "Matt",
@@ -12883,6 +12883,12 @@
         "handle": "neektza",
         "name": "Nikica Jokic"
       },
+      "contributors": [
+        {
+          "handle": "tmchow",
+          "name": "Trevin Chow"
+        }
+      ],
       "mcp": {
         "binary": "notion-pp-mcp",
         "transports": [
