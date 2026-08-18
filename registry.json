@@ -2112,6 +2112,58 @@
       }
     },
     {
+      "name": "axs",
+      "category": "other",
+      "api": "SRAM AXS",
+      "description": "Every SRAM AXS feature from the terminal, plus a local database, offline search, and cross-bike views the web app has no way to show.",
+      "search_terms": [
+        "axs",
+        "SRAM AXS",
+        "axs-pp-cli",
+        "Every SRAM AXS feature from the terminal, plus a local database, offline search, and cross-bike views the web app has no way to show.",
+        "Firmware summary check",
+        "firmware-check",
+        "Show the latest synced firmware version per AXS device type.",
+        "Battery dashboard",
+        "battery",
+        "Latest synced battery status per AXS device type, including voltage when available.",
+        "Component wear rollup",
+        "wear",
+        "Rank components by synced shift counts, distance, and actuations from component summaries.",
+        "Ride shift log",
+        "shifts",
+        "Show per-ride front/rear shift counts, chainrings, and cogs from synced component summaries.",
+        "Unified garage view",
+        "garage",
+        "A tree of every bike with its components and serials in one shot.",
+        "Since last sync",
+        "since",
+        "Show new ride activities and notifications since your last sync."
+      ],
+      "path": "library/other/axs",
+      "printer": "stellato",
+      "printer_name": "Greg Stellato",
+      "creator": {
+        "handle": "stellato",
+        "name": "Greg Stellato"
+      },
+      "mcp": {
+        "binary": "axs-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 21,
+        "public_tool_count": 1,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "SRAM_AXS_TOKEN"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "azure-cost-admin",
       "category": "cloud",
       "api": "Azure Cost Admin",
@@ -17148,6 +17200,61 @@
         "env_vars": [
           "REVENUECAT_API_KEY",
           "DEVELOPER_BEARER_AUTH"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "ridewithgps",
+      "category": "travel",
+      "api": "Ride with GPS",
+      "description": "Your whole Ride with GPS library, offline — bulk export, gear mileage, and ride analytics no other tool ships.",
+      "search_terms": [
+        "ridewithgps",
+        "Ride with GPS",
+        "ridewithgps-pp-cli",
+        "Your whole Ride with GPS library, offline — bulk export, gear mileage, and ride analytics no other tool ships.",
+        "Bulk export to your bike computer",
+        "export",
+        "Export many routes or trips to GPX, TCX, CSV, or KML files in one command — with cue sheets included, ready to side-load onto a Garmin, Wahoo, or Hammerhead. The bulk export Ride with GPS itself won't do.",
+        "Routes from an event",
+        "event-routes",
+        "List the routes attached to an event (group ride, gran fondo, brevet) and optionally export them straight to files for your bike computer.",
+        "Gear mileage & maintenance",
+        "gear",
+        "Per-bike accumulated mileage from your logged rides, plus maintenance-due flags against wear thresholds.",
+        "Training stats",
+        "stats",
+        "Time-windowed distance, elevation, and moving-time totals with activity-type breakdowns over your logged rides.",
+        "Personal records",
+        "records",
+        "All-time best efforts — longest ride, most climbing, fastest average speed, biggest power — from your trip metrics.",
+        "Route dedup",
+        "dedup",
+        "Find near-duplicate routes by distance and start/end geometry, and optionally delete the extras.",
+        "Library audit",
+        "audit",
+        "Flag routes that are stale, private, or incomplete (missing name, description, or distance) — catalog hygiene across your library."
+      ],
+      "path": "library/travel/ridewithgps",
+      "printer": "stellato",
+      "printer_name": "Greg Stellato",
+      "creator": {
+        "handle": "stellato",
+        "name": "Greg Stellato"
+      },
+      "mcp": {
+        "binary": "ridewithgps-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 29,
+        "public_tool_count": 0,
+        "auth_type": "api_key",
+        "env_vars": [
+          "RIDEWITHGPS_API_KEY"
         ],
         "mcp_ready": "full",
         "spec_format": "openapi3"
