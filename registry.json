@@ -2972,6 +2972,12 @@
         "Scan search results in a city and rank businesses by the cheapest service matching your query (e.g. haircut), with rating alongside price."
       ],
       "path": "library/commerce/booksy",
+      "release": {
+        "cli_name": "booksy-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-18T18:49:03Z",
+        "source_commit": "694359abcfd7b9c5834a9656e0c3248957a09bbd"
+      },
       "printer": "milloni",
       "printer_name": "Max Tomago",
       "creator": {
@@ -23212,6 +23218,59 @@
         "auth_type": "bearer_token",
         "env_vars": [
           "WEAVIATE_API_KEY"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "webflow",
+      "category": "developer-tools",
+      "api": "Webflow",
+      "description": "The whole Webflow Data API, plus a local database that lets you audit SEO, diff staging against live, and preview a publish before you trigger it.",
+      "search_terms": [
+        "webflow",
+        "webflow-pp-cli",
+        "The whole Webflow Data API, plus a local database that lets you audit SEO, diff staging against live, and preview a publish before you trigger it.",
+        "Page SEO audit",
+        "seo audit",
+        "Find every page on a site with a missing, duplicated, or over-length SEO title or description before it costs you traffic.",
+        "Staged-vs-live drift",
+        "drift",
+        "See exactly which CMS items were edited in staging but never published, field by field.",
+        "Publish preview",
+        "See everything that would change if you published this site right now: pages edited since the last publish, draft pages, and unpublished CMS items, alongside the site's redirect-rule count.",
+        "Query-driven bulk field set",
+        "items bulk-set",
+        "Apply the same field value to many CMS items selected by a condition. Previews the change set by default; --apply writes it, paced so you never hit a rate limit mid-run.",
+        "Collection field completeness",
+        "collections completeness",
+        "Per-field fill rate across a whole collection, so you can spot required fields nobody filled and schema fields nobody uses.",
+        "Redirect table audit",
+        "redirects audit",
+        "Catch redirects that shadow a live page, point nowhere, loop, or duplicate another rule.",
+        "Multi-site rollup",
+        "overview",
+        "One row per site you have synced locally: pages, collections, unpublished items, SEO findings, days since last publish."
+      ],
+      "path": "library/developer-tools/webflow",
+      "printer": "kmorebetter",
+      "printer_name": "Kerry Morrison",
+      "creator": {
+        "handle": "kmorebetter",
+        "name": "Kerry Morrison"
+      },
+      "mcp": {
+        "binary": "webflow-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 117,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "WEBFLOW_OAUTH2"
         ],
         "mcp_ready": "full",
         "spec_format": "openapi3"
