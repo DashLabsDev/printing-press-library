@@ -2944,6 +2944,57 @@
       }
     },
     {
+      "name": "booksy",
+      "category": "commerce",
+      "api": "Booksy",
+      "description": "Book a haircut in Poland from the terminal — search barbers, compare prices and reviews, check open slots, and book, with a dry-run-by-default booking guard.",
+      "search_terms": [
+        "booksy",
+        "booksy-pp-cli",
+        "Book a haircut in Poland from the terminal — search barbers, compare prices and reviews, check open slots, and book, with a dry-run-by-default booking guard.",
+        "Guided haircut booking",
+        "book",
+        "Book an appointment end to end — it previews the exact service, staffer, time, and price first, and only sends the real booking when you pass --confirm.",
+        "Open slots",
+        "availability",
+        "List open time slots for a service at a business over a date range, grouped by day. No login required.",
+        "Services table",
+        "services",
+        "Flatten a business profile into a clean table of bookable services with price, duration, and the service-variant id you pass to book.",
+        "Soonest slot",
+        "earliest",
+        "Find the single earliest open slot for a service across a date window in one call.",
+        "Compare barbers",
+        "compare",
+        "Compare several businesses side by side on rating, review count, and cheapest matching service price — from the local cache.",
+        "Cheapest haircut nearby",
+        "cheapest",
+        "Scan search results in a city and rank businesses by the cheapest service matching your query (e.g. haircut), with rating alongside price."
+      ],
+      "path": "library/commerce/booksy",
+      "printer": "milloni",
+      "printer_name": "Max Tomago",
+      "creator": {
+        "handle": "milloni",
+        "name": "Max Tomago"
+      },
+      "mcp": {
+        "binary": "booksy-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 8,
+        "public_tool_count": 0,
+        "auth_type": "api_key",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "botsee",
       "category": "marketing",
       "api": "Botsee",
@@ -8756,6 +8807,12 @@
         "Instances of recurring events that moved or were cancelled in a window — the routine-deviation surprises, isolated."
       ],
       "path": "library/productivity/google-calendar",
+      "release": {
+        "cli_name": "google-calendar-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-18T16:42:44Z",
+        "source_commit": "77c63107ede69873fec85cf934242f19ef85d22e"
+      },
       "printer": "dmarketingllm",
       "printer_name": "Derik Parkinson",
       "creator": {
