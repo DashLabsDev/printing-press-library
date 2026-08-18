@@ -2751,6 +2751,57 @@
       }
     },
     {
+      "name": "bonusly",
+      "category": "productivity",
+      "api": "Bonusly",
+      "description": "The recognition analytics Bonusly reserves for admins -- rebuilt from data any employee can already read.",
+      "search_terms": [
+        "bonusly",
+        "bonusly-pp-cli",
+        "The recognition analytics Bonusly reserves for admins -- rebuilt from data any employee can already read.",
+        "Recognition Budget Audit",
+        "recognition audit",
+        "See whether your team's recognition spend is on pace with its monthly budget, broken down by department -- the report Bonusly normally reserves for admins.",
+        "Personal Recognition Search",
+        "recognition search-mine",
+        "Search your own given and received recognition offline, without scrolling the public company feed. Requires one live lookup to confirm your identity (no local fallback); not yet verified against a real API response in this build.",
+        "Points Burn-Rate Forecast",
+        "balance history",
+        "Track your giving-allowance burn rate over time and see forfeiture coming before the monthly reset, not after.",
+        "Neglected-Teammate Finder",
+        "recognition gap",
+        "Find direct reports you haven't recognized recently, without an admin's Participation Report. Requires a live lookup to resolve your manager identity and direct reports (no local fallback); not yet verified against a real API response in this build.",
+        "Company Values Trend Audit",
+        "recognition values",
+        "See which company-value hashtags are actually trending in a department, instead of manually tallying the feed.",
+        "Redemption Spend Forecast",
+        "redemptions forecast",
+        "Project your reward-redemption spend from your own history -- a simple trend line, not a black box."
+      ],
+      "path": "library/productivity/bonusly",
+      "printer": "enlewof",
+      "printer_name": "Allen Lew",
+      "creator": {
+        "handle": "enlewof",
+        "name": "Allen Lew"
+      },
+      "mcp": {
+        "binary": "bonusly-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 26,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "booking-com",
       "category": "travel",
       "api": "Booking.com",
@@ -3330,6 +3381,60 @@
         "env_vars": [],
         "mcp_ready": "full",
         "spec_format": "sqlite"
+      }
+    },
+    {
+      "name": "clarify",
+      "category": "sales-and-crm",
+      "api": "Clarify",
+      "description": "Every Clarify API operation as a typed command, plus the morning briefing, meeting prep, and pipeline analytics the autonomous CRM knows about but cannot run.",
+      "search_terms": [
+        "clarify",
+        "clarify-pp-cli",
+        "Every Clarify API operation as a typed command, plus the morning briefing, meeting prep, and pipeline analytics the autonomous CRM knows about but cannot run.",
+        "Meeting prep pack",
+        "prep",
+        "One command before a call: the meeting's attendees, their company, open deals, and transcript excerpts from past meetings with that company.",
+        "Morning briefing",
+        "brief",
+        "Start-of-day overview: today's meetings joined to their companies, open deals, and yesterday's record activity, on one screen.",
+        "Follow-up gaps",
+        "followup",
+        "The dropped-ball list: meetings with no subsequent activity, comment, or task on the linked deal or company.",
+        "Stale-deal report",
+        "stale",
+        "Open deals with no activity in N days, grouped by pipeline stage.",
+        "Record dossier",
+        "dossier",
+        "A complete background bundle on any record: fields, relationships, activities, comments, and related meetings with transcript references, in one compact payload.",
+        "Pipeline velocity",
+        "velocity",
+        "Per-stage dwell time and stage-to-stage conversion counts, accrued from a local stage-history table across repeated runs (the first run reports the current stage distribution).",
+        "Duplicate finder",
+        "dupes",
+        "Finds likely duplicate people or companies by shared email, domain, or normalized name, and prints ready-to-run merge commands."
+      ],
+      "path": "library/sales-and-crm/clarify",
+      "printer": "ndearborn68",
+      "printer_name": "Isaac Marks",
+      "creator": {
+        "handle": "ndearborn68",
+        "name": "Isaac Marks"
+      },
+      "mcp": {
+        "binary": "clarify-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 75,
+        "public_tool_count": 0,
+        "auth_type": "api_key",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
       }
     },
     {
@@ -16936,6 +17041,50 @@
           "RESTAURANT365_ODATA_USERNAME",
           "RESTAURANT365_ODATA_PASSWORD"
         ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "retraction-checker",
+      "category": "other",
+      "api": "Retraction Checker",
+      "description": "Check whether a paper is retracted, why, and what the current research says now — keyless, over Crossref and OpenAlex.",
+      "search_terms": [
+        "retraction-checker",
+        "Retraction Checker",
+        "retraction-checker-pp-cli",
+        "Check whether a paper is retracted, why, and what the current research says now — keyless, over Crossref and OpenAlex.",
+        "Retraction check",
+        "check",
+        "Tell whether a paper (by DOI or PMID) has been retracted, when, why, and where the notice is.",
+        "Bibliography scan",
+        "scan",
+        "Batch-check a reading list or .bib file and flag every retracted entry.",
+        "Superseding research",
+        "superseded",
+        "For a retracted or older paper, find related more-recent research on the same topic, ranked by citation count.",
+        "Retraction watch",
+        "watch",
+        "Monitor a topic or reading list for newly-announced retractions since the last run."
+      ],
+      "path": "library/other/retraction-checker",
+      "printer": "laci141",
+      "printer_name": "laci141",
+      "creator": {
+        "handle": "laci141",
+        "name": "laci141"
+      },
+      "mcp": {
+        "binary": "retraction-checker-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 2,
+        "public_tool_count": 2,
+        "auth_type": "none",
+        "env_vars": [],
         "mcp_ready": "full",
         "spec_format": "openapi3"
       }
