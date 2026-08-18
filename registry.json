@@ -1119,9 +1119,9 @@
       "path": "library/commerce/amazon-orders",
       "release": {
         "cli_name": "amazon-orders-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-17T09:32:36Z",
+        "source_commit": "4ca9b8c2abbfaaa227fd484232a5fb927eee6745"
       },
       "printer": "bwishan",
       "printer_name": "Brian Wishan",
@@ -11376,9 +11376,9 @@
       "path": "library/project-management/linear",
       "release": {
         "cli_name": "linear-pp-cli",
-        "version": "2026.8.3",
-        "released_at": "2026-08-17T09:11:29Z",
-        "source_commit": "4f33aaa88eac8ad612fcebb6592b73fdd1fca68f"
+        "version": "2026.8.4",
+        "released_at": "2026-08-17T09:26:48Z",
+        "source_commit": "7c4f3ebab9d0cc346090f666d5e95fa9a87a71bf"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -13970,6 +13970,19 @@
       "creator": {
         "handle": "aborruso",
         "name": "aborruso"
+      },
+      "mcp": {
+        "binary": "openipa-pp-mcp",
+        "transports": [
+          "stdio"
+        ],
+        "tool_count": 31,
+        "public_tool_count": 31,
+        "auth_type": "api_key",
+        "env_vars": [
+          "IPA_auth_id"
+        ],
+        "mcp_ready": "full"
       }
     },
     {
@@ -22894,6 +22907,12 @@
         "Uses the same frontend searchOffers paging, category, price, and page filters that Woot's All Deals UI uses."
       ],
       "path": "library/commerce/woot",
+      "release": {
+        "cli_name": "woot-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-17T09:25:00Z",
+        "source_commit": "c6be916f966d099fa8558102cca5f59517ad2cb2"
+      },
       "printer": "TheFabulousMoolah",
       "printer_name": "Matthew Vassallo",
       "creator": {
