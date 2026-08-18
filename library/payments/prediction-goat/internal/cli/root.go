@@ -17,7 +17,7 @@ import (
 	"github.com/mvanhorn/printing-press-library/library/payments/prediction-goat/internal/config"
 )
 
-var version = "2026.8.1"
+var version = "2026.8.2"
 
 type rootFlags struct {
 	asJSON     bool
