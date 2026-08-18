@@ -14066,9 +14066,9 @@
       "path": "library/developer-tools/openipa",
       "release": {
         "cli_name": "openipa-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-18T16:23:15Z",
+        "source_commit": "4c5f0a16bf0bb39f3bb1fb005a7e4a82f0e826a5"
       },
       "printer": "aborruso",
       "printer_name": "aborruso",
@@ -19299,6 +19299,54 @@
       }
     },
     {
+      "name": "snipd",
+      "category": "media-and-entertainment",
+      "api": "Snipd",
+      "description": "Turn your Snipd snips into a local, ranked, full-text-searchable corpus — search a concept across every note, quote, and transcript, pull the exact quote, and synthesize across shows from the command line, plus an MCP for agents.",
+      "search_terms": [
+        "snipd",
+        "snipd-pp-cli",
+        "Turn your Snipd snips into a local, ranked, full-text-searchable corpus — search a concept across every note, quote, and transcript, pull the exact quote, and synthesize across shows from the command line, plus an MCP for agents.",
+        "Build the local snip corpus",
+        "pull",
+        "Pull your Snipd snips into a local SQLite mirror you can search and query offline — the app has no export-to-query path.",
+        "Pull the exact quote",
+        "quote",
+        "Get the verbatim pull-quote and speaker for matching snips — the distinct unit other tools concatenate into transcript prose and lose.",
+        "Scoped synthesis feed",
+        "synthesize",
+        "Gather a deduped, snippet-only evidence set (title + note + quote + deep-link) scoped by query, show, or topic — sized for an agent to reason over.",
+        "Structured filter",
+        "filter",
+        "Slice the corpus by show, favorite, tag, date, or duration and return compact rows or counts.",
+        "Corpus rollups",
+        "aggregate",
+        "Roll up counts and distributions across your corpus — snips per show, top tags, favorites, episode density, and timeline."
+      ],
+      "path": "library/media-and-entertainment/snipd",
+      "printer": "maxswinguy",
+      "printer_name": "Maxime Delavergne",
+      "creator": {
+        "handle": "maxswinguy",
+        "name": "Maxime Delavergne"
+      },
+      "mcp": {
+        "binary": "snipd-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 1,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "SNIPD_TOKEN"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "soccer-goat",
       "category": "media-and-entertainment",
       "api": "soccer-goat",
@@ -19490,6 +19538,67 @@
         ],
         "mcp_ready": "full",
         "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "sprocket",
+      "category": "productivity",
+      "api": "Sprocket Sports",
+      "description": "Your youth-soccer club's schedule, teams, and dues from the terminal — with merged multi-kid agendas, conflict detection, and iCal export no dashboard gives you.",
+      "search_terms": [
+        "sprocket",
+        "Sprocket Sports",
+        "sprocket-pp-cli",
+        "Your youth-soccer club's schedule, teams, and dues from the terminal — with merged multi-kid agendas, conflict detection, and iCal export no dashboard gives you.",
+        "This-week schedule",
+        "week",
+        "Every game and practice for the current week across all your players' teams, in one view.",
+        "Next event",
+        "next",
+        "The single next upcoming game or practice across all your players' teams: what, when, where, home/away, opponent.",
+        "Merged family agenda",
+        "agenda",
+        "Both kids' separate team schedules merged into one chronological agenda over an N-day window.",
+        "Conflict finder",
+        "conflicts",
+        "Flags time overlaps and impossible tight time-plus-location gaps between events across all your players.",
+        "Away-game drive list",
+        "away",
+        "Away games only, location-first, with field, opponent, and date — built for the carpool group chat.",
+        "iCal export",
+        "ical",
+        "Emit the merged schedule as an RFC-5545 .ics file for phone-calendar subscription.",
+        "Changed since last check",
+        "since",
+        "What schedule items were added, moved, or cancelled since the last time you ran it.",
+        "Outstanding balance roll-up",
+        "owed",
+        "Total money owed across all your players: registration balances plus overdue invoices, with one number.",
+        "Registration deadline radar",
+        "deadlines",
+        "Open registration programs sorted by how soon they close, flagging ones closing within N days."
+      ],
+      "path": "library/productivity/sprocket",
+      "printer": "stellato",
+      "printer_name": "Greg Stellato",
+      "creator": {
+        "handle": "stellato",
+        "name": "Greg Stellato"
+      },
+      "mcp": {
+        "binary": "sprocket-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 19,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "SPROCKET_TOKEN"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
       }
     },
     {
@@ -20920,6 +21029,55 @@
         ],
         "mcp_ready": "full",
         "spec_format": "internal"
+      }
+    },
+    {
+      "name": "thelancet",
+      "category": "developer-tools",
+      "api": "The Lancet",
+      "description": "Search Lancet articles offline and analyze author impact, institutional networks, and editorial trends — powered by the free OpenAlex scholarly graph.",
+      "search_terms": [
+        "thelancet",
+        "The Lancet",
+        "thelancet-pp-cli",
+        "Search Lancet articles offline and analyze author impact, institutional networks, and editorial trends — powered by the free OpenAlex scholarly graph.",
+        "Lab Citation Impact Rank",
+        "rank-authors",
+        "Rank researchers at your institution by citation impact within a specific Lancet journal or topic.",
+        "Institutional Citation Mesh",
+        "mesh",
+        "Find researchers at your institution who co-author Lancet papers and quantify how their work connects.",
+        "Affiliation Growth Tracking",
+        "affiliation-growth",
+        "Track institutions gaining publication velocity in Lancet journals; identify rising research centers.",
+        "Editorial Drift Detector",
+        "drift",
+        "Compare how a journal's topic distribution shifts between two time windows; spot emerging and fading specialties.",
+        "Reading List Curation",
+        "curate",
+        "Auto-generate ranked reading lists for a topic, sorted by date/citations/relevance, exportable as Markdown or BibTeX.",
+        "Citation Visibility Gap",
+        "visibility-gap",
+        "Find authors whose citation impact is out of step with the prestige of the Lancet journals they publish in."
+      ],
+      "path": "library/developer-tools/thelancet",
+      "printer": "laci141",
+      "printer_name": "laci141",
+      "creator": {
+        "handle": "laci141",
+        "name": "laci141"
+      },
+      "mcp": {
+        "binary": "thelancet-pp-mcp",
+        "transports": [
+          "stdio"
+        ],
+        "tool_count": 5,
+        "public_tool_count": 5,
+        "auth_type": "none",
+        "env_vars": [],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
       }
     },
     {
@@ -23504,6 +23662,47 @@
         ],
         "mcp_ready": "full",
         "spec_format": "internal"
+      }
+    },
+    {
+      "name": "ynab",
+      "category": "other",
+      "api": "YNAB",
+      "description": "Every YNAB feature, plus a local mirror that makes reconciliation, payee trend analysis, and a ready-made ProjectionLab export instant instead of manual.",
+      "search_terms": [
+        "ynab",
+        "ynab-pp-cli",
+        "Every YNAB feature, plus a local mirror that makes reconciliation, payee trend analysis, and a ready-made ProjectionLab export instant instead of manual.",
+        "Export balances (ProjectionLab-shaped)",
+        "export balances",
+        "One-shot export of current account balances reshaped into ProjectionLab's expected schema, ready to sync into a net-worth projection tool.",
+        "Reconciliation helper",
+        "accounts reconcile",
+        "Diff the local cleared-transaction total against a bank statement balance and surface the transaction(s) most likely responsible for the gap.",
+        "Payee spend profile",
+        "payees profile",
+        "Aggregated monthly spend stats, average transaction size, and typical categories for a single payee."
+      ],
+      "path": "library/other/ynab",
+      "printer": "mikesnowbie",
+      "printer_name": "Mike Snow",
+      "creator": {
+        "handle": "mikesnowbie",
+        "name": "Mike Snow"
+      },
+      "mcp": {
+        "binary": "ynab-pp-mcp",
+        "transports": [
+          "stdio"
+        ],
+        "tool_count": 44,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
       }
     },
     {
