@@ -2141,6 +2141,12 @@
         "Show new ride activities and notifications since your last sync."
       ],
       "path": "library/other/axs",
+      "release": {
+        "cli_name": "axs-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-18T16:37:30Z",
+        "source_commit": "1d8a252d545c4bf7cba8a64746c9513f24dd0e48"
+      },
       "printer": "stellato",
       "printer_name": "Greg Stellato",
       "creator": {
@@ -8721,6 +8727,58 @@
       }
     },
     {
+      "name": "google-calendar",
+      "category": "productivity",
+      "api": "Google Calendar",
+      "description": "The multi-account Google Calendar layer for agents that must never surprise a human.",
+      "search_terms": [
+        "google-calendar",
+        "Google Calendar",
+        "google-calendar-pp-cli",
+        "The multi-account Google Calendar layer for agents that must never surprise a human.",
+        "Conflict verdict engine",
+        "conflicts",
+        "One command answers 'am I double-booked?' across every account, and refuses to give a confident all-clear over partial or stale data.",
+        "Open-slot enumeration",
+        "slots",
+        "Ranked open windows of a requested duration across all accounts, computed from live freebusy under the same busy semantics as conflicts.",
+        "Safe-mutation contract",
+        "events update",
+        "Writes take an etag precondition and return the pre-image plus a structured inverse operation, so every change is cleanly reversible and race-safe.",
+        "Stateless change sweep",
+        "changes",
+        "Everything that moved, appeared, or was cancelled across all accounts since a caller-held watermark — deletions included.",
+        "Manifest reconciliation",
+        "manifest check",
+        "Diffs live calendar reality across all accounts against the approved calendars.yaml — new, missing, or permission-drifted calendars become findings.",
+        "Recurring-series deviations",
+        "events exceptions",
+        "Instances of recurring events that moved or were cancelled in a window — the routine-deviation surprises, isolated."
+      ],
+      "path": "library/productivity/google-calendar",
+      "printer": "dmarketingllm",
+      "printer_name": "Derik Parkinson",
+      "creator": {
+        "handle": "dmarketingllm",
+        "name": "Derik Parkinson"
+      },
+      "mcp": {
+        "binary": "google-calendar-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 14,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "GOOGLE_CALENDAR_OAUTH2C"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "google-photos",
       "category": "media-and-entertainment",
       "api": "Google Photos",
@@ -9106,9 +9164,9 @@
       "path": "library/health/grants",
       "release": {
         "cli_name": "grants-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-10T03:06:35Z",
-        "source_commit": "1dcdf980e27beaaea5b5ddc408d269b52cefdeaf"
+        "version": "2026.8.2",
+        "released_at": "2026-08-18T16:37:30Z",
+        "source_commit": "54e65e7ef30ebf00beb1fd204a77b20a68ae6c8c"
       },
       "printer": "laci141",
       "printer_name": "laci141",
@@ -17238,6 +17296,12 @@
         "Flag routes that are stale, private, or incomplete (missing name, description, or distance) — catalog hygiene across your library."
       ],
       "path": "library/travel/ridewithgps",
+      "release": {
+        "cli_name": "ridewithgps-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-18T16:37:30Z",
+        "source_commit": "88b33098c6b770432355230ecd2238c94afbbe68"
+      },
       "printer": "stellato",
       "printer_name": "Greg Stellato",
       "creator": {
@@ -19686,6 +19750,12 @@
         "Open registration programs sorted by how soon they close, flagging ones closing within N days."
       ],
       "path": "library/productivity/sprocket",
+      "release": {
+        "cli_name": "sprocket-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-18T16:37:30Z",
+        "source_commit": "fa63d83d82ecfde71a555653921c482ba19a20cf"
+      },
       "printer": "stellato",
       "printer_name": "Greg Stellato",
       "creator": {
