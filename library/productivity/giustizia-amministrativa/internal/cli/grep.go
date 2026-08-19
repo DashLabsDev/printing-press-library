@@ -89,7 +89,7 @@ func newNovelGrepCmd(flags *rootFlags) *cobra.Command {
 				return cmd.Help()
 			}
 			if gaSkip(flags) {
-				return nil
+				return emitSkip(cmd, flags)
 			}
 			pat := pattern
 			if ignoreCase {

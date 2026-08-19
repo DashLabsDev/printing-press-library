@@ -32,7 +32,7 @@ func newNovelStatsCmd(flags *rootFlags) *cobra.Command {
 		Annotations: map[string]string{"mcp:read-only": "true"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if gaSkip(flags) {
-				return nil
+				return emitSkip(cmd, flags)
 			}
 			dims := splitDims(by)
 			if len(dims) == 0 {
@@ -109,9 +109,8 @@ func newNovelStatsCmd(flags *rootFlags) *cobra.Command {
 				}
 			}
 			if troncato != "" {
-				fmt.Fprintf(cmd.ErrOrStderr(),
-					"Attenzione: il campione (%d) si e' esaurito prima del totale dichiarato (%d): il gruppo %q e' tagliato a meta' e i gruppi successivi nell'ordine del portale mancano del tutto. I numeri qui sopra non sono una distribuzione completa. Alza --limit oppure interroga un gruppo per volta.\n",
-					len(res.Items), res.Total, troncato)
+				fmt.Fprintf(cmd.ErrOrStderr(), "Attenzione: %s\n",
+					avvisoGruppoTroncato(len(res.Items), res.Total, troncato, dims))
 			}
 			out := map[string]any{
 				"gruppo_troncato": troncato,

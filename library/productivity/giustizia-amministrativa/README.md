@@ -37,7 +37,7 @@ npx -y @mvanhorn/printing-press-library install giustizia-amministrativa --agent
 
 ### Without Node
 
-If `npx` is not available (no Node, offline), install directly with Go (requires Go 1.26.5 or newer). This writes into `$GOPATH/bin` (default `$HOME/go/bin`), so add that directory to `$PATH`:
+If `npx` is not available (no Node, offline), install directly with Go (requires Go 1.26.6 or newer). This writes into `$GOPATH/bin` (default `$HOME/go/bin`), so add that directory to `$PATH`:
 
 ```bash
 go install github.com/mvanhorn/printing-press-library/library/productivity/giustizia-amministrativa/cmd/giustizia-amministrativa-pp-cli@latest

@@ -12,9 +12,9 @@ import (
 	"text/tabwriter"
 	"time"
 
+	"github.com/spf13/cobra"
 	"github.com/mvanhorn/printing-press-library/library/productivity/giustizia-amministrativa/internal/client"
 	"github.com/mvanhorn/printing-press-library/library/productivity/giustizia-amministrativa/internal/config"
-	"github.com/spf13/cobra"
 )
 
 type rootFlags struct {

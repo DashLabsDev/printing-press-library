@@ -54,10 +54,10 @@ func newNovelCorpusBuildCmd(flags *rootFlags) *cobra.Command {
   giustizia-amministrativa-pp-cli corpus build --ids "ECLI:IT:CDS:2020:4665SENT,ECLI:IT:TARLAZ:2026:9344SENT" --out ./selezione
   giustizia-amministrativa-pp-cli corpus build --all "accesso generalizzato" --plan --out ./corpus
   giustizia-amministrativa-pp-cli corpus build --all "accesso generalizzato" --skip-existing --front-matter --out ./corpus`, "\n"),
-		Annotations: map[string]string{"mcp:read-only": "false"},
+		Annotations: map[string]string{"mcp:read-only": "false", "pp:happy-args": "--ids=ECLI:IT:CDS:2020:4665SENT;--out=./corpus-dogfood"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if gaSkip(flags) {
-				return nil
+				return emitSkip(cmd, flags)
 			}
 			if out == "" {
 				return fmt.Errorf("specifica la cartella di destinazione con --out")

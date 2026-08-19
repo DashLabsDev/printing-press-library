@@ -29,7 +29,14 @@ func newNovelGetCmd(flags *rootFlags) *cobra.Command {
   giustizia-amministrativa-pp-cli get IT:TARLAZ:2026:11307SENT --front-matter=false
   giustizia-amministrativa-pp-cli get IT:TARLAZ:2026:11307SENT --json
   giustizia-amministrativa-pp-cli get --sede tar_rm --nrg 202600422 --file 202611307_01.html`, "\n"),
-		Annotations: map[string]string{"mcp:read-only": "true"},
+		// pp:happy-args da argomenti veri al posizionale, altrimenti il gate phase5
+		// segna il comando come 'hollow coverage': mai eseguito davvero nella
+		// matrice live. Serve la forma autosufficiente --sede/--nrg/--file: il solo
+		// ECLI richiede che il provvedimento sia gia' nello store locale, che su una
+		// macchina pulita e' vuoto, e il comando esce 1. Tutto per flag, --id
+		// compreso: il posizionale qui e' dichiarato `get [id]` fra quadre e non
+		// viene raccolto, a differenza del `run <nome>` di watch.
+		Annotations: map[string]string{"mcp:read-only": "true", "pp:happy-args": "--id=ECLI:IT:CDS:2026:6289SENT;--sede=cds;--nrg=202601334;--file=202606289_11.html"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
 				id = args[0]

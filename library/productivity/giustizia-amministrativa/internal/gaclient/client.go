@@ -30,7 +30,7 @@ const (
 	// portletID is the matching p_p_id value.
 	portletID = "decisioni_pareri_web_DecisioniPareriWebPortlet_INSTANCE_XKc17mrB8J10"
 
-	defaultUA       = "giustizia-amministrativa-pp-cli/0.1.0 (+https://github.com/aborruso)"
+	defaultUA       = "github.com/mvanhorn/printing-press-library/library/productivity/giustizia-amministrativa/0.1.0 (+https://github.com/aborruso)"
 	defaultPageSize = 10
 	// politeRate keeps requests gentle against a public institutional site.
 	politeRate = 2.0

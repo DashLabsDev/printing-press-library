@@ -1,5 +1,64 @@
 # LOG
 
+## 2026-08-18 — primo uso del bundle MCPB in Claude Desktop
+
+### `data_deposito` e' sempre vuoto in ricerca, e nessuno lo dice
+
+Misurato: 37 risultati su 37, sedi diverse, `data_deposito: ""`. Non e' un bug del
+parsing. La data si ricava con `ExtractDataDeposito(docHTML)` (`internal/cli/ga_core.go:353`),
+cioe' leggendo il documento: l'indice di ricerca del portale non la espone, e il campo si
+popola solo dove il testo c'e' gia' — `get`, `massime`, `corpus build`.
+
+Il difetto e' nel segnale, non nel dato: in ricerca il campo esce come stringa vuota, e chi
+legge non distingue «il portale non la fornisce a questo endpoint» da «questo provvedimento
+non ha data». Stessa forma dei problemi chiusi con la #1675 — una risposta plausibile che non
+dichiara la propria incompletezza. Costo concreto osservato: per ordinare 22 pronunce per data
+servirebbero 22 `get`, cioe' 22 documenti interi scaricati per ricavare una colonna. In Desktop
+il modello ha ripiegato da solo su store locale piu' una query mirata, dopo tre chiamate.
+
+**Corretto** nel branch `fix/avvisi-ricerca-e-stats-sede` (`c09c3fd`). Premessa verificata
+prima di scrivere codice, non assunta: catturato l'HTML reale della ricerca e ispezionato il
+blocco `<article class="ricerca--item">` — nessuna data, in nessun formato. Se il portale
+l'avesse fornita sotto un nome non mappato, il fix sarebbe stato una riga di mapping e questa
+voce sbagliata.
+
+La nota va **solo su stderr**. Metterla fra gli `avvisi` dell'envelope faceva scattare
+l'incapsulamento su ogni ricerca — e' una proprieta' costante dell'endpoint, non un risultato
+parziale — e l'array nudo di `--json` spariva per chiunque: misurato, `type` da `array` a
+`object`. Il client MCP la riceve lo stesso, perche' `warningsFromStderr` raccoglie le righe
+con prefisso `Nota: `.
+
+Corretto nello stesso branch anche `stats --by sede` senza `--sede-sweep`: non tronca
+soltanto, **distorce**, perche' l'ordine del portale e' proprio quello delle sedi. Roma 29
+contro 65, Brescia 4 contro 11, sedi piccole invariate. L'avviso di troncamento ora lo dice e
+indica lo sweep.
+
+### Verificato per via indipendente: `stats --by sede --sede-sweep` e' onesto
+
+Desktop ha risposto 167 pronunce 2026 su «accesso civico generalizzato», Roma 65, CdS 22,
+Napoli 19, Brescia 11. La CLI locale con gli stessi filtri da gli stessi numeri, somma 167,
+`conteggi_da: "totali dichiarati dal portale per sede"`. **Senza `--sede-sweep` il confronto
+non vale**: il campione unico e' ordinato per sede e taglia Roma a 29 su 65 — ci sono cascato
+verificando, ed e' esattamente l'errore che lo sweep esiste per evitare.
+
+Nota: i 48 gemelli raggruppati nel campione unico diventano 7 sotto sweep, perche' i ricorsi
+identici si distribuiscono fra sedi diverse.
+
+### Repo personale: 20 commit fermi sul disco per otto giorni
+
+`main` locale era `ahead 20` su `origin`, con il lavoro gia' mergiato nel catalogo (#1675).
+Il publish impacchetta la directory, non il remote, quindi la pubblicazione non se n'era
+accorta: mancava solo il backup. Pushato. `PUBBLICARE.md` aggiornato — allineare vuol dire
+anche pushare, e `main` avanti su `origin` non e' un ritardo da curare con `pull`.
+
+Cancellati i tre cloni gestiti del publish (391 MB): tutte le PR mergiate, ogni branch gia' su
+`origin`, nessun file non tracciato. Il disco resta al 99%.
+
+### Log MCP di Claude Desktop (per debug del bundle)
+
+`%APPDATA%\Claude\logs\mcp.log` — da WSL, sotto
+`/mnt/c/Users/<utente>/AppData/Roaming/Claude/logs/`.
+
 ## 2026-08-08 (sera) — emboss: due difetti reali, e quattro allarmi che non lo erano
 
 ### Da dove riprendere

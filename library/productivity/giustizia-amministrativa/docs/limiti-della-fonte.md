@@ -51,6 +51,8 @@ Il campo `data_deposito` esiste nello schema dei risultati ma il motore lo lasci
 
 Si recupera in due modi: dal testo integrale, dove compare come "Pubblicato il GG/MM/AAAA" oppure "DEPOSITATA IN SEGRETERIA / Il GG/MM/AAAA" — `get` e `corpus build` leggono entrambe le diciture, anche nei PDF; e dagli open data, campo `DATA_PUBBLICAZIONE`, in formato ISO.
 
+Dal 2026-08-18 la ricerca lo dichiara invece di lasciarlo dedurre: quando le righe escono senza data, una nota su stderr — e nel campo `avvisi` per i client MCP — dice che il portale non espone il campo a questo endpoint e da dove si ottiene. Verificato sull'HTML dei risultati: la data non compare in alcun formato, quindi non è un campo che il parser trascura.
+
 # Duplicati e record malformati
 
 Il portale restituisce talvolta lo stesso provvedimento più volte, righe con ECLI vuoto — non recuperabili a valle, perché `get` e `corpus build --ids` lavorano su ECLI — e occasionali record spazzatura: osservato un `nrg` a 100000000 con allegato `.docx`.

@@ -38,13 +38,13 @@ type Provvedimento struct {
 	// snippet were folded into this one (ricorsi gemelli: multiple parties
 	// challenging the same provvedimento). It holds the total group size;
 	// the folded siblings are omitted from the result list.
-	Duplicati int `json:"duplicati,omitempty"`
+	Duplicati    int    `json:"duplicati,omitempty"`
 	// MatchCount is set (>0) when the full text was found in the local store
 	// and the search terms were counted in it. It distinguishes "1 match in
 	// an obiter" from "12 matches in the dispositivo" — the portal's snippet
 	// shows only one occurrence, so relevance is invisible without it.
 	// Absent when the text is not cached (first search on a fresh store).
-	MatchCount int `json:"match_count,omitempty"`
+	MatchCount   int    `json:"match_count,omitempty"`
 }
 
 var (

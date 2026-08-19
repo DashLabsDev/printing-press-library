@@ -30,7 +30,7 @@ const (
 func RegisterTools(s *server.MCPServer) {
 	s.AddTool(
 		mcplib.NewTool("provvedimenti_cerca",
-			mcplib.WithDescription("Cerca provvedimenti per testo, tipo, sede, anno, numero o NRG. Optional: testo, phrase, tipo, sede, sede-sweep (plus 9 more). Returns array of Provvedimento."),
+			mcplib.WithDescription("Cerca provvedimenti per testo, tipo, sede, anno, numero o NRG. Optional: testo, phrase, tipo, sede, sede-sweep (plus 9 more). Returns the provvedimenti; quando la CLI emette avvisi il risultato e' {count, items, avvisi} invece dell'array nudo. La data di deposito non e' fra i dati restituiti: il portale non la espone in ricerca, e arriva vuota su ogni riga. Per averla usa provvedimenti_get sul singolo provvedimento, oppure corpus_build, che la scrive nel manifest."),
 			mcplib.WithString("testo", mcplib.Description("Ricerca full-text libera (parole in AND, ordine e adiacenza non contano: puo' agganciare corrispondenze casuali, es. 'civico' su un numero civico invece che su 'accesso civico').")),
 			mcplib.WithString("phrase", mcplib.Description("Cerca le parole come locuzione esatta, adiacenti e nell'ordine dato (--phrase sulla CLI). Piu' preciso di testo per un istituto giuridico con nome fisso (es. 'accesso civico generalizzato'): riduce i falsi positivi.")),
 			mcplib.WithString("tipo", mcplib.Description("Tipo: sentenza, ordinanza, decreto, parere, plenaria, generale.")),
