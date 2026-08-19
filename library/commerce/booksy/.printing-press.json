@@ -63,6 +63,11 @@
       "name": "Cheapest haircut nearby",
       "command": "cheapest",
       "description": "Scan search results in a city and rank businesses by the cheapest service matching your query (e.g. haircut), with rating alongside price."
+    },
+    {
+      "name": "Cancel appointment",
+      "command": "cancel",
+      "description": "Cancel one of your Booksy appointments by id — previews the appointment first and only cancels with --confirm."
     }
   ],
   "novel_features_built": [
