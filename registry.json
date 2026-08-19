@@ -4926,9 +4926,9 @@
       "path": "library/marketing/dataforseo",
       "release": {
         "cli_name": "dataforseo-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-21T05:40:08Z",
-        "source_commit": "14529fb037d1b0345280dba2013667e996eb228f"
+        "version": "2026.8.1",
+        "released_at": "2026-08-18T18:57:59Z",
+        "source_commit": "a29aa29d089080aa13398d96d1a90c4a09db06e2"
       },
       "printer": "Mazzsterr",
       "printer_name": "Mazzsterr",
@@ -7682,9 +7682,9 @@
       "path": "library/media-and-entertainment/foxnews",
       "release": {
         "cli_name": "foxnews-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-08T18:21:21Z",
-        "source_commit": "11d7b4ea752c9c8fb8909037133058eb57560cc0"
+        "version": "2026.8.1",
+        "released_at": "2026-08-18T18:57:59Z",
+        "source_commit": "a29aa29d089080aa13398d96d1a90c4a09db06e2"
       },
       "printer": "john-fiedler",
       "printer_name": "John Fiedler",
@@ -7791,9 +7791,9 @@
       "path": "library/developer-tools/framer",
       "release": {
         "cli_name": "framer-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-18T18:57:59Z",
+        "source_commit": "a29aa29d089080aa13398d96d1a90c4a09db06e2"
       },
       "printer": "ioncom",
       "printer_name": "ioncom",
@@ -11762,6 +11762,52 @@
       }
     },
     {
+      "name": "logitech-docs",
+      "category": "devices",
+      "api": "Logitech",
+      "description": "Every Logitech manual, spec sheet, and install guide — searchable offline, agent-native, no browser.",
+      "search_terms": [
+        "logitech-docs",
+        "Logitech",
+        "logitech-docs-pp-cli",
+        "Every Logitech manual, spec sheet, and install guide — searchable offline, agent-native, no browser.",
+        "Friendly doc-type search",
+        "docs",
+        "Search Logitech support docs by friendly type: spec sheet, manual, install guide, FAQ, download, warranty.",
+        "Offline full-text search",
+        "find",
+        "Full-text search inside synced manuals and spec sheets from the local store.",
+        "Download resolver",
+        "download",
+        "Resolve download01.logi.com file links in an article and fetch them (with --dry-run and local cache).",
+        "Spec comparison",
+        "compare",
+        "Side-by-side spec comparison between two products from synced spec sheets."
+      ],
+      "path": "library/devices/logitech-docs",
+      "printer": "Drummerms",
+      "printer_name": "drummerms",
+      "creator": {
+        "handle": "Drummerms",
+        "name": "drummerms"
+      },
+      "mcp": {
+        "binary": "logitech-docs-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 6,
+        "public_tool_count": 6,
+        "auth_type": "none",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "loopnet",
       "category": "commerce",
       "api": "Loopnet",
@@ -13310,9 +13356,9 @@
       "path": "library/developer-tools/npm",
       "release": {
         "cli_name": "npm-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-18T18:57:59Z",
+        "source_commit": "a29aa29d089080aa13398d96d1a90c4a09db06e2"
       },
       "printer": "hnshah",
       "printer_name": "Hiten Shah",
@@ -14115,9 +14161,9 @@
       "path": "library/ai/openart",
       "release": {
         "cli_name": "openart-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T05:47:06Z",
-        "source_commit": "d6b74e6df2b2c66612e1f6e29433c0c0aae531e6"
+        "version": "2026.8.2",
+        "released_at": "2026-08-18T18:57:59Z",
+        "source_commit": "a29aa29d089080aa13398d96d1a90c4a09db06e2"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -16072,9 +16118,9 @@
       "path": "library/payments/prediction-goat",
       "release": {
         "cli_name": "prediction-goat-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-18T18:57:59Z",
+        "source_commit": "a29aa29d089080aa13398d96d1a90c4a09db06e2"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -17832,9 +17878,9 @@
       "path": "library/other/scientific-consensus",
       "release": {
         "cli_name": "scientific-consensus-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T08:21:18Z",
-        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
+        "version": "2026.8.3",
+        "released_at": "2026-08-18T18:58:49Z",
+        "source_commit": "54e2a636de822ae1339ee8b7654eaef7297740bd"
       },
       "printer": "laci141",
       "printer_name": "laci141",
@@ -22250,9 +22296,9 @@
       "path": "library/other/ufo-goat",
       "release": {
         "cli_name": "ufo-goat-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T08:21:18Z",
-        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
+        "version": "2026.8.3",
+        "released_at": "2026-08-18T18:57:59Z",
+        "source_commit": "a29aa29d089080aa13398d96d1a90c4a09db06e2"
       },
       "printer": "davemorin",
       "printer_name": "Dave Morin",
@@ -23254,6 +23300,12 @@
         "One row per site you have synced locally: pages, collections, unpublished items, SEO findings, days since last publish."
       ],
       "path": "library/developer-tools/webflow",
+      "release": {
+        "cli_name": "webflow-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-18T18:50:34Z",
+        "source_commit": "2def5d034d580612a47ad8db5917e3f10ba73fbe"
+      },
       "printer": "kmorebetter",
       "printer_name": "Kerry Morrison",
       "creator": {
@@ -23936,9 +23988,9 @@
       "path": "library/developer-tools/yeswehack",
       "release": {
         "cli_name": "yeswehack-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-18T18:57:59Z",
+        "source_commit": "a29aa29d089080aa13398d96d1a90c4a09db06e2"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
