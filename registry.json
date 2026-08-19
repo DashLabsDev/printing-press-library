@@ -2969,7 +2969,10 @@
         "Compare several businesses side by side on rating, review count, and cheapest matching service price — from the local cache.",
         "Cheapest haircut nearby",
         "cheapest",
-        "Scan search results in a city and rank businesses by the cheapest service matching your query (e.g. haircut), with rating alongside price."
+        "Scan search results in a city and rank businesses by the cheapest service matching your query (e.g. haircut), with rating alongside price.",
+        "Cancel appointment",
+        "cancel",
+        "Cancel one of your Booksy appointments by id — previews the appointment first and only cancels with --confirm."
       ],
       "path": "library/commerce/booksy",
       "release": {
@@ -11785,6 +11788,12 @@
         "Side-by-side spec comparison between two products from synced spec sheets."
       ],
       "path": "library/devices/logitech-docs",
+      "release": {
+        "cli_name": "logitech-docs-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-19T09:13:23Z",
+        "source_commit": "4e0bc616b5df55beeae3b58eee9ada517e5c70da"
+      },
       "printer": "Drummerms",
       "printer_name": "drummerms",
       "creator": {
