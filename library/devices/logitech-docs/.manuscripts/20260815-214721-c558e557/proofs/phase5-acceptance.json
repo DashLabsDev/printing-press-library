@@ -4,15 +4,15 @@
   "run_id": "20260815-214721-c558e557",
   "status": "pass",
   "level": "full",
-  "matrix_size": 96,
-  "tests_passed": 96,
+  "matrix_size": 100,
+  "tests_passed": 100,
   "tests_skipped": 73,
   "tests_unverified": 73,
   "auth_context": {
     "type": "none",
     "api_key_available": true
   },
-  "source_fingerprint": "f85e567d885ecf85d76d74f9c8e0d56d6e8190ae449843b186d8ba1aadee6734",
+  "source_fingerprint": "3d173bc46fb501e35c5b0b9f714304dd7adfd899c9e3f74f3afce0b29cd307cc",
   "source_files": {
     "cmd/logitech-docs-pp-cli/main.go": "d8ab95b5ba789c20f75c0ec21cfb4f392605faa9cf9e9d6545890d64f89d8552",
     "cmd/logitech-docs-pp-mcp/main.go": "4579e4cd6ffe927f10a8bdbdc3d23cbedd26a95a0f393cd413bfc59b92333f89",
@@ -22,7 +22,7 @@
     "internal/cli/agent_context.go": "be8b264c0065ab1d40961f3ed18a913617f81e04f678d85bf8205d0d33c41c16",
     "internal/cli/api_discovery.go": "80f39196f18b4815986ebc7499272446d54e66def029ea49264ff6890059e638",
     "internal/cli/articles.go": "a7f85c62e7dbdfd04870a71ea5e787cbcaa47b4cbbae77e96f4b4fc9401d6ba9",
-    "internal/cli/articles_by_section.go": "91206a53ef874c14076f8a89591d6decb314d3aa87bb9fb228155cd44efcee57",
+    "internal/cli/articles_by_section.go": "f2ff15f8a8c86c65974a9dd786645b7509f8e514d216d37d108974488abf6992",
     "internal/cli/articles_get.go": "e118adf5282958f6c6b27385563ea2faa842125e26eed8ecc5e8b7908a3c77e7",
     "internal/cli/articles_list.go": "90f80920e4b1bca5ce236e65b9809d49bcc70592189ba7c30083ed570e12c9de",
     "internal/cli/articles_pagination_test.go": "a1038ccc333ad315cedc708762f9c5655e9c63480a8b7833940c148b6ef549d4",
@@ -38,7 +38,7 @@
     "internal/cli/download.go": "9c4594846af4fa1b2aee694b25dd77a9f92ccba31d84362357a19bb42f729651",
     "internal/cli/download_test.go": "7d251ccb854f606b448cd97ba4be6d768a3e562e02f6a4d08c7b93fb313ffae2",
     "internal/cli/export.go": "791a194fdc1b585866723f455c2422db88b4b24a7c4ee9e910234f9039017a8a",
-    "internal/cli/feedback.go": "c55c24baf58b05a3d14a77fcaf66244faca04675a5dbbe65463fc73ea5c127ec",
+    "internal/cli/feedback.go": "1b24a0bf4ac1ade5971ebf3d769fc8edb951e32dd8db27a62a72bcd0785f1bae",
     "internal/cli/find.go": "45239970aae86984b7347d0a961dd82f911f6d9f3aca959b3ba2645f3fe07339",
     "internal/cli/find_test.go": "af6fde688d6cb5f96a3e824e472e6ff3bb9df2ee4e33f7a8b815e37e41ba26e5",
     "internal/cli/helpers.go": "88f8e0ba896e01978c4888d461f0e4e5d243affc1c963c7f774999977d989246",
@@ -144,9 +144,9 @@
     "internal/mcp/cobratree/classify.go": "144edba744adc9aa9a42e767d2ab0e4912972bb68526b4c3347aafd7a58d1af2",
     "internal/mcp/cobratree/cli_path.go": "3e9eb304713303a052a0373bf966466c0a770540e383bf88f93ec4970563f550",
     "internal/mcp/cobratree/names.go": "0060e36e0a5414aa20fb208c127e219922f0055d23d9743d2efb99a4394ba5c9",
-    "internal/mcp/cobratree/shellout.go": "494d852b605600d4328d6fba685a1be77d71fe7572f92de357d5b69ca820344f",
-    "internal/mcp/cobratree/shellout_test.go": "6d294093927661e9c26ce81e5700d3a9f2bcbaeb994e98368bf4aa3ba9ff3677",
-    "internal/mcp/cobratree/typemap.go": "1ffe861e81fd356072526a94816d3d0f49ff818f7a011804b2409a96cbd81fc4",
+    "internal/mcp/cobratree/shellout.go": "1ea787251636eb12b06763a8db50910087e299fcf8834f6452b9197e8af8089b",
+    "internal/mcp/cobratree/shellout_test.go": "8cdb186a927344ba70928c071808b46880ddf6d500ba35ba4483dcc36c23d8ea",
+    "internal/mcp/cobratree/typemap.go": "8be12ad414c65337efa2ee104757b358de76c44589e8393a152a5b11e12a8ee4",
     "internal/mcp/cobratree/walker.go": "a7d36b9dbc39792f47dc7d0c0a9a53d920e4b7a9e4c735e6f61ac0fd5d48cf09",
     "internal/mcp/intents.go": "c7f3d35ca14da4a79aa915f2ea335be924f49945b7828816ad4e7accbe71d5a2",
     "internal/mcp/platform_gate.go": "9fe9664e0d45d0adb6080f6fc5bc807fe1cd36ebf831bfc60945022f2a98f278",
@@ -177,6 +177,6 @@
     "internal/store/store.go": "fda1a001d1721c4d4d68d63aff31a1179015ca1212662ba0c818a45ab2b8ae6f",
     "internal/store/upsert_batch_test.go": "5a09f97f9c7a6de93fc697c288be6d09451ec00c642684c1a78c3f044c6078ac",
     "internal/types/types.go": "13ffd460feb519b154d24b4f7fd748961b65938540b578f52575d58f58f06704",
-    "spec.yaml": "296e1c7146ced227c6ed9677ea282adcf4585d5e126bfee120ccb6f51c1fe197"
+    "spec.yaml": "4b43f68a70bebf0e8219395b4d0ea416f797790ca531f6c0640eb5e522a93795"
   }
 }

@@ -203,6 +203,19 @@ func blockedStructuredArgsForCommand(cmd *cobra.Command) map[string]bool {
 			blocked[flag.Name] = true
 		}
 	})
+	// Host-file sinks are blocked for every tool, read-only or not: they let a
+	// caller pick an arbitrary path for os.Create rather than performing the
+	// command's own domain write.
+	markHostFileSinkFlags := func(flag *pflag.Flag) {
+		if flag == nil || flag.Hidden || flag.Deprecated != "" {
+			return
+		}
+		if hostFileSinkFlags[flag.Name] {
+			blocked[flag.Name] = true
+		}
+	}
+	cmd.NonInheritedFlags().VisitAll(markHostFileSinkFlags)
+	cmd.InheritedFlags().VisitAll(markHostFileSinkFlags)
 	if isMCPReadOnly(cmd) {
 		markWriteSinkFlags := func(flag *pflag.Flag) {
 			if flag == nil || flag.Hidden || flag.Deprecated != "" {

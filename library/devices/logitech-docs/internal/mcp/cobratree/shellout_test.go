@@ -910,3 +910,35 @@ func toolResultText(result *mcplib.CallToolResult) string {
 	}
 	return text.Text
 }
+
+// TestExportOutputFlagIsBlockedForMCP covers the Greptile finding that the
+// export command's --output flag reached os.Create with a caller-chosen path.
+// export is not annotated mcp:read-only (writing is its job), so the read-only
+// write-sink guard never applied to it, and --output is a per-command flag so
+// blockedRootFlags did not either. It must be absent from both the tool schema
+// and the argv the shell-out layer builds.
+func TestExportOutputFlagIsBlockedForMCP(t *testing.T) {
+	exportCmd := &cobra.Command{Use: "export", Short: "Export data"}
+	var out, format string
+	exportCmd.Flags().StringVarP(&out, "output", "o", "", "Output file path (default: stdout)")
+	exportCmd.Flags().StringVar(&format, "format", "", "Output format")
+
+	blocked := blockedStructuredArgsForCommand(exportCmd)
+	if !blocked["output"] {
+		t.Error("export --output is not blocked; an MCP caller could create or truncate any process-writable host file")
+	}
+	if blocked["format"] {
+		t.Error("--format was blocked; only host-file sinks should be")
+	}
+
+	argv := cliArgsFromMCP(map[string]any{"output": "/etc/passwd", "format": "json"}, blocked)
+	for _, a := range argv {
+		if strings.Contains(a, "output") || strings.Contains(a, "/etc/passwd") {
+			t.Errorf("argv leaked the blocked output sink: %v", argv)
+		}
+	}
+	joined := strings.Join(argv, " ")
+	if !strings.Contains(joined, "format") {
+		t.Errorf("argv dropped an allowed flag: %v", argv)
+	}
+}

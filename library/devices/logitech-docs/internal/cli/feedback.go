@@ -108,6 +108,8 @@ POSTed as JSON after the local write.
 Write what surprised you or tripped you up, not a bug report. The
 loop is: agent notices friction -> one invocation -> captured -> the
 maintainer sees it.`,
+		Example: "  logitech-docs-pp-cli feedback \"the docs search needs a --lang flag\"\n" +
+			"  echo \"typo in install guide\" | logitech-docs-pp-cli feedback --stdin",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var text string
 			if useStdin {

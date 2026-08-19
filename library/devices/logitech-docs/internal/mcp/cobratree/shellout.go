@@ -221,6 +221,22 @@ var readOnlyWriteSinkFlags = map[string]bool{
 	"save": true,
 }
 
+// hostFileSinkFlags are flags whose only purpose is to redirect a command's
+// payload into a caller-named host file. Unlike readOnlyWriteSinkFlags these
+// are blocked for EVERY shell-out tool, not just the read-only ones, because
+// the mutation they enable is not the command's own domain write — it is
+// "create or truncate this arbitrary path". `export --output` reaches
+// os.Create directly, so an MCP caller could clobber any process-writable
+// file on the host.
+//
+// Blocking costs the MCP caller nothing: RunCLICommand captures stdout and
+// returns it as the tool result, and export writes to stdout when --output is
+// omitted. The agent still gets the full export payload; it just cannot choose
+// where the host writes it.
+var hostFileSinkFlags = map[string]bool{
+	"output": true,
+}
+
 func cliArgsFromMCP(args map[string]any, blocked map[string]bool) []string {
 	keys := make([]string, 0, len(args))
 	for k := range args {

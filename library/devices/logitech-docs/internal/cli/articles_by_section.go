@@ -19,8 +19,8 @@ func newArticlesBySectionCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "by-section <section_id>",
 		Short:       "List articles in one section (server-side scoped)",
-		Example:     "  logitech-docs-pp-cli articles by-section 550e8400-e29b-41d4-a716-446655440000",
-		Annotations: map[string]string{"pp:endpoint": "articles.by_section", "pp:method": "GET", "pp:path": "/api/v2/help_center/en-us/sections/{section_id}/articles.json", "mcp:read-only": "true"},
+		Example:     "  logitech-docs-pp-cli articles by-section 360004159593",
+		Annotations: map[string]string{"pp:endpoint": "articles.by_section", "pp:method": "GET", "pp:path": "/api/v2/help_center/en-us/sections/{section_id}/articles.json", "mcp:read-only": "true", "pp:happy-args": "section_id=360004159593"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {
 				// A missing required positional is a usage error in every output
