@@ -17,6 +17,7 @@ func newLedgerShowCmd(flags *rootFlags) *cobra.Command {
 		Use:         "show <id>",
 		Short:       "Show one ledger entry with target proofs and rollback hints",
 		Example:     "  devonthink-pp-cli ledger show 550e8400-e29b-41d4-a716-446655440000",
+		Args:        requireUUIDArgument("id"),
 		Annotations: map[string]string{"pp:endpoint": "ledger.show", "pp:method": "GET", "pp:path": "/ledger/{id}", "mcp:read-only": "true"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {

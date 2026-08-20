@@ -18,6 +18,7 @@ func newRecordsRelatedCmd(flags *rootFlags) *cobra.Command {
 		Use:         "related <uuid>",
 		Short:       "Find related records using DEVONthink similarity",
 		Example:     "  devonthink-pp-cli records related 550e8400-e29b-41d4-a716-446655440000",
+		Args:        requireUUIDArgument("uuid"),
 		Annotations: map[string]string{"pp:endpoint": "records.related", "pp:method": "GET", "pp:path": "/records/{uuid}/related", "mcp:read-only": "true"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {

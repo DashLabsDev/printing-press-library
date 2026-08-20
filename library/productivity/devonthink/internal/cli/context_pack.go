@@ -15,6 +15,7 @@ func newNovelContextPackCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "pack",
 		Short:       "Build a compact evidence packet from records, selections, highlights, links, and related items.",
+		Example:     "  devonthink-pp-cli context pack --limit 10 --token-budget 4000",
 		Annotations: map[string]string{"mcp:read-only": "true"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			c, err := flags.newClient()

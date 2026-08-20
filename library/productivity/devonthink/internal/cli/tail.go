@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"slices"
 	"syscall"
 	"time"
 
@@ -55,6 +56,9 @@ native streaming instead of polling.`,
 			}
 			if resource == "" {
 				return fmt.Errorf("resource name required (e.g., 'tail messages')")
+			}
+			if !isTailKnownResource(resource) {
+				return usageErr(fmt.Errorf("unknown tail resource %q", resource))
 			}
 
 			c, err := flags.newClient()
@@ -118,6 +122,7 @@ func tailKnownResources() []string {
 		"batch",
 		"context",
 		"databases",
+		"events",
 		"graph",
 		"groups",
 		"ingest",
@@ -125,6 +130,7 @@ func tailKnownResources() []string {
 		"ledger",
 		"mcp",
 		"media",
+		"messages",
 		"mirror",
 		"privacy",
 		"records",
@@ -133,6 +139,10 @@ func tailKnownResources() []string {
 		"sheets",
 		"tags",
 	}
+}
+
+func isTailKnownResource(resource string) bool {
+	return slices.Contains(tailKnownResources(), resource)
 }
 
 func fetchAndEmit(ctx context.Context, c interface {

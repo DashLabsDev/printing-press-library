@@ -16,6 +16,7 @@ func newNovelInventoryExportCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "export",
 		Short:       "Export DEVONthink databases, groups, tags, and document metadata for maintenance plugins.",
+		Example:     "  devonthink-pp-cli inventory export --format maintenance --limit 100",
 		Annotations: map[string]string{"mcp:read-only": "true"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			c, err := flags.newClient()

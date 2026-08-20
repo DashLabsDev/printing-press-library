@@ -17,6 +17,7 @@ func newRecordsVersionsCmd(flags *rootFlags) *cobra.Command {
 		Use:         "versions <uuid>",
 		Short:       "List saved record versions",
 		Example:     "  devonthink-pp-cli records versions 550e8400-e29b-41d4-a716-446655440000",
+		Args:        requireUUIDArgument("uuid"),
 		Annotations: map[string]string{"pp:endpoint": "records.versions", "pp:method": "GET", "pp:path": "/records/{uuid}/versions", "mcp:read-only": "true"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {

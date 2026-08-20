@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/mvanhorn/printing-press-library/library/productivity/devonthink/internal/client"
+	"github.com/mvanhorn/printing-press-library/library/productivity/devonthink/internal/store"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"io"
@@ -27,6 +28,15 @@ import (
 var As = errors.As
 
 const paginatedGetMaxPages = 100
+
+func requireUUIDArgument(name string) cobra.PositionalArgs {
+	return func(_ *cobra.Command, args []string) error {
+		if len(args) > 0 && !store.IsUUID(args[0]) {
+			return usageErr(fmt.Errorf("%s must be a UUID", name))
+		}
+		return nil
+	}
+}
 
 func formatCLIParamValue(v any) string {
 	if f, ok := v.(float64); ok {

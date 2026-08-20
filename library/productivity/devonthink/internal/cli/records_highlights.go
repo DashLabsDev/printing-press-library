@@ -17,6 +17,7 @@ func newRecordsHighlightsCmd(flags *rootFlags) *cobra.Command {
 		Use:         "highlights <uuid>",
 		Short:       "Extract highlights and annotations",
 		Example:     "  devonthink-pp-cli records highlights 550e8400-e29b-41d4-a716-446655440000",
+		Args:        requireUUIDArgument("uuid"),
 		Annotations: map[string]string{"pp:endpoint": "records.highlights", "pp:method": "GET", "pp:path": "/records/{uuid}/highlights", "mcp:read-only": "true"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {

@@ -18,6 +18,7 @@ func newRecordsContentCmd(flags *rootFlags) *cobra.Command {
 		Use:         "content <uuid>",
 		Short:       "Extract text content with length and redaction controls",
 		Example:     "  devonthink-pp-cli records content 550e8400-e29b-41d4-a716-446655440000",
+		Args:        requireUUIDArgument("uuid"),
 		Annotations: map[string]string{"pp:endpoint": "records.content", "pp:method": "GET", "pp:path": "/records/{uuid}/content", "mcp:read-only": "true"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {

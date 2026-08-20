@@ -18,6 +18,7 @@ func newSheetsPromotedCmd(flags *rootFlags) *cobra.Command {
 		Short:       "Read a sheet as structured rows",
 		Long:        "Read a sheet as structured rows",
 		Example:     "  devonthink-pp-cli sheets 550e8400-e29b-41d4-a716-446655440000",
+		Args:        requireUUIDArgument("uuid"),
 		Annotations: map[string]string{"pp:endpoint": "sheets.get", "pp:method": "GET", "pp:path": "/sheets/{uuid}", "mcp:read-only": "true"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			c, err := flags.newClient()

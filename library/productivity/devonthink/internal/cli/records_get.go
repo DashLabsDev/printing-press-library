@@ -17,6 +17,7 @@ func newRecordsGetCmd(flags *rootFlags) *cobra.Command {
 		Use:         "get <uuid>",
 		Short:       "Get record metadata",
 		Example:     "  devonthink-pp-cli records get 550e8400-e29b-41d4-a716-446655440000",
+		Args:        requireUUIDArgument("uuid"),
 		Annotations: map[string]string{"pp:endpoint": "records.get", "pp:method": "GET", "pp:path": "/records/{uuid}", "mcp:read-only": "true"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {

@@ -14,6 +14,7 @@ func newNovelPrivacyAuditCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "audit",
 		Short:       "Preview what a workflow may expose before content leaves the local machine.",
+		Example:     "  devonthink-pp-cli privacy audit --limit 25",
 		Annotations: map[string]string{"mcp:read-only": "true"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			c, err := flags.newClient()
