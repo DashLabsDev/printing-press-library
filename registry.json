@@ -3802,6 +3802,71 @@
       }
     },
     {
+      "name": "clinical-trials",
+      "category": "health",
+      "api": "ClinicalTrials.gov",
+      "description": "A multi-source clinical-trials intelligence system — aggregates, normalizes, and analyzes trials across ClinicalTrials.gov, EU CTIS, and biomedical sources, with an offline SQLite engine no single-registry tool has.",
+      "search_terms": [
+        "clinical-trials",
+        "ClinicalTrials.gov",
+        "clinical-trials-pp-cli",
+        "A multi-source clinical-trials intelligence system — aggregates, normalizes, and analyzes trials across ClinicalTrials.gov, EU CTIS, and biomedical sources, with an offline SQLite engine no single-registry tool has.",
+        "Emerging therapy detection",
+        "emerging",
+        "See the fastest-growing trial categories for a disease area, with percent change.",
+        "Recruitment velocity",
+        "velocity",
+        "Measure how fast a disease area's trials and enrollment are growing over time.",
+        "Drug compare",
+        "compare",
+        "Compare two drugs head-to-head across trial counts, phases, sponsors, and recruiting status.",
+        "Trial risk score",
+        "risk",
+        "Get an explainable risk read on a single trial from termination, enrollment, site count, sponsor track record, and phase factor (earlier phases = higher risk).",
+        "Watch with change diff",
+        "watch",
+        "Track a term and report new, changed, and terminated trials since the last run.",
+        "Sponsor dominance",
+        "sponsors",
+        "Rank who runs the most trials in an area, classified as industry, academic, or government.",
+        "Multi-source merge",
+        "search",
+        "Search a single normalized trial model aggregated and deduplicated across ClinicalTrials.gov, EU CTIS, and OpenAlex.",
+        "Evidence linkage",
+        "evidence",
+        "Link a trial to its publications and citation context via PubMed and OpenAlex.",
+        "Safety signals",
+        "safety",
+        "Surface FDA adverse-event signals for a trial's intervention drug.",
+        "Clinician landscape report",
+        "report",
+        "Compose search, emerging, hotspots, and sponsors into one markdown or CSV briefing for a topic.",
+        "Per-provider health",
+        "health",
+        "Show live status, latency, and failure rate for every data source in the fallback chain."
+      ],
+      "path": "library/health/clinical-trials",
+      "printer": "laci141",
+      "printer_name": "laci141",
+      "creator": {
+        "handle": "laci141",
+        "name": "laci141"
+      },
+      "mcp": {
+        "binary": "clinical-trials-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 9,
+        "public_tool_count": 9,
+        "auth_type": "none",
+        "env_vars": [],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "clockify",
       "category": "productivity",
       "api": "Clockify",
@@ -6950,6 +7015,57 @@
       }
     },
     {
+      "name": "extron",
+      "category": "devices",
+      "api": "Extron",
+      "description": "Every Extron spec sheet and user manual, browsable and searchable offline with revision tracking no other Extron tool has.",
+      "search_terms": [
+        "extron",
+        "extron-pp-cli",
+        "Every Extron spec sheet and user manual, browsable and searchable offline with revision tracking no other Extron tool has.",
+        "Revision drift check",
+        "literature updates",
+        "See which downloaded spec sheets and manuals have a newer revision available upstream, so project shares never run stale docs.",
+        "Doc-set completeness",
+        "catalog completeness",
+        "Per-model gap report across Brochure, Declaration of Conformity, Design Guide, Product Guide, Manual, and Revit BIM — see which doc types each model is missing.",
+        "Library what's-new",
+        "literature recent",
+        "Newest Extron literature across the whole library, ordered by date, filterable by category and age.",
+        "BOM doc bundle",
+        "literature rack",
+        "Assemble the full official doc set for every model in a rack bill of materials — report or batch-download in one pass.",
+        "Series grouping",
+        "literature family",
+        "Browse every document for a product family (DTP, MAV, IPL, DVS, ...) across all alphabetical letters at once.",
+        "Download integrity",
+        "catalog verify",
+        "Compare local PDF sizes against the download ledger to flag truncated or mismatched downloads."
+      ],
+      "path": "library/devices/extron",
+      "printer": "Drummerms",
+      "printer_name": "drummerms",
+      "creator": {
+        "handle": "Drummerms",
+        "name": "drummerms"
+      },
+      "mcp": {
+        "binary": "extron-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 1,
+        "public_tool_count": 0,
+        "auth_type": "none",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "faa-registry",
       "category": "travel",
       "api": "FAA Aircraft Registry",
@@ -7619,6 +7735,52 @@
         "mcp_ready": "full",
         "spec_format": "internal"
       }
+    },
+    {
+      "name": "foodpanda",
+      "category": "food-and-dining",
+      "api": "foodpanda",
+      "description": "Every foodpanda restaurant, menu and price in a local database — with cross-restaurant dish search, price history and fee comparison the app cannot do.",
+      "search_terms": [
+        "foodpanda",
+        "foodpanda-pp-cli",
+        "Home delivery-fee board",
+        "home",
+        "Rank every restaurant near your saved home address by what delivery actually costs you.",
+        "Cross-restaurant dish search",
+        "dish",
+        "Find which nearby restaurant sells a specific dish cheapest, searching every synced menu at once.",
+        "Menu and price drift",
+        "menu-diff",
+        "Show what changed in a restaurant's menu and prices between two syncs.",
+        "Commercial posture signals",
+        "posture",
+        "Rank vendors by advertising and placement signals: CPC ad participation, promoted and premium status, and ranking score.",
+        "Delivery coverage test",
+        "coverage",
+        "Determine which vendors actually deliver to an arbitrary point using each vendor's published delivery radius.",
+        "True cost fee board",
+        "fees",
+        "Compare the full cost structure across an area: delivery fee, minimum order, service fee and VAT together.",
+        "Review topic breakdown",
+        "digest",
+        "Split a restaurant's blended star rating into per-topic scores so food quality and delivery quality are separated.",
+        "Cross-market comparison",
+        "market-compare",
+        "Run the same query across every foodpanda market and compare vendor counts, ratings and fees side by side.",
+        "Live search with match confidence",
+        "find",
+        "Search vendors live upstream and label how strongly each result actually matched the query."
+      ],
+      "path": "library/food-and-dining/foodpanda",
+      "printer": "qazmataz",
+      "printer_name": "qazmataz",
+      "contributors": [
+        {
+          "handle": "qazmataz",
+          "name": "qazmataz"
+        }
+      ]
     },
     {
       "name": "forgejo",
@@ -13193,9 +13355,9 @@
       "path": "library/health/nejm",
       "release": {
         "cli_name": "nejm-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-21T04:55:07Z",
+        "source_commit": "8c6c417e7affcead94062c679863e10158c285cc"
       },
       "printer": "laci141",
       "printer_name": "laci141",
@@ -16523,6 +16685,64 @@
       }
     },
     {
+      "name": "psx",
+      "category": "payments",
+      "api": "Pakistan Stock Exchange",
+      "description": "Every PSX data-portal surface in one Go binary, plus the local price history the exchange itself throws away.",
+      "search_terms": [
+        "psx",
+        "Pakistan Stock Exchange",
+        "psx-pp-cli",
+        "Every PSX data-portal surface in one Go binary, plus the local price history the exchange itself throws away.",
+        "Corporate-action digest",
+        "actions",
+        "See every announcement, payout, AGM date and circuit-breaker event for the symbols you track, in one place.",
+        "Snapshot delta",
+        "diff",
+        "Show what changed in price, volume and valuation metrics between two synced snapshots.",
+        "Local watchlist",
+        "watchlist",
+        "Keep a saved symbol set and price it on demand, with change measured from the day you added each name.",
+        "Baseline-relative anomaly scan",
+        "unusual",
+        "Find names trading abnormally against their own trailing history, not just the day's biggest movers.",
+        "Sector rotation",
+        "rotation",
+        "Rank sectors by movement over a window and name the constituents that drove each move.",
+        "Valuation drift",
+        "drift",
+        "Trace one symbol's PE, dividend yield, market cap or free float across time.",
+        "Futures basis",
+        "basis",
+        "Compare futures-board prices against the regular spot board to see premium or discount per symbol.",
+        "Regulatory document search",
+        "docs search",
+        "Search PSX regulatory documents, listing guides and notices by keyword, with last-updated dates."
+      ],
+      "path": "library/payments/psx",
+      "printer": "qazmataz",
+      "printer_name": "qazmataz",
+      "creator": {
+        "handle": "qazmataz",
+        "name": "qazmataz"
+      },
+      "mcp": {
+        "binary": "psx-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 22,
+        "public_tool_count": 22,
+        "auth_type": "none",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "pushover",
       "category": "social-and-messaging",
       "api": "Pushover",
@@ -16717,6 +16937,64 @@
           "QBO_CLIENT_ID",
           "QBO_CLIENT_SECRET",
           "QBO_REALM_ID"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
+      "name": "qsys",
+      "category": "devices",
+      "api": "Q-SYS",
+      "description": "Q-SYS product specs, configuration procedures, and connection guides in one local index - with equipment-list compatibility checks neither QSC website can do.",
+      "search_terms": [
+        "qsys",
+        "Q-SYS",
+        "qsys-pp-cli",
+        "Q-SYS product specs, configuration procedures, and connection guides in one local index - with equipment-list compatibility checks neither QSC website can do.",
+        "Unified product card",
+        "product get",
+        "See a Q-SYS product's overview, spec-sheet text, configuration pages, and connection guidance in one record.",
+        "BOM compatibility check",
+        "compat check",
+        "Check a whole equipment list against a Q-SYS Designer version and get back what is supported and what is not.",
+        "Deprecation sweep",
+        "compat deprecated",
+        "Flag which models in a list are deprecated or discontinued before they reach a quote.",
+        "Connection guidance by model",
+        "connect",
+        "Get the networking, wiring, and I/O guidance that actually applies to a given model.",
+        "BOM sweep — one report per model",
+        "bom verify",
+        "One report per model in an equipment list: version support, EOL status, and spec-sheet availability in a single pass.",
+        "Version-aware page reads",
+        "page get",
+        "Read a help page as of a specific Q-SYS Designer version from the versioned doc tree.",
+        "Extraction coverage report",
+        "coverage",
+        "Report how many products resolved a spec sheet and how many pages parsed, so extraction gaps are visible.",
+        "UC platform integration lookup",
+        "integrations",
+        "Find which UC platforms (Teams, Zoom, Meet) a device is certified or integrated with."
+      ],
+      "path": "library/devices/qsys",
+      "printer": "Drummerms",
+      "printer_name": "drummerms",
+      "creator": {
+        "handle": "Drummerms",
+        "name": "drummerms"
+      },
+      "mcp": {
+        "binary": "qsys-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 10,
+        "public_tool_count": 10,
+        "auth_type": "none",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
         ],
         "mcp_ready": "full",
         "spec_format": "internal"
@@ -24192,26 +24470,38 @@
       "description": "Search YouTube in bulk, grab transcripts, get embed snippets — for the photo-keywords-to-blog-post workflow.",
       "search_terms": [
         "youtube",
-        "Youtube Data",
         "youtube-pp-cli",
-        "Bulk search from stdin",
-        "youtube search-bulk",
-        "Take a list of search terms from stdin or args, return top-N YouTube videos per term in one JSON document with titles, channels, embed URLs, and thumbnails.",
-        "Transcript fetcher",
-        "youtube videos-transcript",
-        "Fetch the spoken-content transcript of a YouTube video using the timedtext endpoint. Works for auto-generated and manual captions on any public video. Caches into the local store.",
-        "Embed snippet generator",
-        "youtube videos-embed",
-        "Print embed HTML, iframe, or markdown-style embed for a video ID. Direct copy-paste into a blog draft.",
-        "Topic-similarity related videos",
-        "youtube videos-related",
-        "Find videos related to a target video using topicDetails + same-channel + tag overlap from the local store. Best-effort replacement for the deprecated relatedToVideoId parameter.",
-        "Top comments by likes",
-        "youtube videos-comments",
-        "Fetch top comments on a video, ranked locally by likeCount. Pulls up to 5 pages from commentThreads.list and sorts so most-liked floats regardless of API order.",
-        "Channel uploads in one call",
-        "youtube channel-uploads",
-        "List a channel's most recent uploads in one call. Resolves @handle or channelId, walks the auto-generated uploads playlist, returns video IDs + titles + publish times."
+        "A self-maintained competitor-monitoring machine for YouTube: full read API coverage plus a local databank of channel histories, snapshots, comments, and packaging assets - market data hours old, not weeks.",
+        "Competitor watchlist",
+        "watch list",
+        "Register the competitor channels your monitoring machine tracks, in a typed watchlist table you own.",
+        "Watchlist monitor",
+        "monitor",
+        "Refresh every watched channel in one run: stats snapshot, new uploads, re-snapshot of recent video statistics.",
+        "Video velocity",
+        "velocity",
+        "See which tracked videos are gaining views fastest right now, computed from real between-snapshot deltas.",
+        "Growth between snapshots",
+        "growth",
+        "Channel-level subscriber, view, and upload-count deltas between dated local snapshots.",
+        "Breakout finder",
+        "breakouts",
+        "Chain search filters into a matrix (terms x upload window x duration x region), join results to channel size, and rank fresh high-momentum videos.",
+        "Comment intelligence",
+        "comments-mine",
+        "Sync comments into a typed full-text-searchable table and report top-liked comments, keyword frequencies, and audience questions.",
+        "Channel history backfill",
+        "backfill",
+        "Pull a channel's complete upload history with statistics into the local databank in one command.",
+        "Packaging collector",
+        "packaging",
+        "Collect titles, thumbnails (downloaded as local image files), and hook text from transcript openings into a packaging table.",
+        "Workspaces",
+        "workspace list",
+        "Named databanks: keep the competitor machine in one database and explore a new niche in another, switching instantly.",
+        "API key ring",
+        "keys list",
+        "Store multiple named YouTube API keys, switch between them instantly, and optionally fail over automatically via --rotate when one runs out of quota."
       ],
       "path": "library/media-and-entertainment/youtube",
       "release": {
@@ -24228,20 +24518,21 @@
       },
       "contributors": [
         {
-          "handle": "giuseppebisemi",
-          "name": "Giuseppe Bisemi"
+          "handle": "vieGPT",
+          "name": "Maximus"
         }
       ],
       "mcp": {
         "binary": "youtube-pp-mcp",
         "transports": [
-          "stdio"
+          "stdio",
+          "http"
         ],
-        "tool_count": 5,
+        "tool_count": 12,
         "public_tool_count": 0,
         "auth_type": "api_key",
         "env_vars": [
-          "YOUTUBE_API_KEY"
+          "PRINTING_PRESS_CLIENT_PROFILE"
         ],
         "mcp_ready": "full",
         "spec_format": "openapi3"
