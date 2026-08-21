@@ -6657,6 +6657,61 @@
       }
     },
     {
+      "name": "etsy-seller-dashboard",
+      "category": "commerce",
+      "api": "Etsy Seller Dashboard",
+      "description": "First-party Etsy demand and marketing evidence, reconciled locally.",
+      "search_terms": [
+        "etsy-seller-dashboard",
+        "Etsy Seller Dashboard",
+        "etsy-seller-dashboard-pp-cli",
+        "First-party Etsy demand and marketing evidence, reconciled locally.",
+        "Listing action queue",
+        "listing action-queue",
+        "Rank listing-level research and marketing review actions from all four synchronized Etsy surfaces.",
+        "Economics reconciliation",
+        "economics reconcile",
+        "Reconcile onsite spend, offsite fees, attributed revenue, and promotion observations without inventing net profit.",
+        "Observed promotion lift",
+        "promotion observed-lift",
+        "Compare one promotion window with an equal-length prior window across promotion, onsite-ad, and offsite observations.",
+        "Acquisition channel gap",
+        "acquisition channel-gap",
+        "Find listings whose separately labeled onsite and offsite efficiency signals diverge.",
+        "Research-quota allocation",
+        "quota allocate",
+        "Prioritize scarce Marketplace Insights searches where stale demand evidence affects the most consequential listing decisions.",
+        "Visibility-performance gap",
+        "listing visibility-gap",
+        "Compare explicit listing-keyword visibility observations with onsite and offsite performance without fabricating keyword revenue.",
+        "Cross-surface anomalies",
+        "growth anomalies",
+        "Detect deterministic weekly outliers and coincident movements across all four synchronized surfaces."
+      ],
+      "path": "library/commerce/etsy-seller-dashboard",
+      "printer": "horknfbr",
+      "printer_name": "horknfbr",
+      "creator": {
+        "handle": "horknfbr",
+        "name": "horknfbr"
+      },
+      "mcp": {
+        "binary": "etsy-seller-dashboard-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 12,
+        "public_tool_count": 0,
+        "auth_type": "cookie",
+        "env_vars": [
+          "ETSY_COOKIE"
+        ],
+        "mcp_ready": "partial",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "eu-tenders",
       "category": "sales-and-crm",
       "api": "EU Tenders",
@@ -8678,6 +8733,73 @@
       }
     },
     {
+      "name": "gmail",
+      "category": "productivity",
+      "api": "Gmail",
+      "description": "Mailbox cleanup that can prove itself — preview, confirm, undo, verify — from a binary that structurally cannot send email.",
+      "search_terms": [
+        "gmail",
+        "gmail-pp-cli",
+        "Mailbox cleanup that can prove itself — preview, confirm, undo, verify — from a binary that structurally cannot send email.",
+        "Unsubscribe compliance check",
+        "unsub verify",
+        "See which senders kept mailing you after a one-click unsubscribe, with an escalation query per violator.",
+        "Requires joining the local unsubscribe ledger against post-unsubscribe arrivals in the synced store — one-click is fire-and-forget in every other tool.",
+        "Mailbox delta report",
+        "delta",
+        "Everything new since your last check: new messages per category and sender, never-seen senders, volume spikes.",
+        "Requires a local checkpoint row plus synced tables — a live API can only re-list, it cannot diff against what was already reported.",
+        "Storage attribution report",
+        "storage report",
+        "Which senders, labels, years, and attachments own your storage, with ready-to-run cleanup queries per row.",
+        "Gmail exposes only a profile total; attribution requires local aggregation over sizeEstimate, labels, and dates.",
+        "Saved cleanup rules",
+        "rules run",
+        "Named local recipes (query plus trash or label action) replayed through the preview-confirm-undo engine as one merged plan.",
+        "Server-side Gmail filters are structurally absent from this binary; a local rulebook replayed through the safe engine is the compliant recurrence path.",
+        "Sort suggestions",
+        "sort suggest",
+        "Senders whose mail you already label consistently, with a generated plan to label the rest the same way.",
+        "Requires majority-label statistics over messages, labels, and senders in the local store — mechanical, LLM-free categorization.",
+        "Trash undo-window watch",
+        "trash report",
+        "What you trashed, grouped by applied plan, with days remaining before Gmail's 30-day purge makes undo impossible.",
+        "Requires the local mutation ledger joined to trash state — the API has no memory of why or when something was trashed.",
+        "Mailbox health score",
+        "score",
+        "Per-account hygiene metrics — unread share, promo share, subscription count, storage headroom — snapshotted over time.",
+        "Requires local aggregates persisted to a snapshots table; week-over-week campaign progress no single API call can report."
+      ],
+      "path": "library/productivity/gmail",
+      "release": {
+        "cli_name": "gmail-pp-cli",
+        "version": "2026.8.3",
+        "released_at": "2026-08-21T08:23:54Z",
+        "source_commit": "7db5af195c10a4c718dd477c76e531925a3000ec"
+      },
+      "printer": "dmarketingllm",
+      "printer_name": "Derik Parkinson",
+      "creator": {
+        "handle": "dmarketingllm",
+        "name": "Derik Parkinson"
+      },
+      "mcp": {
+        "binary": "gmail-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 14,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "GMAIL_OAUTH2C"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "godaddy",
       "category": "developer-tools",
       "api": "GoDaddy",
@@ -9454,6 +9576,10 @@
         {
           "handle": "mvanhorn",
           "name": "Matt Van Horn"
+        },
+        {
+          "handle": "giuseppebisemi",
+          "name": "Giuseppe Bisemi"
         }
       ],
       "mcp": {
@@ -10628,6 +10754,63 @@
       }
     },
     {
+      "name": "immich",
+      "category": "media-and-entertainment",
+      "api": "Immich",
+      "description": "Agent-native control and careful personal-library rituals for a self-hosted Immich instance.",
+      "search_terms": [
+        "immich",
+        "immich-pp-cli",
+        "Agent-native control and careful personal-library rituals for a self-hosted Immich instance.",
+        "Shared event album",
+        "album event",
+        "Create or update a reviewable shared event album from explicit Immich search filters.",
+        "Duplicate resolution plan",
+        "duplicates plan",
+        "Preview native duplicate groups and a deterministic keeper proposal without changing assets.",
+        "Duplicate resolution apply",
+        "duplicates apply",
+        "Resolve selected native duplicate groups only after an explicit apply confirmation.",
+        "Recurring-month people finder",
+        "people july",
+        "Find one or two people across past Julys using real people and metadata search endpoints.",
+        "Memory review queue",
+        "memories review",
+        "List recent native memories with their dates and asset counts for an intentional review.",
+        "Favorites/archive review",
+        "library review",
+        "Review bounded favorite and archived asset search results without mutating the library.",
+        "Stack hygiene review",
+        "stacks review",
+        "Inspect native stacks for empty, singleton, and unusually large groups without changing them.",
+        "Partner and job health",
+        "library health",
+        "Report partner-sharing and worker-queue facts from the configured Immich server."
+      ],
+      "path": "library/media-and-entertainment/immich",
+      "printer": "Avanderheyde",
+      "printer_name": "avanderheyde",
+      "creator": {
+        "handle": "Avanderheyde",
+        "name": "avanderheyde"
+      },
+      "mcp": {
+        "binary": "immich-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 254,
+        "public_tool_count": 0,
+        "auth_type": "api_key",
+        "env_vars": [
+          "IMMICH_API_KEY"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "inaturalist",
       "category": "other",
       "api": "iNaturalist",
@@ -11626,6 +11809,42 @@
           "name": "Trevin Chow"
         }
       ]
+    },
+    {
+      "name": "layers",
+      "category": "productivity",
+      "api": "Layers Digital",
+      "description": "School announcements, agenda events, account context, and a private local search surface in one agent-ready CLI.",
+      "search_terms": [
+        "layers",
+        "Layers Digital",
+        "layers-pp-cli",
+        "School announcements, agenda events, account context, and a private local search surface in one agent-ready CLI.",
+        "Unified local school search",
+        "search",
+        "Search previously synchronized school data across Layers services from one local, pipeable index."
+      ],
+      "path": "library/productivity/layers",
+      "printer": "educrvz",
+      "printer_name": "Edu Cruz",
+      "creator": {
+        "handle": "educrvz",
+        "name": "Edu Cruz"
+      },
+      "mcp": {
+        "binary": "layers-pp-mcp",
+        "transports": [
+          "stdio"
+        ],
+        "tool_count": 16,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
     },
     {
       "name": "lda-gov",
@@ -14634,6 +14853,58 @@
       }
     },
     {
+      "name": "openrouter-image",
+      "category": "ai",
+      "api": "OpenRouter Images",
+      "description": "Every image model on OpenRouter, one key: generate, rank, estimate, and batch with a local cost ledger.",
+      "search_terms": [
+        "openrouter-image",
+        "OpenRouter Images",
+        "openrouter-image-pp-cli",
+        "Every image model on OpenRouter, one key: generate, rank, estimate, and batch with a local cost ledger.",
+        "Capability+budget model ranker",
+        "models rank",
+        "Rank every image model+provider combo cheapest-first under your capability and budget constraints.",
+        "Budget-gated batch run",
+        "batch",
+        "Run many generations from a CSV with a hard USD budget: estimate first, abort before any spend if over, then execute and log each cost.",
+        "Pre-spend cost estimate",
+        "cost-estimate",
+        "Estimate USD cost of a generation before spending credits, computed offline from synced per-endpoint pricing.",
+        "Deterministic re-generation",
+        "regenerate",
+        "Re-run a past generation with its exact stored parameters (model, seed, resolution, quality, references).",
+        "Catalog change diff",
+        "models diff",
+        "See newly added, retired, and price-changed image models between syncs so pinned pipelines never break silently.",
+        "Weekly spend digest",
+        "usage digest",
+        "Period-over-period spend and volume summary: images generated, USD spent, top models, cost per image vs the prior window."
+      ],
+      "path": "library/ai/openrouter-image",
+      "printer": "neal-kyle",
+      "printer_name": "Kyle Neal",
+      "creator": {
+        "handle": "neal-kyle",
+        "name": "Kyle Neal"
+      },
+      "mcp": {
+        "binary": "openrouter-image-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 96,
+        "public_tool_count": 1,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "OPENROUTER_IMAGE_API_KEY"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "opensky",
       "category": "travel",
       "api": "Opensky Network",
@@ -15574,9 +15845,9 @@
       "path": "library/health/peloton",
       "release": {
         "cli_name": "peloton-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-21T05:30:51Z",
-        "source_commit": "f45ab2336707acf9b267d59512a069cccec2f2e9"
+        "version": "2026.8.3",
+        "released_at": "2026-08-21T05:39:38Z",
+        "source_commit": "468965a6256a732add10cf35f442a9f52166e634"
       },
       "printer": "itsmefelix-",
       "printer_name": "Felix Banuchi",
@@ -17059,6 +17330,57 @@
       }
     },
     {
+      "name": "quentli",
+      "category": "payments",
+      "api": "Quentli",
+      "description": "Every Quentli payments, invoicing, and SAT tax-billing endpoint, plus offline collection, reconciliation, and at-risk-subscription intelligence no other Quentli tool has.",
+      "search_terms": [
+        "quentli",
+        "quentli-pp-cli",
+        "Every Quentli payments, invoicing, and SAT tax-billing endpoint, plus offline collection, reconciliation, and at-risk-subscription intelligence no other Quentli tool has.",
+        "Collection / dunning queue",
+        "dunning",
+        "See every customer with an outstanding or overdue invoice, how much is owed, and the next collection action (send reminder, retry payment, or resend pay link).",
+        "Subscriptions at-risk",
+        "subs at-risk",
+        "Surface active subscriptions whose saved payment method is expired, unconfirmed, or deleted, or that have recent failed collection attempts, ranked by recovery urgency.",
+        "CFDI tax-invoice reconciliation",
+        "reconcile",
+        "Cross-check completed or refunded payments and paid invoices against SAT tax-invoice status (VALID/CANCELED/PENDING) to find timbre gaps before monthly SAT filing.",
+        "Revenue report",
+        "revenue",
+        "Aggregate payments and refunds by status, type, and currency over a window; see net collected vs returned in localized minor-currency amounts.",
+        "Webhook delivery health",
+        "webhooks health",
+        "Aggregate webhook delivery events by status per endpoint and surface PAYMENT_ATTEMPT_FAILED events as an operational alert with a retry path.",
+        "Customer balance drill-down",
+        "customer balance",
+        "Render a one-screen financial snapshot for a single customer: outstanding invoices, active subscriptions, payment methods, and CFDI linkage."
+      ],
+      "path": "library/payments/quentli",
+      "printer": "bobeglz",
+      "printer_name": "bobe",
+      "creator": {
+        "handle": "bobeglz",
+        "name": "bobe"
+      },
+      "mcp": {
+        "binary": "quentli-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 54,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "quranku",
       "category": "education",
       "api": "QuranKu",
@@ -17681,6 +18003,61 @@
         ],
         "mcp_ready": "full",
         "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "respondio",
+      "category": "social-and-messaging",
+      "api": "Respond.io",
+      "description": "Every Respond.io feature, plus an offline mirror and SQL that answers inbox questions no single API call can.",
+      "search_terms": [
+        "respondio",
+        "Respond.io",
+        "respondio-pp-cli",
+        "Every Respond.io feature, plus an offline mirror and SQL that answers inbox questions no single API call can.",
+        "Inbox workload overview",
+        "overview",
+        "One-command summary of open conversations, unassigned contacts, per-agent distribution, and recent activity.",
+        "Channel mix report",
+        "report channel-mix",
+        "See which messaging channels (WhatsApp, Instagram, email...) your contacts actually use.",
+        "Workload by agent",
+        "report workload",
+        "Per-agent message and conversation handling volume from the synced workspace.",
+        "Tag cohort segments",
+        "contact by-tag",
+        "List every contact that carries a given tag (VIP, unpaid, in-trial).",
+        "Custom-field gaps",
+        "contact field-gaps",
+        "Find contacts missing a custom field value (e.g. no orderId or region).",
+        "Idle follow-up",
+        "contact idle",
+        "Find unassigned contacts with no recent activity worth working.",
+        "Offline contact search",
+        "contact search",
+        "Free-text search across synced contacts without hitting the API."
+      ],
+      "path": "library/social-and-messaging/respondio",
+      "printer": "bobeglz",
+      "printer_name": "bobe",
+      "creator": {
+        "handle": "bobeglz",
+        "name": "bobe"
+      },
+      "mcp": {
+        "binary": "respondio-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 28,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
       }
     },
     {
@@ -22315,6 +22692,12 @@
         "Test one corporate or group code against every saved hotel at once."
       ],
       "path": "library/travel/travelclick",
+      "release": {
+        "cli_name": "travelclick-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-21T05:35:12Z",
+        "source_commit": "2ead546e61fb2beeceff18b4264d6eb9b63f15d9"
+      },
       "printer": "enlewof",
       "printer_name": "Allen Lew",
       "creator": {
