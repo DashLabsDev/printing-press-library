@@ -25,7 +25,7 @@ import (
 )
 
 // version is the printed CLI's version, stamped by the library release workflow.
-var version = "2026.8.2"
+var version = "2026.8.3"
 
 type rootFlags struct {
 	asJSON  bool

@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.4 - 2026-08-21
+
+- fix(ars-sicilia): check sitting/date coherence both ways, drop the unmet emendamenti claim (#1772).
+
 ## 2026.8.3 - 2026-08-17
 
 - fix(catalog): align Go fallback docs with toolchain floor (#1735).

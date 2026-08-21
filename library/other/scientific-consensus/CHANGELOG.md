@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.4 - 2026-08-21
+
+- fix(scientific-consensus): let a stronger heuristic outrank a generic review pubtype (#1770).
+
 ## 2026.8.3 - 2026-08-18
 
 - feat(scientific-consensus): add scientific-consensus (#1309).

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "slug": "extron",
+  "cli_name": "extron-pp-cli",
+  "version": "2026.8.1",
+  "released_at": "2026-08-21T04:59:06Z",
+  "source_commit": "f90557ce4377686db321f4a867d30a1f452a9ea6",
+  "printing_press_version": "4.30.1",
+  "run_id": "20260811-011552-d999fbbe",
+  "changes": [
+    {
+      "title": "feat(extron): add extron",
+      "pr": 1690,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/1690",
+      "commit": "f90557ce4377686db321f4a867d30a1f452a9ea6"
+    }
+  ]
+}

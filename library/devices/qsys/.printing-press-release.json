@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "slug": "qsys",
+  "cli_name": "qsys-pp-cli",
+  "version": "2026.8.1",
+  "released_at": "2026-08-21T04:59:06Z",
+  "source_commit": "89a21990857681f8109b67c5d5ebf061624999c6",
+  "printing_press_version": "4.30.1",
+  "run_id": "20260810-144721-14e1d1f6",
+  "changes": [
+    {
+      "title": "feat(qsys): add qsys",
+      "pr": 1688,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/1688",
+      "commit": "89a21990857681f8109b67c5d5ebf061624999c6"
+    }
+  ]
+}
