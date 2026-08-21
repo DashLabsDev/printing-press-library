@@ -45,7 +45,7 @@
     {
       "name": "Cronologia inversa di una legge",
       "command": "legge cronologia",
-      "description": "Partendo da una legge regionale promulgata (archivio 201), risale al DDL originario, agli emendamenti citati nei resoconti d'aula e ai pareri di commissione: l'inverso temporale di ddl iter."
+      "description": "Partendo da una legge regionale promulgata (archivio 201), risale al DDL originario, ai pareri di commissione e al voto d'aula: l'inverso temporale di ddl iter."
     }
   ],
   "printer": "aborruso",

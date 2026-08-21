@@ -43,8 +43,13 @@ var whichAssenti = []capacitaAssente{
 	{
 		Capacita: "gli emendamenti a un atto",
 		Perche:   "non esiste un archivio degli emendamenti: il portale non li pubblica come atti a sé.",
-		Invece:   "`legge cronologia` raccoglie gli emendamenti citati nei resoconti d'aula lungo l'iter di una legge; sono citazioni, non l'elenco completo.",
-		chiavi:   []string{"emendamento", "emendamenti", "subemendamenti"},
+		// Indicava `legge cronologia`, che gli emendamenti non li ha mai
+		// raccolti: chi cercava un ripiego finiva su un comando che non
+		// risponde a quella domanda. La cosa più vicina che esiste davvero è
+		// la prosa dei resoconti d'aula, dove gli emendamenti sono citati uno
+		// per uno ma solo come testo.
+		Invece: "gli emendamenti sono citati nella prosa dei resoconti d'aula: prendi la seduta con `ddl iter` o `legge cronologia` e leggine il testo con `resoconti get <legisl> <seduta>` (sulle sedute recenti il testo sta nel PDF indicato da `pdf_url`). Sono citazioni dentro un discorso, non un elenco interrogabile.",
+		chiavi: []string{"emendamento", "emendamenti", "subemendamenti"},
 	},
 	{
 		Capacita: "spese, bilancio e costi dell'Assemblea",

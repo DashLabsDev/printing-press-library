@@ -13,8 +13,12 @@ var campiAvviso = map[string]bool{
 	"troncato":  true,
 	"conteggio": true,
 	"nota":      true,
-	"hint":      true,
-	"meta":      true,
+	// `iterReport` scrive la stessa cosa in inglese (`note`): senza questa
+	// riga l'avviso di incoerenza seduta↔data spariva proprio sotto --select,
+	// che è il modo in cui l'iter si legge di solito.
+	"note": true,
+	"hint": true,
+	"meta": true,
 }
 
 // preservaAvvisi rimette in cima all'output i campi di avviso che --select ha

@@ -154,7 +154,17 @@ func runLeggeCronologia(cmd *cobra.Command, flags *rootFlags, legisl, numero, an
 					// "<numero> <parola> <4 cifre>" quando il taglio di fine
 					// iter non li esclude.
 					if doc, gerr := c2.GetDoc(ctx, *arcDdl, r.DocID); gerr == nil {
-						for _, ev := range docIterEvents(doc) {
+						// Le stesse guardie di coerenza seduta↔data di `ddl
+						// iter`: gli eventi sono letti dallo stesso iter e
+						// portano le stesse contraddizioni della fonte. Senza,
+						// la cronologia della L.R. 9/2020 dava il voto finale
+						// al 2 maggio 2020 con la seduta 187 (che è del 28
+						// aprile) senza alcun segnale, e chi incrociava per
+						// data concludeva «resoconto mancante».
+						evs := docIterEvents(doc)
+						_, avviso := marcaEventiIncoerenti(cmd, legisl, evs)
+						report.Note = uniscoNote(report.Note, avviso)
+						for _, ev := range evs {
 							ev.URL = r.URL
 							ev.ArchiveID = arcDdl.ID
 							ev.DocID = r.DocID
@@ -166,7 +176,7 @@ func runLeggeCronologia(cmd *cobra.Command, flags *rootFlags, legisl, numero, an
 		}
 	}
 	if len(report.Eventi) == 1 {
-		report.Note = fmt.Sprintf("Nessun DDL d'origine collegato alla L.R. %d/%d nell'archivio: il portale non espone il legame (campi P010/P012) per questo atto.", numero, annoLegge)
+		report.Note = uniscoNote(report.Note, fmt.Sprintf("Nessun DDL d'origine collegato alla L.R. %d/%d nell'archivio: il portale non espone il legame (campi P010/P012) per questo atto.", numero, annoLegge))
 	}
 
 	sort.SliceStable(report.Eventi, func(i, j int) bool {

@@ -1,10 +1,12 @@
 package cli
 
 import (
+	"io"
 	"strings"
 	"testing"
 
 	icaro "github.com/mvanhorn/printing-press-library/library/other/ars-sicilia/internal/icaroclient"
+	"github.com/spf13/cobra"
 )
 
 // TestParseFirmatariBlock_NoLabelLeak covers the labeled "Firmatari" block:
@@ -455,5 +457,90 @@ func TestParseIterFromBody_StoriaAnterioreDelloStralcioResta(t *testing.T) {
 	}
 	if ev[1].Data != "13 gen 2026" {
 		t.Errorf("l'assegnazione del 13 gen è sparita: %+v", ev)
+	}
+}
+
+// Il verso inverso: una seduta ha una data sola, quindi lo stesso numero su due
+// date vuol dire che almeno una è sbagliata. È il caso reale del ddl 733 della
+// XVII (poi L.R. 9/2020), dove la seduta d'Aula 187 compare il 28 aprile e di
+// nuovo il 2 maggio 2020 — giorno in cui l'Aula non ha tenuto seduta alcuna.
+func TestSeduteConDateIncoerenti(t *testing.T) {
+	// L'elenco è quello vero dell'iter del ddl 733, ridotto alle righe che
+	// contano: le due d'Aula in conflitto, la 187 di COMMISSIONE del 20 aprile
+	// (numerazione indipendente, non deve entrare nel confronto) e la 198
+	// «Esitato per Aula», evento di fase aula che però cita una seduta di
+	// commissione.
+	evs := []iterEvent{
+		{Data: "20 apr 2020", Seduta: 187},
+		{Data: "26 apr 2020", Seduta: 198},
+		{Data: "27 apr 2020", Seduta: 186, sedutaAula: true},
+		{Data: "28 apr 2020", Seduta: 187, sedutaAula: true},
+		{Data: "02 mag 2020", Seduta: 187, sedutaAula: true},
+	}
+	got := seduteConDateIncoerenti(evs)
+	if !got[187] {
+		t.Error("stessa seduta d'Aula su due date: la seduta va segnalata")
+	}
+	if got[186] || got[198] {
+		t.Errorf("segnalate sedute coerenti: %v", got)
+	}
+	if len(got) != 1 {
+		t.Errorf("sedute segnalate = %v, want solo la 187", got)
+	}
+
+	// La marcatura tocca solo i due eventi d'Aula: la 187 di commissione resta
+	// pulita, e con lei la 198 di fase aula ma seduta di commissione.
+	cmd := &cobra.Command{}
+	cmd.SetErr(io.Discard)
+	_, avviso := marcaEventiIncoerenti(cmd, 17, evs)
+	if avviso == "" {
+		t.Fatal("iter incoerente: l'avviso non deve essere vuoto")
+	}
+	marcati := 0
+	for i, ev := range evs {
+		if ev.Anomalia {
+			marcati++
+			if !ev.sedutaAula || ev.Seduta != 187 {
+				t.Errorf("evento %d marcato a torto: %+v", i, ev)
+			}
+		}
+	}
+	if marcati != 2 {
+		t.Errorf("eventi marcati = %d, want 2 (le due righe d'Aula sulla seduta 187)", marcati)
+	}
+
+	// La stessa data scritta nelle due forme della fonte è la stessa data: un
+	// iter sano non va marcato solo perché il portale alterna i formati.
+	forme := []iterEvent{
+		{Data: "28 apr 2020", Seduta: 187, sedutaAula: true},
+		{Data: "28.04.20", Seduta: 187, sedutaAula: true},
+	}
+	if len(seduteConDateIncoerenti(forme)) != 0 {
+		t.Error("stessa data in due formati: nessuna incoerenza")
+	}
+}
+
+// Una cronologia sana non deve produrre né marcature né avviso: è la condizione
+// che rende il marcatore un segnale e non rumore di fondo.
+func TestMarcaEventiIncoerentiIterSano(t *testing.T) {
+	evs := []iterEvent{
+		{Data: "07 feb 2024", Seduta: 95, sedutaAula: true},
+		{Data: "20 mar 2024", Seduta: 101, sedutaAula: true},
+		{Data: "20 mar 2024", Seduta: 101, sedutaAula: true},
+		{Data: "21 mar 2024", Seduta: 44},
+	}
+	cmd := &cobra.Command{}
+	cmd.SetErr(io.Discard)
+	incoerenti, avviso := marcaEventiIncoerenti(cmd, 18, evs)
+	if avviso != "" {
+		t.Errorf("iter coerente: avviso = %q, want vuoto", avviso)
+	}
+	if len(incoerenti) != 0 {
+		t.Errorf("iter coerente: date incoerenti = %v", incoerenti)
+	}
+	for i, ev := range evs {
+		if ev.Anomalia {
+			t.Errorf("evento %d marcato in un iter coerente: %+v", i, ev)
+		}
 	}
 }
