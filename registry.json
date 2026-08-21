@@ -3852,6 +3852,12 @@
         "Show live status, latency, and failure rate for every data source in the fallback chain."
       ],
       "path": "library/health/clinical-trials",
+      "release": {
+        "cli_name": "clinical-trials-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-21T05:08:21Z",
+        "source_commit": "b919219d91c1d02e7479abf249e1bbb91cb09926"
+      },
       "printer": "laci141",
       "printer_name": "laci141",
       "creator": {
@@ -7791,6 +7797,12 @@
         "Search vendors live upstream and label how strongly each result actually matched the query."
       ],
       "path": "library/food-and-dining/foodpanda",
+      "release": {
+        "cli_name": "foodpanda-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-21T05:08:21Z",
+        "source_commit": "7979876b0dc483fcd3decb5f3e28b9bd97806fbd"
+      },
       "printer": "qazmataz",
       "printer_name": "qazmataz",
       "contributors": [
@@ -10135,9 +10147,9 @@
       "path": "library/travel/hotel-goat",
       "release": {
         "cli_name": "hotel-goat-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-21T05:10:35Z",
+        "source_commit": "a9b43cad26b13446af76d75637a1fbd9c79be810"
       },
       "printer": "kothari-nikunj",
       "printer_name": "kothari-nikunj",
@@ -16744,6 +16756,12 @@
         "Search PSX regulatory documents, listing guides and notices by keyword, with last-updated dates."
       ],
       "path": "library/payments/psx",
+      "release": {
+        "cli_name": "psx-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-21T05:08:21Z",
+        "source_commit": "970e75e368294cdaa9837ff964a1b82db6310280"
+      },
       "printer": "qazmataz",
       "printer_name": "qazmataz",
       "creator": {
@@ -18321,9 +18339,9 @@
       "path": "library/other/scientific-consensus",
       "release": {
         "cli_name": "scientific-consensus-pp-cli",
-        "version": "2026.8.4",
-        "released_at": "2026-08-21T04:59:06Z",
-        "source_commit": "f9bc704024355b9e30eb61331ff3699d70cf3ede"
+        "version": "2026.8.5",
+        "released_at": "2026-08-21T05:11:42Z",
+        "source_commit": "fbb8f22489730e8bd59a482c9dcf1c8ab2f0e6e2"
       },
       "printer": "laci141",
       "printer_name": "laci141",
@@ -21755,6 +21773,43 @@
         "auth_type": "bearer_token",
         "env_vars": [
           "TESLA_AUTH_TOKEN"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
+      "name": "tessie",
+      "category": "devices",
+      "api": "Tessie",
+      "description": "Live Tesla vehicle data and commands from the terminal via the Tessie API",
+      "search_terms": [
+        "tessie",
+        "tessie-pp-cli",
+        "Live Tesla vehicle data and commands from the terminal via the Tessie API",
+        "assume-vehicle",
+        "use",
+        "Persist an assumed vehicle (matched by display name, VIN, or VIN suffix) so vehicle state/battery/location/wake subcommands fall back to it when no VIN is given; current prints it.",
+        "Tessie vehicle endpoints are VIN-keyed; assume-a-car gives a single-token flow where the user sets which car once and every command targets it without repeating a VIN."
+      ],
+      "path": "library/devices/tessie",
+      "printer": "keithah",
+      "printer_name": "Keith Herrington",
+      "creator": {
+        "handle": "keithah",
+        "name": "Keith Herrington"
+      },
+      "mcp": {
+        "binary": "tessie-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 6,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "TESSIE_API_TOKEN"
         ],
         "mcp_ready": "full",
         "spec_format": "internal"
