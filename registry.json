@@ -10794,6 +10794,12 @@
         "Report partner-sharing and worker-queue facts from the configured Immich server."
       ],
       "path": "library/media-and-entertainment/immich",
+      "release": {
+        "cli_name": "immich-pp-cli",
+        "version": "2026.8.13",
+        "released_at": "2026-08-21T08:31:57Z",
+        "source_commit": "790604ed93373b51d5718b4c7036c6e3d1dd4fef"
+      },
       "printer": "Avanderheyde",
       "printer_name": "avanderheyde",
       "creator": {
@@ -20763,6 +20769,39 @@
         ],
         "mcp_ready": "full",
         "spec_format": "internal"
+      }
+    },
+    {
+      "name": "square",
+      "category": "commerce",
+      "api": "Square",
+      "description": "The current Square v2 API surface, plus local reconciliation and history the remote API cannot provide by itself.",
+      "search_terms": [
+        "square",
+        "square-pp-cli",
+        "The current Square v2 API surface, plus local reconciliation and history the remote API cannot provide by itself.",
+        "Daily close reconciliation",
+        "reconcile close",
+        "Explain the difference between sales, collected payments, refunds, disputes, and payouts for each location.",
+        "Inventory drift",
+        "See which prices, variations, availability settings, and location counts changed since an earlier snapshot.",
+        "Customer timeline",
+        "Follow one customer's orders, payments, refunds, loyalty activity, invoices, and bookings in chronological order.",
+        "Webhook health",
+        "Measure duplicate locally ingested webhook deliveries, ordering problems, delivery lag, gaps, and subscription changes.",
+        "Weekly service review",
+        "service review",
+        "Review completed, unpaid, and missed appointments alongside staff and location utilization.",
+        "Request readiness check",
+        "request check",
+        "Validate a planned Square request, environment, API version, mutation policy, and idempotency before anything is sent."
+      ],
+      "path": "library/commerce/square",
+      "printer": "wirelesstkd",
+      "printer_name": "matthew.martin",
+      "creator": {
+        "handle": "wirelesstkd",
+        "name": "matthew.martin"
       }
     },
     {
