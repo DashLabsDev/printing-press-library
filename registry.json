@@ -1081,6 +1081,53 @@
       }
     },
     {
+      "name": "amazon-jobs",
+      "category": "productivity",
+      "api": "Amazon Jobs",
+      "description": "Every Amazon.jobs feature, plus a local job store, new-since diffing, and aggregation Amazon's own site can't do — no login required.",
+      "search_terms": [
+        "amazon-jobs",
+        "Amazon Jobs",
+        "amazon-jobs-pp-cli",
+        "Every Amazon.jobs feature, plus a local job store, new-since diffing, and aggregation Amazon's own site can't do — no login required.",
+        "New-since diff",
+        "new",
+        "See only the Amazon reqs that appeared since you last synced a saved search — no more re-scanning the whole list every morning.",
+        "Saved searches",
+        "save",
+        "Persist a named query plus its filters and diff cursor so a search and its new-since state survive between runs.",
+        "Facet aggregation",
+        "stats",
+        "Count synced reqs grouped by city, state, team, or category — the aggregation Amazon's own empty facets[] never returns.",
+        "Qualification-demand scan",
+        "skills",
+        "Rank teams and cities by how many synced reqs demand a given skill keyword in their basic/preferred qualifications.",
+        "Pipeline facet filters",
+        "find",
+        "Filter live results by intern, manager, university, and schedule type — fields the .json endpoint silently ignores as server params."
+      ],
+      "path": "library/productivity/amazon-jobs",
+      "printer": "qazmataz",
+      "printer_name": "qazmataz",
+      "creator": {
+        "handle": "qazmataz",
+        "name": "qazmataz"
+      },
+      "mcp": {
+        "binary": "amazon-jobs-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 1,
+        "public_tool_count": 1,
+        "auth_type": "none",
+        "env_vars": [],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "amazon-orders",
       "category": "commerce",
       "api": "Amazon Orders",
@@ -1775,7 +1822,7 @@
         "Mostra per ognuno dei 12 archivi ARS: timestamp ultima sync, n. record locali, età della sync, eventuale segnalazione di staleness.",
         "Cronologia inversa di una legge",
         "legge cronologia",
-        "Partendo da una legge regionale promulgata (archivio 201), risale al DDL originario, agli emendamenti citati nei resoconti d'aula e ai pareri di commissione: l'inverso temporale di ddl iter."
+        "Partendo da una legge regionale promulgata (archivio 201), risale al DDL originario, ai pareri di commissione e al voto d'aula: l'inverso temporale di ddl iter."
       ],
       "path": "library/other/ars-sicilia",
       "release": {
@@ -2977,9 +3024,9 @@
       "path": "library/commerce/booksy",
       "release": {
         "cli_name": "booksy-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-18T18:49:03Z",
-        "source_commit": "694359abcfd7b9c5834a9656e0c3248957a09bbd"
+        "version": "2026.8.2",
+        "released_at": "2026-08-19T09:15:30Z",
+        "source_commit": "45623085ac8da3c63ce7f1c4fc2a9c49ac613ed5"
       },
       "printer": "milloni",
       "printer_name": "Max Tomago",
@@ -4147,6 +4194,34 @@
         "env_vars": [],
         "mcp_ready": "full",
         "spec_format": "internal"
+      }
+    },
+    {
+      "name": "concur",
+      "category": "productivity",
+      "api": "SAP Concur",
+      "description": "Every expense-report and travel workflow Concur's web app offers, plus real flight and hotel search and duplicate detection no Concur tool has -- filed through the same session your browser already uses.",
+      "search_terms": [
+        "concur",
+        "SAP Concur",
+        "concur-pp-cli",
+        "Every expense-report and travel workflow Concur's web app offers, plus real flight and hotel search and duplicate detection no Concur tool has -- filed through the same session your browser already uses.",
+        "Cross-report duplicate-charge detector",
+        "expenses scan-duplicates",
+        "Local SQLite scan across synced expenses for vendor+amount+date-proximity duplicates. LIVE-VERIFIED (scorecard live-check pass).",
+        "Real flight search",
+        "flights search --from <origin> --to <dest> --depart <date> [--return <date>]",
+        "Searches real, live flight availability and fares via the GraphQL BFF's air-shopping mutation+poll flow -- not just already-booked trips. LIVE-VERIFIED 2026-08-17: real JetBlue LAX-JFK/EWR fares ($194-$2217 across cabin tiers) with policy compliance flags. Also ships 'flights locations' (metro-to-airport resolution, e.g. NYC expands to JFK/LGA/EWR/HPN) and 'flights preferences' (policy search defaults), both pure reads. KNOWN GAP: --return is accepted and included in the search, but only the outbound leg's results are rendered -- combined round-trip fares need an unmapped select-then-refine step. Net-new capability beyond the original absorb manifest; see .printing-press-patches/flights-hotels-search.json.",
+        "Real hotel search",
+        "hotels search --to <destination> --check-in <date> --check-out <date>",
+        "Searches real, live hotel availability and rates. Architecturally unique in this CLI: the session-creation mutation is confirmed blocked from scripted replay (even a byte-for-byte replay of a request that had just succeeded natively still failed), so this command drives the real Hotel Search form via agent-browser for that one step, then reads results directly via HTTP once the session exists (confirmed working via scripted replay). Requires agent-browser installed and a live, logged-in Chrome session. LIVE-VERIFIED 2026-08-17 across two separate runs: The Greenwich Hotel ($11,553/5-star), Hilton Brooklyn New York ($3,654/4-star), Moxy Nyc East Village ($3,456/4-star) on one run; Soho House New York, Hotel On Rivington, Public on a second, confirming repeatability. Net-new capability; see .printing-press-patches/flights-hotels-search.json."
+      ],
+      "path": "library/productivity/concur",
+      "printer": "enlewof",
+      "printer_name": "Allen Lew",
+      "creator": {
+        "handle": "enlewof",
+        "name": "Allen Lew"
       }
     },
     {
@@ -8254,9 +8329,9 @@
       "path": "library/productivity/giustizia-amministrativa",
       "release": {
         "cli_name": "giustizia-amministrativa-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-19T09:14:36Z",
+        "source_commit": "c91441d1a9fb8ae8bad026c85a0e886377032d9a"
       },
       "printer": "aborruso",
       "printer_name": "aborruso",
@@ -15161,6 +15236,57 @@
       "creator": {
         "handle": "markvandeven",
         "name": "markvandeven"
+      }
+    },
+    {
+      "name": "peekaboo",
+      "category": "commerce",
+      "api": "Peekaboo",
+      "description": "Every Peekaboo deal, branch, and bank-card offer from the terminal — plus city-wide deal ranking, bank-card reverse lookup, and bulk branch map-link export the Peekaboo site has no button for.",
+      "search_terms": [
+        "peekaboo",
+        "peekaboo-pp-cli",
+        "Every Peekaboo deal, branch, and bank-card offer from the terminal — plus city-wide deal ranking, bank-card reverse lookup, and bulk branch map-link export the Peekaboo site has no button for.",
+        "Branch directions URLs",
+        "directions",
+        "Get a ready-to-open Google Maps directions link for every branch of a restaurant at once.",
+        "Nearest branch",
+        "nearest",
+        "Find the single closest branch of a restaurant to a city or coordinates, with its directions link.",
+        "Card to merchants",
+        "wallet",
+        "List every merchant in a city that honors a given bank card's deal (card to merchants).",
+        "Top deals ranking",
+        "top-deals",
+        "Rank a city's merchants by discount percentage and return the biggest current discounts.",
+        "Expiring deals",
+        "expiring",
+        "List deals whose validity window closes within N days.",
+        "Open now",
+        "open-now",
+        "Keep only merchants with a branch open at the current local time."
+      ],
+      "path": "library/commerce/peekaboo",
+      "printer": "qazmataz",
+      "printer_name": "qazmataz",
+      "creator": {
+        "handle": "qazmataz",
+        "name": "qazmataz"
+      },
+      "mcp": {
+        "binary": "peekaboo-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 9,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "PEEKABOO_TOKEN"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
       }
     },
     {
