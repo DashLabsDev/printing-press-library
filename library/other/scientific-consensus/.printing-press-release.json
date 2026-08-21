@@ -2,17 +2,17 @@
   "schema_version": 1,
   "slug": "scientific-consensus",
   "cli_name": "scientific-consensus-pp-cli",
-  "version": "2026.8.4",
-  "released_at": "2026-08-21T04:59:06Z",
-  "source_commit": "f9bc704024355b9e30eb61331ff3699d70cf3ede",
+  "version": "2026.8.5",
+  "released_at": "2026-08-21T05:11:42Z",
+  "source_commit": "fbb8f22489730e8bd59a482c9dcf1c8ab2f0e6e2",
   "printing_press_version": "4.24.0",
   "run_id": "20260620-165352-e55cec69",
   "changes": [
     {
-      "title": "fix(scientific-consensus): let a stronger heuristic outrank a generic review pubtype",
-      "pr": 1770,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/1770",
-      "commit": "f9bc704024355b9e30eb61331ff3699d70cf3ede"
+      "title": "feat(scientific-consensus): add DeepSeek provider, pin sampling temperature to 0",
+      "pr": 1758,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/1758",
+      "commit": "fbb8f22489730e8bd59a482c9dcf1c8ab2f0e6e2"
     }
   ]
 }
