@@ -1107,6 +1107,12 @@
         "Filter live results by intern, manager, university, and schedule type — fields the .json endpoint silently ignores as server params."
       ],
       "path": "library/productivity/amazon-jobs",
+      "release": {
+        "cli_name": "amazon-jobs-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-21T04:59:06Z",
+        "source_commit": "6d90ecb5f220733624e9e1249d344352bd864fc7"
+      },
       "printer": "qazmataz",
       "printer_name": "qazmataz",
       "creator": {
@@ -1827,9 +1833,9 @@
       "path": "library/other/ars-sicilia",
       "release": {
         "cli_name": "ars-sicilia-pp-cli",
-        "version": "2026.8.3",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.4",
+        "released_at": "2026-08-21T04:59:06Z",
+        "source_commit": "537fd0d1808d2c38bda504f99c0be48beb6d5439"
       },
       "printer": "aborruso",
       "printer_name": "aborruso"
@@ -4282,6 +4288,12 @@
         "Searches real, live hotel availability and rates. Architecturally unique in this CLI: the session-creation mutation is confirmed blocked from scripted replay (even a byte-for-byte replay of a request that had just succeeded natively still failed), so this command drives the real Hotel Search form via agent-browser for that one step, then reads results directly via HTTP once the session exists (confirmed working via scripted replay). Requires agent-browser installed and a live, logged-in Chrome session. LIVE-VERIFIED 2026-08-17 across two separate runs: The Greenwich Hotel ($11,553/5-star), Hilton Brooklyn New York ($3,654/4-star), Moxy Nyc East Village ($3,456/4-star) on one run; Soho House New York, Hotel On Rivington, Public on a second, confirming repeatability. Net-new capability; see .printing-press-patches/flights-hotels-search.json."
       ],
       "path": "library/productivity/concur",
+      "release": {
+        "cli_name": "concur-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-21T04:59:06Z",
+        "source_commit": "9b9f298193109d3c0ffbdcb28cb856ecf322407c"
+      },
       "printer": "enlewof",
       "printer_name": "Allen Lew",
       "creator": {
@@ -7043,6 +7055,12 @@
         "Compare local PDF sizes against the download ledger to flag truncated or mismatched downloads."
       ],
       "path": "library/devices/extron",
+      "release": {
+        "cli_name": "extron-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-21T04:59:06Z",
+        "source_commit": "f90557ce4377686db321f4a867d30a1f452a9ea6"
+      },
       "printer": "Drummerms",
       "printer_name": "drummerms",
       "creator": {
@@ -15429,6 +15447,12 @@
         "Keep only merchants with a branch open at the current local time."
       ],
       "path": "library/commerce/peekaboo",
+      "release": {
+        "cli_name": "peekaboo-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-21T04:59:06Z",
+        "source_commit": "7c8c5d85a9715d397244a4d4c5b7ddd4ed899258"
+      },
       "printer": "qazmataz",
       "printer_name": "qazmataz",
       "creator": {
@@ -16978,6 +17002,12 @@
         "Find which UC platforms (Teams, Zoom, Meet) a device is certified or integrated with."
       ],
       "path": "library/devices/qsys",
+      "release": {
+        "cli_name": "qsys-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-21T04:59:06Z",
+        "source_commit": "89a21990857681f8109b67c5d5ebf061624999c6"
+      },
       "printer": "Drummerms",
       "printer_name": "drummerms",
       "creator": {
@@ -18291,9 +18321,9 @@
       "path": "library/other/scientific-consensus",
       "release": {
         "cli_name": "scientific-consensus-pp-cli",
-        "version": "2026.8.3",
-        "released_at": "2026-08-18T18:58:49Z",
-        "source_commit": "54e2a636de822ae1339ee8b7654eaef7297740bd"
+        "version": "2026.8.4",
+        "released_at": "2026-08-21T04:59:06Z",
+        "source_commit": "f9bc704024355b9e30eb61331ff3699d70cf3ede"
       },
       "printer": "laci141",
       "printer_name": "laci141",
@@ -24506,9 +24536,9 @@
       "path": "library/media-and-entertainment/youtube",
       "release": {
         "cli_name": "youtube-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-21T04:59:06Z",
+        "source_commit": "88ffc17d84e14259a7fc65b5c06ef8da3ecb7201"
       },
       "printer": "justinwfu",
       "printer_name": "Justin",
