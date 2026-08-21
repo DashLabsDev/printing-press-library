@@ -2,17 +2,17 @@
   "schema_version": 1,
   "slug": "peloton",
   "cli_name": "peloton-pp-cli",
-  "version": "2026.8.2",
-  "released_at": "2026-08-21T05:30:51Z",
-  "source_commit": "f45ab2336707acf9b267d59512a069cccec2f2e9",
+  "version": "2026.8.3",
+  "released_at": "2026-08-21T05:39:38Z",
+  "source_commit": "468965a6256a732add10cf35f442a9f52166e634",
   "printing_press_version": "4.28.0",
   "run_id": "20260714-231159",
   "changes": [
     {
-      "title": "fix(peloton): repair auth, offline/sync store gaps, and add bounded/resumable dependent sync",
-      "pr": 1773,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/1773",
-      "commit": "f45ab2336707acf9b267d59512a069cccec2f2e9"
+      "title": "feat(peloton): add classes_detail dependent sync, and the bugs found building it",
+      "pr": 1774,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/1774",
+      "commit": "468965a6256a732add10cf35f442a9f52166e634"
     }
   ]
 }

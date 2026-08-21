@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.3 - 2026-08-21
+
+- feat(peloton): add classes_detail dependent sync, and the bugs found building it (#1774).
+
 ## 2026.8.2 - 2026-08-21
 
 - fix(peloton): repair auth, offline/sync store gaps, and add bounded/resumable dependent sync (#1773).
