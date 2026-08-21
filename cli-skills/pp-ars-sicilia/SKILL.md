@@ -67,6 +67,10 @@ These capabilities aren't available in any other tool for this API.
 
   Se due eventi d'Aula danno alla **stessa data** numeri di seduta diversi, il link viene omesso su entrambi e un hint lo dice: l'Aula tiene una seduta al giorno, quindi almeno un numero è sbagliato nella fonte (`ddl iter 17 199` dà il voto del 19 feb 2020 in «Seduta n. 179», ma la 179 è del 26 febbraio). In quel caso la chiave affidabile è la data: `resoconti cerca --legisl 17 --data 2020-02-19`.
 
+  La coerenza fra seduta e data è controllata **nei due versi**, su `ddl iter` come su `legge cronologia`. Stessa data con numeri di seduta diversi: l'Aula ne tiene una al giorno. Stessa seduta con date diverse, mentre l'archivio resoconti le assegna una data sola (`legge cronologia 17 9 --anno 2020` dà il voto della stabilità 2020 al 2 maggio in «Seduta n. 187»; `resoconti get 17 187` dà la 187 al 28 aprile, e il 2 maggio l'Aula non ha resoconto). In entrambi i casi gli eventi coinvolti portano **`anomalia: true`**, il link al resoconto è omesso, e il motivo esce sia su stderr sia nel campo `note` del report — che `--select` non può togliere. Prima di concludere «resoconto mancante» guarda `anomalia`: la contraddizione è nella fonte, non un buco dell'archivio.
+
+  Il ripiego cambia con il verso, e sbagliarlo riporta al falso gap. Nel caso stessa-data si cerca il numero partendo dalla data, che è la metà affidabile: `resoconti cerca --legisl 17 --data 2020-02-19`. Nel caso stessa-seduta la data è la metà contestata e cercarla non trova nulla (`resoconti cerca --legisl 17 --data 2020-05-02` → `[]`): si parte dal numero, `resoconti get 17 187`, e la data autorevole è in `fields.Data`.
+
   ```bash
   ars-sicilia-pp-cli ddl iter 18 1153 --json
   ars-sicilia-pp-cli ddl iter 17 290 --json --select data,fase,seduta,titolo,url
@@ -95,7 +99,7 @@ These capabilities aren't available in any other tool for this API.
   ars-sicilia-pp-cli commissione dossier "SESTA" --legisl 18 --json
   ars-sicilia-pp-cli commissione dossier "inchiesta e vigilanza" --legisl 18 --json
   ```
-- **`legge cronologia`** — Partendo da una legge regionale promulgata (archivio 201), risale al DDL originario, agli emendamenti citati nei resoconti d'aula e ai pareri di commissione: l'inverso temporale di ddl iter. Aggiungi sempre **`--anno`**: lo stesso numero di legge si ripete in anni diversi della stessa legislatura (nella XVIII ci sono due L.R. 26, ottobre 2024 e giugno 2025) e senza `--anno` l'archivio ne restituisce una sola — la cronologia esce coerente e riferita all'atto sbagliato. Un avviso su stderr dice quale legge è stata presa.
+- **`legge cronologia`** — Partendo da una legge regionale promulgata (archivio 201), risale al DDL originario, ai pareri di commissione e al voto d'aula: l'inverso temporale di ddl iter. Aggiungi sempre **`--anno`**: lo stesso numero di legge si ripete in anni diversi della stessa legislatura (nella XVIII ci sono due L.R. 26, ottobre 2024 e giugno 2025) e senza `--anno` l'archivio ne restituisce una sola — la cronologia esce coerente e riferita all'atto sbagliato. Un avviso su stderr dice quale legge è stata presa.
 
   _Per ricercatori e giornalisti che partono dalla legge promulgata e vogliono raccontare come ci si è arrivati._
 

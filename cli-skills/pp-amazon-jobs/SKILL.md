@@ -1,7 +1,7 @@
 ---
-name: pp-youtube
-description: "A self-maintained competitor-monitoring machine for YouTube: the read surfaces that matter for market and competitor research plus a local databank of channel histories, snapshots, comments, and packaging assets - market data hours old, not weeks. Trigger phrases: `monitor my youtube competitors`, `which competitor videos are gaining views right now`, `find fresh breakout videos in a niche`, `youtube packaging and thumbnail analysis data`, `mine youtube comments for audience signal`, `new niche research workspace`, `switch youtube api key`, `backfill youtube channel history`, `get the transcript of this youtube video`, `use youtube`, `run youtube`."
-author: "Justin"
+name: pp-amazon-jobs
+description: "Every Amazon.jobs feature, plus a local job store, new-since diffing, and aggregation Amazon's own site can't do — no login required. Trigger phrases: `find amazon jobs`, `search amazon.jobs for`, `new amazon reqs since yesterday`, `which teams at amazon are hiring for`, `amazon jobs in seattle`, `use amazon-jobs`, `run amazon-jobs`."
+author: "qazmataz"
 license: "Apache-2.0"
 argument-hint: "<command> [args] | install cli|mcp"
 allowed-tools: "Read Bash"
@@ -9,156 +9,129 @@ metadata:
   openclaw:
     requires:
       bins:
-        - youtube-pp-cli
+        - amazon-jobs-pp-cli
     install:
       - kind: go
-        bins: [youtube-pp-cli]
-        module: github.com/mvanhorn/printing-press-library/library/media-and-entertainment/youtube/cmd/youtube-pp-cli
+        bins: [amazon-jobs-pp-cli]
+        module: github.com/mvanhorn/printing-press-library/library/productivity/amazon-jobs/cmd/amazon-jobs-pp-cli
 ---
 <!-- GENERATED FILE — DO NOT EDIT.
-     This file is a verbatim mirror of library/media-and-entertainment/youtube/SKILL.md,
+     This file is a verbatim mirror of library/productivity/amazon-jobs/SKILL.md,
      regenerated post-merge by tools/generate-skills/. Hand-edits here are
      silently overwritten on the next regen. Edit the library/ source instead.
      See the repository agent guide, section "Generated artifacts: registry.json, cli-skills/". -->
 
-# YouTube — Printing Press CLI
+# Amazon Jobs — Printing Press CLI
 
 ## Prerequisites: Install the CLI
 
-This skill drives the `youtube-pp-cli` binary. **You must verify the CLI is installed before invoking any command from this skill.** If it is missing, install it first:
+This skill drives the `amazon-jobs-pp-cli` binary. **You must verify the CLI is installed before invoking any command from this skill.** If it is missing, install it first:
 
 1. Install via the Printing Press installer. It defaults binaries to `$HOME/.local/bin` on macOS/Linux and `%LOCALAPPDATA%\Programs\PrintingPress\bin` on Windows:
    ```bash
-   npx -y @mvanhorn/printing-press-library install youtube --cli-only
+   npx -y @mvanhorn/printing-press-library install amazon-jobs --cli-only
    ```
-2. Verify: `youtube-pp-cli --version`
+2. Verify: `amazon-jobs-pp-cli --version`
 3. Ensure the reported install directory is on `$PATH` for the agent/runtime that will invoke this skill.
 
-If the `npx` install fails (no Node, offline, etc.), fall back to a direct Go install (requires Go 1.26.6 or newer). This installs into `$GOPATH/bin` (default `$HOME/go/bin`), so add that directory to `$PATH` instead:
+If the `npx` install fails (no Node, offline, etc.), fall back to a direct Go install (requires Go 1.26.5 or newer). This installs into `$GOPATH/bin` (default `$HOME/go/bin`), so add that directory to `$PATH` instead:
 
 ```bash
-go install github.com/mvanhorn/printing-press-library/library/media-and-entertainment/youtube/cmd/youtube-pp-cli@latest
+go install github.com/mvanhorn/printing-press-library/library/productivity/amazon-jobs/cmd/amazon-jobs-pp-cli@latest
 ```
 
 If `--version` reports "command not found" after install, the runtime cannot see the binary directory on `$PATH`. Do not proceed with skill commands until verification succeeds.
 
-The YouTube Data API v3 read surfaces that matter for market and competitor research with complete parameter wiring, feeding a local SQLite databank designed for competitor monitoring: `watch` your ~15 competitors, `monitor` refreshes them for ~20-40 quota units per run, and `velocity`, `growth`, `breakouts`, `comments-mine`, and `packaging` turn the accumulated snapshots into current market intelligence that lagging analytics platforms deliver one to two weeks late.
+amazon-jobs turns Amazon's careers site from a page you refresh into a queryable, watchable dataset. It uses the same unauthenticated JSON the site does, so there is no API key and no scraping fragility. Beyond search and filters, it keeps a local SQLite mirror that powers `new` (reqs unseen since your last check), `stats` (counts by city/team/category the empty server facets can't give), and `skills` (which teams demand a given qualification).
 
 ## When to Use This CLI
 
-Reach for this CLI whenever the task is YouTube market or competitor research: tracking a fixed set of competitor channels over time, measuring what is gaining views right now, discovering fresh breakout videos in a niche, mining comments for audience signal, or collecting titles, thumbnails, and hooks for packaging analysis. It is the right tool when the answer should come from a locally owned, regularly refreshed databank instead of a lagging external analytics platform.
+Use amazon-jobs when a task involves finding, filtering, tracking, or analyzing open roles at Amazon or AWS: keyword and location search, watching for newly-posted reqs over time, or aggregating the open-req landscape by city, team, or demanded skill. It is ideal for agents doing recurring labor-market research because output is deterministic JSON and the local store answers questions a single API call cannot.
 
 ## Anti-triggers
 
 Do not use this CLI for:
-- Do not use this CLI for your own channel's private analytics (revenue, retention, demographics, traffic sources) - that is the OAuth-only YouTube Analytics API, which this CLI deliberately excludes
-- Do not use it to upload, edit, rate, or delete videos or manage a channel - all write operations are out of scope
-- Do not use it to download video or audio media - use yt-dlp for media files
-- Do not use it for wide-market computed judgments like cross-niche outlier scores or monetization estimates - curated analytics databases own that; this CLI owns fresh data on the channels you track
+- Do not use this CLI for job boards other than Amazon.jobs — it only queries Amazon's careers API.
+- Do not use it to submit an application; it is read-only and has no apply/authenticated workflow.
+- Do not use it for general AWS service management — it is unrelated to the AWS SDK or AWS APIs.
 
 ## Unique Capabilities
 
 These capabilities aren't available in any other tool for this API.
 
-### Competitor monitoring machine
-- **`watch`** — Register the competitor channels your monitoring machine tracks, in a typed watchlist table you own.
+### Local state that compounds
 
-  _Defines the tracked market once; every later monitoring command runs against it without re-specifying channels._
+- **`new`** — See only the Amazon reqs that appeared since you last synced a saved search — no more re-scanning the whole list every morning.
+
+  _Reach for this when a user tracks a role over time and wants the delta, not the full list._
 
   ```bash
-  youtube-pp-cli watch add @mkbhd --json
+  amazon-jobs-pp-cli new sde-seattle --agent
   ```
-- **`monitor`** — Refresh every watched channel in one run: stats snapshot, new uploads, re-snapshot of recent video statistics.
+- **`save`** — Persist a named query plus its filters and diff cursor so a search and its new-since state survive between runs.
 
-  _One command keeps the databank current, so market answers are hours old instead of weeks old._
-
-  ```bash
-  youtube-pp-cli monitor --json
-  ```
-- **`velocity`** — See which tracked videos are gaining views fastest right now, computed from real between-snapshot deltas.
-
-  _Current market movement - what is taking off today, not what took off two weeks ago._
+  _Use this to set up a repeatable watch that `new` and `sync` then operate on by name._
 
   ```bash
-  youtube-pp-cli velocity --json
-  ```
-- **`growth`** — Channel-level subscriber, view, and upload-count deltas between dated local snapshots.
-
-  _Tells an agent whether a competitor is accelerating without any external history service._
-
-  ```bash
-  youtube-pp-cli growth @mkbhd --json
-  ```
-- **`backfill`** — Pull a channel's complete upload history with statistics into the local databank in one command.
-
-  _Run once per competitor; every later question about that channel is answered offline for free._
-
-  ```bash
-  youtube-pp-cli backfill @mkbhd --json
-  ```
-- **`workspace`** — Named databanks: keep the competitor machine in one database and explore a new niche in another, switching instantly.
-
-  _Lets an agent spin up a clean research sandbox per niche without risking the production watchlist databank._
-
-  ```bash
-  youtube-pp-cli workspace list --json
-  ```
-- **`auth keys`** — Store multiple named YouTube API keys, switch between them instantly, and optionally fail over automatically via --rotate when one runs out of quota.
-
-  _An agent can finish large collection jobs without human intervention when the first key's daily quota is spent._
-
-  ```bash
-  youtube-pp-cli auth keys list --json
+  amazon-jobs-pp-cli save sde-seattle "software engineer" --city Seattle --country USA
   ```
 
-### Fresh market discovery
-- **`breakouts`** — Chain search filters into a matrix (terms x upload window x duration x region), join results to channel size, and rank fresh high-momentum videos.
+### Aggregation the API can't do
 
-  _Finds niche breakouts days after upload, weeks before they reach lagging analytics platforms._
+- **`stats`** — Count synced reqs grouped by city, state, team, or category — the aggregation Amazon's own empty facets[] never returns.
+
+  _Use this to answer 'which cities/teams have the most open reqs' without paging every result._
 
   ```bash
-  youtube-pp-cli breakouts "berlin history" --days 14 --json
+  amazon-jobs-pp-cli stats --by city --agent
   ```
-- **`comments-mine`** — Sync comments into a typed full-text-searchable table and report top-liked comments, keyword frequencies, and audience questions.
+- **`skills`** — Rank teams and cities by how many synced reqs demand a given skill keyword in their basic/preferred qualifications.
 
-  _Fast audience signal from data you own - what viewers praise, ask, and complain about across a channel._
+  _Reach for this for labor-market questions like 'who is hiring for X skill' rather than retrieving individual reqs._
 
   ```bash
-  youtube-pp-cli comments-mine @mkbhd --json
+  amazon-jobs-pp-cli skills Rust --agent
   ```
-- **`packaging`** — Collect titles, thumbnails (downloaded as local image files), and hook text from transcript openings into a packaging table.
 
-  _Hands a multimodal agent everything it needs for thumbnail and hook analysis without any scraping or manual collection._
+### Honest client-side filtering
+
+- **`find`** — Filter live results by intern, manager, university, and schedule type — fields the .json endpoint silently ignores as server params.
+
+  _Use these flags when a user wants senior-IC, non-intern, or schedule-specific roles that Amazon can't filter server-side._
 
   ```bash
-  youtube-pp-cli packaging @mkbhd --json
+  amazon-jobs-pp-cli find "software engineer" --manager=false --intern=false --agent
+  ```
+
+### True recency: use `posted_date`, never `updated_time`
+
+- **`find --posted-within`** — Filter on the real posting date. Accepts `24h`, `3d`, `7d`, `2w`.
+
+  **This is a correctness trap, not a convenience flag.** `updated_time` is a relative string ("about 21 hours") that tracks the last edit or re-index — not the posting. Measured on 1000 live reqs: 514 were posted more than 14 days ago, and **all 514** reported `updated_time` under 48 hours; the worst case was posted August 2025 and read "about 21 hours". If a user asks for "jobs posted recently" or wants to "apply as fast as possible", filter with `--posted-within` and report `posted_date`. Never present `updated_time` as recency.
+
+  Rows where the two disagree badly (posted >14 days ago, updated <48h) are marked `(edited)` in human output and carry `"updated_diverged": true` in JSON — surface that caveat to the user rather than dropping it.
+
+  `posted_date` is day-granular; the API has no sub-day posting timestamp. `--posted-within 7d` therefore means "posted on or after (today − 7 days)", inclusive by whole date. Do not promise the user hour-level precision on posting time — it does not exist upstream.
+
+  ```bash
+  amazon-jobs-pp-cli find "program manager" --country GBR --posted-within 7d --agent
+  ```
+
+- **`find --description-contains` / `--description-not-contains`** — Case-insensitive regex over `description` + `basic_qualifications` + `preferred_qualifications`, HTML stripped before matching.
+
+  _Reach for this whenever the user's constraint is buried in prose rather than exposed as a facet: visa/sponsorship eligibility, relocation support (check both directions — "Relocation assistance is NOT provided" and "Relocation benefits are offered" both exist), or language requirements (Mandarin, Japanese N1) that silently disqualify._
+
+  Invalid regex falls back to a literal match, so `C++` works as typed. These matches are rare (sponsorship language appears in roughly 16 of 1000 reqs, relocation language in about 2), so raise `--max-scan-pages` when nothing comes back — the "no matching jobs" note tells you how many were scanned.
+
+  ```bash
+  amazon-jobs-pp-cli find "" --country SGP --description-not-contains "without sponsorship" --max-scan-pages 10 --agent
   ```
 
 ## Command Reference
 
-**youtube** — YouTube Data API v3 (read-only, api-key) for market and competitor analysis
+**postings** — Search Amazon job listings
 
-- `youtube-pp-cli youtube activities-list` — Retrieves a list of resources, possibly filtered.
-- `youtube-pp-cli youtube captions-list` — Retrieves a list of resources, possibly filtered.
-- `youtube-pp-cli youtube channel-sections-list` — Retrieves a list of resources, possibly filtered.
-- `youtube-pp-cli youtube channels-list` — Retrieves a list of resources, possibly filtered.
-- `youtube-pp-cli youtube comment-threads-list` — Retrieves a list of top-level comment threads, filterable by video, channel, or thread id.
-- `youtube-pp-cli youtube i18n-languages-list` — Retrieves a list of resources, possibly filtered.
-- `youtube-pp-cli youtube i18n-regions-list` — Retrieves a list of resources, possibly filtered.
-- `youtube-pp-cli youtube playlist-items-list` — Retrieves a list of resources, possibly filtered.
-- `youtube-pp-cli youtube playlists-list` — Retrieves a list of resources, possibly filtered.
-- `youtube-pp-cli youtube search-list` — Retrieves a list of search resources
-- `youtube-pp-cli youtube video-categories-list` — Retrieves a list of resources, possibly filtered.
-- `youtube-pp-cli youtube videos-list` — Retrieves a list of resources, possibly filtered.
-- `youtube-pp-cli youtube channel-uploads` — List a channel's most recent uploads (resolves @handle or channelId, then walks the uploads playlist).
-- `youtube-pp-cli youtube playlist-enrich` — Resolve a playlist to per-video metadata + transcript + description in one concurrent call.
-- `youtube-pp-cli youtube search-bulk` — Search YouTube for multiple terms in one call, return top-N per term.
-- `youtube-pp-cli youtube videos-comments` — Fetch top comments for a video, ranked by like count across pages.
-- `youtube-pp-cli youtube videos-embed` — Print embed HTML, iframe, or markdown snippet for a video.
-- `youtube-pp-cli youtube videos-enrich` — One video's metadata + transcript + description in one call.
-- `youtube-pp-cli youtube videos-links` — Extract resource links from a video description (expands short links, skips social noise).
-- `youtube-pp-cli youtube videos-related` — Find related videos, shared-topic ranking above same-channel.
-- `youtube-pp-cli youtube videos-transcript` — Fetch the transcript without OAuth (timedtext; --format markdown|text|json).
+- `amazon-jobs-pp-cli postings` — Search Amazon job listings by keyword, location, and sort order
 
 
 ### Finding the right command
@@ -166,68 +139,95 @@ These capabilities aren't available in any other tool for this API.
 When you know what you want to do but not which command does it, ask the CLI directly:
 
 ```bash
-youtube-pp-cli which "<capability in your own words>"
+amazon-jobs-pp-cli which "<capability in your own words>"
 ```
 
 `which` resolves a natural-language capability query to the best matching command from this CLI's curated feature index. Exit code `0` means at least one match; exit code `2` means no confident match — fall back to `--help` or use a narrower query.
 
 ## Recipes
 
-### Stand up the monitoring machine
+
+### Track new SDE roles in Seattle each morning
 
 ```bash
-youtube-pp-cli watch add @mkbhd --json
+amazon-jobs-pp-cli save sde-seattle "software engineer" --city Seattle --country USA && amazon-jobs-pp-cli new sde-seattle --agent
 ```
 
-Add each competitor once; backfill seeds history and every monitor run keeps them current
+Persist a named search once, then run `new` to see only reqs that appeared since your last sync.
 
-### What moved today
+### Agent-native search narrowed to key fields
 
 ```bash
-youtube-pp-cli velocity --agent --select items.title,items.views_per_day
+amazon-jobs-pp-cli find "solutions architect" --country USA --agent --select title,location,posted_date,job_path
 ```
 
-Between-snapshot view velocity for tracked videos, narrowed to the fields an agent needs
+Amazon reqs carry huge description/qualification text; --select trims the payload to the fields an agent needs.
 
-### Fresh breakouts in a niche
+### Where is AWS hiring most right now?
 
 ```bash
-youtube-pp-cli breakouts "berlin history" --days 14 --json
+amazon-jobs-pp-cli sync aws --max-pages 10 && amazon-jobs-pp-cli stats --by city
 ```
 
-Chained filter matrix joined to channel size - high views-per-subscriber uploads from the last two weeks
+Mirror AWS reqs locally, then aggregate by city — counts the empty server facets never return.
 
-### Packaging dossier for the agent
+### Which teams demand a specific skill
 
 ```bash
-youtube-pp-cli packaging @mkbhd --json
+amazon-jobs-pp-cli sync engineer --max-pages 10 && amazon-jobs-pp-cli skills Rust --agent
 ```
 
-Titles, local thumbnail files, and hook text side by side, ready for multimodal packaging analysis
+Scan synced qualification text for a keyword and rank teams/cities by demand.
 
-### What the audience keeps asking
+### Senior IC roles only (no manager, no intern)
 
 ```bash
-youtube-pp-cli comments-mine @mkbhd --json
+amazon-jobs-pp-cli find "software engineer" --country USA --manager=false --intern=false
 ```
 
-Top-liked comments, keyword frequencies, and extracted questions from the synced comment table
+Client-side NULL-safe filters for fields Amazon can't filter server-side.
+
+### Only reqs actually posted this week
+
+```bash
+amazon-jobs-pp-cli find "program manager" --country GBR --posted-within 7d --max-scan-pages 10 --agent
+```
+
+Filters on the true `posted_date`. Any row carrying `"updated_diverged": true` was posted long ago and merely re-indexed — do not describe it to the user as newly posted.
+
+### Screen out roles that won't sponsor a visa
+
+```bash
+amazon-jobs-pp-cli find "" --country SGP --description-not-contains "without sponsorship" --posted-within 2w --max-scan-pages 10 --agent
+```
+
+Sponsorship, relocation, and language constraints exist only in description prose. Combine the text filter with a recency window to build a shortlist worth applying to.
+
+### Sweep several countries for fresh reqs
+
+```bash
+for c in GBR IRL LUX JPN SGP SAU ARE; do
+  amazon-jobs-pp-cli find "" --country "$c" --posted-within 7d --max-scan-pages 10 --agent
+done
+```
+
+The API takes one country per request, so multi-market searches fan out client-side. Pair with `save`/`new` when the sweep should run repeatedly and only report reqs unseen since last time.
 
 ## Auth Setup
 
-Set YOUTUBE_API_KEY to a YouTube Data API v3 key (create one at console.cloud.google.com under APIs & Services > Credentials), or store it once with `auth set-token`. A key in the environment overrides the stored one - if `doctor` shows auth_source env and calls fail with HTTP 400 'API key not valid', the environment copy is stale: unset it or update it. Read-only public-data operations only; no OAuth anywhere.
+No authentication required.
 
-Run `youtube-pp-cli doctor` to verify setup.
+Run `amazon-jobs-pp-cli doctor` to verify setup.
 
 ## Agent Mode
 
-Add `--agent` to any command. Expands to: `--json --compact --no-input --no-color`.
+Add `--agent` to any command. Expands to: `--json --compact --no-input --no-color --yes`.
 
 - **Pipeable** — JSON on stdout, errors on stderr
 - **Filterable** — `--select` keeps a subset of fields. Dotted paths descend into nested structures; arrays traverse element-wise. Critical for keeping context small on verbose APIs:
 
   ```bash
-  youtube-pp-cli youtube activities-list --part snippet --agent --select contentDetails,etag,id
+  amazon-jobs-pp-cli postings --agent --select id,name,status
   ```
 - **Previewable** — `--dry-run` shows the request without sending
 - **Offline-friendly** — sync/search commands can use the local SQLite store when available
@@ -251,73 +251,30 @@ Parse `.results` for data and `.meta.source` to know whether it's live or local.
 
 Agents should treat the CLI's path resolver as part of the runtime contract:
 
-- Use `--home <dir>` for one invocation, or set `YOUTUBE_HOME=<dir>` to relocate all four path kinds under one root.
-- Use per-kind env vars only when a specific kind must diverge: `YOUTUBE_CONFIG_DIR`, `YOUTUBE_DATA_DIR`, `YOUTUBE_STATE_DIR`, `YOUTUBE_CACHE_DIR`.
-- Resolution order is per-kind env var, `--home`, `YOUTUBE_HOME`, XDG (`XDG_CONFIG_HOME`, `XDG_DATA_HOME`, `XDG_STATE_HOME`, `XDG_CACHE_HOME`), then platform defaults.
+- Use `--home <dir>` for one invocation, or set `AMAZON_JOBS_HOME=<dir>` to relocate all four path kinds under one root.
+- Use per-kind env vars only when a specific kind must diverge: `AMAZON_JOBS_CONFIG_DIR`, `AMAZON_JOBS_DATA_DIR`, `AMAZON_JOBS_STATE_DIR`, `AMAZON_JOBS_CACHE_DIR`.
+- Resolution order is per-kind env var, `--home`, `AMAZON_JOBS_HOME`, XDG (`XDG_CONFIG_HOME`, `XDG_DATA_HOME`, `XDG_STATE_HOME`, `XDG_CACHE_HOME`), then platform defaults.
 - `config` contains settings like `config.toml` and profiles. `data` contains `credentials.toml`, `data.db`, cookies, and auth sidecars. `state` contains persisted queries, jobs, and `teach.log`. `cache` contains regenerable HTTP/cache files.
 - Stored secrets live in `credentials.toml` under the data dir. Existing legacy `config.toml` secrets are read for compatibility and leave `config.toml` on the first auth write.
-- Run `youtube-pp-cli doctor --fail-on warn` to surface path and credential-location warnings. `agent-context` exposes a schema v4 `paths` block for agents that need the resolved dirs.
+- Run `amazon-jobs-pp-cli doctor --fail-on warn` to surface path and credential-location warnings. `agent-context` exposes a schema v4 `paths` block for agents that need the resolved dirs.
 - For MCP, pass relocation through the MCP host config. The MCP binary does not inherit CLI flags:
 
   ```json
   {
     "mcpServers": {
-      "youtube": {
-        "command": "youtube-pp-mcp",
+      "amazon-jobs": {
+        "command": "amazon-jobs-pp-mcp",
         "env": {
-          "YOUTUBE_HOME": "/srv/youtube"
+          "AMAZON_JOBS_HOME": "/srv/amazon-jobs"
         }
       }
     }
   }
   ```
 
-⚠️ Two files deliberately live OUTSIDE the relocatable tree, in the platform config dir (`~/Library/Application Support/youtube-pp-cli/` on macOS): `workspaces.json` (the workspace registry must sit outside workspace homes or switching becomes self-referential) and `keyring.json` (quota is per key, not per workspace). Consequence: `--home`/`YOUTUBE_HOME` does NOT isolate the key ring or workspace registry — `keys add/use` and `workspace create/use` mutate shared state even under an isolated home.
+Override the API host with `AMAZON_JOBS_BASE_URL` (or the `base_url` key in `config.toml`) when the default `https://www.amazon.jobs` is not reachable from this machine. If `doctor` reports `cannot resolve host`, the fault is the local resolver, not the API or your arguments: some routers and split-DNS/VPN setups refuse the `amazon.jobs` zone. Do not retry the command or rewrite the query — unresolvable hosts fail fast by design and will keep failing. Confirm with `host amazon.jobs` versus `host amazon.jobs 1.1.1.1`, then switch resolver, drop the VPN, or set `AMAZON_JOBS_BASE_URL`. Use `--dry-run` on `find` to print the exact URL and client-side filters the command would use without sending the request.
 
-Fleet precedence: an inherited per-kind env var overrides an explicit `--home` for that kind. Use `YOUTUBE_HOME` or per-kind vars as durable fleet levers, and use `--home` only for a single invocation. Relocation is not reversible by unsetting env vars; move files manually before clearing `YOUTUBE_HOME`, or `doctor` will not find credentials left under the former root.
-
-## The analyst databank (SQL schema)
-
-Every analyst command writes into one local SQLite databank — the file `doctor --json` reports
-as the store path. The filename is scoped by the active API key (`data-<hash>.db`); `workspace`
-switches between entirely separate databank files. Agents query it two ways: the MCP `sql` tool
-(read-only, validated) and the MCP `search` / CLI `search` full-text surface.
-
-| Table | One row per | Key columns |
-|---|---|---|
-| `yt_watchlist` | tracked competitor channel | `channel_id`, `handle`, `title`, `note`, `added_at`, `last_monitored_at` |
-| `yt_channel_snapshots` | channel per capture time | `channel_id`, `captured_at`, `subscriber_count`, `view_count`, `video_count` |
-| `yt_videos` | known video (dimension table) | `video_id`, `channel_id`, `title`, `published_at`, `duration_seconds`, `is_short`, `description` |
-| `yt_video_snapshots` | video per capture time | `video_id`, `captured_at`, `view_count`, `like_count`, `comment_count` |
-| `yt_comments` | synced comment | `comment_id`, `video_id`, `channel_id`, `author`, `text`, `like_count`, `published_at`, `is_reply` |
-| `yt_comments_fts` | FTS5 index over `yt_comments.text` | `MATCH` queries; kept in sync by insert/update/delete triggers |
-| `yt_packaging` | collected packaging asset | `video_id`, `channel_id`, `title`, `thumb_url`, `thumb_path`, `hook_text`, `view_count`, `captured_at`, `hook_error`, `thumb_error` |
-| `yt_monitor_runs` | one `monitor` run | `run_id`, `started_at`, `finished_at`, `channels`, `new_videos`, `video_snapshots`, `comments_synced`, `quota_units_est` |
-
-`monitor`, `backfill`, `breakouts`, `comments-mine`, and `packaging` feed these tables
-automatically (write-through); `velocity` and `growth` are computed from consecutive
-`yt_video_snapshots` / `yt_channel_snapshots` rows — two runs on different days are the
-minimum for a non-empty answer.
-
-Example queries (all verified against a live-populated store):
-
-```sql
--- What moved: views per video from the latest snapshots
-SELECT s.video_id, v.title, s.view_count, s.captured_at
-FROM yt_video_snapshots s JOIN yt_videos v USING(video_id)
-ORDER BY s.captured_at DESC, s.view_count DESC LIMIT 20;
-
--- Audience signal: most-liked comments mentioning a topic (FTS5)
-SELECT c.like_count, c.author, c.text
-FROM yt_comments_fts f JOIN yt_comments c ON c.rowid = f.rowid
-WHERE yt_comments_fts MATCH 'gemini' ORDER BY c.like_count DESC LIMIT 10;
-
--- Growth rate per tracked channel between first and last snapshot
-SELECT channel_id,
-       MAX(subscriber_count) - MIN(subscriber_count) AS subs_delta,
-       MIN(captured_at) AS first_seen, MAX(captured_at) AS last_seen
-FROM yt_channel_snapshots GROUP BY channel_id;
-```
+Fleet precedence: an inherited per-kind env var overrides an explicit `--home` for that kind. Use `AMAZON_JOBS_HOME` or per-kind vars as durable fleet levers, and use `--home` only for a single invocation. Relocation is not reversible by unsetting env vars; move files manually before clearing `AMAZON_JOBS_HOME`, or `doctor` will not find credentials left under the former root.
 
 ## Automatic learning
 
@@ -328,7 +285,7 @@ This CLI ships a self-capturing learning loop. The CLI does its own bookkeeping:
 Before list/search/drill commands on a new user question, run:
 
 ```bash
-youtube-pp-cli recall "<user's question>" --agent
+amazon-jobs-pp-cli recall "<user's question>" --agent
 ```
 
 The response envelope:
@@ -351,7 +308,7 @@ The response envelope:
     { "id": 12, "class": "flag_alias | playbook_candidate",
       "summary": "...", "sightings": 3, "last_seen": "...",
       "rationale": "...",
-      "next_action": ["<trial command>", "youtube-pp-cli learnings confirm 12"] }
+      "next_action": ["<trial command>", "amazon-jobs-pp-cli learnings confirm 12"] }
   ],
   "playbook": {
     "query_family": "...",
@@ -390,7 +347,7 @@ if Playbook present:
        for the entity slot tokens. If a step's slot is unresolved, fall back to
        discovery for that step only.
     -> the Playbook's expected_tool_calls is a budget; if you find yourself running
-       materially more, record the divergence via `youtube-pp-cli playbook amend`
+       materially more, record the divergence via `amazon-jobs-pp-cli playbook amend`
        at end-of-session.
 
 elif Notes present (no Playbook):
@@ -416,7 +373,7 @@ else:  // Found == false, no playbook, no notes
 
 Playbook and Notes are orthogonal to the per-resource path. A recall response can carry both a Playbook AND a `Results[]` hit - use both: the Playbook tells you which choreography to run; the resource hits short-circuit specific steps. Default to skipping `mismatches`; pass `--debug-mismatches` only when investigating cold-start surprises.
 
-Candidate judgment details: `learnings confirm <id>` prints the candidate's full payload before materializing it - check that the printed payload matches the behavior you verified. `learnings reject <id>` tombstones the derivation signature so the same candidate does not resurface. The envelope carries only the few candidates worth acting on now; `youtube-pp-cli learnings candidates` lists the full open set.
+Candidate judgment details: `learnings confirm <id>` prints the candidate's full payload before materializing it - check that the printed payload matches the behavior you verified. `learnings reject <id>` tombstones the derivation signature so the same candidate does not resurface. The envelope carries only the few candidates worth acting on now; `amazon-jobs-pp-cli learnings candidates` lists the full open set.
 
 Graceful degradation: if `learnings confirm` is an unknown command, you are driving an older binary - ignore the candidates guidance and follow the rest of the protocol.
 
@@ -428,7 +385,6 @@ Graceful degradation: if `learnings confirm` is an unknown command, you are driv
 - `similar_shape_different_entity:<canonical>` (top-level): a structurally matching row exists but its canonical entity differs from the live query's. Treated as cold start; the warning carries the conflicting canonical as a hint, but the row is NOT promoted into Results.
 - `ambiguous_alias` (top-level): a single query entity resolved to multiple canonicals (e.g., "Cards" → Arizona Cardinals + St. Louis Cardinals). Surface the ambiguity from context before committing to a resource.
 - `candidates_present` (top-level): the envelope carries a `candidates` section. Handle it via the candidates branch in Step 2 before anything else.
-- `lookup_refresh_available` (top-level): an entity in the query has no lookup row yet, but synced data could provide one. Run `youtube-pp-cli sync` to refresh entity lookups.
 - Top-level `no_learnings_for_query_family`: the table had no rows above the Jaccard floor. Pure cold start.
 
 ### Step 4: `teach &` after finalizing your response - always
@@ -436,7 +392,7 @@ Graceful degradation: if `learnings confirm` is an unknown command, you are driv
 Teaching is unconditional. After resolving a query the store could not answer, background-teach the final resource mapping - no call-count threshold, no judging whether it was "worth" learning. The teach is the anchor of the loop: it triggers playbook synthesis for a family without a playbook, and same-referent phrasings fold into one family so near-duplicate teaches do not fragment the store. Fire it after assembling your user-facing response but BEFORE emitting it, with a shell `&` so the call returns immediately:
 
 ```bash
-youtube-pp-cli teach --query "<user's question>" --resource-type <type> --resource <id1> --resource <id2>
+amazon-jobs-pp-cli teach --query "<user's question>" --resource-type <type> --resource <id1> --resource <id2>
 # (append shell `&` to background it)
 ```
 
@@ -450,7 +406,7 @@ You do not need to decide whether a session "deserves" a playbook: a teach on a 
 
 ```bash
 # Common case: record both the resource learning AND the playbook in one call.
-youtube-pp-cli teach \
+amazon-jobs-pp-cli teach \
   --query "<user's question>" \
   --resource <id> \
   --playbook-file ~/playbooks/<shape>.json \
@@ -458,7 +414,7 @@ youtube-pp-cli teach \
 # (append shell `&` to background it)
 
 # Alternate: playbook-only (no resource to record alongside).
-youtube-pp-cli teach-playbook \
+amazon-jobs-pp-cli teach-playbook \
   --query "<user's question>" \
   --playbook-file ~/playbooks/<shape>.json \
   --notes-file ~/playbooks/<shape>-notes.md
@@ -473,7 +429,7 @@ When you DO find a playbook on a future recall, treat it as ground truth: replay
 If your debug-protocol response identifies a concrete correction the notes or playbook should know — a workaround, an undocumented endpoint shape, a stale field name, observed schema drift, an empty-payload fallback — fire `playbook amend` BEFORE emitting your user-facing response. Same fire-and-forget posture as `teach`.
 
 ```bash
-youtube-pp-cli playbook amend \
+amazon-jobs-pp-cli playbook amend \
   --query "<exact recall query string>" \
   --add-note "<your concrete correction>"
 # (append shell `&` to background it)
@@ -504,24 +460,24 @@ If a correction is only meaningful with user-specific context, it belongs in a p
 
 ### Measuring the loop
 
-`youtube-pp-cli learnings stats` reports recall hit rate, teach-to-reuse, playbook resolution rate, and candidate confirm/reject counts from the local `learn_events` table. Rates are null until they have a denominator; everything stays on this machine. Use it to check whether the loop is earning its keep for this CLI.
+`amazon-jobs-pp-cli learnings stats` reports recall hit rate, teach-to-reuse, playbook resolution rate, and candidate confirm/reject counts from the local `learn_events` table. Rates are null until they have a denominator; everything stays on this machine. Use it to check whether the loop is earning its keep for this CLI.
 
 ### Disabling learning
 
 - `--no-learn` on a single command short-circuits both `recall` and the `teach` write path. Use for deterministic agent flows or tests that must not be affected by accumulated learnings.
-- `YOUTUBE_NO_LEARN=true` in the environment globally disables the pipeline.
+- `AMAZON_JOBS_NO_LEARN=true` in the environment globally disables the pipeline.
 
 ## Agent Feedback
 
 When you (or the agent) notice something off about this CLI, record it:
 
 ```
-youtube-pp-cli feedback "the --since flag is inclusive but docs say exclusive"
-youtube-pp-cli feedback --stdin < notes.txt
-youtube-pp-cli feedback list --json --limit 10
+amazon-jobs-pp-cli feedback "the --since flag is inclusive but docs say exclusive"
+amazon-jobs-pp-cli feedback --stdin < notes.txt
+amazon-jobs-pp-cli feedback list --json --limit 10
 ```
 
-Entries are stored locally as `feedback.jsonl` under the resolved data dir. They are never POSTed unless `YOUTUBE_FEEDBACK_ENDPOINT` is set AND either `--send` is passed or `YOUTUBE_FEEDBACK_AUTO_SEND=true`. Default behavior is local-only.
+Entries are stored locally as `feedback.jsonl` under the resolved data dir. They are never POSTed unless `AMAZON_JOBS_FEEDBACK_ENDPOINT` is set AND either `--send` is passed or `AMAZON_JOBS_FEEDBACK_AUTO_SEND=true`. Default behavior is local-only.
 
 Write what *surprised* you, not a bug report. Short, specific, one line: that is the part that compounds.
 
@@ -542,11 +498,11 @@ Unknown schemes are refused with a structured error naming the supported set. We
 A profile is a saved set of flag values, reused across invocations. Use it when a scheduled or recurring agent reuses the same saved flags while providing different input each run.
 
 ```
-youtube-pp-cli profile save briefing --json
-youtube-pp-cli --profile briefing youtube activities-list --part snippet
-youtube-pp-cli profile list --json
-youtube-pp-cli profile show briefing
-youtube-pp-cli profile delete briefing --yes
+amazon-jobs-pp-cli profile save briefing --json
+amazon-jobs-pp-cli --profile briefing postings
+amazon-jobs-pp-cli profile list --json
+amazon-jobs-pp-cli profile show briefing
+amazon-jobs-pp-cli profile delete briefing --yes
 ```
 
 Explicit flags always win over profile values; profile values win over defaults. `agent-context` lists all available profiles under `available_profiles` so introspecting agents discover them at runtime.
@@ -558,7 +514,6 @@ Explicit flags always win over profile values; profile values win over defaults.
 | 0 | Success |
 | 2 | Usage error (wrong arguments) |
 | 3 | Resource not found |
-| 4 | Authentication required |
 | 5 | API error (upstream issue) |
 | 7 | Rate limited (wait and retry) |
 | 10 | Config error |
@@ -567,7 +522,7 @@ Explicit flags always win over profile values; profile values win over defaults.
 
 Parse `$ARGUMENTS`:
 
-1. **Empty, `help`, or `--help`** → show `youtube-pp-cli --help` output
+1. **Empty, `help`, or `--help`** → show `amazon-jobs-pp-cli --help` output
 2. **Starts with `install`** → ends with `mcp` → MCP installation; otherwise → see Prerequisites above
 3. **Anything else** → Direct Use (execute as CLI command with `--agent`)
 
@@ -575,21 +530,21 @@ Parse `$ARGUMENTS`:
 
 1. Install the MCP server:
    ```bash
-   go install github.com/mvanhorn/printing-press-library/library/media-and-entertainment/youtube/cmd/youtube-pp-mcp@latest
+   go install github.com/mvanhorn/printing-press-library/library/productivity/amazon-jobs/cmd/amazon-jobs-pp-mcp@latest
    ```
 2. Register with Claude Code:
    ```bash
-   claude mcp add youtube-pp-mcp -- youtube-pp-mcp
+   claude mcp add amazon-jobs-pp-mcp -- amazon-jobs-pp-mcp
    ```
 3. Verify: `claude mcp list`
 
 ## Direct Use
 
-1. Check if installed: `which youtube-pp-cli`
+1. Check if installed: `which amazon-jobs-pp-cli`
    If not found, offer to install (see Prerequisites at the top of this skill).
 2. Match the user query to the best command from the Unique Capabilities and Command Reference above.
 3. Execute with the `--agent` flag:
    ```bash
-   youtube-pp-cli <command> [subcommand] [args] --agent
+   amazon-jobs-pp-cli <command> [subcommand] [args] --agent
    ```
-4. If ambiguous, drill into subcommand help: `youtube-pp-cli <command> --help`.
+4. If ambiguous, drill into subcommand help: `amazon-jobs-pp-cli <command> --help`.

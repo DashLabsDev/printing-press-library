@@ -1,7 +1,7 @@
 ---
-name: pp-youtube
-description: "A self-maintained competitor-monitoring machine for YouTube: the read surfaces that matter for market and competitor research plus a local databank of channel histories, snapshots, comments, and packaging assets - market data hours old, not weeks. Trigger phrases: `monitor my youtube competitors`, `which competitor videos are gaining views right now`, `find fresh breakout videos in a niche`, `youtube packaging and thumbnail analysis data`, `mine youtube comments for audience signal`, `new niche research workspace`, `switch youtube api key`, `backfill youtube channel history`, `get the transcript of this youtube video`, `use youtube`, `run youtube`."
-author: "Justin"
+name: pp-concur
+description: "Every expense-report and travel workflow Concur's web app offers, plus duplicate detection and real flight/hotel search no Concur tool has -- filed through the same session your browser already uses. Trigger phrases: `file my Concur expense report`, `submit my expense report`, `what's in my Concur trip`, `use concur`, `run concur`."
+author: "Allen Lew"
 license: "Apache-2.0"
 argument-hint: "<command> [args] | install cli|mcp"
 allowed-tools: "Read Bash"
@@ -9,156 +9,160 @@ metadata:
   openclaw:
     requires:
       bins:
-        - youtube-pp-cli
+        - concur-pp-cli
     install:
       - kind: go
-        bins: [youtube-pp-cli]
-        module: github.com/mvanhorn/printing-press-library/library/media-and-entertainment/youtube/cmd/youtube-pp-cli
+        bins: [concur-pp-cli]
+        module: github.com/mvanhorn/printing-press-library/library/accounting/concur/cmd/concur-pp-cli
 ---
 <!-- GENERATED FILE — DO NOT EDIT.
-     This file is a verbatim mirror of library/media-and-entertainment/youtube/SKILL.md,
+     This file is a verbatim mirror of library/productivity/concur/SKILL.md,
      regenerated post-merge by tools/generate-skills/. Hand-edits here are
      silently overwritten on the next regen. Edit the library/ source instead.
      See the repository agent guide, section "Generated artifacts: registry.json, cli-skills/". -->
 
-# YouTube — Printing Press CLI
+# SAP Concur — Printing Press CLI
 
 ## Prerequisites: Install the CLI
 
-This skill drives the `youtube-pp-cli` binary. **You must verify the CLI is installed before invoking any command from this skill.** If it is missing, install it first:
+This skill drives the `concur-pp-cli` binary. **You must verify the CLI is installed before invoking any command from this skill.** If it is missing, install it first:
 
 1. Install via the Printing Press installer. It defaults binaries to `$HOME/.local/bin` on macOS/Linux and `%LOCALAPPDATA%\Programs\PrintingPress\bin` on Windows:
    ```bash
-   npx -y @mvanhorn/printing-press-library install youtube --cli-only
+   npx -y @mvanhorn/printing-press-library install concur --cli-only
    ```
-2. Verify: `youtube-pp-cli --version`
+2. Verify: `concur-pp-cli --version`
 3. Ensure the reported install directory is on `$PATH` for the agent/runtime that will invoke this skill.
 
 If the `npx` install fails (no Node, offline, etc.), fall back to a direct Go install (requires Go 1.26.6 or newer). This installs into `$GOPATH/bin` (default `$HOME/go/bin`), so add that directory to `$PATH` instead:
 
 ```bash
-go install github.com/mvanhorn/printing-press-library/library/media-and-entertainment/youtube/cmd/youtube-pp-cli@latest
+go install github.com/mvanhorn/printing-press-library/library/accounting/concur/cmd/concur-pp-cli@latest
 ```
 
 If `--version` reports "command not found" after install, the runtime cannot see the binary directory on `$PATH`. Do not proceed with skill commands until verification succeeds.
 
-The YouTube Data API v3 read surfaces that matter for market and competitor research with complete parameter wiring, feeding a local SQLite databank designed for competitor monitoring: `watch` your ~15 competitors, `monitor` refreshes them for ~20-40 quota units per run, and `velocity`, `growth`, `breakouts`, `comments-mine`, and `packaging` turn the accumulated snapshots into current market intelligence that lagging analytics platforms deliver one to two weeks late.
+SAP Concur's official API requires enterprise partner credentials most individual users can never get. This CLI defaults to your logged-in browser session instead, so filing expense reports and checking travel works the same day you install it. Local SQLite sync turns your report history into something you can search, join, and validate offline.
 
 ## When to Use This CLI
 
-Reach for this CLI whenever the task is YouTube market or competitor research: tracking a fixed set of competitor channels over time, measuring what is gaining views right now, discovering fresh breakout videos in a niche, mining comments for audience signal, or collecting titles, thumbnails, and hooks for packaging analysis. It is the right tool when the answer should come from a locally owned, regularly refreshed databank instead of a lagging external analytics platform.
+Use this CLI for filing and checking your own SAP Concur expense reports and travel -- creating reports, pulling in available card charges, validating and submitting, and checking trip/itinerary status. It is the right choice whenever the task is something an individual employee would otherwise do by logging into concursolutions.com.
 
 ## Anti-triggers
 
 Do not use this CLI for:
-- Do not use this CLI for your own channel's private analytics (revenue, retention, demographics, traffic sources) - that is the OAuth-only YouTube Analytics API, which this CLI deliberately excludes
-- Do not use it to upload, edit, rate, or delete videos or manage a channel - all write operations are out of scope
-- Do not use it to download video or audio media - use yt-dlp for media files
-- Do not use it for wide-market computed judgments like cross-niche outlier scores or monetization estimates - curated analytics databases own that; this CLI owns fresh data on the channels you track
+- Do not use this CLI to register a new SAP Concur partner application or manage OAuth2 App Center listings -- that is an admin/partner workflow, not an end-user one.
+- Do not use this CLI to actually book new travel (flights/hotels/cars). `flights search` and `hotels search` return real, live fares and rates from your actual corporate-negotiated policy for research and comparison, but completing a booking is a complex multi-step web/agent experience this CLI does not implement -- finish the booking in Concur's web app.
+- Do not use this CLI for company-wide financial reporting or accounting-system integration -- use the documented v3/v4 partner REST API directly for that.
 
 ## Unique Capabilities
 
 These capabilities aren't available in any other tool for this API.
 
-### Competitor monitoring machine
-- **`watch`** — Register the competitor channels your monitoring machine tracks, in a typed watchlist table you own.
+### Local state that compounds
+- **`expenses scan-duplicates`** — Find potential double-entered charges across all of your synced expenses.
 
-  _Defines the tracked market once; every later monitoring command runs against it without re-specifying channels._
-
-  ```bash
-  youtube-pp-cli watch add @mkbhd --json
-  ```
-- **`monitor`** — Refresh every watched channel in one run: stats snapshot, new uploads, re-snapshot of recent video statistics.
-
-  _One command keeps the databank current, so market answers are hours old instead of weeks old._
+  _Run this before submitting a batch of reports if you suspect a corporate-card charge and a manually-entered cash expense might be the same transaction._
 
   ```bash
-  youtube-pp-cli monitor --json
+  concur-pp-cli expenses scan-duplicates --agent
   ```
-- **`velocity`** — See which tracked videos are gaining views fastest right now, computed from real between-snapshot deltas.
 
-  _Current market movement - what is taking off today, not what took off two weeks ago._
+### Live travel shopping (search only, never books)
+- **`flights search`** — Real flight availability and fares from a live shopping session against your actual corporate-negotiated rates and travel policy -- not a public fare aggregator. One-way by default; `--return` includes both legs in the search but only renders the outbound leg (see `--help` for the known gap).
+
+  _Use this to compare real options before requesting travel, with policy-compliance flags already applied per fare._
 
   ```bash
-  youtube-pp-cli velocity --json
+  concur-pp-cli flights search --from LAX --to "New York" --depart 2026-10-12 --yes --agent
   ```
-- **`growth`** — Channel-level subscriber, view, and upload-count deltas between dated local snapshots.
+- **`hotels search`** — Real hotel availability and rates via a live, policy-scoped search -- the same inventory and pricing Concur's own Hotel Search page shows. Drives a real browser (see HTTP Transport and Auth Setup below) rather than a direct API call, because the hotel shopping-session mutation is blocked from scripted replay by the tenant's bot-mitigation.
 
-  _Tells an agent whether a competitor is accelerating without any external history service._
+  _A one-time dedicated-browser setup (see Auth Setup) avoids a separate login every time this command's session expires._
 
   ```bash
-  youtube-pp-cli growth @mkbhd --json
-  ```
-- **`backfill`** — Pull a channel's complete upload history with statistics into the local databank in one command.
-
-  _Run once per competitor; every later question about that channel is answered offline for free._
-
-  ```bash
-  youtube-pp-cli backfill @mkbhd --json
-  ```
-- **`workspace`** — Named databanks: keep the competitor machine in one database and explore a new niche in another, switching instantly.
-
-  _Lets an agent spin up a clean research sandbox per niche without risking the production watchlist databank._
-
-  ```bash
-  youtube-pp-cli workspace list --json
-  ```
-- **`auth keys`** — Store multiple named YouTube API keys, switch between them instantly, and optionally fail over automatically via --rotate when one runs out of quota.
-
-  _An agent can finish large collection jobs without human intervention when the first key's daily quota is spent._
-
-  ```bash
-  youtube-pp-cli auth keys list --json
+  concur-pp-cli hotels search --to "New York" --check-in 2026-10-12 --check-out 2026-10-18 --yes --agent
   ```
 
-### Fresh market discovery
-- **`breakouts`** — Chain search filters into a matrix (terms x upload window x duration x region), join results to channel size, and rank fresh high-momentum videos.
+## HTTP Transport
 
-  _Finds niche breakouts days after upload, weeks before they reach lagging analytics platforms._
+This CLI uses Chrome-compatible HTTP transport for browser-facing endpoints. It does not require a resident browser process for normal API calls.
 
-  ```bash
-  youtube-pp-cli breakouts "berlin history" --days 14 --json
-  ```
-- **`comments-mine`** — Sync comments into a typed full-text-searchable table and report top-liked comments, keyword frequencies, and audience questions.
-
-  _Fast audience signal from data you own - what viewers praise, ask, and complain about across a channel._
-
-  ```bash
-  youtube-pp-cli comments-mine @mkbhd --json
-  ```
-- **`packaging`** — Collect titles, thumbnails (downloaded as local image files), and hook text from transcript openings into a packaging table.
-
-  _Hands a multimodal agent everything it needs for thumbnail and hook analysis without any scraping or manual collection._
-
-  ```bash
-  youtube-pp-cli packaging @mkbhd --json
-  ```
+**Exception: `hotels search`.** Confirmed live that Concur's hotel shopping-session mutation is blocked from scripted HTTP replay by the tenant's bot-mitigation (byte-for-byte replay of a request that had just succeeded natively in the browser still failed). So this one command drives a real browser via `agent-browser` instead (`npm install -g agent-browser && agent-browser install`) -- `flights search` and every other command remain pure HTTP; only the hotel-shopping mutation needs a real browser.
 
 ## Command Reference
 
-**youtube** — YouTube Data API v3 (read-only, api-key) for market and competitor analysis
+**account** — Current user profile, policies, and delegate context
 
-- `youtube-pp-cli youtube activities-list` — Retrieves a list of resources, possibly filtered.
-- `youtube-pp-cli youtube captions-list` — Retrieves a list of resources, possibly filtered.
-- `youtube-pp-cli youtube channel-sections-list` — Retrieves a list of resources, possibly filtered.
-- `youtube-pp-cli youtube channels-list` — Retrieves a list of resources, possibly filtered.
-- `youtube-pp-cli youtube comment-threads-list` — Retrieves a list of top-level comment threads, filterable by video, channel, or thread id.
-- `youtube-pp-cli youtube i18n-languages-list` — Retrieves a list of resources, possibly filtered.
-- `youtube-pp-cli youtube i18n-regions-list` — Retrieves a list of resources, possibly filtered.
-- `youtube-pp-cli youtube playlist-items-list` — Retrieves a list of resources, possibly filtered.
-- `youtube-pp-cli youtube playlists-list` — Retrieves a list of resources, possibly filtered.
-- `youtube-pp-cli youtube search-list` — Retrieves a list of search resources
-- `youtube-pp-cli youtube video-categories-list` — Retrieves a list of resources, possibly filtered.
-- `youtube-pp-cli youtube videos-list` — Retrieves a list of resources, possibly filtered.
-- `youtube-pp-cli youtube channel-uploads` — List a channel's most recent uploads (resolves @handle or channelId, then walks the uploads playlist).
-- `youtube-pp-cli youtube playlist-enrich` — Resolve a playlist to per-video metadata + transcript + description in one concurrent call.
-- `youtube-pp-cli youtube search-bulk` — Search YouTube for multiple terms in one call, return top-N per term.
-- `youtube-pp-cli youtube videos-comments` — Fetch top comments for a video, ranked by like count across pages.
-- `youtube-pp-cli youtube videos-embed` — Print embed HTML, iframe, or markdown snippet for a video.
-- `youtube-pp-cli youtube videos-enrich` — One video's metadata + transcript + description in one call.
-- `youtube-pp-cli youtube videos-links` — Extract resource links from a video description (expands short links, skips social noise).
-- `youtube-pp-cli youtube videos-related` — Find related videos, shared-topic ranking above same-channel.
-- `youtube-pp-cli youtube videos-transcript` — Fetch the transcript without OAuth (timedtext; --format markdown|text|json).
+- `concur-pp-cli account travel <user_id>` — Get the current user's travel profile and loyalty programs
+- `concur-pp-cli account whoami` — Get the current user's profile, addresses, and travel IDs
+
+**attendees** — Attendee catalog and per-expense attendee associations
+
+- `concur-pp-cli attendees add` — Add attendees to an expense (merge-preserves existing associations; Concur's underlying association call is a replace
+- `concur-pp-cli attendees list` — Get attendees currently associated with an expense
+
+**delegates** — Delegate (act-on-behalf-of) relationships
+
+- `concur-pp-cli delegates` — List users the current session user delegates for, with permission flags
+
+**expense_types** — Expense type catalog and per-type dynamic form fields
+
+- `concur-pp-cli expense-types list` — List usable expense types for the current user's policy
+
+**expenses** — Expense line items within a report
+
+- `concur-pp-cli expenses create` — Create an expense inside a report (core v3-equivalent fields: type, date, amount, currency, payment type)
+- `concur-pp-cli expenses get` — Get a single expense with its filled/empty field manifest
+- `concur-pp-cli expenses update` — Fill or change writable fields on an expense (core + custom/list fields)
+
+**flights** — Search flight locations, travel policy preferences, and real flight availability (creates a live shopping session -- searches only, never books)
+
+- `concur-pp-cli flights locations <query>` — Resolve an airport, city, or metro name to Concur's travel location IDs; metro queries (e.g. "New York") resolve to one search endpoint covering all constituent airports
+- `concur-pp-cli flights preferences` — Show your travel policy's flight search defaults
+- `concur-pp-cli flights search --from <origin> --to <dest> --depart <date> [--return <date>]` — Search real flight availability and fares
+
+**hotels** — Search real hotel availability and rates (drives a real browser search -- searches only, never books)
+
+- `concur-pp-cli hotels search --to <destination> --check-in <date> --check-out <date>` — Search real hotel availability and rates; requires `agent-browser` installed (see HTTP Transport and Auth Setup below)
+
+**lists** — Valid values for list-type expense form fields
+
+- `concur-pp-cli lists --list-id <id>` — Get valid values for a list-type form field by list ID
+
+**locations** — Location catalog for filling expense/attendee location fields
+
+- `concur-pp-cli locations <query>` — Search the location catalog by city or venue name
+
+**payment_types** — Payment type catalog (Cash, Company Card, etc.)
+
+- `concur-pp-cli payment-types` — List payment types available to the current user
+
+**receipts** — Receipt image/PDF attachment
+
+- `concur-pp-cli receipts <expense_id> --file <path>` — Attach a receipt image or PDF to an expense
+
+**reports** — Expense report headers and lifecycle
+
+- `concur-pp-cli reports create` — Create a new expense report header
+- `concur-pp-cli reports get` — Get a report's header, expenses, and web deep link
+- `concur-pp-cli reports list` — List the current user's expense reports
+- `concur-pp-cli reports submit` — Submit a report for approval
+- `concur-pp-cli reports update` — Update a report's name or business purpose
+
+**requests** — Travel requests / pre-trip authorization (UNVERIFIED paths -- see spec header notes)
+
+- `concur-pp-cli requests get` — Get a travel request's detail and workflow status
+- `concur-pp-cli requests list` — List the current user's travel requests
+
+**travel_allowance** — Per-diem / travel allowance calculations (UNVERIFIED path -- see spec header notes)
+
+- `concur-pp-cli travel-allowance <trip_id>` — Get travel allowance (per-diem) calculation results for a trip
+
+**trips** — Booked trips and itineraries (UNVERIFIED paths -- see spec header notes)
+
+- `concur-pp-cli trips get` — Get a trip's itinerary detail
+- `concur-pp-cli trips list` — List the current user's upcoming and past trips
 
 
 ### Finding the right command
@@ -166,73 +170,63 @@ These capabilities aren't available in any other tool for this API.
 When you know what you want to do but not which command does it, ask the CLI directly:
 
 ```bash
-youtube-pp-cli which "<capability in your own words>"
+concur-pp-cli which "<capability in your own words>"
 ```
 
 `which` resolves a natural-language capability query to the best matching command from this CLI's curated feature index. Exit code `0` means at least one match; exit code `2` means no confident match — fall back to `--help` or use a narrower query.
 
 ## Recipes
 
-### Stand up the monitoring machine
+### Check for duplicate charges
 
 ```bash
-youtube-pp-cli watch add @mkbhd --json
+concur-pp-cli expenses scan-duplicates --agent
 ```
 
-Add each competitor once; backfill seeds history and every monitor run keeps them current
-
-### What moved today
+### Compare real flight and hotel options before requesting travel
 
 ```bash
-youtube-pp-cli velocity --agent --select items.title,items.views_per_day
+concur-pp-cli flights search --from LAX --to "New York" --depart 2026-10-12 --yes --agent
+concur-pp-cli hotels search --to "New York" --check-in 2026-10-12 --check-out 2026-10-18 --yes --agent
 ```
 
-Between-snapshot view velocity for tracked videos, narrowed to the fields an agent needs
+Both create a live shopping session against your real tenant -- searches only, never books. `flights search` is a direct API call; `hotels search` drives a real browser (see HTTP Transport and Auth Setup) and is markedly slower.
 
-### Fresh breakouts in a niche
-
-```bash
-youtube-pp-cli breakouts "berlin history" --days 14 --json
-```
-
-Chained filter matrix joined to channel size - high views-per-subscriber uploads from the last two weeks
-
-### Packaging dossier for the agent
-
-```bash
-youtube-pp-cli packaging @mkbhd --json
-```
-
-Titles, local thumbnail files, and hook text side by side, ready for multimodal packaging analysis
-
-### What the audience keeps asking
-
-```bash
-youtube-pp-cli comments-mine @mkbhd --json
-```
-
-Top-liked comments, keyword frequencies, and extracted questions from the synced comment table
+Scan the local SQLite cache for likely double-entered transactions across all your reports.
 
 ## Auth Setup
 
-Set YOUTUBE_API_KEY to a YouTube Data API v3 key (create one at console.cloud.google.com under APIs & Services > Credentials), or store it once with `auth set-token`. A key in the environment overrides the stored one - if `doctor` shows auth_source env and calls fail with HTTP 400 'API key not valid', the environment copy is stale: unset it or update it. Read-only public-data operations only; no OAuth anywhere.
+Concur's documented OAuth2 partner API is gated behind a Partner Enablement Manager relationship -- there is no self-serve signup, and this CLI does not implement that OAuth2 flow at all. Instead, this CLI authenticates via cookie/browser-session auth: run 'auth login --chrome', log into your company's Concur portal like you normally would (including SSO/MFA), and the CLI captures the resulting session. If a command fails with 401/403 and your company IT has partner OAuth2 credentials, that workflow requires calling the documented v3/v4 REST API directly (developer.concur.com) outside this CLI -- it is not something 'auth login' or any other command here can switch to.
 
-Run `youtube-pp-cli doctor` to verify setup.
+Run `concur-pp-cli doctor` to verify setup.
+
+### `hotels search` has a second, separate login by default
+
+`hotels search` drives its own `agent-browser`-controlled Chrome instance (see HTTP Transport above), which does not share cookies with `auth login --chrome`'s source browser or credential store. Confirmed live that bridging them by copying cookies does not work -- Concur's bot-mitigation appears to bind the session to the browser/device that created it, not just the cookie value, so a copied JWT gets cleared by the server on the next navigation even when every cookie (including the Akamai bot-sensor ones) is copied alongside it. The first time (or whenever that session expires), `hotels search` opens its own Chrome window and asks you to log in there directly -- that login persists across later invocations until it expires again, so this is an occasional cost, not a per-search one.
+
+**Optional one-time setup to avoid that second login entirely**: run a dedicated Chrome profile with remote debugging enabled and log into Concur there once. Use a real named profile (Chrome menu -> "Add Person", or chrome://settings -> Add profile) rather than a throwaway `--user-data-dir`, so `auth login --chrome --profile "<name>"` can read its cookies too:
+
+```bash
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+  --remote-debugging-port=9222 --profile-directory="<profile dir name>"
+```
+
+`hotels search` auto-detects that session (tries CDP ports 9222, 9333, 9229 in order, or set `CONCUR_CDP_PORT` for a custom port) and *attaches* to it -- rather than copying its credentials -- before falling back to its own isolated login. Attaching, not copying, is what makes this work: it is the same live browser connection, so there is no separate device fingerprint for Concur's bot-mitigation to reject. Keep that Chrome window running whenever you plan to use `hotels search`; if you see "the dedicated Concur browser ... is no longer logged in", log in there again.
 
 ## Agent Mode
 
-Add `--agent` to any command. Expands to: `--json --compact --no-input --no-color`.
+Add `--agent` to any command. Expands to: `--json --compact --no-input --no-color --yes`.
 
 - **Pipeable** — JSON on stdout, errors on stderr
 - **Filterable** — `--select` keeps a subset of fields. Dotted paths descend into nested structures; arrays traverse element-wise. Critical for keeping context small on verbose APIs:
 
   ```bash
-  youtube-pp-cli youtube activities-list --part snippet --agent --select contentDetails,etag,id
+  concur-pp-cli payment-types --agent --select paymentTypeId,paymentTypeName,description
   ```
 - **Previewable** — `--dry-run` shows the request without sending
 - **Offline-friendly** — sync/search commands can use the local SQLite store when available
 - **Non-interactive** — never prompts, every input is a flag
-- **Read-only** — do not use this CLI for create, update, delete, publish, comment, upvote, invite, order, send, or other mutating requests
+- **Explicit retries** — use `--idempotent` only when an already-existing create should count as success
 
 ### Response envelope
 
@@ -251,73 +245,28 @@ Parse `.results` for data and `.meta.source` to know whether it's live or local.
 
 Agents should treat the CLI's path resolver as part of the runtime contract:
 
-- Use `--home <dir>` for one invocation, or set `YOUTUBE_HOME=<dir>` to relocate all four path kinds under one root.
-- Use per-kind env vars only when a specific kind must diverge: `YOUTUBE_CONFIG_DIR`, `YOUTUBE_DATA_DIR`, `YOUTUBE_STATE_DIR`, `YOUTUBE_CACHE_DIR`.
-- Resolution order is per-kind env var, `--home`, `YOUTUBE_HOME`, XDG (`XDG_CONFIG_HOME`, `XDG_DATA_HOME`, `XDG_STATE_HOME`, `XDG_CACHE_HOME`), then platform defaults.
+- Use `--home <dir>` for one invocation, or set `CONCUR_HOME=<dir>` to relocate all four path kinds under one root.
+- Use per-kind env vars only when a specific kind must diverge: `CONCUR_CONFIG_DIR`, `CONCUR_DATA_DIR`, `CONCUR_STATE_DIR`, `CONCUR_CACHE_DIR`.
+- Resolution order is per-kind env var, `--home`, `CONCUR_HOME`, XDG (`XDG_CONFIG_HOME`, `XDG_DATA_HOME`, `XDG_STATE_HOME`, `XDG_CACHE_HOME`), then platform defaults.
 - `config` contains settings like `config.toml` and profiles. `data` contains `credentials.toml`, `data.db`, cookies, and auth sidecars. `state` contains persisted queries, jobs, and `teach.log`. `cache` contains regenerable HTTP/cache files.
 - Stored secrets live in `credentials.toml` under the data dir. Existing legacy `config.toml` secrets are read for compatibility and leave `config.toml` on the first auth write.
-- Run `youtube-pp-cli doctor --fail-on warn` to surface path and credential-location warnings. `agent-context` exposes a schema v4 `paths` block for agents that need the resolved dirs.
+- Run `concur-pp-cli doctor --fail-on warn` to surface path and credential-location warnings. `agent-context` exposes a schema v4 `paths` block for agents that need the resolved dirs.
 - For MCP, pass relocation through the MCP host config. The MCP binary does not inherit CLI flags:
 
   ```json
   {
     "mcpServers": {
-      "youtube": {
-        "command": "youtube-pp-mcp",
+      "concur": {
+        "command": "concur-pp-mcp",
         "env": {
-          "YOUTUBE_HOME": "/srv/youtube"
+          "CONCUR_HOME": "/srv/concur"
         }
       }
     }
   }
   ```
 
-⚠️ Two files deliberately live OUTSIDE the relocatable tree, in the platform config dir (`~/Library/Application Support/youtube-pp-cli/` on macOS): `workspaces.json` (the workspace registry must sit outside workspace homes or switching becomes self-referential) and `keyring.json` (quota is per key, not per workspace). Consequence: `--home`/`YOUTUBE_HOME` does NOT isolate the key ring or workspace registry — `keys add/use` and `workspace create/use` mutate shared state even under an isolated home.
-
-Fleet precedence: an inherited per-kind env var overrides an explicit `--home` for that kind. Use `YOUTUBE_HOME` or per-kind vars as durable fleet levers, and use `--home` only for a single invocation. Relocation is not reversible by unsetting env vars; move files manually before clearing `YOUTUBE_HOME`, or `doctor` will not find credentials left under the former root.
-
-## The analyst databank (SQL schema)
-
-Every analyst command writes into one local SQLite databank — the file `doctor --json` reports
-as the store path. The filename is scoped by the active API key (`data-<hash>.db`); `workspace`
-switches between entirely separate databank files. Agents query it two ways: the MCP `sql` tool
-(read-only, validated) and the MCP `search` / CLI `search` full-text surface.
-
-| Table | One row per | Key columns |
-|---|---|---|
-| `yt_watchlist` | tracked competitor channel | `channel_id`, `handle`, `title`, `note`, `added_at`, `last_monitored_at` |
-| `yt_channel_snapshots` | channel per capture time | `channel_id`, `captured_at`, `subscriber_count`, `view_count`, `video_count` |
-| `yt_videos` | known video (dimension table) | `video_id`, `channel_id`, `title`, `published_at`, `duration_seconds`, `is_short`, `description` |
-| `yt_video_snapshots` | video per capture time | `video_id`, `captured_at`, `view_count`, `like_count`, `comment_count` |
-| `yt_comments` | synced comment | `comment_id`, `video_id`, `channel_id`, `author`, `text`, `like_count`, `published_at`, `is_reply` |
-| `yt_comments_fts` | FTS5 index over `yt_comments.text` | `MATCH` queries; kept in sync by insert/update/delete triggers |
-| `yt_packaging` | collected packaging asset | `video_id`, `channel_id`, `title`, `thumb_url`, `thumb_path`, `hook_text`, `view_count`, `captured_at`, `hook_error`, `thumb_error` |
-| `yt_monitor_runs` | one `monitor` run | `run_id`, `started_at`, `finished_at`, `channels`, `new_videos`, `video_snapshots`, `comments_synced`, `quota_units_est` |
-
-`monitor`, `backfill`, `breakouts`, `comments-mine`, and `packaging` feed these tables
-automatically (write-through); `velocity` and `growth` are computed from consecutive
-`yt_video_snapshots` / `yt_channel_snapshots` rows — two runs on different days are the
-minimum for a non-empty answer.
-
-Example queries (all verified against a live-populated store):
-
-```sql
--- What moved: views per video from the latest snapshots
-SELECT s.video_id, v.title, s.view_count, s.captured_at
-FROM yt_video_snapshots s JOIN yt_videos v USING(video_id)
-ORDER BY s.captured_at DESC, s.view_count DESC LIMIT 20;
-
--- Audience signal: most-liked comments mentioning a topic (FTS5)
-SELECT c.like_count, c.author, c.text
-FROM yt_comments_fts f JOIN yt_comments c ON c.rowid = f.rowid
-WHERE yt_comments_fts MATCH 'gemini' ORDER BY c.like_count DESC LIMIT 10;
-
--- Growth rate per tracked channel between first and last snapshot
-SELECT channel_id,
-       MAX(subscriber_count) - MIN(subscriber_count) AS subs_delta,
-       MIN(captured_at) AS first_seen, MAX(captured_at) AS last_seen
-FROM yt_channel_snapshots GROUP BY channel_id;
-```
+Fleet precedence: an inherited per-kind env var overrides an explicit `--home` for that kind. Use `CONCUR_HOME` or per-kind vars as durable fleet levers, and use `--home` only for a single invocation. Relocation is not reversible by unsetting env vars; move files manually before clearing `CONCUR_HOME`, or `doctor` will not find credentials left under the former root.
 
 ## Automatic learning
 
@@ -328,7 +277,7 @@ This CLI ships a self-capturing learning loop. The CLI does its own bookkeeping:
 Before list/search/drill commands on a new user question, run:
 
 ```bash
-youtube-pp-cli recall "<user's question>" --agent
+concur-pp-cli recall "<user's question>" --agent
 ```
 
 The response envelope:
@@ -351,7 +300,7 @@ The response envelope:
     { "id": 12, "class": "flag_alias | playbook_candidate",
       "summary": "...", "sightings": 3, "last_seen": "...",
       "rationale": "...",
-      "next_action": ["<trial command>", "youtube-pp-cli learnings confirm 12"] }
+      "next_action": ["<trial command>", "concur-pp-cli learnings confirm 12"] }
   ],
   "playbook": {
     "query_family": "...",
@@ -390,7 +339,7 @@ if Playbook present:
        for the entity slot tokens. If a step's slot is unresolved, fall back to
        discovery for that step only.
     -> the Playbook's expected_tool_calls is a budget; if you find yourself running
-       materially more, record the divergence via `youtube-pp-cli playbook amend`
+       materially more, record the divergence via `concur-pp-cli playbook amend`
        at end-of-session.
 
 elif Notes present (no Playbook):
@@ -416,7 +365,7 @@ else:  // Found == false, no playbook, no notes
 
 Playbook and Notes are orthogonal to the per-resource path. A recall response can carry both a Playbook AND a `Results[]` hit - use both: the Playbook tells you which choreography to run; the resource hits short-circuit specific steps. Default to skipping `mismatches`; pass `--debug-mismatches` only when investigating cold-start surprises.
 
-Candidate judgment details: `learnings confirm <id>` prints the candidate's full payload before materializing it - check that the printed payload matches the behavior you verified. `learnings reject <id>` tombstones the derivation signature so the same candidate does not resurface. The envelope carries only the few candidates worth acting on now; `youtube-pp-cli learnings candidates` lists the full open set.
+Candidate judgment details: `learnings confirm <id>` prints the candidate's full payload before materializing it - check that the printed payload matches the behavior you verified. `learnings reject <id>` tombstones the derivation signature so the same candidate does not resurface. The envelope carries only the few candidates worth acting on now; `concur-pp-cli learnings candidates` lists the full open set.
 
 Graceful degradation: if `learnings confirm` is an unknown command, you are driving an older binary - ignore the candidates guidance and follow the rest of the protocol.
 
@@ -428,7 +377,7 @@ Graceful degradation: if `learnings confirm` is an unknown command, you are driv
 - `similar_shape_different_entity:<canonical>` (top-level): a structurally matching row exists but its canonical entity differs from the live query's. Treated as cold start; the warning carries the conflicting canonical as a hint, but the row is NOT promoted into Results.
 - `ambiguous_alias` (top-level): a single query entity resolved to multiple canonicals (e.g., "Cards" → Arizona Cardinals + St. Louis Cardinals). Surface the ambiguity from context before committing to a resource.
 - `candidates_present` (top-level): the envelope carries a `candidates` section. Handle it via the candidates branch in Step 2 before anything else.
-- `lookup_refresh_available` (top-level): an entity in the query has no lookup row yet, but synced data could provide one. Run `youtube-pp-cli sync` to refresh entity lookups.
+- `lookup_refresh_available` (top-level): an entity in the query has no lookup row yet, but synced data could provide one. Run `concur-pp-cli sync` to refresh entity lookups.
 - Top-level `no_learnings_for_query_family`: the table had no rows above the Jaccard floor. Pure cold start.
 
 ### Step 4: `teach &` after finalizing your response - always
@@ -436,7 +385,7 @@ Graceful degradation: if `learnings confirm` is an unknown command, you are driv
 Teaching is unconditional. After resolving a query the store could not answer, background-teach the final resource mapping - no call-count threshold, no judging whether it was "worth" learning. The teach is the anchor of the loop: it triggers playbook synthesis for a family without a playbook, and same-referent phrasings fold into one family so near-duplicate teaches do not fragment the store. Fire it after assembling your user-facing response but BEFORE emitting it, with a shell `&` so the call returns immediately:
 
 ```bash
-youtube-pp-cli teach --query "<user's question>" --resource-type <type> --resource <id1> --resource <id2>
+concur-pp-cli teach --query "<user's question>" --resource-type <type> --resource <id1> --resource <id2>
 # (append shell `&` to background it)
 ```
 
@@ -450,7 +399,7 @@ You do not need to decide whether a session "deserves" a playbook: a teach on a 
 
 ```bash
 # Common case: record both the resource learning AND the playbook in one call.
-youtube-pp-cli teach \
+concur-pp-cli teach \
   --query "<user's question>" \
   --resource <id> \
   --playbook-file ~/playbooks/<shape>.json \
@@ -458,7 +407,7 @@ youtube-pp-cli teach \
 # (append shell `&` to background it)
 
 # Alternate: playbook-only (no resource to record alongside).
-youtube-pp-cli teach-playbook \
+concur-pp-cli teach-playbook \
   --query "<user's question>" \
   --playbook-file ~/playbooks/<shape>.json \
   --notes-file ~/playbooks/<shape>-notes.md
@@ -473,7 +422,7 @@ When you DO find a playbook on a future recall, treat it as ground truth: replay
 If your debug-protocol response identifies a concrete correction the notes or playbook should know — a workaround, an undocumented endpoint shape, a stale field name, observed schema drift, an empty-payload fallback — fire `playbook amend` BEFORE emitting your user-facing response. Same fire-and-forget posture as `teach`.
 
 ```bash
-youtube-pp-cli playbook amend \
+concur-pp-cli playbook amend \
   --query "<exact recall query string>" \
   --add-note "<your concrete correction>"
 # (append shell `&` to background it)
@@ -504,24 +453,24 @@ If a correction is only meaningful with user-specific context, it belongs in a p
 
 ### Measuring the loop
 
-`youtube-pp-cli learnings stats` reports recall hit rate, teach-to-reuse, playbook resolution rate, and candidate confirm/reject counts from the local `learn_events` table. Rates are null until they have a denominator; everything stays on this machine. Use it to check whether the loop is earning its keep for this CLI.
+`concur-pp-cli learnings stats` reports recall hit rate, teach-to-reuse, playbook resolution rate, and candidate confirm/reject counts from the local `learn_events` table. Rates are null until they have a denominator; everything stays on this machine. Use it to check whether the loop is earning its keep for this CLI.
 
 ### Disabling learning
 
 - `--no-learn` on a single command short-circuits both `recall` and the `teach` write path. Use for deterministic agent flows or tests that must not be affected by accumulated learnings.
-- `YOUTUBE_NO_LEARN=true` in the environment globally disables the pipeline.
+- `CONCUR_NO_LEARN=true` in the environment globally disables the pipeline.
 
 ## Agent Feedback
 
 When you (or the agent) notice something off about this CLI, record it:
 
 ```
-youtube-pp-cli feedback "the --since flag is inclusive but docs say exclusive"
-youtube-pp-cli feedback --stdin < notes.txt
-youtube-pp-cli feedback list --json --limit 10
+concur-pp-cli feedback "the --since flag is inclusive but docs say exclusive"
+concur-pp-cli feedback --stdin < notes.txt
+concur-pp-cli feedback list --json --limit 10
 ```
 
-Entries are stored locally as `feedback.jsonl` under the resolved data dir. They are never POSTed unless `YOUTUBE_FEEDBACK_ENDPOINT` is set AND either `--send` is passed or `YOUTUBE_FEEDBACK_AUTO_SEND=true`. Default behavior is local-only.
+Entries are stored locally as `feedback.jsonl` under the resolved data dir. They are never POSTed unless `CONCUR_FEEDBACK_ENDPOINT` is set AND either `--send` is passed or `CONCUR_FEEDBACK_AUTO_SEND=true`. Default behavior is local-only.
 
 Write what *surprised* you, not a bug report. Short, specific, one line: that is the part that compounds.
 
@@ -542,14 +491,26 @@ Unknown schemes are refused with a structured error naming the supported set. We
 A profile is a saved set of flag values, reused across invocations. Use it when a scheduled or recurring agent reuses the same saved flags while providing different input each run.
 
 ```
-youtube-pp-cli profile save briefing --json
-youtube-pp-cli --profile briefing youtube activities-list --part snippet
-youtube-pp-cli profile list --json
-youtube-pp-cli profile show briefing
-youtube-pp-cli profile delete briefing --yes
+concur-pp-cli profile save briefing --json
+concur-pp-cli --profile briefing payment-types
+concur-pp-cli profile list --json
+concur-pp-cli profile show briefing
+concur-pp-cli profile delete briefing --yes
 ```
 
 Explicit flags always win over profile values; profile values win over defaults. `agent-context` lists all available profiles under `available_profiles` so introspecting agents discover them at runtime.
+
+## Async Jobs
+
+For endpoints that submit long-running work, the generator detects the submit-then-poll pattern (a `job_id`/`task_id`/`operation_id` field in the response plus a sibling status endpoint) and wires up three extra flags on the submitting command:
+
+| Flag | Purpose |
+|------|---------|
+| `--wait` | Block until the job reaches a terminal status instead of returning the job ID immediately |
+| `--wait-timeout` | Maximum wait duration (default 10m, 0 means no timeout) |
+| `--wait-interval` | Initial poll interval (default 2s; grows with exponential backoff up to 30s) |
+
+Use async submission without `--wait` when you want to fire-and-forget; use `--wait` when you want one command to return the finished artifact.
 
 ## Exit Codes
 
@@ -567,7 +528,7 @@ Explicit flags always win over profile values; profile values win over defaults.
 
 Parse `$ARGUMENTS`:
 
-1. **Empty, `help`, or `--help`** → show `youtube-pp-cli --help` output
+1. **Empty, `help`, or `--help`** → show `concur-pp-cli --help` output
 2. **Starts with `install`** → ends with `mcp` → MCP installation; otherwise → see Prerequisites above
 3. **Anything else** → Direct Use (execute as CLI command with `--agent`)
 
@@ -575,21 +536,21 @@ Parse `$ARGUMENTS`:
 
 1. Install the MCP server:
    ```bash
-   go install github.com/mvanhorn/printing-press-library/library/media-and-entertainment/youtube/cmd/youtube-pp-mcp@latest
+   go install github.com/mvanhorn/printing-press-library/library/accounting/concur/cmd/concur-pp-mcp@latest
    ```
 2. Register with Claude Code:
    ```bash
-   claude mcp add youtube-pp-mcp -- youtube-pp-mcp
+   claude mcp add concur-pp-mcp -- concur-pp-mcp
    ```
 3. Verify: `claude mcp list`
 
 ## Direct Use
 
-1. Check if installed: `which youtube-pp-cli`
+1. Check if installed: `which concur-pp-cli`
    If not found, offer to install (see Prerequisites at the top of this skill).
 2. Match the user query to the best command from the Unique Capabilities and Command Reference above.
 3. Execute with the `--agent` flag:
    ```bash
-   youtube-pp-cli <command> [subcommand] [args] --agent
+   concur-pp-cli <command> [subcommand] [args] --agent
    ```
-4. If ambiguous, drill into subcommand help: `youtube-pp-cli <command> --help`.
+4. If ambiguous, drill into subcommand help: `concur-pp-cli <command> --help`.
