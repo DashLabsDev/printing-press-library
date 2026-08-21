@@ -6689,6 +6689,12 @@
         "Detect deterministic weekly outliers and coincident movements across all four synchronized surfaces."
       ],
       "path": "library/commerce/etsy-seller-dashboard",
+      "release": {
+        "cli_name": "etsy-seller-dashboard-pp-cli",
+        "version": "2026.8.2",
+        "released_at": "2026-08-21T08:29:25Z",
+        "source_commit": "948566a1a3201bef916e09e4a1b4e0426cef4292"
+      },
       "printer": "horknfbr",
       "printer_name": "horknfbr",
       "creator": {
@@ -7960,9 +7966,9 @@
       "path": "library/food-and-dining/forkable",
       "release": {
         "cli_name": "forkable-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.4",
+        "released_at": "2026-08-21T08:29:25Z",
+        "source_commit": "c8f05ea0f30474bafd6488e47c019f223d88e9f4"
       },
       "printer": "enlewof",
       "printer_name": "Allen Lew",
@@ -9558,9 +9564,9 @@
       "path": "library/productivity/granola",
       "release": {
         "cli_name": "granola-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.10",
+        "released_at": "2026-08-21T08:29:25Z",
+        "source_commit": "3db31e7b485f847b259b4b5a252295aadeeba67e"
       },
       "printer": "dstevens",
       "printer_name": "Damien Stevens",
@@ -11825,6 +11831,12 @@
         "Search previously synchronized school data across Layers services from one local, pipeable index."
       ],
       "path": "library/productivity/layers",
+      "release": {
+        "cli_name": "layers-pp-cli",
+        "version": "2026.8.5",
+        "released_at": "2026-08-21T08:29:25Z",
+        "source_commit": "a6d349fad9824ca41e3bbb5e36a109822ec42f35"
+      },
       "printer": "educrvz",
       "printer_name": "Edu Cruz",
       "creator": {
@@ -14882,6 +14894,12 @@
         "Period-over-period spend and volume summary: images generated, USD spent, top models, cost per image vs the prior window."
       ],
       "path": "library/ai/openrouter-image",
+      "release": {
+        "cli_name": "openrouter-image-pp-cli",
+        "version": "2026.8.10",
+        "released_at": "2026-08-21T08:29:25Z",
+        "source_commit": "35f6cabd68c76fd1eceb6aa37126126ef7d4d7a6"
+      },
       "printer": "neal-kyle",
       "printer_name": "Kyle Neal",
       "creator": {
@@ -17358,6 +17376,12 @@
         "Render a one-screen financial snapshot for a single customer: outstanding invoices, active subscriptions, payment methods, and CFDI linkage."
       ],
       "path": "library/payments/quentli",
+      "release": {
+        "cli_name": "quentli-pp-cli",
+        "version": "2026.8.8",
+        "released_at": "2026-08-21T08:29:25Z",
+        "source_commit": "a99895c913a155edd85e744a947ee17a88f003f0"
+      },
       "printer": "bobeglz",
       "printer_name": "bobe",
       "creator": {
@@ -18038,6 +18062,12 @@
         "Free-text search across synced contacts without hitting the API."
       ],
       "path": "library/social-and-messaging/respondio",
+      "release": {
+        "cli_name": "respondio-pp-cli",
+        "version": "2026.8.7",
+        "released_at": "2026-08-21T08:29:25Z",
+        "source_commit": "026bd1cd3b57f37b35b95c1709d0fe086c7e39b6"
+      },
       "printer": "bobeglz",
       "printer_name": "bobe",
       "creator": {
