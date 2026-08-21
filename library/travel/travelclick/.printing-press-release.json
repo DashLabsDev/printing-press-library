@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "slug": "travelclick",
+  "cli_name": "travelclick-pp-cli",
+  "version": "2026.8.1",
+  "released_at": "2026-08-21T05:35:12Z",
+  "source_commit": "2ead546e61fb2beeceff18b4264d6eb9b63f15d9",
+  "printing_press_version": "4.30.3",
+  "run_id": "20260820-153504-d88b22af",
+  "changes": [
+    {
+      "title": "feat(travelclick): add travelclick",
+      "pr": 1775,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/1775",
+      "commit": "2ead546e61fb2beeceff18b4264d6eb9b63f15d9"
+    }
+  ]
+}
