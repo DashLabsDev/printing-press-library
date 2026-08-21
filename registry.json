@@ -15567,9 +15567,9 @@
         "peloton",
         "peloton-pp-cli",
         "Read-only Peloton workout, class, and structural-provider facts in a private local store.",
-        "Managed OAuth catalog access",
+        "Automatic Peloton login",
         "auth setup",
-        "Bootstraps a private OAuth bundle and reuses or refreshes it for bearer-authenticated catalog reads."
+        "Shows how to supply PELOTON_OAUTH_USERNAME/PELOTON_OAUTH_PASSWORD; the CLI logs in and persists credentials automatically, no external provisioning service involved."
       ],
       "path": "library/health/peloton",
       "release": {
@@ -15584,6 +15584,16 @@
         "handle": "itsmefelix-",
         "name": "Felix Banuchi"
       },
+      "contributors": [
+        {
+          "handle": "jrmii",
+          "name": "Jim Martin"
+        },
+        {
+          "handle": "tmchow",
+          "name": "Trevin Chow"
+        }
+      ],
       "mcp": {
         "binary": "peloton-pp-mcp",
         "transports": [
@@ -21793,6 +21803,12 @@
         "Tessie vehicle endpoints are VIN-keyed; assume-a-car gives a single-token flow where the user sets which car once and every command targets it without repeating a VIN."
       ],
       "path": "library/devices/tessie",
+      "release": {
+        "cli_name": "tessie-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-21T05:15:26Z",
+        "source_commit": "261cb88c4d7ea5534110b631a6b74f8efad727fc"
+      },
       "printer": "keithah",
       "printer_name": "Keith Herrington",
       "creator": {
@@ -22272,6 +22288,38 @@
         ],
         "mcp_ready": "full",
         "spec_format": "internal"
+      }
+    },
+    {
+      "name": "travelclick",
+      "category": "travel",
+      "api": "travelclick",
+      "description": "Search any TravelClick-powered hotel's own rates directly -- room types, rate plans, fee-inclusive pricing, and the cheapest night to book -- without opening a browser tab per property.",
+      "search_terms": [
+        "travelclick",
+        "travelclick-pp-cli",
+        "Multi-hotel rate compare",
+        "rates compare",
+        "Check several boutique hotels for the same dates in one call, ranked by lowest fee-inclusive total.",
+        "Cheapest night across saved hotels",
+        "rates cheapest-night",
+        "Scan several hotels' calendars at once and return the single best hotel+date combination.",
+        "Saved hotel aliases",
+        "hotels alias list",
+        "Give a memorable name to a TravelClick hotel ID instead of memorizing a 6-digit number.",
+        "Rate-snapshot price-drift history",
+        "analytics price-drift",
+        "Track how a hotel's rates move over time from your own saved search history.",
+        "Rate-code check across saved hotels",
+        "codes check-all",
+        "Test one corporate or group code against every saved hotel at once."
+      ],
+      "path": "library/travel/travelclick",
+      "printer": "enlewof",
+      "printer_name": "Allen Lew",
+      "creator": {
+        "handle": "enlewof",
+        "name": "Allen Lew"
       }
     },
     {
