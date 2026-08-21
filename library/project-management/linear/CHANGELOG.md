@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.5 - 2026-08-21
+
+- feat(linear): rebase --label-name issue writes from #1411 (#1779).
+
 ## 2026.8.4 - 2026-08-17
 
 - feat(linear): sync prunes upstream deletions and supports incremental crawls (#1693).

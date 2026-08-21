@@ -2,17 +2,17 @@
   "schema_version": 1,
   "slug": "linear",
   "cli_name": "linear-pp-cli",
-  "version": "2026.8.4",
-  "released_at": "2026-08-17T09:26:48Z",
-  "source_commit": "7c4f3ebab9d0cc346090f666d5e95fa9a87a71bf",
+  "version": "2026.8.5",
+  "released_at": "2026-08-21T09:54:13Z",
+  "source_commit": "f5a91598ebe9a1937badb59e6b4d18b1a87f1466",
   "printing_press_version": "4.9.0",
   "run_id": "20260518-232543",
   "changes": [
     {
-      "title": "feat(linear): sync prunes upstream deletions and supports incremental crawls",
-      "pr": 1693,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/1693",
-      "commit": "7c4f3ebab9d0cc346090f666d5e95fa9a87a71bf"
+      "title": "feat(linear): rebase --label-name issue writes from #1411",
+      "pr": 1779,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/1779",
+      "commit": "f5a91598ebe9a1937badb59e6b4d18b1a87f1466"
     }
   ]
 }
