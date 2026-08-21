@@ -100,13 +100,23 @@ Resource scoping:
   the dependent by name; the parent table must already be populated
   from a prior sync.
 
-Parent-keyed dependents (performance, workout_details) have no bulk list
-endpoint -- one HTTP request per already-synced workout. A large account
-can exceed a single call's practical time budget, so each invocation
-bounds and resumes this fan-out automatically:
-  - By default, only workouts that don't yet have a dependent record are
+Parent-keyed dependents (performance, workout_details, classes_detail) have
+no bulk list endpoint -- one HTTP request per already-synced parent. A
+large account can exceed a single call's practical time budget, so each
+invocation bounds and resumes this fan-out automatically. classes_detail is
+keyed on "classes" but its actual fan-out is over the distinct classes a
+workout references (workouts.ride_id), not the full catalog -- the bulk
+classes list endpoint never returns segments/target_metrics_data, only the
+per-class detail endpoint does, so this dependent backfills those fields
+onto classes the account holder actually took (what offline classes
+structure / offline intervals read), typically hundreds of ids even on an
+account with tens of thousands of catalog classes synced.
+  - By default, only parents that don't yet have a dependent record are
     fetched, so repeated sync calls drain a large backlog incrementally
     at no extra cost (an id with existing data is simply skipped).
+    classes_detail's "existing data" check is content-based (does the
+    record already carry segments), not presence-based, since every taken
+    class already has a "classes" record from the flat catalog sync.
   - --full ignores existing records (e.g. to backfill a fix retroactively)
     and resumes across repeated --full calls via a persisted offset,
     wrapping back to a fresh pass once one full pass completes.
@@ -119,9 +129,15 @@ bounds and resumes this fan-out automatically:
   - --max-parents bounds how many dependent fetches happen per call; a
     cap hit emits a sync_warning event and the run still exits 0 -- just
     re-run sync to continue.
-  - --latest-only additionally scopes a dependent's fan-out to only the
-    workouts THIS run's flat phase actually touched, not the whole local
-    store, so "refresh the top" stays bounded end to end.`,
+  - --latest-only additionally scopes performance/workout_details' fan-out
+    to only the workouts THIS run's flat phase actually touched, not the
+    whole local store, so "refresh the top" stays bounded end to end.
+    classes_detail is the one exception: its own candidate set is already
+    small (bounded by workouts.ride_id, not the full catalog) and content-
+    based (bounded by which taken classes still lack segments), so
+    --latest-only leaves it unscoped rather than mapping newly-touched
+    workout ids to their ride ids -- --max-parents still bounds any single
+    call regardless.`,
 		Example: `  # Sync all resources
   peloton-pp-cli sync
 
@@ -250,7 +266,7 @@ bounds and resumes this fan-out automatically:
 			// the workouts they depend on) has completed.
 			var flatResources, dependentResources []string
 			for _, resource := range resources {
-				if resource == "performance" || resource == "workout_details" {
+				if resource == "performance" || resource == "workout_details" || resource == "classes_detail" {
 					dependentResources = append(dependentResources, resource)
 					continue
 				}
@@ -429,6 +445,18 @@ bounds and resumes this fan-out automatically:
 			// a prior sync populated, when only a dependent was named).
 			dependentScopeSince := dependentScopeSinceFor(effectiveLatestOnly, flatResources, runStarted)
 			for _, resource := range dependentResources {
+				if resource == "classes_detail" {
+					plan, planErr := planClassDetailSync(db, full, dependentScopeSince, staleBefore, maxParents)
+					if planErr != nil {
+						if !humanFriendly {
+							fmt.Fprintln(syncEventWriter, syncErrorJSON(resource, "", planErr))
+						}
+						accumulate(syncResult{Resource: resource, Err: fmt.Errorf("planning %s dependent sync: %w", resource, planErr)})
+						continue
+					}
+					accumulate(syncClassDetailDependent(cmd.Context(), c, db, plan, concurrency, syncEventWriter))
+					continue
+				}
 				plan, planErr := planDependentSync(db, "workouts", resource, full, dependentScopeSince, staleBefore, maxParents, c.DryRun)
 				if planErr != nil {
 					if !humanFriendly {
@@ -1861,6 +1889,7 @@ func knownSyncResourceNames() []string {
 		"workouts",
 		"performance",
 		"workout_details",
+		"classes_detail",
 	}
 	return names
 }
@@ -1892,23 +1921,34 @@ func normalizeSyncResourceAliases(resources []string) []string {
 // the sync command's Long help: naming a parent also runs its parent-keyed
 // dependents. "performance" (per-workout performance_graph samples) and
 // "workout_details" (per-workout detail payload, backing `offline
-// workout`/`intervals`/`repeat`/`strength`) are this CLI's two dependents,
-// both keyed on "workouts". Naming a dependent without "workouts" is left
-// alone — it runs against whatever workouts are already in the local store
-// from a prior sync, per the documented "run a dependent without re-syncing
+// workout`/`intervals`/`repeat`/`strength`) are keyed on "workouts".
+// "classes_detail" (per-class segments/target_metrics_data, backing
+// `offline classes structure`/`offline intervals`) is keyed on "classes" --
+// its parent ids are workouts.ride_id, but the resource that must be named
+// to trigger it is "classes" (the resource it enriches), matching how a
+// user thinks about "sync my classes" rather than requiring them to name an
+// otherwise-invisible fan-out step explicitly. Naming a dependent without
+// its parent is left alone — it runs against whatever the parent's local
+// store already has, per the documented "run a dependent without re-syncing
 // its parent" scoping.
 func expandSyncResourcesWithDependents(resources []string) []string {
 	hasWorkouts := false
+	hasClasses := false
 	hasPerformance := false
 	hasWorkoutDetails := false
+	hasClassDetail := false
 	for _, resource := range resources {
 		switch resource {
 		case "workouts":
 			hasWorkouts = true
+		case "classes":
+			hasClasses = true
 		case "performance":
 			hasPerformance = true
 		case "workout_details":
 			hasWorkoutDetails = true
+		case "classes_detail":
+			hasClassDetail = true
 		}
 	}
 	if hasWorkouts && !hasPerformance {
@@ -1916,6 +1956,9 @@ func expandSyncResourcesWithDependents(resources []string) []string {
 	}
 	if hasWorkouts && !hasWorkoutDetails {
 		resources = append(resources, "workout_details")
+	}
+	if hasClasses && !hasClassDetail {
+		resources = append(resources, "classes_detail")
 	}
 	return resources
 }
@@ -2309,21 +2352,145 @@ func planDependentSync(db *store.Store, parentResource, dependentResource string
 	return plan, nil
 }
 
+// classDetailFamily/classDetailField name where classes_detail's fan-out
+// checks for "already has the richer detail content" -- see
+// planClassDetailSync.
+const (
+	classDetailFamily = "classes"
+	classDetailField  = "segments"
+)
+
+// planClassDetailSync resolves which ride ids the classes_detail dependent
+// should fetch this call. It deliberately does not reuse planDependentSync:
+// that function's parent ids come from dependentParentIDs (a resource's own
+// stored primary keys, e.g. every synced "workouts" row), but classes_detail's
+// parent ids are workouts.ride_id -- a non-PK field on a DIFFERENT resource,
+// scoping the fan-out to the ~hundreds of classes an account holder actually
+// took, not the tens of thousands in the full catalog "classes" already
+// flat-syncs. Its pending check is also different in kind: planDependentSync
+// treats "has any record" as done, but a class synced via the flat catalog
+// list endpoint already has a "classes" provider_payloads row (title,
+// duration, instructor_id, ...) that a presence-only check would see as
+// already-fetched forever, even though it never carries segments/
+// target_metrics_data (round-11 verification NEW 1) -- those fields exist
+// only in the per-class detail response this dependent fetches. Presence of
+// classDetailField, not presence of any record, is therefore "done" here.
+// That also makes this naturally resumable / self-correcting with no
+// separate progress cursor: a class that gets detail-fetched sets
+// classDetailField, which is exactly what removes it from "pending" on the
+// next call.
+func planClassDetailSync(db *store.Store, full bool, scopeSince, staleBefore *time.Time, maxParents int) (dependentSyncPlan, error) {
+	// DistinctWorkoutRideIDs, not db.ListField("workouts", "ride_id"): the
+	// typed ride_id column is only populated by enrichWorkoutRideMetadata
+	// at write time, and round-12 verification NEW B found a real account
+	// where the column covered barely more than half of the workouts that
+	// actually carried a ride association in their raw JSON (511 of 843).
+	// Reading ListField alone silently caps this dependent's fan-out to
+	// whatever subset of taken classes happened to get the typed column
+	// populated, not the account's real distinct-class count.
+	rideIDs, err := db.DistinctWorkoutRideIDs()
+	if err != nil {
+		return dependentSyncPlan{}, err
+	}
+	// pelotonNoClassRideID (offline.go) is Peloton's sentinel for
+	// freestyle/non-class workouts (Just Run, Outdoor Running, Just Ride),
+	// not a real class id -- there is no detail endpoint for it and never
+	// will be. Without this exclusion it fetches, fails (a 4xx from GET
+	// /api/ride/<sentinel>/details), and gets logged as a
+	// per_parent_fetch_failed anomaly on every single invocation forever,
+	// and -- since this dependent's pending check is content-based (does
+	// the record carry segments) rather than presence-based -- it can
+	// never be satisfied, so it never drains from the pending set either.
+	// offline_repeat/offline_intervals (workoutDetailRideID) already
+	// exclude this same sentinel for the analogous reason.
+	rideIDs = slices.DeleteFunc(rideIDs, func(id string) bool { return id == pelotonNoClassRideID })
+	if len(rideIDs) == 0 {
+		return dependentSyncPlan{parentTableEmpty: true}, nil
+	}
+	sort.Strings(rideIDs)
+
+	fetchedAt, err := db.ExistingProviderFactFetchedAt(classDetailFamily)
+	if err != nil {
+		return dependentSyncPlan{}, err
+	}
+	haveDetail, err := db.ProviderFactIDsWithField(classDetailFamily, classDetailField)
+	if err != nil {
+		return dependentSyncPlan{}, err
+	}
+
+	type pendingID struct {
+		id        string
+		fetchedAt time.Time
+	}
+	pending := make([]pendingID, 0, len(rideIDs))
+	for _, id := range rideIDs {
+		at := fetchedAt[id] // zero time.Time when absent -- sorts first, same as planDependentSync
+		switch {
+		case full:
+			pending = append(pending, pendingID{id, at})
+		case !haveDetail[id]:
+			pending = append(pending, pendingID{id, at})
+		case staleBefore != nil && at.Before(*staleBefore):
+			pending = append(pending, pendingID{id, at})
+		}
+	}
+	sort.Slice(pending, func(i, j int) bool {
+		if !pending[i].fetchedAt.Equal(pending[j].fetchedAt) {
+			return pending[i].fetchedAt.Before(pending[j].fetchedAt)
+		}
+		return pending[i].id < pending[j].id
+	})
+	candidates := make([]string, len(pending))
+	for i, p := range pending {
+		candidates[i] = p.id
+	}
+
+	// scopeSince (--latest-only) scoping is intentionally not applied here:
+	// unlike performance/workout_details, classes_detail's candidate set is
+	// already bounded by classDetailField presence (not by the full id
+	// space), so it stays small and cheap to recompute even under
+	// --latest-only. Always recomputing the full pending set is simpler
+	// than mapping --latest-only's newly-touched workout ids to their
+	// ride_ids, and --max-parents below still bounds any single call.
+	_ = scopeSince
+
+	plan := dependentSyncPlan{totalPending: len(candidates)}
+	if maxParents > 0 && len(candidates) > maxParents {
+		plan.ids = candidates[:maxParents]
+		plan.capped = true
+	} else {
+		plan.ids = candidates
+	}
+	return plan, nil
+}
+
 // runDependentFanOut is the shared per-parent fan-out engine for
-// parent-keyed dependents (performance, workout_details): both fetch one
-// item per workout id via a GET with no bulk list endpoint, concurrently,
-// differing only in the request path/params (buildRequest) and the family
-// they store under (resource). Factored out of two near-identical copies
-// when both dependents needed the same bounded/resumable planning logic
-// (dependentSyncPlan) layered on top of the existing fan-out mechanics.
+// parent-keyed dependents (performance, workout_details, classes_detail):
+// each fetches one item per parent id via a GET with no bulk list endpoint,
+// concurrently, differing only in the request path/params (buildRequest)
+// and how a fetched item gets stored (write). Factored out of two
+// near-identical copies when both dependents needed the same
+// bounded/resumable planning logic (dependentSyncPlan) layered on top of
+// the existing fan-out mechanics.
 //
-// plan.ids is already fully resolved by planDependentSync (resumability +
-// --latest-only run-scoping + --max-parents cap applied); this function's
-// only remaining job is the actual fetch/store loop and reporting.
+// plan.ids is already fully resolved by the caller's own planning function
+// (resumability + --latest-only run-scoping + --max-parents cap applied);
+// this function's only remaining job is the actual fetch/store loop and
+// reporting. resource names the phase for event/error reporting only --
+// write decides what family a fetched item actually lands under, which
+// classes_detail deliberately decouples from resource (it reports under
+// "classes_detail" but writes into the "classes" family so a detail fetch
+// enriches the same record the flat classes list sync already populated).
+// write defaults to db.UpsertWithFacts(resource, id, data) when nil.
 func runDependentFanOut(ctx context.Context, c interface {
 	Get(context.Context, string, map[string]string) (json.RawMessage, error)
 	RateLimit() float64
-}, db *store.Store, resource string, plan dependentSyncPlan, concurrency int, buildRequest func(workoutID string) (path string, params map[string]string), syncEvents io.Writer) syncResult {
+}, db *store.Store, resource string, plan dependentSyncPlan, concurrency int, buildRequest func(workoutID string) (path string, params map[string]string), syncEvents io.Writer, write func(id string, data json.RawMessage) error) syncResult {
+	if write == nil {
+		write = func(id string, data json.RawMessage) error {
+			return db.UpsertWithFacts(resource, id, data)
+		}
+	}
 	started := time.Now()
 	if syncEvents == nil {
 		syncEvents = io.Discard
@@ -2407,7 +2574,7 @@ func runDependentFanOut(ctx context.Context, c interface {
 					mu.Unlock()
 					continue
 				}
-				if err := db.UpsertWithFacts(resource, workoutID, data); err != nil {
+				if err := write(workoutID, data); err != nil {
 					mu.Lock()
 					failures++
 					failedIDs[workoutID] = true
@@ -2445,7 +2612,20 @@ func runDependentFanOut(ctx context.Context, c interface {
 	}
 
 	if failures > 0 && !humanFriendly {
-		fmt.Fprintf(syncEvents, `{"event":"sync_anomaly","resource":"%s","consumed":%d,"stored":%d,"reason":"per_parent_fetch_failed"}`+"\n", resource, len(plan.ids), totalCount)
+		// sample_error surfaces the first failure's own message so a
+		// consistent-but-unexplained per_parent_fetch_failed count (round-12
+		// verification NEW D: roughly one failure per classes_detail batch,
+		// with no way to tell from the event alone whether it's a specific
+		// class type, a transient blip, or something systematic) is at
+		// least diagnosable from the sync output itself, without needing a
+		// second debugging pass. Only the first error is sampled (not one
+		// per failure) to keep the event a single bounded line even when
+		// every failure shares the same cause.
+		sampleError := ""
+		if firstErr != nil {
+			sampleError = strings.ReplaceAll(truncate(firstErr.Error(), 200), `"`, `\"`)
+		}
+		fmt.Fprintf(syncEvents, `{"event":"sync_anomaly","resource":"%s","consumed":%d,"stored":%d,"failed":%d,"reason":"per_parent_fetch_failed","sample_error":"%s"}`+"\n", resource, len(plan.ids), totalCount, failures, sampleError)
 	}
 	// Persist --full's two-tier resumability state now that plan.ids has
 	// actually been fetched (never before -- see dependentSyncPlan's
@@ -2574,7 +2754,7 @@ func syncPerformanceDependent(ctx context.Context, c interface {
 		params := map[string]string{"every_n": "1"}
 		userParams.applyTo("performance", params, true)
 		return path, params
-	}, syncEvents)
+	}, syncEvents, nil)
 }
 
 // syncWorkoutDetailsDependent syncs "workout_details" (the full per-workout
@@ -2596,7 +2776,36 @@ func syncWorkoutDetailsDependent(ctx context.Context, c interface {
 		params := map[string]string{}
 		userParams.applyTo("workout_details", params, true)
 		return path, params
-	}, syncEvents)
+	}, syncEvents, nil)
+}
+
+// syncClassDetailDependent syncs "classes_detail" (per-class segments and
+// target_metrics_data from GET /api/ride/{ride_id}/details), a third
+// parent-keyed dependent alongside performance/workout_details -- but
+// unlike those two, it is NOT keyed on "workouts" ids and does NOT write
+// into a family named after itself. Its parent ids are the distinct
+// ride_id values workouts.ride_id already carries (see
+// planClassDetailSync), scoping the fan-out to classes the account holder
+// actually took rather than the full catalog (tens of thousands of untaken
+// classes on a long-lived account never need per-class detail). Its writes
+// go into the "classes" family via UpsertBatchWithFacts, the same
+// write-through path a live `classes show`/`classes structure` call
+// already uses (including that path's nested-ride-id id resolution): a
+// detail fetch enriches the same record the flat "classes" list sync
+// populated, rather than creating a second copy under a new family name,
+// so offline_classes_structure/offline_intervals need no changes to start
+// seeing segments once a class has been detail-fetched.
+func syncClassDetailDependent(ctx context.Context, c interface {
+	Get(context.Context, string, map[string]string) (json.RawMessage, error)
+	RateLimit() float64
+}, db *store.Store, plan dependentSyncPlan, concurrency int, syncEvents io.Writer) syncResult {
+	return runDependentFanOut(ctx, c, db, "classes_detail", plan, concurrency, func(rideID string) (string, map[string]string) {
+		path := replacePathParam("/api/ride/{ride_id}/details", "ride_id", rideID)
+		return path, map[string]string{}
+	}, syncEvents, func(id string, data json.RawMessage) error {
+		_, _, err := db.UpsertBatchWithFacts("classes", []json.RawMessage{data})
+		return err
+	})
 }
 
 func describeFailedResources(count int, resources []string) string {

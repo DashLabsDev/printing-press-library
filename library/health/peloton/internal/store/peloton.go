@@ -175,6 +175,38 @@ func (s *Store) ExistingProviderFactFetchedAt(family string) (map[string]time.Ti
 	return fetchedAt, rows.Err()
 }
 
+// ProviderFactIDsWithField returns the set of provider ids within family
+// whose stored payload has a non-null value at the given top-level JSON
+// field. Distinct from ExistingProviderFactFetchedAt's plain presence
+// check: a dependent sync that enriches an already-present record in place
+// (e.g. class detail backfilling "segments"/"target_metrics_data" onto a
+// class that was previously synced only in flat list form, which shares
+// the same "classes" family and provider id) needs to know which already-
+// present records still lack the richer field, not merely which ids exist
+// at all.
+func (s *Store) ProviderFactIDsWithField(family, field string) (map[string]bool, error) {
+	if !validIdentifierRE.MatchString(field) {
+		return nil, fmt.Errorf("ProviderFactIDsWithField: invalid field name %q", field)
+	}
+	rows, err := s.db.Query(
+		fmt.Sprintf(`SELECT provider_id FROM provider_payloads WHERE family=? AND json_extract(payload,'$.%s') IS NOT NULL`, field),
+		family,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	ids := map[string]bool{}
+	for rows.Next() {
+		var id string
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		ids[id] = true
+	}
+	return ids, rows.Err()
+}
+
 // ParentIDsTouchedSince returns provider_payloads ids for a family fetched
 // at or after `since`. Dependent syncs use this to scope their
 // parent-keyed fan-out to only the parents a specific sync invocation
@@ -261,12 +293,103 @@ func (s *Store) ListProviderFacts(family string, limit int) ([]ProviderFact, err
 // succeeded" tolerance for a secondary, reconstructable local index.
 func (s *Store) UpsertBatchWithFacts(resourceType string, items []json.RawMessage) (int, int, error) {
 	items = enrichResourceItems(resourceType, items)
+	if resourceType == "classes" {
+		items = s.mergeClassesListItemsWithStoredDetail(items)
+	}
 	stored, extractFailures, err := s.UpsertBatch(resourceType, items)
 	if err != nil {
 		return stored, extractFailures, err
 	}
 	s.recordProviderFactsBestEffort(resourceType, items)
 	return stored, extractFailures, nil
+}
+
+// mergeClassesListItemsWithStoredDetail preserves detail-only fields
+// (segments, target_metrics_data, ride, averages, playlist, instructor,
+// workout_share_images, related_rides, questions, and anything else the
+// detail endpoint carries that the catalog list endpoint doesn't) that a
+// prior classes_detail dependent-sync fetch backfilled onto a class, which
+// the flat catalog list sync's own items never carry, before the flat
+// sync's wholesale upsertGenericResourceTx/RecordProviderFact replace
+// would otherwise strip them back out on every routine
+// `sync --resources classes` / `workflow archive` call. It copies over
+// EVERY existing top-level key the incoming item lacks, not a fixed
+// allowlist, so a future detail-response field survives automatically
+// without this function needing an update. A detail-shaped incoming item
+// (recognizable by a top-level "ride" object -- the same signal
+// classIsListForm/nestedIDContainerKeys use) is returned unchanged:
+// there's nothing to preserve when the incoming item is already at least
+// as rich as what's stored. Only called for resourceType=="classes";
+// every other resource's batch write is unaffected.
+func (s *Store) mergeClassesListItemsWithStoredDetail(items []json.RawMessage) []json.RawMessage {
+	out := make([]json.RawMessage, len(items))
+	for i, item := range items {
+		out[i] = s.mergeClassesListItemWithStoredDetail(item)
+	}
+	return out
+}
+
+// classFactHasRideObject reports whether a decoded class fact's "ride"
+// field is a real, non-null JSON object -- the same detail-shape signal
+// internal/cli/offline.go's classIsListForm uses via a type assertion to
+// map[string]any. A plain comma-ok presence check on the raw
+// map[string]json.RawMessage (an earlier version of this function) isn't
+// enough: it's also true for a hypothetical "ride": null value, which
+// would then be wrongly treated as a real detail object -- either
+// short-circuiting the merge for a still-list-shaped incoming item, or
+// treating a still-list-shaped stored record as having detail fields to
+// preserve when it has none.
+func classFactHasRideObject(obj map[string]json.RawMessage) bool {
+	raw, ok := obj["ride"]
+	if !ok {
+		return false
+	}
+	var ride map[string]any
+	return json.Unmarshal(raw, &ride) == nil && ride != nil
+}
+
+func (s *Store) mergeClassesListItemWithStoredDetail(item json.RawMessage) json.RawMessage {
+	var incoming map[string]json.RawMessage
+	if err := json.Unmarshal(item, &incoming); err != nil {
+		return item
+	}
+	if classFactHasRideObject(incoming) {
+		return item // already detail-shaped; nothing to preserve
+	}
+	var plain map[string]any
+	if err := json.Unmarshal(item, &plain); err != nil {
+		return item
+	}
+	id := ExtractResourceID("classes", plain)
+	if id == "" {
+		return item
+	}
+	existing, err := s.Get("classes", id)
+	if err != nil {
+		return item // no prior record (or unreadable) -- nothing to merge
+	}
+	var existingObj map[string]json.RawMessage
+	if err := json.Unmarshal(existing, &existingObj); err != nil {
+		return item
+	}
+	if !classFactHasRideObject(existingObj) {
+		return item // prior record was list-shaped too; nothing to preserve
+	}
+	changed := false
+	for key, value := range existingObj {
+		if _, present := incoming[key]; !present {
+			incoming[key] = value
+			changed = true
+		}
+	}
+	if !changed {
+		return item
+	}
+	merged, err := json.Marshal(incoming)
+	if err != nil {
+		return item
+	}
+	return merged
 }
 
 // UpsertWithFacts mirrors UpsertBatchWithFacts for the generic single-object
@@ -306,6 +429,39 @@ func (s *Store) UpsertWorkoutsWithFacts(data json.RawMessage) error {
 	}
 	s.recordProviderFactsBestEffort("workouts", []json.RawMessage{data})
 	return nil
+}
+
+// DistinctWorkoutRideIDs returns every distinct ride/class id referenced by
+// a synced workout, preferring the typed "ride_id" column but falling back
+// to the raw ride.id nested field (json_extract on the workouts table's own
+// "data" column) when the column is empty or missing for that row. The two
+// can diverge: enrichWorkoutRideMetadata only promotes ride.id to the
+// top-level ride_id column at WRITE time, so a workout whose raw JSON
+// carries a "ride" object but was written before that promotion existed
+// (or by any future write path that stores workouts without going through
+// it) keeps a populated "ride" object with no corresponding typed column
+// value. Round-12 verification NEW B found a real account where only 511
+// of 843 ride-bearing workouts had the typed column populated -- callers
+// that need the full set of taken classes (classes_detail's fan-out via
+// planClassDetailSync) must query both, not just the typed column.
+func (s *Store) DistinctWorkoutRideIDs() ([]string, error) {
+	rows, err := s.db.Query(`
+		SELECT DISTINCT COALESCE(NULLIF("ride_id", ''), json_extract("data", '$.ride.id')) AS rid
+		FROM "workouts"
+		WHERE COALESCE(NULLIF("ride_id", ''), json_extract("data", '$.ride.id')) IS NOT NULL`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var ids []string
+	for rows.Next() {
+		var id string
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+	return ids, rows.Err()
 }
 
 // enrichResourceItems applies best-effort peloton-specific fixups at the

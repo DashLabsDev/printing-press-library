@@ -994,6 +994,15 @@ func unwrapSingleKeyArray(data json.RawMessage) json.RawMessage {
 	return data
 }
 
+// FilterFieldsJSON exports filterFields for the internal/mcp package, whose
+// hand-written tool handlers (e.g. the "search" MCP tool, which builds its
+// own count/results/store_status/resumable envelope rather than going
+// through this package's printOffline/printOutput* pipeline) need the same
+// dotted-path projection --select applies everywhere else in this CLI.
+func FilterFieldsJSON(data json.RawMessage, fields string) json.RawMessage {
+	return filterFields(data, fields)
+}
+
 // filterFields keeps only the specified fields (comma-separated) from JSON objects/arrays.
 // Supports dotted paths like "events.shortName" to descend into nested structures.
 // Arrays are traversed element-wise: "events.shortName" keeps shortName on each event.
@@ -1015,6 +1024,11 @@ func filterFields(data json.RawMessage, fields string) json.RawMessage {
 	}
 	return filterFieldsRec(data, paths)
 }
+
+// maxEnvelopeFallbackKeys bounds filterFieldsRec's envelope-fallback
+// heuristic to objects small enough to be one of this CLI's own thin
+// wrapper shapes. See the guard's call site for why this matters.
+const maxEnvelopeFallbackKeys = 5
 
 // filterFieldsRec applies path filters to a JSON value. Each path is a list of
 // lowercase segments; arrays descend element-wise.
@@ -1070,7 +1084,24 @@ func filterFieldsRec(data json.RawMessage, paths [][]string) json.RawMessage {
 		// array exists. The `arr != nil` check rejects JSON null, which
 		// json.Unmarshal otherwise accepts into a []json.RawMessage as a
 		// nil slice and would coerce to `[]`.
-		if !matchedAny {
+		// Only attempt the envelope-fallback heuristic on objects small
+		// enough to plausibly be one of this CLI's own thin wrapper shapes
+		// (e.g. offline_history's {"items":[...],"caveats":[...]},
+		// offline_intervals's {"workout_id":...,"ride_id":...,"segments":
+		// [...],"caveats":[...]}) -- every legitimate wrapper this
+		// fallback exists for tops out at maxEnvelopeFallbackKeys fields.
+		// Without this guard, a raw upstream payload passed straight
+		// through (e.g. offline_classes_show's "show one locally stored
+		// class fact", which has no CLI-chosen wrapper at all) trips the
+		// same heuristic whenever it has ANY array-valued field
+		// (segments, related_rides, ...) and the requested --select names
+		// don't happen to be top-level keys on that particular record
+		// shape -- every OTHER field, including large nested objects
+		// (playlist, instructor bio, workout_share_images), then passes
+		// through completely unfiltered at the bottom of
+		// filterListEnvelopeFields's loop, leaking most of the record
+		// instead of returning the requested (possibly empty) projection.
+		if !matchedAny && len(obj) <= maxEnvelopeFallbackKeys {
 			if pending, foundArray := filterListEnvelopeFields(obj, paths); foundArray {
 				filtered = pending
 			}
