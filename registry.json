@@ -5200,6 +5200,43 @@
       }
     },
     {
+      "name": "devonthink",
+      "category": "productivity",
+      "api": "devonthink",
+      "description": "Local-first DEVONthink automation with safer shell workflows than raw AppleScript or MCP alone.",
+      "search_terms": [
+        "devonthink",
+        "devonthink-pp-cli",
+        "Local-first DEVONthink automation with safer shell workflows than raw AppleScript or MCP alone.",
+        "Smart Group scoped search",
+        "records search",
+        "Scope a normal DEVONthink query to a Smart Group by UUID, exact name, or DEVONthink path while preserving normal search output.",
+        "Context pack",
+        "Build a compact evidence packet from records, selections, highlights, links, and related items.",
+        "Privacy audit",
+        "Preview database scope, content-size budget, and cloud/MCP exposure before a handoff.",
+        "Batch planning ledger",
+        "batch plan",
+        "Stage multi-record edits as validated dry-run plans before applying them.",
+        "Maintenance inventory export",
+        "inventory export",
+        "Export DEVONthink databases, groups, tags, and document metadata for maintenance plugins.",
+        "Knowledge graph audit",
+        "graph audit",
+        "Detect orphans, broken links, unresolved wiki links, weak hubs, and tag-only clusters.",
+        "MCP passthrough",
+        "mcp call",
+        "Call DEVONthink's official local MCP tools from scripts when the local MCP server is enabled."
+      ],
+      "path": "library/productivity/devonthink",
+      "printer": "Rowdy",
+      "printer_name": "Johns",
+      "creator": {
+        "handle": "Rowdy",
+        "name": "Johns"
+      }
+    },
+    {
       "name": "dice-fm",
       "category": "media-and-entertainment",
       "api": "DICE",
@@ -7661,9 +7698,9 @@
       "path": "library/productivity/fireflies",
       "release": {
         "cli_name": "fireflies-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-21T09:27:03Z",
+        "source_commit": "d8146269cb69e0041e5a8765943fdf6b663ca02e"
       },
       "printer": "neektza",
       "printer_name": "Nikica Jokic",
@@ -20797,6 +20834,12 @@
         "Validate a planned Square request, environment, API version, mutation policy, and idempotency before anything is sent."
       ],
       "path": "library/commerce/square",
+      "release": {
+        "cli_name": "square-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-21T08:34:06Z",
+        "source_commit": "ed6adaf1f079e7e8dba1c04cdd60be0995533a42"
+      },
       "printer": "wirelesstkd",
       "printer_name": "matthew.martin",
       "creator": {
@@ -22763,9 +22806,9 @@
       "path": "library/travel/travelclick",
       "release": {
         "cli_name": "travelclick-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-21T05:35:12Z",
-        "source_commit": "2ead546e61fb2beeceff18b4264d6eb9b63f15d9"
+        "version": "2026.8.2",
+        "released_at": "2026-08-21T09:10:51Z",
+        "source_commit": "b6357e247080787066b80ee9efa239ff5f8bbe0e"
       },
       "printer": "enlewof",
       "printer_name": "Allen Lew",
