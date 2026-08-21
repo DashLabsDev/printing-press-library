@@ -1,7 +1,7 @@
 ---
-name: pp-forkable
-description: "A CLI and MCP server for your Forkable office-lunch program, with a local database and history, spend, and preference queries the web app cannot answer, plus commands to set, confirm, and skip meal orders (dry-run by default; --confirm to apply). Trigger phrases: `what have I eaten on forkable`, `forkable lunch spend this month`, `which forkable venues do we use most`, `did my forkable meals match my dietary preferences`, `forkable week ahead`, `set my forkable meal`, `skip forkable tomorrow`, `use forkable`, `run forkable`."
-author: "Allen Lew"
+name: pp-gmail
+description: "Mailbox cleanup that can prove itself — preview, confirm, undo, verify — from a binary that structurally cannot send email. Trigger phrases: `clean up my inbox`, `summarize my email`, `who emails me the most`, `unsubscribe me from these`, `what's eating my Gmail storage`, `use gmail-pp-cli`, `run gmail`."
+author: "Derik Parkinson"
 license: "Apache-2.0"
 argument-hint: "<command> [args] | install cli|mcp"
 allowed-tools: "Read Bash"
@@ -9,165 +9,135 @@ metadata:
   openclaw:
     requires:
       bins:
-        - forkable-pp-cli
-    install:
-      - kind: go
-        bins: [forkable-pp-cli]
-        module: github.com/mvanhorn/printing-press-library/library/food-and-dining/forkable/cmd/forkable-pp-cli
+        - gmail-pp-cli
 ---
 <!-- GENERATED FILE — DO NOT EDIT.
-     This file is a verbatim mirror of library/food-and-dining/forkable/SKILL.md,
+     This file is a verbatim mirror of library/productivity/gmail/SKILL.md,
      regenerated post-merge by tools/generate-skills/. Hand-edits here are
      silently overwritten on the next regen. Edit the library/ source instead.
      See the repository agent guide, section "Generated artifacts: registry.json, cli-skills/". -->
 
-# Forkable — Printing Press CLI
+# Gmail — Printing Press CLI
 
 ## Prerequisites: Install the CLI
 
-This skill drives the `forkable-pp-cli` binary. **You must verify the CLI is installed before invoking any command from this skill.** If it is missing, install it first:
+This skill drives the `gmail-pp-cli` binary. **You must verify the CLI is installed before invoking any command from this skill.** If it is missing, install it first:
 
 1. Install via the Printing Press installer. It defaults binaries to `$HOME/.local/bin` on macOS/Linux and `%LOCALAPPDATA%\Programs\PrintingPress\bin` on Windows:
    ```bash
-   npx -y @mvanhorn/printing-press-library install forkable --cli-only
+   npx -y @mvanhorn/printing-press-library install gmail --cli-only
    ```
-2. Verify: `forkable-pp-cli --version`
+2. Verify: `gmail-pp-cli --version`
 3. Ensure the reported install directory is on `$PATH` for the agent/runtime that will invoke this skill.
 
-If the `npx` install fails (no Node, offline, etc.), fall back to a direct Go install (requires Go 1.26.6 or newer). This installs into `$GOPATH/bin` (default `$HOME/go/bin`), so add that directory to `$PATH` instead:
+If the `npx` install fails (no Node, offline, etc.), fall back to a direct Go install (requires Go 1.26.5 or newer). This installs into `$GOPATH/bin` (default `$HOME/go/bin`), so add that directory to `$PATH` instead:
 
 ```bash
-go install github.com/mvanhorn/printing-press-library/library/food-and-dining/forkable/cmd/forkable-pp-cli@latest
+go install github.com/mvanhorn/printing-press-library/library/productivity/gmail/cmd/gmail-pp-cli@latest
 ```
 
 If `--version` reports "command not found" after install, the runtime cannot see the binary directory on `$PATH`. Do not proceed with skill commands until verification succeeds.
 
-Forkable exposes no public API. This CLI reverse-engineers the my-account app's GraphQL surface into a Go binary with clean read commands and agent-native output. On top of the raw reads it adds longitudinal views the product never shows — served-meal history, preference-vs-served drift, spend trends, allowance utilization, venue rotation, and a week-ahead digest — all fetched live from Forkable. It also exposes the my-account app's own meal-management mutations as meal set, meal set-all, meal confirm, meal skip, and reorder; these are dry-run by default and only place, confirm, or skip real orders when you pass --confirm.
+Every read and cleanup surface from the Gmail tool landscape, multi-account, with a local SQLite store underneath: sender intelligence, all-category digests, bulk trash/label with preview-confirm-undo, RFC 8058 one-click unsubscribes with a compliance ledger. Send, drafts, settings, and permanent deletion are absent from the binary by construction — Trash is the ceiling.
 
 ## When to Use This CLI
 
-Use this CLI when an agent or script needs to query a Forkable office-lunch program from the terminal: what meals were served, how much was spent, which venues rotate, and whether served meals match stated dietary preferences. It is the only programmatic surface for Forkable and the only way to get longitudinal history the web app does not aggregate. It can also set, confirm, and skip upcoming meal deliveries on the user's behalf — those commands are dry-run by default and require `--confirm` to apply. All commands fetch live from Forkable (no local sync step).
+Reach for this CLI when an agent or operator needs to understand or clean a Gmail mailbox safely: summaries across every category, sender and storage intelligence, bulk trash/label with preview and undo, and one-click unsubscribes with follow-up verification. It is the wrong tool for composing or sending anything — by design it cannot.
 
-## Anti-triggers
+Do NOT use this CLI for:
 
-Do not use this CLI for:
-- Do not place, change, or cancel meal orders without explicit user intent — the `meal set`, `meal set-all`, `meal confirm`, `meal skip`, and `reorder` commands mutate the real account and require `--confirm`; run them dry-run first and confirm the printed mutation before adding `--confirm`.
-- Do not use this CLI to add or remove club members or manage billing — use the Forkable web app.
-- Do not use this CLI for real-time delivery tracking notifications — those come via Forkable's email/Slack/SMS.
+- **Composing, sending, replying, forwarding, or drafting email** — no send or draft surface exists in the binary.
+- **Permanently deleting messages or emptying Trash** — Trash is the ceiling; the gmail.modify scope cannot permanently delete.
+- **Deleting labels** — `labels create` and `labels rename` are the only label writes; there is no `labels delete`, update, or patch.
+- **Managing Gmail settings, filters, forwarding, or vacation responders** — settings endpoints do not exist in this binary.
+- **Thread-level mutations** — threads are read-only; mutations operate on messages through the cleanup engine.
+- **Sending mailto: unsubscribes** — `unsub run` executes RFC 8058 one-click HTTPS POSTs only; mailto-only senders are surfaced as a desk list, never acted on.
 
 ## Unique Capabilities
 
 These capabilities aren't available in any other tool for this API.
 
-### Local history that compounds
-- **`served-history`** — See every meal actually served to you over time, with date, venue, price, and dietary level.
+### Cleanup that compounds
+- **`unsub verify`** — See which senders kept mailing you after a one-click unsubscribe, with an escalation query per violator.
 
-  _Reach for this when an agent needs a longitudinal view of what a person has eaten, not just the current delivery._
+  _After running unsubscribes, this is the only way to learn which ones actually stuck before escalating to block/filter decisions._
 
   ```bash
-  forkable-pp-cli served-history --since 90d --agent
+  gmail-pp-cli unsub verify --account ads --agent
   ```
-- **`preference-drift`** — Flag served meals that violate your stated dislikes or dietary restrictions, or miss your likes.
+- **`rules run`** — Named local recipes (query plus trash or label action) replayed through the preview-confirm-undo engine as one merged plan.
 
-  _Use this to audit whether auto-selection is actually honoring dietary preferences over time._
+  _Standing hygiene (old promos to trash, receipts to their folder) becomes one command a scheduled job can run daily, always previewed before applying._
 
   ```bash
-  forkable-pp-cli preference-drift --since 60d --agent
+  gmail-pp-cli rules run --plan-only --agent
   ```
-- **`venue-rotation`** — Rank venues by how often they've served you and how recently.
+- **`sort suggest`** — Senders whose mail you already label consistently, with a generated plan to label the rest the same way.
 
-  _Use this to spot venue fatigue or under-used favorites across the whole synced window._
-
-  ```bash
-  forkable-pp-cli venue-rotation --since 120d --agent
-  ```
-
-### Making the opaque legible
-- **`why-picked`** — Explain why a delivery's meal was auto-selected by ranking candidate items and their scores.
-
-  _Pick this to explain a single day's auto-selected meal; use preference-drift for aggregate conformance._
+  _Folder-sorting at scale without guessing: the plan only proposes what the operator's own labeling history already proves._
 
   ```bash
-  forkable-pp-cli why-picked --delivery 1219480 --agent
+  gmail-pp-cli sort suggest --account personal --min-confidence 0.8 --agent
   ```
 
-### Finance and allowances
-- **`spend-trend`** — Bucket lunch spend into per-week or per-month totals with CSV export.
+### Local state that answers instantly
+- **`delta`** — Everything new since your last check: new messages per category and sender, never-seen senders, volume spikes.
 
-  _Reach for this when finance needs a time series of lunch cost, not a single delivery receipt._
+  _The first question of any recurring mailbox check is what changed — this answers it without re-reporting what the operator already saw._
 
   ```bash
-  forkable-pp-cli spend-trend --since 6mo --by month --csv
+  gmail-pp-cli delta --account personal --agent
   ```
-- **`allowance-burn`** — Show granted-vs-consumed allowance utilization per club, including multi-club comparison.
+- **`storage report`** — Which senders, labels, years, and attachments own your storage, with ready-to-run cleanup queries per row.
 
-  _Use this to see which teams are over- or under-using their lunch budget._
+  _Turns a vague quota number into a ranked hit-list whose rows paste straight into cleanup plan._
 
   ```bash
-  forkable-pp-cli allowance-burn --by club --csv
+  gmail-pp-cli storage report --account ads --top 15 --agent
   ```
 
-### Agent-native plumbing
-- **`upcoming-digest`** — One agent-shaped line per upcoming day: date, venue, auto-selected item, price, allowance headroom.
+### Safety made visible
+- **`trash report`** — What you trashed, grouped by applied plan, with days remaining before Gmail's 30-day purge makes undo impossible.
 
-  _Pick this for a quick 'what's coming this week' summary an agent can read in one shot._
+  _The last regret-check: surfaces batches whose undo window is closing so recovery happens while it still can._
 
   ```bash
-  forkable-pp-cli upcoming-digest --agent
+  gmail-pp-cli trash report --closing-soon --agent
+  ```
+- **`score`** — Per-account hygiene metrics — unread share, promo share, subscription count, storage headroom — snapshotted over time.
+
+  _Shows whether the cleanup campaign is actually winning — Promotions down 60% since baseline beats a feeling._
+
+  ```bash
+  gmail-pp-cli score --account ads --agent
   ```
 
 ## Command Reference
 
-**account** — 
+Raw modify/trash/delete subcommands do not exist. Every mailbox mutation flows through `cleanup plan` → `cleanup apply` (reversible via `undo`), `labels create`/`labels rename`, or `unsub plan` → `unsub run` — all gated by one-time plan tokens. One-click POSTs additionally require the unsubscribe URL host to share the sender's registrable domain: ESP-hosted (third-party) destinations are listed by `unsub plan` under `third_party_hosts` and are skipped by `unsub run` unless it is invoked with `--allow-third-party`.
 
-- `forkable-pp-cli account` — Show the authenticated Forkable user: profile, roles, dietary preferences (likes/dislikes/restrictions), companies
+**Mailbox engine**
 
-**buffet_addresses** — 
+- `gmail-pp-cli accounts` / `accounts auth` — List gauth profiles and token status; run the browser OAuth flow for one profile (or `--all`).
+- `gmail-pp-cli sync` — Sync message metadata into the local store (full or historyId-incremental); never mutates the mailbox.
+- `gmail-pp-cli digest` — Per-category mailbox summary plus an account rollup.
+- `gmail-pp-cli senders` — Rank senders by volume, with size, unread rate, and unsubscribe capability.
+- `gmail-pp-cli delta` / `storage report` / `trash report` / `score` / `sort suggest` — The local-intelligence reports described under Unique Capabilities.
+- `gmail-pp-cli cleanup plan|apply|recover` — Preview-confirm-undo cleanup: `plan` freezes what would change (mailbox untouched), `apply` executes exactly that, `recover` finishes a crashed apply.
+- `gmail-pp-cli undo --ledger <id>` — Reverse a ledgered apply delta-by-delta; changed ids are skipped as conflicts, never forced.
+- `gmail-pp-cli rules add|list|rm|run` — Named local cleanup recipes replayed through the engine as one merged plan; `run` always stops at the plan.
+- `gmail-pp-cli unsub audit|plan|run|verify` — One-click unsubscribe engine: classify, freeze, POST (RFC 8058, hardened), verify.
+- `gmail-pp-cli search` / `analytics` / `tail` / `workflow archive|status` / `api` — Local FTS search and analytics, polling change stream, archive workflows, endpoint browsing.
 
-- `forkable-pp-cli buffet-addresses` — List your buffet delivery addresses (street, city, postal code, coordinates, club).
+**API reads (plus the two safe label writes)** — `<userId>` accepts `me`
 
-**clubs** — 
-
-- `forkable-pp-cli clubs` — List meal clubs (teams/offices) you belong to or manage, with delivery address, delivery days, allowances
-
-**csrf** — 
-
-- `forkable-pp-cli csrf` — Fetch a CSRF token. Read-only.
-
-**deliveries** — 
-
-- `forkable-pp-cli deliveries in-progress-ids` — List IDs of deliveries currently in progress.
-- `forkable-pp-cli deliveries list` — List your meal deliveries from a given date forward, including per-delivery orders, chosen menu items, receipts
-
-**meal_scores** — 
-
-- `forkable-pp-cli meal-scores` — Show meal auto-selection scores (menuId, itemId, score) for a delivery and user across candidate menus.
-
-**menus** — 
-
-- `forkable-pp-cli menus` — Get menu(s) with venue, sections, items, prices, dietary levels, ratings, and modifiers.
-
-**notifications** — 
-
-- `forkable-pp-cli notifications` — List account notifications shown in the my-account app (title, description, links, publish window).
-
-**venue_usage** — 
-
-- `forkable-pp-cli venue-usage` — Get per-venue usage keyed by venue id over a date range. Requires venue ids and from/to dates inlined in the query.
-
-**Stale default dates on `deliveries list` and `venue-usage`.** These two raw GraphQL passthrough commands ship a default `--query` with an example date baked directly into the query text. Running either with no flags can silently return an empty or misleading result (e.g. `deliveries list` with no overrides returns `{"count":0}` even when real deliveries exist) rather than an error. Always override the date argument with a real date — today's date for forward-looking reads, or a far-past date (e.g. `2000-01-01`, as `served-history`/`allowance-burn` already do internally) for full-history reads — before trusting a zero/empty result from either command. Other passthrough reads (`menus`, `meal-scores`) instead ship placeholder ids that need replacing — see each command's own entry above.
-
-**meal management (writes)** — place real orders and spend; **dry-run by default**, pass `--confirm` to apply.
-
-- `forkable-pp-cli meal set <deliveryId> --item <id> --menu <id> [--modifier <modifierId>:<optionId>] [--replace-piece <uuid>] [--note <text>] [--confirm]` — Override the auto-picked meal for one delivery day (`replacePiece`). `--replace-piece` takes the current piece's UUID (from `deliveries list`).
-- `forkable-pp-cli meal set-all --deliveries <id,id> --item <id> --menu <id> [--modifier <modifierId>:<optionId>] [--confirm]` — Apply one meal item across several delivery days (`replaceAllPieces`).
-- `forkable-pp-cli meal confirm <deliveryId> [--unconfirm] [--confirm]` — Confirm (or `--unconfirm`) a delivery day (`confirmDelivery`).
-- `forkable-pp-cli meal skip <deliveryId> [--confirm]` — Skip / cancel one or more delivery days (`removeDelivery`); `--deliveries <id,id>` skips several.
-- `forkable-pp-cli reorder <fromDate> --onto <deliveryId> [--replace-piece <uuid>] [--confirm]` — Repeat the meal you had on a past date onto an upcoming delivery day.
-
-**`--replace-piece` is effectively always required for `meal set` and `reorder`.** Forkable auto-selects a candidate meal for every delivery day before you ever touch it — in practice there is no delivery day with a genuinely empty slot, so omitting `--replace-piece` is a rare/theoretical path, not the default case. **Dry-run mode does not validate this.** A dry-run without `--replace-piece` renders a plausible-looking mutation preview and only fails at `--confirm` time, with a raw GraphQL error (`oldPieceId ... Expected value to not be null`). Before running `--confirm`, always look up the target delivery's current piece id via `deliveries list` (its `orders[].pieces[].id`) and pass it with `--replace-piece`. `meal set-all` has no `--replace-piece` flag — `replaceAllPieces` takes no old-piece id at all, so this caveat doesn't apply to it.
-
-**Required item options — `--modifier`.** An item with a required option group (e.g. "Choose Protein", `min: 1`) is rejected by Forkable unless you send a selection. Pass `--modifier <modifierId>:<optionId>[,<optionId>...]` (repeatable) — the CLI builds the `selectionsHash` (`{"16":[10]}`) the `replacePiece` mutation needs. Find modifier and option ids under each item's `modifiers` in the `menus` output. Example: `forkable-pp-cli meal set 12345 --item 678 --menu 90 --modifier 16:10 --replace-piece <uuid> --confirm`.
+- `gmail-pp-cli history <userId>` — Lists the history of all changes to the given mailbox.
+- `gmail-pp-cli labels list|get` — Read labels.
+- `gmail-pp-cli labels create` — Create a label, idempotently by name (an existing case-insensitive match is returned, not duplicated).
+- `gmail-pp-cli labels rename` — Rename a label by id, ledgering the inverse for `undo --ledger <id>`. No `labels delete`, update, or patch exists.
+- `gmail-pp-cli messages list|get` / `messages attachments get` — Read messages and attachments (reads only).
+- `gmail-pp-cli threads list|get` — Read threads (thread mutations do not exist).
+- `gmail-pp-cli users-profile <userId>` — Gets the current user's Gmail profile.
 
 
 ### Finding the right command
@@ -175,58 +145,58 @@ These capabilities aren't available in any other tool for this API.
 When you know what you want to do but not which command does it, ask the CLI directly:
 
 ```bash
-forkable-pp-cli which "<capability in your own words>"
+gmail-pp-cli which "<capability in your own words>"
 ```
 
 `which` resolves a natural-language capability query to the best matching command from this CLI's curated feature index. Exit code `0` means at least one match; exit code `2` means no confident match — fall back to `--help` or use a narrower query.
 
 ## Recipes
 
-### What have I eaten this quarter
+### Morning mailbox delta
 
 ```bash
-forkable-pp-cli served-history --since 90d --agent --select date,venue,name,price
+gmail-pp-cli delta --account ads --agent
 ```
 
-Longitudinal list of served meals, narrowed to the high-signal fields to keep agent context small.
+What arrived since the last check, grouped by category and sender, without re-reporting what was already seen.
 
-### Audit dietary conformance
+### Top senders, narrowed for an agent
 
 ```bash
-forkable-pp-cli preference-drift --since 60d --json
+gmail-pp-cli senders --account personal --top 25 --agent --select senders.email,senders.count,senders.unread_rate
 ```
 
-Flags any served meal that conflicts with your stated dislikes or restrictions.
+Dotted --select keeps the payload to the three fields a triage decision needs.
 
-### Monthly lunch spend for finance
+### Unsubscribe audit before acting
 
 ```bash
-forkable-pp-cli spend-trend --since 6mo --by month --csv
+gmail-pp-cli unsub audit --account ads --min-count 5 --agent
 ```
 
-Per-month spend totals exported as CSV for a budget close.
+Ranks subscription senders by volume and classifies each as one-click (actionable) or mailto-only (desk list).
 
-### Which teams are burning their allowance
+### Preview a year-old promotions purge
 
 ```bash
-forkable-pp-cli allowance-burn --by club --csv
+gmail-pp-cli cleanup plan --q "category:promotions older_than:1y" --action trash --account personal --agent
 ```
 
-Granted-vs-consumed allowance utilization per club, side by side.
+Counts and samples first; the printed plan token is required by cleanup apply, and every apply is undoable.
 
-### This week's lunch at a glance
+### Verify last week's unsubscribes stuck
 
 ```bash
-forkable-pp-cli upcoming-digest --agent
+gmail-pp-cli unsub verify --account ads --since 7d --agent
 ```
 
-One compact line per upcoming day for a quick agent-readable briefing.
+Joins the unsubscribe ledger to fresh arrivals — violators come back with an escalation query.
 
 ## Auth Setup
 
-Forkable authenticates with a browser session cookie plus a per-request CSRF token fetched from /api/v2/csrf_token. Log in to forkable.com in Chrome, then run 'forkable-pp-cli auth login --chrome' to import your session. There is no API key.
+Installed-app OAuth with named multi-account profiles (per-profile token store, consented-account verification). The only scope ever requested is gmail.modify; send/draft/settings endpoints do not exist in this binary, and permanent deletion is impossible under this scope — Google enforces the Trash ceiling, not us.
 
-Run `forkable-pp-cli doctor` to verify setup.
+Run `gmail-pp-cli doctor` to verify setup.
 
 ## Agent Mode
 
@@ -236,12 +206,12 @@ Add `--agent` to any command. Expands to: `--json --compact --no-input --no-colo
 - **Filterable** — `--select` keeps a subset of fields. Dotted paths descend into nested structures; arrays traverse element-wise. Critical for keeping context small on verbose APIs:
 
   ```bash
-  forkable-pp-cli buffet-addresses --query example-value --agent --select id,name,status
+  gmail-pp-cli labels list me --agent --select id,name
   ```
 - **Previewable** — `--dry-run` shows the request without sending
-- **Safe writes** — read commands query Forkable; the write commands (`meal set`, `meal set-all`, `meal confirm`, `meal skip`, `reorder`) are dry-run by default and only mutate the account when invoked with `--confirm`
-- **Live fetch** — commands query Forkable directly over GraphQL; there is no local sync/cache step
+- **Offline-friendly** — sync/search commands can use the local SQLite store when available
 - **Non-interactive** — never prompts, every input is a flag
+- **Explicit retries** — use `--idempotent` only when an already-existing create should count as success (`labels create` already matches by name)
 
 ### Response envelope
 
@@ -260,28 +230,28 @@ Parse `.results` for data and `.meta.source` to know whether it's live or local.
 
 Agents should treat the CLI's path resolver as part of the runtime contract:
 
-- Use `--home <dir>` for one invocation, or set `FORKABLE_HOME=<dir>` to relocate all four path kinds under one root.
-- Use per-kind env vars only when a specific kind must diverge: `FORKABLE_CONFIG_DIR`, `FORKABLE_DATA_DIR`, `FORKABLE_STATE_DIR`, `FORKABLE_CACHE_DIR`.
-- Resolution order is per-kind env var, `--home`, `FORKABLE_HOME`, XDG (`XDG_CONFIG_HOME`, `XDG_DATA_HOME`, `XDG_STATE_HOME`, `XDG_CACHE_HOME`), then platform defaults.
+- Use `--home <dir>` for one invocation, or set `GMAIL_HOME=<dir>` to relocate all four path kinds under one root.
+- Use per-kind env vars only when a specific kind must diverge: `GMAIL_CONFIG_DIR`, `GMAIL_DATA_DIR`, `GMAIL_STATE_DIR`, `GMAIL_CACHE_DIR`.
+- Resolution order is per-kind env var, `--home`, `GMAIL_HOME`, XDG (`XDG_CONFIG_HOME`, `XDG_DATA_HOME`, `XDG_STATE_HOME`, `XDG_CACHE_HOME`), then platform defaults.
 - `config` contains settings like `config.toml` and profiles. `data` contains `credentials.toml`, `data.db`, cookies, and auth sidecars. `state` contains persisted queries, jobs, and `teach.log`. `cache` contains regenerable HTTP/cache files.
 - Stored secrets live in `credentials.toml` under the data dir. Existing legacy `config.toml` secrets are read for compatibility and leave `config.toml` on the first auth write.
-- Run `forkable-pp-cli doctor --fail-on warn` to surface path and credential-location warnings. `agent-context` exposes a schema v4 `paths` block for agents that need the resolved dirs.
+- Run `gmail-pp-cli doctor --fail-on warn` to surface path and credential-location warnings. `agent-context` exposes a schema v4 `paths` block for agents that need the resolved dirs.
 - For MCP, pass relocation through the MCP host config. The MCP binary does not inherit CLI flags:
 
   ```json
   {
     "mcpServers": {
-      "forkable": {
-        "command": "forkable-pp-mcp",
+      "gmail": {
+        "command": "gmail-pp-mcp",
         "env": {
-          "FORKABLE_HOME": "/srv/forkable"
+          "GMAIL_HOME": "/srv/gmail"
         }
       }
     }
   }
   ```
 
-Fleet precedence: an inherited per-kind env var overrides an explicit `--home` for that kind. Use `FORKABLE_HOME` or per-kind vars as durable fleet levers, and use `--home` only for a single invocation. Relocation is not reversible by unsetting env vars; move files manually before clearing `FORKABLE_HOME`, or `doctor` will not find credentials left under the former root.
+Fleet precedence: an inherited per-kind env var overrides an explicit `--home` for that kind. Use `GMAIL_HOME` or per-kind vars as durable fleet levers, and use `--home` only for a single invocation. Relocation is not reversible by unsetting env vars; move files manually before clearing `GMAIL_HOME`, or `doctor` will not find credentials left under the former root.
 
 ## Automatic learning
 
@@ -292,7 +262,7 @@ This CLI ships a self-capturing learning loop. The CLI does its own bookkeeping:
 Before list/search/drill commands on a new user question, run:
 
 ```bash
-forkable-pp-cli recall "<user's question>" --agent
+gmail-pp-cli recall "<user's question>" --agent
 ```
 
 The response envelope:
@@ -315,7 +285,7 @@ The response envelope:
     { "id": 12, "class": "flag_alias | playbook_candidate",
       "summary": "...", "sightings": 3, "last_seen": "...",
       "rationale": "...",
-      "next_action": ["<trial command>", "forkable-pp-cli learnings confirm 12"] }
+      "next_action": ["<trial command>", "gmail-pp-cli learnings confirm 12"] }
   ],
   "playbook": {
     "query_family": "...",
@@ -354,7 +324,7 @@ if Playbook present:
        for the entity slot tokens. If a step's slot is unresolved, fall back to
        discovery for that step only.
     -> the Playbook's expected_tool_calls is a budget; if you find yourself running
-       materially more, record the divergence via `forkable-pp-cli playbook amend`
+       materially more, record the divergence via `gmail-pp-cli playbook amend`
        at end-of-session.
 
 elif Notes present (no Playbook):
@@ -380,7 +350,7 @@ else:  // Found == false, no playbook, no notes
 
 Playbook and Notes are orthogonal to the per-resource path. A recall response can carry both a Playbook AND a `Results[]` hit - use both: the Playbook tells you which choreography to run; the resource hits short-circuit specific steps. Default to skipping `mismatches`; pass `--debug-mismatches` only when investigating cold-start surprises.
 
-Candidate judgment details: `learnings confirm <id>` prints the candidate's full payload before materializing it - check that the printed payload matches the behavior you verified. `learnings reject <id>` tombstones the derivation signature so the same candidate does not resurface. The envelope carries only the few candidates worth acting on now; `forkable-pp-cli learnings candidates` lists the full open set.
+Candidate judgment details: `learnings confirm <id>` prints the candidate's full payload before materializing it - check that the printed payload matches the behavior you verified. `learnings reject <id>` tombstones the derivation signature so the same candidate does not resurface. The envelope carries only the few candidates worth acting on now; `gmail-pp-cli learnings candidates` lists the full open set.
 
 Graceful degradation: if `learnings confirm` is an unknown command, you are driving an older binary - ignore the candidates guidance and follow the rest of the protocol.
 
@@ -392,7 +362,7 @@ Graceful degradation: if `learnings confirm` is an unknown command, you are driv
 - `similar_shape_different_entity:<canonical>` (top-level): a structurally matching row exists but its canonical entity differs from the live query's. Treated as cold start; the warning carries the conflicting canonical as a hint, but the row is NOT promoted into Results.
 - `ambiguous_alias` (top-level): a single query entity resolved to multiple canonicals (e.g., "Cards" → Arizona Cardinals + St. Louis Cardinals). Surface the ambiguity from context before committing to a resource.
 - `candidates_present` (top-level): the envelope carries a `candidates` section. Handle it via the candidates branch in Step 2 before anything else.
-- `lookup_refresh_available` (top-level): an entity in the query has no lookup row yet. This CLI fetches live (no sync command); populate lookups by running the relevant read command (e.g. `deliveries list`, `clubs list`).
+- `lookup_refresh_available` (top-level): an entity in the query has no lookup row yet, but synced data could provide one. Run `gmail-pp-cli sync` to refresh entity lookups.
 - Top-level `no_learnings_for_query_family`: the table had no rows above the Jaccard floor. Pure cold start.
 
 ### Step 4: `teach &` after finalizing your response - always
@@ -400,7 +370,7 @@ Graceful degradation: if `learnings confirm` is an unknown command, you are driv
 Teaching is unconditional. After resolving a query the store could not answer, background-teach the final resource mapping - no call-count threshold, no judging whether it was "worth" learning. The teach is the anchor of the loop: it triggers playbook synthesis for a family without a playbook, and same-referent phrasings fold into one family so near-duplicate teaches do not fragment the store. Fire it after assembling your user-facing response but BEFORE emitting it, with a shell `&` so the call returns immediately:
 
 ```bash
-forkable-pp-cli teach --query "<user's question>" --resource-type <type> --resource <id1> --resource <id2>
+gmail-pp-cli teach --query "<user's question>" --resource-type <type> --resource <id1> --resource <id2>
 # (append shell `&` to background it)
 ```
 
@@ -414,7 +384,7 @@ You do not need to decide whether a session "deserves" a playbook: a teach on a 
 
 ```bash
 # Common case: record both the resource learning AND the playbook in one call.
-forkable-pp-cli teach \
+gmail-pp-cli teach \
   --query "<user's question>" \
   --resource <id> \
   --playbook-file ~/playbooks/<shape>.json \
@@ -422,7 +392,7 @@ forkable-pp-cli teach \
 # (append shell `&` to background it)
 
 # Alternate: playbook-only (no resource to record alongside).
-forkable-pp-cli teach-playbook \
+gmail-pp-cli teach-playbook \
   --query "<user's question>" \
   --playbook-file ~/playbooks/<shape>.json \
   --notes-file ~/playbooks/<shape>-notes.md
@@ -437,7 +407,7 @@ When you DO find a playbook on a future recall, treat it as ground truth: replay
 If your debug-protocol response identifies a concrete correction the notes or playbook should know — a workaround, an undocumented endpoint shape, a stale field name, observed schema drift, an empty-payload fallback — fire `playbook amend` BEFORE emitting your user-facing response. Same fire-and-forget posture as `teach`.
 
 ```bash
-forkable-pp-cli playbook amend \
+gmail-pp-cli playbook amend \
   --query "<exact recall query string>" \
   --add-note "<your concrete correction>"
 # (append shell `&` to background it)
@@ -468,24 +438,24 @@ If a correction is only meaningful with user-specific context, it belongs in a p
 
 ### Measuring the loop
 
-`forkable-pp-cli learnings stats` reports recall hit rate, teach-to-reuse, playbook resolution rate, and candidate confirm/reject counts from the local `learn_events` table. Rates are null until they have a denominator; everything stays on this machine. Use it to check whether the loop is earning its keep for this CLI.
+`gmail-pp-cli learnings stats` reports recall hit rate, teach-to-reuse, playbook resolution rate, and candidate confirm/reject counts from the local `learn_events` table. Rates are null until they have a denominator; everything stays on this machine. Use it to check whether the loop is earning its keep for this CLI.
 
 ### Disabling learning
 
 - `--no-learn` on a single command short-circuits both `recall` and the `teach` write path. Use for deterministic agent flows or tests that must not be affected by accumulated learnings.
-- `FORKABLE_NO_LEARN=true` in the environment globally disables the pipeline.
+- `GMAIL_NO_LEARN=true` in the environment globally disables the pipeline.
 
 ## Agent Feedback
 
 When you (or the agent) notice something off about this CLI, record it:
 
 ```
-forkable-pp-cli feedback "the --since flag is inclusive but docs say exclusive"
-forkable-pp-cli feedback --stdin < notes.txt
-forkable-pp-cli feedback list --json --limit 10
+gmail-pp-cli feedback "the --since flag is inclusive but docs say exclusive"
+gmail-pp-cli feedback --stdin < notes.txt
+gmail-pp-cli feedback list --json --limit 10
 ```
 
-Entries are stored locally as `feedback.jsonl` under the resolved data dir. They are never POSTed unless `FORKABLE_FEEDBACK_ENDPOINT` is set AND either `--send` is passed or `FORKABLE_FEEDBACK_AUTO_SEND=true`. Default behavior is local-only.
+Entries are stored locally as `feedback.jsonl` under the resolved data dir. They are never POSTed unless `GMAIL_FEEDBACK_ENDPOINT` is set AND either `--send` is passed or `GMAIL_FEEDBACK_AUTO_SEND=true`. Default behavior is local-only.
 
 Write what *surprised* you, not a bug report. Short, specific, one line: that is the part that compounds.
 
@@ -506,11 +476,11 @@ Unknown schemes are refused with a structured error naming the supported set. We
 A profile is a saved set of flag values, reused across invocations. Use it when a scheduled or recurring agent reuses the same saved flags while providing different input each run.
 
 ```
-forkable-pp-cli profile save briefing --json
-forkable-pp-cli --profile briefing buffet-addresses --query example-value
-forkable-pp-cli profile list --json
-forkable-pp-cli profile show briefing
-forkable-pp-cli profile delete briefing --yes
+gmail-pp-cli profile save briefing --account personal --agent
+gmail-pp-cli --profile briefing digest
+gmail-pp-cli profile list --json
+gmail-pp-cli profile show briefing
+gmail-pp-cli profile delete briefing --yes
 ```
 
 Explicit flags always win over profile values; profile values win over defaults. `agent-context` lists all available profiles under `available_profiles` so introspecting agents discover them at runtime.
@@ -527,33 +497,33 @@ Explicit flags always win over profile values; profile values win over defaults.
 | 7 | Rate limited (wait and retry) |
 | 10 | Config error |
 
+The mutation engine (`cleanup apply|recover`, `unsub run`, `undo`) reuses `3` for a partial run and `7` for a busy apply lock, and uses `4` for refusals (identity, plan-sha, token, drift). Each engine command's `--help` documents its typed exits.
+
 ## Argument Parsing
 
 Parse `$ARGUMENTS`:
 
-1. **Empty, `help`, or `--help`** → show `forkable-pp-cli --help` output
+1. **Empty, `help`, or `--help`** → show `gmail-pp-cli --help` output
 2. **Starts with `install`** → ends with `mcp` → MCP installation; otherwise → see Prerequisites above
 3. **Anything else** → Direct Use (execute as CLI command with `--agent`)
 
 ## MCP Server Installation
 
-1. Install the MCP server:
-   ```bash
-   go install github.com/mvanhorn/printing-press-library/library/food-and-dining/forkable/cmd/forkable-pp-mcp@latest
-   ```
-2. Register with Claude Code:
-   ```bash
-   claude mcp add forkable-pp-mcp -- forkable-pp-mcp
-   ```
-3. Verify: `claude mcp list`
+Install the MCP binary from this CLI's published public-library entry or pre-built release, then register it:
+
+```bash
+claude mcp add gmail-pp-mcp -- gmail-pp-mcp
+```
+
+Verify: `claude mcp list`
 
 ## Direct Use
 
-1. Check if installed: `which forkable-pp-cli`
+1. Check if installed: `which gmail-pp-cli`
    If not found, offer to install (see Prerequisites at the top of this skill).
 2. Match the user query to the best command from the Unique Capabilities and Command Reference above.
 3. Execute with the `--agent` flag:
    ```bash
-   forkable-pp-cli <command> [subcommand] [args] --agent
+   gmail-pp-cli <command> [subcommand] [args] --agent
    ```
-4. If ambiguous, drill into subcommand help: `forkable-pp-cli <command> --help`.
+4. If ambiguous, drill into subcommand help: `gmail-pp-cli <command> --help`.

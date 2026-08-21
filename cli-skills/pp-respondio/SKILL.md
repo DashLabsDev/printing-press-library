@@ -1,7 +1,7 @@
 ---
-name: pp-forkable
-description: "A CLI and MCP server for your Forkable office-lunch program, with a local database and history, spend, and preference queries the web app cannot answer, plus commands to set, confirm, and skip meal orders (dry-run by default; --confirm to apply). Trigger phrases: `what have I eaten on forkable`, `forkable lunch spend this month`, `which forkable venues do we use most`, `did my forkable meals match my dietary preferences`, `forkable week ahead`, `set my forkable meal`, `skip forkable tomorrow`, `use forkable`, `run forkable`."
-author: "Allen Lew"
+name: pp-respondio
+description: "Every Respond.io feature, plus an offline mirror and SQL that answers inbox questions no single API call can. Trigger phrases: `check my respondio inbox`, `who talks to us on whatsapp`, `find contacts missing orderId`, `respondio workload by agent`, `send a message to this contact`, `use respondio`, `run respondio`."
+author: "bobe"
 license: "Apache-2.0"
 argument-hint: "<command> [args] | install cli|mcp"
 allowed-tools: "Read Bash"
@@ -9,165 +9,155 @@ metadata:
   openclaw:
     requires:
       bins:
-        - forkable-pp-cli
+        - respondio-pp-cli
     install:
       - kind: go
-        bins: [forkable-pp-cli]
-        module: github.com/mvanhorn/printing-press-library/library/food-and-dining/forkable/cmd/forkable-pp-cli
+        bins: [respondio-pp-cli]
+        module: github.com/mvanhorn/printing-press-library/library/social-and-messaging/respondio/cmd/respondio-pp-cli
 ---
 <!-- GENERATED FILE — DO NOT EDIT.
-     This file is a verbatim mirror of library/food-and-dining/forkable/SKILL.md,
+     This file is a verbatim mirror of library/social-and-messaging/respondio/SKILL.md,
      regenerated post-merge by tools/generate-skills/. Hand-edits here are
      silently overwritten on the next regen. Edit the library/ source instead.
      See the repository agent guide, section "Generated artifacts: registry.json, cli-skills/". -->
 
-# Forkable — Printing Press CLI
+# Respond.io — Printing Press CLI
 
 ## Prerequisites: Install the CLI
 
-This skill drives the `forkable-pp-cli` binary. **You must verify the CLI is installed before invoking any command from this skill.** If it is missing, install it first:
+This skill drives the `respondio-pp-cli` binary. **You must verify the CLI is installed before invoking any command from this skill.** If it is missing, install it first:
 
 1. Install via the Printing Press installer. It defaults binaries to `$HOME/.local/bin` on macOS/Linux and `%LOCALAPPDATA%\Programs\PrintingPress\bin` on Windows:
    ```bash
-   npx -y @mvanhorn/printing-press-library install forkable --cli-only
+   npx -y @mvanhorn/printing-press-library install respondio --cli-only
    ```
-2. Verify: `forkable-pp-cli --version`
+2. Verify: `respondio-pp-cli --version`
 3. Ensure the reported install directory is on `$PATH` for the agent/runtime that will invoke this skill.
 
-If the `npx` install fails (no Node, offline, etc.), fall back to a direct Go install (requires Go 1.26.6 or newer). This installs into `$GOPATH/bin` (default `$HOME/go/bin`), so add that directory to `$PATH` instead:
+If the `npx` install fails (no Node, offline, etc.), fall back to a direct Go install (requires Go 1.26.5 or newer). This installs into `$GOPATH/bin` (default `$HOME/go/bin`), so add that directory to `$PATH` instead:
 
 ```bash
-go install github.com/mvanhorn/printing-press-library/library/food-and-dining/forkable/cmd/forkable-pp-cli@latest
+go install github.com/mvanhorn/printing-press-library/library/social-and-messaging/respondio/cmd/respondio-pp-cli@latest
 ```
 
 If `--version` reports "command not found" after install, the runtime cannot see the binary directory on `$PATH`. Do not proceed with skill commands until verification succeeds.
 
-Forkable exposes no public API. This CLI reverse-engineers the my-account app's GraphQL surface into a Go binary with clean read commands and agent-native output. On top of the raw reads it adds longitudinal views the product never shows — served-meal history, preference-vs-served drift, spend trends, allowance utilization, venue rotation, and a week-ahead digest — all fetched live from Forkable. It also exposes the my-account app's own meal-management mutations as meal set, meal set-all, meal confirm, meal skip, and reorder; these are dry-run by default and only place, confirm, or skip real orders when you pass --confirm.
+respondio-pp-cli wraps the full Respond.io Unification API v2 - contacts, messaging, conversations, comments, and workspace - then syncs contacts, users, and channels into a local SQLite store. Offline you can segment by tag, find custom-field gaps, check channel mix, and gauge workload by agent with --json output built for agents.
 
 ## When to Use This CLI
 
-Use this CLI when an agent or script needs to query a Forkable office-lunch program from the terminal: what meals were served, how much was spent, which venues rotate, and whether served meals match stated dietary preferences. It is the only programmatic surface for Forkable and the only way to get longitudinal history the web app does not aggregate. It can also set, confirm, and skip upcoming meal deliveries on the user's behalf — those commands are dry-run by default and require `--confirm` to apply. All commands fetch live from Forkable (no local sync step).
+Use respondio-pp-cli for Respond.io support/sales operations: looking up contacts, sending messages, routing and assigning conversations, and answering inbox questions offline (channel mix, tag cohorts, custom-field gaps, workload by agent). It is the right choice when you want agent-native --json output and a local mirror instead of one-off API calls.
 
 ## Anti-triggers
 
 Do not use this CLI for:
-- Do not place, change, or cancel meal orders without explicit user intent — the `meal set`, `meal set-all`, `meal confirm`, `meal skip`, and `reorder` commands mutate the real account and require `--confirm`; run them dry-run first and confirm the printed mutation before adding `--confirm`.
-- Do not use this CLI to add or remove club members or manage billing — use the Forkable web app.
-- Do not use this CLI for real-time delivery tracking notifications — those come via Forkable's email/Slack/SMS.
+- Do not use this CLI for deep Respond.io analytics that need historical message-by-message mining (the mirror is a snapshot).
+- Do not use it to configure Respond.io workspace settings outside the exposed endpoints.
+- Do not use it as a replacement for the Respond.io web product for manual conversation handling.
 
 ## Unique Capabilities
 
 These capabilities aren't available in any other tool for this API.
 
-### Local history that compounds
-- **`served-history`** — See every meal actually served to you over time, with date, venue, price, and dietary level.
+### Local state that compounds
+- **`overview`** — One-command summary of open conversations, unassigned contacts, per-agent distribution, and recent activity.
 
-  _Reach for this when an agent needs a longitudinal view of what a person has eaten, not just the current delivery._
+  _Use instead of a dozen API calls when you need the current inbox load at a glance._
 
   ```bash
-  forkable-pp-cli served-history --since 90d --agent
+  respondio-pp-cli overview --json
   ```
-- **`preference-drift`** — Flag served meals that violate your stated dislikes or dietary restrictions, or miss your likes.
+- **`report workload`** — Per-agent message and conversation handling volume from the synced workspace.
 
-  _Use this to audit whether auto-selection is actually honoring dietary preferences over time._
-
-  ```bash
-  forkable-pp-cli preference-drift --since 60d --agent
-  ```
-- **`venue-rotation`** — Rank venues by how often they've served you and how recently.
-
-  _Use this to spot venue fatigue or under-used favorites across the whole synced window._
+  _Balance the team and spot overloaded agents without manual tallying._
 
   ```bash
-  forkable-pp-cli venue-rotation --since 120d --agent
+  respondio-pp-cli report workload --json
   ```
 
-### Making the opaque legible
-- **`why-picked`** — Explain why a delivery's meal was auto-selected by ranking candidate items and their scores.
+### Segment & find
+- **`report channel-mix`** — See which messaging channels (WhatsApp, Instagram, email...) your contacts actually use.
 
-  _Pick this to explain a single day's auto-selected meal; use preference-drift for aggregate conformance._
+  _Answer 'where do our customers talk to us' instantly from local data._
 
   ```bash
-  forkable-pp-cli why-picked --delivery 1219480 --agent
+  respondio-pp-cli report channel-mix --json
   ```
+- **`contact by-tag`** — List every contact that carries a given tag (VIP, unpaid, in-trial).
 
-### Finance and allowances
-- **`spend-trend`** — Bucket lunch spend into per-week or per-month totals with CSV export.
-
-  _Reach for this when finance needs a time series of lunch cost, not a single delivery receipt._
+  _Pull a whole segment for campaigns or support outreach in one command._
 
   ```bash
-  forkable-pp-cli spend-trend --since 6mo --by month --csv
+  respondio-pp-cli contact by-tag VIP --json
   ```
-- **`allowance-burn`** — Show granted-vs-consumed allowance utilization per club, including multi-club comparison.
+- **`contact field-gaps`** — Find contacts missing a custom field value (e.g. no orderId or region).
 
-  _Use this to see which teams are over- or under-using their lunch budget._
+  _Spot data quality gaps to drive clean-up or re-enrichment._
 
   ```bash
-  forkable-pp-cli allowance-burn --by club --csv
+  respondio-pp-cli contact field-gaps --name orderId --json
+  ```
+- **`contact idle`** — Find unassigned contacts with no recent activity worth working.
+
+  _Route idle work before it goes cold._
+
+  ```bash
+  respondio-pp-cli contact idle --days 7 --json
   ```
 
 ### Agent-native plumbing
-- **`upcoming-digest`** — One agent-shaped line per upcoming day: date, venue, auto-selected item, price, allowance headroom.
+- **`contact search`** — Free-text search across synced contacts without hitting the API.
 
-  _Pick this for a quick 'what's coming this week' summary an agent can read in one shot._
+  _Find a customer by name/email offline, fast, without api.respond.io._
 
   ```bash
-  forkable-pp-cli upcoming-digest --agent
+  respondio-pp-cli contact search --query acme --json
   ```
 
 ## Command Reference
 
-**account** — 
+**comment** — Add internal comments to contacts
 
-- `forkable-pp-cli account` — Show the authenticated Forkable user: profile, roles, dietary preferences (likes/dislikes/restrictions), companies
+- `respondio-pp-cli comment <identifier>` — Create an internal comment on a contact
 
-**buffet_addresses** — 
+**contact** — Manage Respond.io contacts and contact-level actions
 
-- `forkable-pp-cli buffet-addresses` — List your buffet delivery addresses (street, city, postal code, coordinates, club).
+- `respondio-pp-cli contact add-tags` — Add tags to a contact
+- `respondio-pp-cli contact create` — Create a new contact (identifier must be email: or phone:)
+- `respondio-pp-cli contact delete` — Delete a contact
+- `respondio-pp-cli contact get` — Get a contact by identifier (id:123, email:user@example.com, phone:+1234567890)
+- `respondio-pp-cli contact list` — List contacts with optional search and filters
+- `respondio-pp-cli contact list-channels` — List all channels connected to a contact
+- `respondio-pp-cli contact merge` — Merge two contacts into one
+- `respondio-pp-cli contact remove-tags` — Remove tags from a contact
+- `respondio-pp-cli contact update` — Update an existing contact
+- `respondio-pp-cli contact update-lifecycle` — Update a contact's lifecycle stage
+- `respondio-pp-cli contact upsert` — Create or update a contact keyed by email/phone identifier
 
-**clubs** — 
+**conversation** — Manage conversation assignment and status
 
-- `forkable-pp-cli clubs` — List meal clubs (teams/offices) you belong to or manage, with delivery address, delivery days, allowances
+- `respondio-pp-cli conversation assign` — Assign or unassign a conversation
+- `respondio-pp-cli conversation update-status` — Open or close a conversation
 
-**csrf** — 
+**message** — Send and retrieve messages for a contact
 
-- `forkable-pp-cli csrf` — Fetch a CSRF token. Read-only.
+- `respondio-pp-cli message get` — Get a message by ID
+- `respondio-pp-cli message list` — List messages for a contact
+- `respondio-pp-cli message send` — Send a message to a contact
 
-**deliveries** — 
+**space** — Respond.io workspace-level operations
 
-- `forkable-pp-cli deliveries in-progress-ids` — List IDs of deliveries currently in progress.
-- `forkable-pp-cli deliveries list` — List your meal deliveries from a given date forward, including per-delivery orders, chosen menu items, receipts
-
-**meal_scores** — 
-
-- `forkable-pp-cli meal-scores` — Show meal auto-selection scores (menuId, itemId, score) for a delivery and user across candidate menus.
-
-**menus** — 
-
-- `forkable-pp-cli menus` — Get menu(s) with venue, sections, items, prices, dietary levels, ratings, and modifiers.
-
-**notifications** — 
-
-- `forkable-pp-cli notifications` — List account notifications shown in the my-account app (title, description, links, publish window).
-
-**venue_usage** — 
-
-- `forkable-pp-cli venue-usage` — Get per-venue usage keyed by venue id over a date range. Requires venue ids and from/to dates inlined in the query.
-
-**Stale default dates on `deliveries list` and `venue-usage`.** These two raw GraphQL passthrough commands ship a default `--query` with an example date baked directly into the query text. Running either with no flags can silently return an empty or misleading result (e.g. `deliveries list` with no overrides returns `{"count":0}` even when real deliveries exist) rather than an error. Always override the date argument with a real date — today's date for forward-looking reads, or a far-past date (e.g. `2000-01-01`, as `served-history`/`allowance-burn` already do internally) for full-history reads — before trusting a zero/empty result from either command. Other passthrough reads (`menus`, `meal-scores`) instead ship placeholder ids that need replacing — see each command's own entry above.
-
-**meal management (writes)** — place real orders and spend; **dry-run by default**, pass `--confirm` to apply.
-
-- `forkable-pp-cli meal set <deliveryId> --item <id> --menu <id> [--modifier <modifierId>:<optionId>] [--replace-piece <uuid>] [--note <text>] [--confirm]` — Override the auto-picked meal for one delivery day (`replacePiece`). `--replace-piece` takes the current piece's UUID (from `deliveries list`).
-- `forkable-pp-cli meal set-all --deliveries <id,id> --item <id> --menu <id> [--modifier <modifierId>:<optionId>] [--confirm]` — Apply one meal item across several delivery days (`replaceAllPieces`).
-- `forkable-pp-cli meal confirm <deliveryId> [--unconfirm] [--confirm]` — Confirm (or `--unconfirm`) a delivery day (`confirmDelivery`).
-- `forkable-pp-cli meal skip <deliveryId> [--confirm]` — Skip / cancel one or more delivery days (`removeDelivery`); `--deliveries <id,id>` skips several.
-- `forkable-pp-cli reorder <fromDate> --onto <deliveryId> [--replace-piece <uuid>] [--confirm]` — Repeat the meal you had on a past date onto an upcoming delivery day.
-
-**`--replace-piece` is effectively always required for `meal set` and `reorder`.** Forkable auto-selects a candidate meal for every delivery day before you ever touch it — in practice there is no delivery day with a genuinely empty slot, so omitting `--replace-piece` is a rare/theoretical path, not the default case. **Dry-run mode does not validate this.** A dry-run without `--replace-piece` renders a plausible-looking mutation preview and only fails at `--confirm` time, with a raw GraphQL error (`oldPieceId ... Expected value to not be null`). Before running `--confirm`, always look up the target delivery's current piece id via `deliveries list` (its `orders[].pieces[].id`) and pass it with `--replace-piece`. `meal set-all` has no `--replace-piece` flag — `replaceAllPieces` takes no old-piece id at all, so this caveat doesn't apply to it.
-
-**Required item options — `--modifier`.** An item with a required option group (e.g. "Choose Protein", `min: 1`) is rejected by Forkable unless you send a selection. Pass `--modifier <modifierId>:<optionId>[,<optionId>...]` (repeatable) — the CLI builds the `selectionsHash` (`{"16":[10]}`) the `replacePiece` mutation needs. Find modifier and option ids under each item's `modifiers` in the `menus` output. Example: `forkable-pp-cli meal set 12345 --item 678 --menu 90 --modifier 16:10 --replace-piece <uuid> --confirm`.
+- `respondio-pp-cli space create-custom-field` — Create a custom field definition
+- `respondio-pp-cli space create-tag` — Create a workspace tag
+- `respondio-pp-cli space delete-tag` — Delete a workspace tag
+- `respondio-pp-cli space get-custom-field` — Get a custom field by ID
+- `respondio-pp-cli space get-user` — Get a user by ID
+- `respondio-pp-cli space list-channels` — List all channels in the workspace
+- `respondio-pp-cli space list-closing-notes` — List closing note categories
+- `respondio-pp-cli space list-custom-fields` — List all custom field definitions
+- `respondio-pp-cli space list-templates` — List message templates for a channel
+- `respondio-pp-cli space list-users` — List users in the workspace
+- `respondio-pp-cli space update-tag` — Update a workspace tag
 
 
 ### Finding the right command
@@ -175,58 +165,58 @@ These capabilities aren't available in any other tool for this API.
 When you know what you want to do but not which command does it, ask the CLI directly:
 
 ```bash
-forkable-pp-cli which "<capability in your own words>"
+respondio-pp-cli which "<capability in your own words>"
 ```
 
 `which` resolves a natural-language capability query to the best matching command from this CLI's curated feature index. Exit code `0` means at least one match; exit code `2` means no confident match — fall back to `--help` or use a narrower query.
 
 ## Recipes
 
-### What have I eaten this quarter
+### Inbox load at a glance
 
 ```bash
-forkable-pp-cli served-history --since 90d --agent --select date,venue,name,price
+respondio-pp-cli overview --json
 ```
 
-Longitudinal list of served meals, narrowed to the high-signal fields to keep agent context small.
+Summarize open conversations, unassigned contacts, and activity.
 
-### Audit dietary conformance
+### Narrow a contact payload
 
 ```bash
-forkable-pp-cli preference-drift --since 60d --json
+respondio-pp-cli contact get id:123 --agent --select firstName,email,lifecycle
 ```
 
-Flags any served meal that conflicts with your stated dislikes or restrictions.
+Keep context small by selecting only the fields you need.
 
-### Monthly lunch spend for finance
+### Find data-quality gaps
 
 ```bash
-forkable-pp-cli spend-trend --since 6mo --by month --csv
+respondio-pp-cli contact field-gaps --name orderId --json
 ```
 
-Per-month spend totals exported as CSV for a budget close.
+List contacts missing a custom field to drive enrichment.
 
-### Which teams are burning their allowance
+### Where customers talk to you
 
 ```bash
-forkable-pp-cli allowance-burn --by club --csv
+respondio-pp-cli report channel-mix --json
 ```
 
-Granted-vs-consumed allowance utilization per club, side by side.
+Show the channel-source distribution across synced contacts.
 
-### This week's lunch at a glance
+### Team workload
 
 ```bash
-forkable-pp-cli upcoming-digest --agent
+respondio-pp-cli report workload --json
 ```
 
-One compact line per upcoming day for a quick agent-readable briefing.
+Per-agent handling volume from synced assignments.
 
 ## Auth Setup
 
-Forkable authenticates with a browser session cookie plus a per-request CSRF token fetched from /api/v2/csrf_token. Log in to forkable.com in Chrome, then run 'forkable-pp-cli auth login --chrome' to import your session. There is no API key.
+Auth uses a Respond.io API access token (Settings > Integrations > Developer API). Set RESPOND_IO_API_TOKEN and run respondio-pp-cli auth login. All commands are read-mostly; mutations support --dry-run.
 
-Run `forkable-pp-cli doctor` to verify setup.
+Run `respondio-pp-cli doctor` to verify setup.
 
 ## Agent Mode
 
@@ -236,12 +226,12 @@ Add `--agent` to any command. Expands to: `--json --compact --no-input --no-colo
 - **Filterable** — `--select` keeps a subset of fields. Dotted paths descend into nested structures; arrays traverse element-wise. Critical for keeping context small on verbose APIs:
 
   ```bash
-  forkable-pp-cli buffet-addresses --query example-value --agent --select id,name,status
+  respondio-pp-cli contact list --agent --select id,name,status
   ```
 - **Previewable** — `--dry-run` shows the request without sending
-- **Safe writes** — read commands query Forkable; the write commands (`meal set`, `meal set-all`, `meal confirm`, `meal skip`, `reorder`) are dry-run by default and only mutate the account when invoked with `--confirm`
-- **Live fetch** — commands query Forkable directly over GraphQL; there is no local sync/cache step
+- **Offline-friendly** — sync/search commands can use the local SQLite store when available
 - **Non-interactive** — never prompts, every input is a flag
+- **Explicit retries** — use `--idempotent` only when an already-existing create should count as success, and use `--ignore-missing` only when a missing delete target should count as success
 
 ### Response envelope
 
@@ -260,28 +250,28 @@ Parse `.results` for data and `.meta.source` to know whether it's live or local.
 
 Agents should treat the CLI's path resolver as part of the runtime contract:
 
-- Use `--home <dir>` for one invocation, or set `FORKABLE_HOME=<dir>` to relocate all four path kinds under one root.
-- Use per-kind env vars only when a specific kind must diverge: `FORKABLE_CONFIG_DIR`, `FORKABLE_DATA_DIR`, `FORKABLE_STATE_DIR`, `FORKABLE_CACHE_DIR`.
-- Resolution order is per-kind env var, `--home`, `FORKABLE_HOME`, XDG (`XDG_CONFIG_HOME`, `XDG_DATA_HOME`, `XDG_STATE_HOME`, `XDG_CACHE_HOME`), then platform defaults.
+- Use `--home <dir>` for one invocation, or set `RESPONDIO_HOME=<dir>` to relocate all four path kinds under one root.
+- Use per-kind env vars only when a specific kind must diverge: `RESPONDIO_CONFIG_DIR`, `RESPONDIO_DATA_DIR`, `RESPONDIO_STATE_DIR`, `RESPONDIO_CACHE_DIR`.
+- Resolution order is per-kind env var, `--home`, `RESPONDIO_HOME`, XDG (`XDG_CONFIG_HOME`, `XDG_DATA_HOME`, `XDG_STATE_HOME`, `XDG_CACHE_HOME`), then platform defaults.
 - `config` contains settings like `config.toml` and profiles. `data` contains `credentials.toml`, `data.db`, cookies, and auth sidecars. `state` contains persisted queries, jobs, and `teach.log`. `cache` contains regenerable HTTP/cache files.
 - Stored secrets live in `credentials.toml` under the data dir. Existing legacy `config.toml` secrets are read for compatibility and leave `config.toml` on the first auth write.
-- Run `forkable-pp-cli doctor --fail-on warn` to surface path and credential-location warnings. `agent-context` exposes a schema v4 `paths` block for agents that need the resolved dirs.
+- Run `respondio-pp-cli doctor --fail-on warn` to surface path and credential-location warnings. `agent-context` exposes a schema v4 `paths` block for agents that need the resolved dirs.
 - For MCP, pass relocation through the MCP host config. The MCP binary does not inherit CLI flags:
 
   ```json
   {
     "mcpServers": {
-      "forkable": {
-        "command": "forkable-pp-mcp",
+      "respondio": {
+        "command": "respondio-pp-mcp",
         "env": {
-          "FORKABLE_HOME": "/srv/forkable"
+          "RESPONDIO_HOME": "/srv/respondio"
         }
       }
     }
   }
   ```
 
-Fleet precedence: an inherited per-kind env var overrides an explicit `--home` for that kind. Use `FORKABLE_HOME` or per-kind vars as durable fleet levers, and use `--home` only for a single invocation. Relocation is not reversible by unsetting env vars; move files manually before clearing `FORKABLE_HOME`, or `doctor` will not find credentials left under the former root.
+Fleet precedence: an inherited per-kind env var overrides an explicit `--home` for that kind. Use `RESPONDIO_HOME` or per-kind vars as durable fleet levers, and use `--home` only for a single invocation. Relocation is not reversible by unsetting env vars; move files manually before clearing `RESPONDIO_HOME`, or `doctor` will not find credentials left under the former root.
 
 ## Automatic learning
 
@@ -292,7 +282,7 @@ This CLI ships a self-capturing learning loop. The CLI does its own bookkeeping:
 Before list/search/drill commands on a new user question, run:
 
 ```bash
-forkable-pp-cli recall "<user's question>" --agent
+respondio-pp-cli recall "<user's question>" --agent
 ```
 
 The response envelope:
@@ -315,7 +305,7 @@ The response envelope:
     { "id": 12, "class": "flag_alias | playbook_candidate",
       "summary": "...", "sightings": 3, "last_seen": "...",
       "rationale": "...",
-      "next_action": ["<trial command>", "forkable-pp-cli learnings confirm 12"] }
+      "next_action": ["<trial command>", "respondio-pp-cli learnings confirm 12"] }
   ],
   "playbook": {
     "query_family": "...",
@@ -354,7 +344,7 @@ if Playbook present:
        for the entity slot tokens. If a step's slot is unresolved, fall back to
        discovery for that step only.
     -> the Playbook's expected_tool_calls is a budget; if you find yourself running
-       materially more, record the divergence via `forkable-pp-cli playbook amend`
+       materially more, record the divergence via `respondio-pp-cli playbook amend`
        at end-of-session.
 
 elif Notes present (no Playbook):
@@ -380,7 +370,7 @@ else:  // Found == false, no playbook, no notes
 
 Playbook and Notes are orthogonal to the per-resource path. A recall response can carry both a Playbook AND a `Results[]` hit - use both: the Playbook tells you which choreography to run; the resource hits short-circuit specific steps. Default to skipping `mismatches`; pass `--debug-mismatches` only when investigating cold-start surprises.
 
-Candidate judgment details: `learnings confirm <id>` prints the candidate's full payload before materializing it - check that the printed payload matches the behavior you verified. `learnings reject <id>` tombstones the derivation signature so the same candidate does not resurface. The envelope carries only the few candidates worth acting on now; `forkable-pp-cli learnings candidates` lists the full open set.
+Candidate judgment details: `learnings confirm <id>` prints the candidate's full payload before materializing it - check that the printed payload matches the behavior you verified. `learnings reject <id>` tombstones the derivation signature so the same candidate does not resurface. The envelope carries only the few candidates worth acting on now; `respondio-pp-cli learnings candidates` lists the full open set.
 
 Graceful degradation: if `learnings confirm` is an unknown command, you are driving an older binary - ignore the candidates guidance and follow the rest of the protocol.
 
@@ -392,7 +382,7 @@ Graceful degradation: if `learnings confirm` is an unknown command, you are driv
 - `similar_shape_different_entity:<canonical>` (top-level): a structurally matching row exists but its canonical entity differs from the live query's. Treated as cold start; the warning carries the conflicting canonical as a hint, but the row is NOT promoted into Results.
 - `ambiguous_alias` (top-level): a single query entity resolved to multiple canonicals (e.g., "Cards" → Arizona Cardinals + St. Louis Cardinals). Surface the ambiguity from context before committing to a resource.
 - `candidates_present` (top-level): the envelope carries a `candidates` section. Handle it via the candidates branch in Step 2 before anything else.
-- `lookup_refresh_available` (top-level): an entity in the query has no lookup row yet. This CLI fetches live (no sync command); populate lookups by running the relevant read command (e.g. `deliveries list`, `clubs list`).
+- `lookup_refresh_available` (top-level): an entity in the query has no lookup row yet, but synced data could provide one. Run `respondio-pp-cli sync` to refresh entity lookups.
 - Top-level `no_learnings_for_query_family`: the table had no rows above the Jaccard floor. Pure cold start.
 
 ### Step 4: `teach &` after finalizing your response - always
@@ -400,7 +390,7 @@ Graceful degradation: if `learnings confirm` is an unknown command, you are driv
 Teaching is unconditional. After resolving a query the store could not answer, background-teach the final resource mapping - no call-count threshold, no judging whether it was "worth" learning. The teach is the anchor of the loop: it triggers playbook synthesis for a family without a playbook, and same-referent phrasings fold into one family so near-duplicate teaches do not fragment the store. Fire it after assembling your user-facing response but BEFORE emitting it, with a shell `&` so the call returns immediately:
 
 ```bash
-forkable-pp-cli teach --query "<user's question>" --resource-type <type> --resource <id1> --resource <id2>
+respondio-pp-cli teach --query "<user's question>" --resource-type <type> --resource <id1> --resource <id2>
 # (append shell `&` to background it)
 ```
 
@@ -414,7 +404,7 @@ You do not need to decide whether a session "deserves" a playbook: a teach on a 
 
 ```bash
 # Common case: record both the resource learning AND the playbook in one call.
-forkable-pp-cli teach \
+respondio-pp-cli teach \
   --query "<user's question>" \
   --resource <id> \
   --playbook-file ~/playbooks/<shape>.json \
@@ -422,7 +412,7 @@ forkable-pp-cli teach \
 # (append shell `&` to background it)
 
 # Alternate: playbook-only (no resource to record alongside).
-forkable-pp-cli teach-playbook \
+respondio-pp-cli teach-playbook \
   --query "<user's question>" \
   --playbook-file ~/playbooks/<shape>.json \
   --notes-file ~/playbooks/<shape>-notes.md
@@ -437,7 +427,7 @@ When you DO find a playbook on a future recall, treat it as ground truth: replay
 If your debug-protocol response identifies a concrete correction the notes or playbook should know — a workaround, an undocumented endpoint shape, a stale field name, observed schema drift, an empty-payload fallback — fire `playbook amend` BEFORE emitting your user-facing response. Same fire-and-forget posture as `teach`.
 
 ```bash
-forkable-pp-cli playbook amend \
+respondio-pp-cli playbook amend \
   --query "<exact recall query string>" \
   --add-note "<your concrete correction>"
 # (append shell `&` to background it)
@@ -468,24 +458,24 @@ If a correction is only meaningful with user-specific context, it belongs in a p
 
 ### Measuring the loop
 
-`forkable-pp-cli learnings stats` reports recall hit rate, teach-to-reuse, playbook resolution rate, and candidate confirm/reject counts from the local `learn_events` table. Rates are null until they have a denominator; everything stays on this machine. Use it to check whether the loop is earning its keep for this CLI.
+`respondio-pp-cli learnings stats` reports recall hit rate, teach-to-reuse, playbook resolution rate, and candidate confirm/reject counts from the local `learn_events` table. Rates are null until they have a denominator; everything stays on this machine. Use it to check whether the loop is earning its keep for this CLI.
 
 ### Disabling learning
 
 - `--no-learn` on a single command short-circuits both `recall` and the `teach` write path. Use for deterministic agent flows or tests that must not be affected by accumulated learnings.
-- `FORKABLE_NO_LEARN=true` in the environment globally disables the pipeline.
+- `RESPONDIO_NO_LEARN=true` in the environment globally disables the pipeline.
 
 ## Agent Feedback
 
 When you (or the agent) notice something off about this CLI, record it:
 
 ```
-forkable-pp-cli feedback "the --since flag is inclusive but docs say exclusive"
-forkable-pp-cli feedback --stdin < notes.txt
-forkable-pp-cli feedback list --json --limit 10
+respondio-pp-cli feedback "the --since flag is inclusive but docs say exclusive"
+respondio-pp-cli feedback --stdin < notes.txt
+respondio-pp-cli feedback list --json --limit 10
 ```
 
-Entries are stored locally as `feedback.jsonl` under the resolved data dir. They are never POSTed unless `FORKABLE_FEEDBACK_ENDPOINT` is set AND either `--send` is passed or `FORKABLE_FEEDBACK_AUTO_SEND=true`. Default behavior is local-only.
+Entries are stored locally as `feedback.jsonl` under the resolved data dir. They are never POSTed unless `RESPONDIO_FEEDBACK_ENDPOINT` is set AND either `--send` is passed or `RESPONDIO_FEEDBACK_AUTO_SEND=true`. Default behavior is local-only.
 
 Write what *surprised* you, not a bug report. Short, specific, one line: that is the part that compounds.
 
@@ -506,11 +496,11 @@ Unknown schemes are refused with a structured error naming the supported set. We
 A profile is a saved set of flag values, reused across invocations. Use it when a scheduled or recurring agent reuses the same saved flags while providing different input each run.
 
 ```
-forkable-pp-cli profile save briefing --json
-forkable-pp-cli --profile briefing buffet-addresses --query example-value
-forkable-pp-cli profile list --json
-forkable-pp-cli profile show briefing
-forkable-pp-cli profile delete briefing --yes
+respondio-pp-cli profile save briefing --json
+respondio-pp-cli --profile briefing contact list
+respondio-pp-cli profile list --json
+respondio-pp-cli profile show briefing
+respondio-pp-cli profile delete briefing --yes
 ```
 
 Explicit flags always win over profile values; profile values win over defaults. `agent-context` lists all available profiles under `available_profiles` so introspecting agents discover them at runtime.
@@ -531,7 +521,7 @@ Explicit flags always win over profile values; profile values win over defaults.
 
 Parse `$ARGUMENTS`:
 
-1. **Empty, `help`, or `--help`** → show `forkable-pp-cli --help` output
+1. **Empty, `help`, or `--help`** → show `respondio-pp-cli --help` output
 2. **Starts with `install`** → ends with `mcp` → MCP installation; otherwise → see Prerequisites above
 3. **Anything else** → Direct Use (execute as CLI command with `--agent`)
 
@@ -539,21 +529,21 @@ Parse `$ARGUMENTS`:
 
 1. Install the MCP server:
    ```bash
-   go install github.com/mvanhorn/printing-press-library/library/food-and-dining/forkable/cmd/forkable-pp-mcp@latest
+   go install github.com/mvanhorn/printing-press-library/library/social-and-messaging/respondio/cmd/respondio-pp-mcp@latest
    ```
 2. Register with Claude Code:
    ```bash
-   claude mcp add forkable-pp-mcp -- forkable-pp-mcp
+   claude mcp add respondio-pp-mcp -- respondio-pp-mcp
    ```
 3. Verify: `claude mcp list`
 
 ## Direct Use
 
-1. Check if installed: `which forkable-pp-cli`
+1. Check if installed: `which respondio-pp-cli`
    If not found, offer to install (see Prerequisites at the top of this skill).
 2. Match the user query to the best command from the Unique Capabilities and Command Reference above.
 3. Execute with the `--agent` flag:
    ```bash
-   forkable-pp-cli <command> [subcommand] [args] --agent
+   respondio-pp-cli <command> [subcommand] [args] --agent
    ```
-4. If ambiguous, drill into subcommand help: `forkable-pp-cli <command> --help`.
+4. If ambiguous, drill into subcommand help: `respondio-pp-cli <command> --help`.

@@ -1,7 +1,7 @@
 ---
-name: pp-forkable
-description: "A CLI and MCP server for your Forkable office-lunch program, with a local database and history, spend, and preference queries the web app cannot answer, plus commands to set, confirm, and skip meal orders (dry-run by default; --confirm to apply). Trigger phrases: `what have I eaten on forkable`, `forkable lunch spend this month`, `which forkable venues do we use most`, `did my forkable meals match my dietary preferences`, `forkable week ahead`, `set my forkable meal`, `skip forkable tomorrow`, `use forkable`, `run forkable`."
-author: "Allen Lew"
+name: pp-quentli
+description: "Every Quentli payments, invoicing, and SAT tax-billing endpoint, plus offline collection, reconciliation, and at-risk-subscription intelligence no other Quentli tool has. Trigger phrases: `who owes me money`, `which subscriptions are about to fail`, `reconcile my SAT invoices`, `what was my net revenue last month`, `check this customer's balance`, `use quentli`, `run quentli`."
+author: "bobe"
 license: "Apache-2.0"
 argument-hint: "<command> [args] | install cli|mcp"
 allowed-tools: "Read Bash"
@@ -9,165 +9,189 @@ metadata:
   openclaw:
     requires:
       bins:
-        - forkable-pp-cli
+        - quentli-pp-cli
     install:
       - kind: go
-        bins: [forkable-pp-cli]
-        module: github.com/mvanhorn/printing-press-library/library/food-and-dining/forkable/cmd/forkable-pp-cli
+        bins: [quentli-pp-cli]
+        module: github.com/mvanhorn/printing-press-library/library/payments/quentli/cmd/quentli-pp-cli
 ---
 <!-- GENERATED FILE — DO NOT EDIT.
-     This file is a verbatim mirror of library/food-and-dining/forkable/SKILL.md,
+     This file is a verbatim mirror of library/payments/quentli/SKILL.md,
      regenerated post-merge by tools/generate-skills/. Hand-edits here are
      silently overwritten on the next regen. Edit the library/ source instead.
      See the repository agent guide, section "Generated artifacts: registry.json, cli-skills/". -->
 
-# Forkable — Printing Press CLI
+# Quentli — Printing Press CLI
 
 ## Prerequisites: Install the CLI
 
-This skill drives the `forkable-pp-cli` binary. **You must verify the CLI is installed before invoking any command from this skill.** If it is missing, install it first:
+This skill drives the `quentli-pp-cli` binary. **You must verify the CLI is installed before invoking any command from this skill.** If it is missing, install it first:
 
 1. Install via the Printing Press installer. It defaults binaries to `$HOME/.local/bin` on macOS/Linux and `%LOCALAPPDATA%\Programs\PrintingPress\bin` on Windows:
    ```bash
-   npx -y @mvanhorn/printing-press-library install forkable --cli-only
+   npx -y @mvanhorn/printing-press-library install quentli --cli-only
    ```
-2. Verify: `forkable-pp-cli --version`
+2. Verify: `quentli-pp-cli --version`
 3. Ensure the reported install directory is on `$PATH` for the agent/runtime that will invoke this skill.
 
-If the `npx` install fails (no Node, offline, etc.), fall back to a direct Go install (requires Go 1.26.6 or newer). This installs into `$GOPATH/bin` (default `$HOME/go/bin`), so add that directory to `$PATH` instead:
+If the `npx` install fails (no Node, offline, etc.), fall back to a direct Go install (requires Go 1.26.5 or newer). This installs into `$GOPATH/bin` (default `$HOME/go/bin`), so add that directory to `$PATH` instead:
 
 ```bash
-go install github.com/mvanhorn/printing-press-library/library/food-and-dining/forkable/cmd/forkable-pp-cli@latest
+go install github.com/mvanhorn/printing-press-library/library/payments/quentli/cmd/quentli-pp-cli@latest
 ```
 
 If `--version` reports "command not found" after install, the runtime cannot see the binary directory on `$PATH`. Do not proceed with skill commands until verification succeeds.
 
-Forkable exposes no public API. This CLI reverse-engineers the my-account app's GraphQL surface into a Go binary with clean read commands and agent-native output. On top of the raw reads it adds longitudinal views the product never shows — served-meal history, preference-vs-served drift, spend trends, allowance utilization, venue rotation, and a week-ahead digest — all fetched live from Forkable. It also exposes the my-account app's own meal-management mutations as meal set, meal set-all, meal confirm, meal skip, and reorder; these are dry-run by default and only place, confirm, or skip real orders when you pass --confirm.
+Quentli is the Stripe-like payments, cobranza, and facturación platform for Latin America. This CLI mirrors your customers, invoices, payments, subscriptions, tax invoices (SAT CFDI), and webhook events into a local database, then answers the questions ops and finance actually ask: who's behind on an invoice, which subscriptions are about to fail, which completed payments lack a valid SAT timbre, and what your net revenue really is — all offline and agent-native.
 
 ## When to Use This CLI
 
-Use this CLI when an agent or script needs to query a Forkable office-lunch program from the terminal: what meals were served, how much was spent, which venues rotate, and whether served meals match stated dietary preferences. It is the only programmatic surface for Forkable and the only way to get longitudinal history the web app does not aggregate. It can also set, confirm, and skip upcoming meal deliveries on the user's behalf — those commands are dry-run by default and require `--confirm` to apply. All commands fetch live from Forkable (no local sync step).
-
-## Anti-triggers
-
-Do not use this CLI for:
-- Do not place, change, or cancel meal orders without explicit user intent — the `meal set`, `meal set-all`, `meal confirm`, `meal skip`, and `reorder` commands mutate the real account and require `--confirm`; run them dry-run first and confirm the printed mutation before adding `--confirm`.
-- Do not use this CLI to add or remove club members or manage billing — use the Forkable web app.
-- Do not use this CLI for real-time delivery tracking notifications — those come via Forkable's email/Slack/SMS.
+Reach for this CLI when you need to run collections, reconcile revenue or SAT CFDI tax invoices, protect recurring subscriptions, or answer any cross-entity money question across your Quentli portfolio. It shines for automation and agent workflows where firing one API call per customer is too slow and you want the answer offline from the local mirror.
 
 ## Unique Capabilities
 
 These capabilities aren't available in any other tool for this API.
 
-### Local history that compounds
-- **`served-history`** — See every meal actually served to you over time, with date, venue, price, and dietary level.
+### Collections that compound
+- **`dunning`** — See every customer with an outstanding or overdue invoice, how much is owed, and the next collection action (send reminder, retry payment, or resend pay link).
 
-  _Reach for this when an agent needs a longitudinal view of what a person has eaten, not just the current delivery._
+  _Reach for this to answer who owes money and what to do next without firing dozens of API calls._
 
   ```bash
-  forkable-pp-cli served-history --since 90d --agent
+  quentli-pp-cli dunning --since 1w --json
   ```
-- **`preference-drift`** — Flag served meals that violate your stated dislikes or dietary restrictions, or miss your likes.
+- **`customer balance`** — Render a one-screen financial snapshot for a single customer: outstanding invoices, active subscriptions, payment methods, and CFDI linkage.
 
-  _Use this to audit whether auto-selection is actually honoring dietary preferences over time._
-
-  ```bash
-  forkable-pp-cli preference-drift --since 60d --agent
-  ```
-- **`venue-rotation`** — Rank venues by how often they've served you and how recently.
-
-  _Use this to spot venue fatigue or under-used favorites across the whole synced window._
+  _Reach for this before calling a customer about money so you have their full financial picture in one command._
 
   ```bash
-  forkable-pp-cli venue-rotation --since 120d --agent
+  quentli-pp-cli customer balance cus_abc123 --json
   ```
 
-### Making the opaque legible
-- **`why-picked`** — Explain why a delivery's meal was auto-selected by ranking candidate items and their scores.
+### Churn prevention
+- **`subs at-risk`** — Surface active subscriptions whose saved payment method is expired, unconfirmed, or deleted, or that have recent failed collection attempts, ranked by recovery urgency.
 
-  _Pick this to explain a single day's auto-selected meal; use preference-drift for aggregate conformance._
+  _Pick this before renewal season to fix expiring cards instead of discovering silent churn after the fact._
 
   ```bash
-  forkable-pp-cli why-picked --delivery 1219480 --agent
+  quentli-pp-cli subs at-risk --json
   ```
 
-### Finance and allowances
-- **`spend-trend`** — Bucket lunch spend into per-week or per-month totals with CSV export.
+### SAT tax compliance
+- **`reconcile`** — Cross-check completed or refunded payments and paid invoices against SAT tax-invoice status (VALID/CANCELED/PENDING) to find timbre gaps before monthly SAT filing.
 
-  _Reach for this when finance needs a time series of lunch cost, not a single delivery receipt._
-
-  ```bash
-  forkable-pp-cli spend-trend --since 6mo --by month --csv
-  ```
-- **`allowance-burn`** — Show granted-vs-consumed allowance utilization per club, including multi-club comparison.
-
-  _Use this to see which teams are over- or under-using their lunch budget._
+  _Use before SAT filing to catch completed payments missing a VALID CFDI instead of eyeballing two exported lists._
 
   ```bash
-  forkable-pp-cli allowance-burn --by club --csv
+  quentli-pp-cli reconcile --period 1m --json
   ```
 
-### Agent-native plumbing
-- **`upcoming-digest`** — One agent-shaped line per upcoming day: date, venue, auto-selected item, price, allowance headroom.
+### Revenue ops
+- **`revenue`** — Aggregate payments and refunds by status, type, and currency over a window; see net collected vs returned in localized minor-currency amounts.
 
-  _Pick this for a quick 'what's coming this week' summary an agent can read in one shot._
+  _Reach for this to answer how much money actually landed last month and what came back in refunds._
 
   ```bash
-  forkable-pp-cli upcoming-digest --agent
+  quentli-pp-cli revenue --since 30d --csv
+  ```
+
+### Operational alerts
+- **`webhooks health`** — Aggregate webhook delivery events by status per endpoint and surface PAYMENT_ATTEMPT_FAILED events as an operational alert with a retry path.
+
+  _Use on-call to spot failed webhook deliveries and refund/failure signals fast instead of polling dashboards._
+
+  ```bash
+  quentli-pp-cli webhooks health --since 24h --json
   ```
 
 ## Command Reference
 
-**account** — 
+**auth-links** — Manage auth links
 
-- `forkable-pp-cli account` — Show the authenticated Forkable user: profile, roles, dietary preferences (likes/dislikes/restrictions), companies
+- `quentli-pp-cli auth-links` — Generates a one-time authenticated URL that signs the customer into the payment portal.
 
-**buffet_addresses** — 
+**customer-portal-session** — Manage customer portal session
 
-- `forkable-pp-cli buffet-addresses` — List your buffet delivery addresses (street, city, postal code, coordinates, club).
+- `quentli-pp-cli customer-portal-session` — Generates a one-time authenticated URL that signs the customer into the portal at a supported destination.
 
-**clubs** — 
+**customers** — Manage customers
 
-- `forkable-pp-cli clubs` — List meal clubs (teams/offices) you belong to or manage, with delivery address, delivery days, allowances
+- `quentli-pp-cli customers create` — Creates a new customer.
+- `quentli-pp-cli customers get-by-id` — Returns a customer by id.
+- `quentli-pp-cli customers list` — Returns customers.
+- `quentli-pp-cli customers update` — Updates editable fields of an existing customer by id.
 
-**csrf** — 
+**discounts** — Manage discounts
 
-- `forkable-pp-cli csrf` — Fetch a CSRF token. Read-only.
+- `quentli-pp-cli discounts create` — Creates a new reusable discount.
+- `quentli-pp-cli discounts delete` — Deletes a discount and all associated discount codes.
+- `quentli-pp-cli discounts get-by-id` — Returns a single discount by id.
+- `quentli-pp-cli discounts list` — Returns reusable discounts for the organization. One-off discounts are excluded.
+- `quentli-pp-cli discounts update` — Updates editable fields of an existing discount by id.
 
-**deliveries** — 
+**invoices** — Manage invoices
 
-- `forkable-pp-cli deliveries in-progress-ids` — List IDs of deliveries currently in progress.
-- `forkable-pp-cli deliveries list` — List your meal deliveries from a given date forward, including per-delivery orders, chosen menu items, receipts
+- `quentli-pp-cli invoices cancel` — Cancels an unpaid invoice by id.
+- `quentli-pp-cli invoices create` — Creates a new invoice for a customer.
+- `quentli-pp-cli invoices get-by-id` — Returns an invoice by id.
+- `quentli-pp-cli invoices list` — Returns invoices.
+- `quentli-pp-cli invoices update` — Updates editable fields of an existing invoice by id.
 
-**meal_scores** — 
+**payment-concepts** — Manage payment concepts
 
-- `forkable-pp-cli meal-scores` — Show meal auto-selection scores (menuId, itemId, score) for a delivery and user across candidate menus.
+- `quentli-pp-cli payment-concepts create` — Creates a new product or service in the catalog.
+- `quentli-pp-cli payment-concepts get-by-id` — Returns a single payment concept by id.
+- `quentli-pp-cli payment-concepts list` — Returns payment concepts for the organization. One-off concepts are excluded.
+- `quentli-pp-cli payment-concepts update` — Updates editable fields of an existing payment concept by id.
 
-**menus** — 
+**payment-methods** — Manage payment methods
 
-- `forkable-pp-cli menus` — Get menu(s) with venue, sections, items, prices, dietary levels, ratings, and modifiers.
+- `quentli-pp-cli payment-methods <id>` — Deletes a payment method by id.
 
-**notifications** — 
+**payment-sessions** — Manage payment sessions
 
-- `forkable-pp-cli notifications` — List account notifications shown in the my-account app (title, description, links, publish window).
+- `quentli-pp-cli payment-sessions create` — Creates a hosted payment session. Resolves or creates the customer and returns an authenticated payment URL.
+- `quentli-pp-cli payment-sessions get-by-id` — Returns a payment session by id.
 
-**venue_usage** — 
+**payments** — Manage payments
 
-- `forkable-pp-cli venue-usage` — Get per-venue usage keyed by venue id over a date range. Requires venue ids and from/to dates inlined in the query.
+- `quentli-pp-cli payments create` — Creates a direct payment against a saved payment method. Optionally attempts to process it immediately.
+- `quentli-pp-cli payments get-by-id` — Returns a payment by id.
+- `quentli-pp-cli payments list` — Returns payments for the organization.
 
-**Stale default dates on `deliveries list` and `venue-usage`.** These two raw GraphQL passthrough commands ship a default `--query` with an example date baked directly into the query text. Running either with no flags can silently return an empty or misleading result (e.g. `deliveries list` with no overrides returns `{"count":0}` even when real deliveries exist) rather than an error. Always override the date argument with a real date — today's date for forward-looking reads, or a far-past date (e.g. `2000-01-01`, as `served-history`/`allowance-burn` already do internally) for full-history reads — before trusting a zero/empty result from either command. Other passthrough reads (`menus`, `meal-scores`) instead ship placeholder ids that need replacing — see each command's own entry above.
+**refunds** — Manage refunds
 
-**meal management (writes)** — place real orders and spend; **dry-run by default**, pass `--confirm` to apply.
+- `quentli-pp-cli refunds` — Refunds a completed payment, fully or partially.
 
-- `forkable-pp-cli meal set <deliveryId> --item <id> --menu <id> [--modifier <modifierId>:<optionId>] [--replace-piece <uuid>] [--note <text>] [--confirm]` — Override the auto-picked meal for one delivery day (`replacePiece`). `--replace-piece` takes the current piece's UUID (from `deliveries list`).
-- `forkable-pp-cli meal set-all --deliveries <id,id> --item <id> --menu <id> [--modifier <modifierId>:<optionId>] [--confirm]` — Apply one meal item across several delivery days (`replaceAllPieces`).
-- `forkable-pp-cli meal confirm <deliveryId> [--unconfirm] [--confirm]` — Confirm (or `--unconfirm`) a delivery day (`confirmDelivery`).
-- `forkable-pp-cli meal skip <deliveryId> [--confirm]` — Skip / cancel one or more delivery days (`removeDelivery`); `--deliveries <id,id>` skips several.
-- `forkable-pp-cli reorder <fromDate> --onto <deliveryId> [--replace-piece <uuid>] [--confirm]` — Repeat the meal you had on a past date onto an upcoming delivery day.
+**setup-sessions** — Manage setup sessions
 
-**`--replace-piece` is effectively always required for `meal set` and `reorder`.** Forkable auto-selects a candidate meal for every delivery day before you ever touch it — in practice there is no delivery day with a genuinely empty slot, so omitting `--replace-piece` is a rare/theoretical path, not the default case. **Dry-run mode does not validate this.** A dry-run without `--replace-piece` renders a plausible-looking mutation preview and only fails at `--confirm` time, with a raw GraphQL error (`oldPieceId ... Expected value to not be null`). Before running `--confirm`, always look up the target delivery's current piece id via `deliveries list` (its `orders[].pieces[].id`) and pass it with `--replace-piece`. `meal set-all` has no `--replace-piece` flag — `replaceAllPieces` takes no old-piece id at all, so this caveat doesn't apply to it.
+- `quentli-pp-cli setup-sessions` — Creates a hosted session for enrolling a payment method.
 
-**Required item options — `--modifier`.** An item with a required option group (e.g. "Choose Protein", `min: 1`) is rejected by Forkable unless you send a selection. Pass `--modifier <modifierId>:<optionId>[,<optionId>...]` (repeatable) — the CLI builds the `selectionsHash` (`{"16":[10]}`) the `replacePiece` mutation needs. Find modifier and option ids under each item's `modifiers` in the `menus` output. Example: `forkable-pp-cli meal set 12345 --item 678 --menu 90 --modifier 16:10 --replace-piece <uuid> --confirm`.
+**subscriptions** — Manage subscriptions
+
+- `quentli-pp-cli subscriptions cancel` — Cancels an active subscription by id.
+- `quentli-pp-cli subscriptions create` — Creates a new recurring subscription for a customer.
+- `quentli-pp-cli subscriptions get-by-id` — Returns a subscription by id.
+- `quentli-pp-cli subscriptions list` — Returns subscriptions.
+- `quentli-pp-cli subscriptions update` — Updates editable fields of an existing subscription by id.
+
+**tax-invoices** — Manage tax invoices
+
+- `quentli-pp-cli tax-invoices create` — Creates a tax invoice for an invoice or payment.
+- `quentli-pp-cli tax-invoices get-by-id` — Returns a tax invoice by id.
+- `quentli-pp-cli tax-invoices list` — Returns tax invoices for the organization.
+
+**webhook-events** — Manage webhook events
+
+- `quentli-pp-cli webhook-events` — Returns webhook delivery events for the organization.
+
+**webhooks** — Manage webhooks
+
+- `quentli-pp-cli webhooks create` — Creates a webhook endpoint for the organization.
+- `quentli-pp-cli webhooks delete` — Soft-deletes a webhook endpoint.
+- `quentli-pp-cli webhooks get-by-id` — Returns a webhook by id.
+- `quentli-pp-cli webhooks list` — Returns webhook endpoints for the organization.
+- `quentli-pp-cli webhooks update` — Updates a webhook endpoint.
 
 
 ### Finding the right command
@@ -175,58 +199,58 @@ These capabilities aren't available in any other tool for this API.
 When you know what you want to do but not which command does it, ask the CLI directly:
 
 ```bash
-forkable-pp-cli which "<capability in your own words>"
+quentli-pp-cli which "<capability in your own words>"
 ```
 
 `which` resolves a natural-language capability query to the best matching command from this CLI's curated feature index. Exit code `0` means at least one match; exit code `2` means no confident match — fall back to `--help` or use a narrower query.
 
 ## Recipes
 
-### What have I eaten this quarter
+### Monday collections run
 
 ```bash
-forkable-pp-cli served-history --since 90d --agent --select date,venue,name,price
+quentli-pp-cli dunning --since 1w --json --select customer.email,outstanding,next_action
 ```
 
-Longitudinal list of served meals, narrowed to the high-signal fields to keep agent context small.
+Dump the whole collection queue as compact JSON narrowed to the fields a reminder script needs.
 
-### Audit dietary conformance
+### At-risk subscriptions before renewals
 
 ```bash
-forkable-pp-cli preference-drift --since 60d --json
+quentli-pp-cli subs at-risk --json
 ```
 
-Flags any served meal that conflicts with your stated dislikes or restrictions.
+List active subscriptions tied to expired or unconfirmed payment methods so you can fix cards before they churn.
 
-### Monthly lunch spend for finance
+### Monthly SAT filing check
 
 ```bash
-forkable-pp-cli spend-trend --since 6mo --by month --csv
+quentli-pp-cli reconcile --period 1m --json
 ```
 
-Per-month spend totals exported as CSV for a budget close.
+Find every completed payment that still lacks a valid SAT CFDI timbre before filing.
 
-### Which teams are burning their allowance
+### Net revenue pull
 
 ```bash
-forkable-pp-cli allowance-burn --by club --csv
+quentli-pp-cli revenue --since 30d --csv
 ```
 
-Granted-vs-consumed allowance utilization per club, side by side.
+Export last month's net collected-vs-returned revenue for your books.
 
-### This week's lunch at a glance
+### On-call delivery health
 
 ```bash
-forkable-pp-cli upcoming-digest --agent
+quentli-pp-cli webhooks health --since 24h
 ```
 
-One compact line per upcoming day for a quick agent-readable briefing.
+Spot failed webhook deliveries and payment-failure signals in the last day.
 
 ## Auth Setup
 
-Forkable authenticates with a browser session cookie plus a per-request CSRF token fetched from /api/v2/csrf_token. Log in to forkable.com in Chrome, then run 'forkable-pp-cli auth login --chrome' to import your session. There is no API key.
+Authenticate with an organization API key. Set QUENTLI_SECRET_KEY to your sk_... secret key; every command sends Authorization: Bearer <key>. Do not share or commit the key.
 
-Run `forkable-pp-cli doctor` to verify setup.
+Run `quentli-pp-cli doctor` to verify setup.
 
 ## Agent Mode
 
@@ -236,12 +260,12 @@ Add `--agent` to any command. Expands to: `--json --compact --no-input --no-colo
 - **Filterable** — `--select` keeps a subset of fields. Dotted paths descend into nested structures; arrays traverse element-wise. Critical for keeping context small on verbose APIs:
 
   ```bash
-  forkable-pp-cli buffet-addresses --query example-value --agent --select id,name,status
+  quentli-pp-cli customers list --agent --select id,name,status
   ```
 - **Previewable** — `--dry-run` shows the request without sending
-- **Safe writes** — read commands query Forkable; the write commands (`meal set`, `meal set-all`, `meal confirm`, `meal skip`, `reorder`) are dry-run by default and only mutate the account when invoked with `--confirm`
-- **Live fetch** — commands query Forkable directly over GraphQL; there is no local sync/cache step
+- **Offline-friendly** — sync/search commands can use the local SQLite store when available
 - **Non-interactive** — never prompts, every input is a flag
+- **Explicit retries** — use `--idempotent` only when an already-existing create should count as success, and use `--ignore-missing` only when a missing delete target should count as success
 
 ### Response envelope
 
@@ -260,28 +284,28 @@ Parse `.results` for data and `.meta.source` to know whether it's live or local.
 
 Agents should treat the CLI's path resolver as part of the runtime contract:
 
-- Use `--home <dir>` for one invocation, or set `FORKABLE_HOME=<dir>` to relocate all four path kinds under one root.
-- Use per-kind env vars only when a specific kind must diverge: `FORKABLE_CONFIG_DIR`, `FORKABLE_DATA_DIR`, `FORKABLE_STATE_DIR`, `FORKABLE_CACHE_DIR`.
-- Resolution order is per-kind env var, `--home`, `FORKABLE_HOME`, XDG (`XDG_CONFIG_HOME`, `XDG_DATA_HOME`, `XDG_STATE_HOME`, `XDG_CACHE_HOME`), then platform defaults.
+- Use `--home <dir>` for one invocation, or set `QUENTLI_HOME=<dir>` to relocate all four path kinds under one root.
+- Use per-kind env vars only when a specific kind must diverge: `QUENTLI_CONFIG_DIR`, `QUENTLI_DATA_DIR`, `QUENTLI_STATE_DIR`, `QUENTLI_CACHE_DIR`.
+- Resolution order is per-kind env var, `--home`, `QUENTLI_HOME`, XDG (`XDG_CONFIG_HOME`, `XDG_DATA_HOME`, `XDG_STATE_HOME`, `XDG_CACHE_HOME`), then platform defaults.
 - `config` contains settings like `config.toml` and profiles. `data` contains `credentials.toml`, `data.db`, cookies, and auth sidecars. `state` contains persisted queries, jobs, and `teach.log`. `cache` contains regenerable HTTP/cache files.
 - Stored secrets live in `credentials.toml` under the data dir. Existing legacy `config.toml` secrets are read for compatibility and leave `config.toml` on the first auth write.
-- Run `forkable-pp-cli doctor --fail-on warn` to surface path and credential-location warnings. `agent-context` exposes a schema v4 `paths` block for agents that need the resolved dirs.
+- Run `quentli-pp-cli doctor --fail-on warn` to surface path and credential-location warnings. `agent-context` exposes a schema v4 `paths` block for agents that need the resolved dirs.
 - For MCP, pass relocation through the MCP host config. The MCP binary does not inherit CLI flags:
 
   ```json
   {
     "mcpServers": {
-      "forkable": {
-        "command": "forkable-pp-mcp",
+      "quentli": {
+        "command": "quentli-pp-mcp",
         "env": {
-          "FORKABLE_HOME": "/srv/forkable"
+          "QUENTLI_HOME": "/srv/quentli"
         }
       }
     }
   }
   ```
 
-Fleet precedence: an inherited per-kind env var overrides an explicit `--home` for that kind. Use `FORKABLE_HOME` or per-kind vars as durable fleet levers, and use `--home` only for a single invocation. Relocation is not reversible by unsetting env vars; move files manually before clearing `FORKABLE_HOME`, or `doctor` will not find credentials left under the former root.
+Fleet precedence: an inherited per-kind env var overrides an explicit `--home` for that kind. Use `QUENTLI_HOME` or per-kind vars as durable fleet levers, and use `--home` only for a single invocation. Relocation is not reversible by unsetting env vars; move files manually before clearing `QUENTLI_HOME`, or `doctor` will not find credentials left under the former root.
 
 ## Automatic learning
 
@@ -292,7 +316,7 @@ This CLI ships a self-capturing learning loop. The CLI does its own bookkeeping:
 Before list/search/drill commands on a new user question, run:
 
 ```bash
-forkable-pp-cli recall "<user's question>" --agent
+quentli-pp-cli recall "<user's question>" --agent
 ```
 
 The response envelope:
@@ -315,7 +339,7 @@ The response envelope:
     { "id": 12, "class": "flag_alias | playbook_candidate",
       "summary": "...", "sightings": 3, "last_seen": "...",
       "rationale": "...",
-      "next_action": ["<trial command>", "forkable-pp-cli learnings confirm 12"] }
+      "next_action": ["<trial command>", "quentli-pp-cli learnings confirm 12"] }
   ],
   "playbook": {
     "query_family": "...",
@@ -354,7 +378,7 @@ if Playbook present:
        for the entity slot tokens. If a step's slot is unresolved, fall back to
        discovery for that step only.
     -> the Playbook's expected_tool_calls is a budget; if you find yourself running
-       materially more, record the divergence via `forkable-pp-cli playbook amend`
+       materially more, record the divergence via `quentli-pp-cli playbook amend`
        at end-of-session.
 
 elif Notes present (no Playbook):
@@ -380,7 +404,7 @@ else:  // Found == false, no playbook, no notes
 
 Playbook and Notes are orthogonal to the per-resource path. A recall response can carry both a Playbook AND a `Results[]` hit - use both: the Playbook tells you which choreography to run; the resource hits short-circuit specific steps. Default to skipping `mismatches`; pass `--debug-mismatches` only when investigating cold-start surprises.
 
-Candidate judgment details: `learnings confirm <id>` prints the candidate's full payload before materializing it - check that the printed payload matches the behavior you verified. `learnings reject <id>` tombstones the derivation signature so the same candidate does not resurface. The envelope carries only the few candidates worth acting on now; `forkable-pp-cli learnings candidates` lists the full open set.
+Candidate judgment details: `learnings confirm <id>` prints the candidate's full payload before materializing it - check that the printed payload matches the behavior you verified. `learnings reject <id>` tombstones the derivation signature so the same candidate does not resurface. The envelope carries only the few candidates worth acting on now; `quentli-pp-cli learnings candidates` lists the full open set.
 
 Graceful degradation: if `learnings confirm` is an unknown command, you are driving an older binary - ignore the candidates guidance and follow the rest of the protocol.
 
@@ -392,7 +416,7 @@ Graceful degradation: if `learnings confirm` is an unknown command, you are driv
 - `similar_shape_different_entity:<canonical>` (top-level): a structurally matching row exists but its canonical entity differs from the live query's. Treated as cold start; the warning carries the conflicting canonical as a hint, but the row is NOT promoted into Results.
 - `ambiguous_alias` (top-level): a single query entity resolved to multiple canonicals (e.g., "Cards" → Arizona Cardinals + St. Louis Cardinals). Surface the ambiguity from context before committing to a resource.
 - `candidates_present` (top-level): the envelope carries a `candidates` section. Handle it via the candidates branch in Step 2 before anything else.
-- `lookup_refresh_available` (top-level): an entity in the query has no lookup row yet. This CLI fetches live (no sync command); populate lookups by running the relevant read command (e.g. `deliveries list`, `clubs list`).
+- `lookup_refresh_available` (top-level): an entity in the query has no lookup row yet, but synced data could provide one. Run `quentli-pp-cli sync` to refresh entity lookups.
 - Top-level `no_learnings_for_query_family`: the table had no rows above the Jaccard floor. Pure cold start.
 
 ### Step 4: `teach &` after finalizing your response - always
@@ -400,7 +424,7 @@ Graceful degradation: if `learnings confirm` is an unknown command, you are driv
 Teaching is unconditional. After resolving a query the store could not answer, background-teach the final resource mapping - no call-count threshold, no judging whether it was "worth" learning. The teach is the anchor of the loop: it triggers playbook synthesis for a family without a playbook, and same-referent phrasings fold into one family so near-duplicate teaches do not fragment the store. Fire it after assembling your user-facing response but BEFORE emitting it, with a shell `&` so the call returns immediately:
 
 ```bash
-forkable-pp-cli teach --query "<user's question>" --resource-type <type> --resource <id1> --resource <id2>
+quentli-pp-cli teach --query "<user's question>" --resource-type <type> --resource <id1> --resource <id2>
 # (append shell `&` to background it)
 ```
 
@@ -414,7 +438,7 @@ You do not need to decide whether a session "deserves" a playbook: a teach on a 
 
 ```bash
 # Common case: record both the resource learning AND the playbook in one call.
-forkable-pp-cli teach \
+quentli-pp-cli teach \
   --query "<user's question>" \
   --resource <id> \
   --playbook-file ~/playbooks/<shape>.json \
@@ -422,7 +446,7 @@ forkable-pp-cli teach \
 # (append shell `&` to background it)
 
 # Alternate: playbook-only (no resource to record alongside).
-forkable-pp-cli teach-playbook \
+quentli-pp-cli teach-playbook \
   --query "<user's question>" \
   --playbook-file ~/playbooks/<shape>.json \
   --notes-file ~/playbooks/<shape>-notes.md
@@ -437,7 +461,7 @@ When you DO find a playbook on a future recall, treat it as ground truth: replay
 If your debug-protocol response identifies a concrete correction the notes or playbook should know — a workaround, an undocumented endpoint shape, a stale field name, observed schema drift, an empty-payload fallback — fire `playbook amend` BEFORE emitting your user-facing response. Same fire-and-forget posture as `teach`.
 
 ```bash
-forkable-pp-cli playbook amend \
+quentli-pp-cli playbook amend \
   --query "<exact recall query string>" \
   --add-note "<your concrete correction>"
 # (append shell `&` to background it)
@@ -468,24 +492,24 @@ If a correction is only meaningful with user-specific context, it belongs in a p
 
 ### Measuring the loop
 
-`forkable-pp-cli learnings stats` reports recall hit rate, teach-to-reuse, playbook resolution rate, and candidate confirm/reject counts from the local `learn_events` table. Rates are null until they have a denominator; everything stays on this machine. Use it to check whether the loop is earning its keep for this CLI.
+`quentli-pp-cli learnings stats` reports recall hit rate, teach-to-reuse, playbook resolution rate, and candidate confirm/reject counts from the local `learn_events` table. Rates are null until they have a denominator; everything stays on this machine. Use it to check whether the loop is earning its keep for this CLI.
 
 ### Disabling learning
 
 - `--no-learn` on a single command short-circuits both `recall` and the `teach` write path. Use for deterministic agent flows or tests that must not be affected by accumulated learnings.
-- `FORKABLE_NO_LEARN=true` in the environment globally disables the pipeline.
+- `QUENTLI_NO_LEARN=true` in the environment globally disables the pipeline.
 
 ## Agent Feedback
 
 When you (or the agent) notice something off about this CLI, record it:
 
 ```
-forkable-pp-cli feedback "the --since flag is inclusive but docs say exclusive"
-forkable-pp-cli feedback --stdin < notes.txt
-forkable-pp-cli feedback list --json --limit 10
+quentli-pp-cli feedback "the --since flag is inclusive but docs say exclusive"
+quentli-pp-cli feedback --stdin < notes.txt
+quentli-pp-cli feedback list --json --limit 10
 ```
 
-Entries are stored locally as `feedback.jsonl` under the resolved data dir. They are never POSTed unless `FORKABLE_FEEDBACK_ENDPOINT` is set AND either `--send` is passed or `FORKABLE_FEEDBACK_AUTO_SEND=true`. Default behavior is local-only.
+Entries are stored locally as `feedback.jsonl` under the resolved data dir. They are never POSTed unless `QUENTLI_FEEDBACK_ENDPOINT` is set AND either `--send` is passed or `QUENTLI_FEEDBACK_AUTO_SEND=true`. Default behavior is local-only.
 
 Write what *surprised* you, not a bug report. Short, specific, one line: that is the part that compounds.
 
@@ -506,11 +530,11 @@ Unknown schemes are refused with a structured error naming the supported set. We
 A profile is a saved set of flag values, reused across invocations. Use it when a scheduled or recurring agent reuses the same saved flags while providing different input each run.
 
 ```
-forkable-pp-cli profile save briefing --json
-forkable-pp-cli --profile briefing buffet-addresses --query example-value
-forkable-pp-cli profile list --json
-forkable-pp-cli profile show briefing
-forkable-pp-cli profile delete briefing --yes
+quentli-pp-cli profile save briefing --json
+quentli-pp-cli --profile briefing customers list
+quentli-pp-cli profile list --json
+quentli-pp-cli profile show briefing
+quentli-pp-cli profile delete briefing --yes
 ```
 
 Explicit flags always win over profile values; profile values win over defaults. `agent-context` lists all available profiles under `available_profiles` so introspecting agents discover them at runtime.
@@ -531,7 +555,7 @@ Explicit flags always win over profile values; profile values win over defaults.
 
 Parse `$ARGUMENTS`:
 
-1. **Empty, `help`, or `--help`** → show `forkable-pp-cli --help` output
+1. **Empty, `help`, or `--help`** → show `quentli-pp-cli --help` output
 2. **Starts with `install`** → ends with `mcp` → MCP installation; otherwise → see Prerequisites above
 3. **Anything else** → Direct Use (execute as CLI command with `--agent`)
 
@@ -539,21 +563,21 @@ Parse `$ARGUMENTS`:
 
 1. Install the MCP server:
    ```bash
-   go install github.com/mvanhorn/printing-press-library/library/food-and-dining/forkable/cmd/forkable-pp-mcp@latest
+   go install github.com/mvanhorn/printing-press-library/library/payments/quentli/cmd/quentli-pp-mcp@latest
    ```
 2. Register with Claude Code:
    ```bash
-   claude mcp add forkable-pp-mcp -- forkable-pp-mcp
+   claude mcp add quentli-pp-mcp -- quentli-pp-mcp
    ```
 3. Verify: `claude mcp list`
 
 ## Direct Use
 
-1. Check if installed: `which forkable-pp-cli`
+1. Check if installed: `which quentli-pp-cli`
    If not found, offer to install (see Prerequisites at the top of this skill).
 2. Match the user query to the best command from the Unique Capabilities and Command Reference above.
 3. Execute with the `--agent` flag:
    ```bash
-   forkable-pp-cli <command> [subcommand] [args] --agent
+   quentli-pp-cli <command> [subcommand] [args] --agent
    ```
-4. If ambiguous, drill into subcommand help: `forkable-pp-cli <command> --help`.
+4. If ambiguous, drill into subcommand help: `quentli-pp-cli <command> --help`.
