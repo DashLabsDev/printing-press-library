@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.6 - 2026-08-22
+
+- fix(linear): preserve and verify issue labels (#1782).
+
 ## 2026.8.5 - 2026-08-21
 
 - feat(linear): rebase --label-name issue writes from #1411 (#1779).
