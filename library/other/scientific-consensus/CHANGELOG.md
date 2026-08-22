@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.6 - 2026-08-22
+
+- feat(scientific-consensus): low-evidence guard and dispersion-aware confidence (#1763).
+
 ## 2026.8.5 - 2026-08-21
 
 - feat(scientific-consensus): add DeepSeek provider, pin sampling temperature to 0 (#1758).
