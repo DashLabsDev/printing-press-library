@@ -2,17 +2,17 @@
   "schema_version": 1,
   "slug": "benzinga",
   "cli_name": "benzinga-pp-cli",
-  "version": "2026.8.1",
-  "released_at": "2026-08-22T09:29:16Z",
-  "source_commit": "d1cdbe82fab7ca0102e05757ee94695a7854915e",
+  "version": "2026.8.2",
+  "released_at": "2026-08-22T09:40:20Z",
+  "source_commit": "6c09eb8976b329386846e8caeddd046d5c5e7462",
   "printing_press_version": "4.27.0",
   "run_id": "20260627-034058-2c1f9c5c",
   "changes": [
     {
-      "title": "feat(benzinga): add benzinga",
-      "pr": 1787,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/1787",
-      "commit": "d1cdbe82fab7ca0102e05757ee94695a7854915e"
+      "title": "fix(benzinga): keep 0-based sync pages and resume watermark",
+      "pr": 1788,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/1788",
+      "commit": "6c09eb8976b329386846e8caeddd046d5c5e7462"
     }
   ]
 }
