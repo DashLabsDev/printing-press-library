@@ -1,0 +1,13 @@
+{
+  "schema_version": 2,
+  "id": "thelancet-curate-html-entities",
+  "applied_at": "2026-08-22",
+  "base_run_id": "20260617-072858-2f9fe13e",
+  "base_printing_press_version": "4.24.0",
+  "summary": "CurateLive applies cliutil.CleanText to Title, primary_topic.display_name, and primary_location.source.display_name before assigning them to WorkRow, so HTML entities returned by OpenAlex are decoded once at the point of construction rather than surfacing raw in every downstream consumer.",
+  "reason": "OpenAlex returns HTML-encoded strings in some title and display_name fields: measured, a reading-list export carried 'Bile Acid &amp; Tryptophan Metabolism' verbatim into JSON, CSV, XLSX, and BibTeX. CleanText already existed in cliutil and is applied at every other extraction point in this CLI; CurateLive was the one call site that constructed rows without it. A regen must preserve these three calls or the entity leak returns.",
+  "files": [
+    "internal/lancet/curate_live.go"
+  ],
+  "validated_outcome": "go build ./... and go vet ./... clean. The affected title renders as 'Bile Acid & Tryptophan Metabolism' in all four export formats after the change; before it, the raw entity appeared in each."
+}
