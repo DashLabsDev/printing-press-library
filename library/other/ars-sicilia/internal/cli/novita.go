@@ -87,6 +87,11 @@ ritardo, «gli ultimi 7 giorni» sarà vuoto a lungo, e non perché l'Assemblea
 sia ferma. Quando la finestra chiesta cade tutta dentro il ritardo, il
 comando lo dice invece di lasciare un elenco vuoto senza spiegazione.
 
+Sull'archivio leggi la riga è per legge, non per articolo: il portale indicizza
+un articolo per riga, quindi senza aggregazione una legge di sette articoli
+conterebbe sette novità. Ogni riga porta articoli_trovati con quanti articoli
+sono entrati nella finestra.
+
 Gli archivi pareri e biblioteca non sono databili — il portale scrive le date
 mangiando l'anno, o non ha proprio una colonna data — e vengono dichiarati
 tali invece di essere riportati vuoti.`,
@@ -106,7 +111,7 @@ tali invece di essere riportati vuoti.`,
 	cmd.Flags().StringVar(&flagSince, "since", "7d", "Finestra all'indietro da oggi: 7d, 3w, 2m, 1y (m = mesi, non minuti), oppure 24h. Alternativa a --dal.")
 	cmd.Flags().StringVar(&flagDal, "dal", "", "Data di inizio in forma YYYY-MM-DD. Vince su --since.")
 	cmd.Flags().StringSliceVar(&flagArchvi, "archivi", nil, "Archivi da guardare (default: tutti quelli datati). Es: --archivi ddl,resoconti")
-	cmd.Flags().IntVar(&flagLimit, "limit", 30, "Massimo di documenti mostrati per archivio; il conteggio resta quello vero.")
+	cmd.Flags().IntVar(&flagLimit, "limit", 30, "Massimo di documenti mostrati per archivio; il conteggio resta quello vero. Sull'archivio leggi conta leggi, non righe-articolo.")
 	return cmd
 }
 
@@ -206,6 +211,7 @@ func novitaDiArchivio(ctx context.Context, arc icaro.Archive, da, oggi time.Time
 
 	soglia := da.Format("2006-01-02")
 	righe := []icaro.Record{}
+	tettoRaggiunto := false
 	// Si legge l'anno della soglia e quello corrente: una finestra a cavallo di
 	// capodanno altrimenti perderebbe la metà vecchia.
 	for anno := da.Year(); anno <= oggi.Year(); anno++ {
@@ -218,10 +224,14 @@ func novitaDiArchivio(ctx context.Context, arc icaro.Archive, da, oggi time.Time
 			e.Errore = erroreLeggibile(arc, err)
 			return e
 		}
+		if len(r) >= novitaLimiteAnno {
+			tettoRaggiunto = true
+		}
 		righe = append(righe, r...)
 	}
 
 	var date []string
+	nuove := []icaro.Record{}
 	for _, r := range righe {
 		iso := dataISO(r.Fields["Data"])
 		if iso == "" {
@@ -229,7 +239,21 @@ func novitaDiArchivio(ctx context.Context, arc icaro.Archive, da, oggi time.Time
 		}
 		date = append(date, iso)
 		if iso >= soglia {
+			nuove = append(nuove, r)
 			e.Nuovi = append(e.Nuovi, rigaNovita(arc, r, iso))
+		}
+	}
+	// L'archivio leggi è indicizzato per ARTICOLO: senza aggregazione la stessa
+	// legge occupa una riga per articolo e `conteggio` conta articoli. Misurato
+	// il 21/08/2026: la finestra a 30 giorni dava 7, cioè i sette articoli
+	// della sola L.R. 14/2026, e chi legge «7» capisce sette leggi. Vedi
+	// leggi_collapse.go, che fa la stessa cosa per `leggi cerca`. Il ramo resta
+	// legato allo slug perché i campi che aggrega (Atto, Docum.) sono
+	// dell'archivio 201.
+	if arc.Slug == "leggi" {
+		e.Nuovi = righeNovitaLeggi(arc, nuove)
+		if tettoRaggiunto {
+			e.Nota = uniscoNote(e.Nota, fmt.Sprintf("lette %d righe-articolo, il tetto per archivio: il conteggio delle leggi può essere in difetto. Restringi la finestra per averlo completo.", novitaLimiteAnno))
 		}
 	}
 	e.Conteggio = len(e.Nuovi)
@@ -322,6 +346,43 @@ func ultimaDentro(righe []icaro.Record, soglia string) bool {
 	return false
 }
 
+// righeNovitaLeggi rende una riga per legge invece di una per articolo.
+//
+// Il conteggio degli articoli agganciati resta nella riga (`articoli_trovati`),
+// così chi vuole le righe grezze sa che ci sono. La legge si nomina in due
+// modi, entrambi presenti: `atto` è l'etichetta con cui si cita ("L.R. 14"),
+// `numero` è il numero nudo ("14") che si passa a --numero. Nell'archivio 201
+// il campo Numero è vuoto, ed è il motivo per cui `--select numero` non
+// trovava nulla e la resa a schermo lasciava la colonna in bianco.
+func righeNovitaLeggi(arc icaro.Archive, recs []icaro.Record) []map[string]string {
+	out := []map[string]string{}
+	for _, l := range collapseLeggi(recs) {
+		riga := map[string]string{
+			"archivio":         arc.Slug,
+			"data":             l.Data,
+			"data_iso":         dataISO(l.Data),
+			"titolo":           l.Titolo,
+			"articoli_trovati": itoa(l.ArticoliTrovati),
+		}
+		// Due nomi per la stessa cosa, di proposito: `atto` è quello con cui
+		// la legge si cita ed è il nome che usa `leggi cerca`, `numero` è
+		// quello che si passa a --numero ed è la chiave che tutti gli altri
+		// archivi di questo comando usano. Chi arriva da una delle due strade
+		// trova il campo dove se lo aspetta.
+		if l.Atto != "" {
+			riga["atto"] = l.Atto
+		}
+		if l.Numero != "" {
+			riga["numero"] = l.Numero
+		}
+		if l.URL != "" {
+			riga["url"] = l.URL
+		}
+		out = append(out, riga)
+	}
+	return out
+}
+
 // rigaNovita tiene i campi che servono a riconoscere un atto e a raggiungerlo.
 // Il testo integrale non entra: qui si guarda cosa è comparso, non lo si legge.
 func rigaNovita(arc icaro.Archive, r icaro.Record, iso string) map[string]string {
@@ -353,7 +414,13 @@ func emitNovita(cmd *cobra.Command, flags *rootFlags, report novitaReport) error
 		}
 		fmt.Fprintln(out)
 		for _, n := range a.Nuovi {
-			fmt.Fprintf(out, "    %s  %s  %s\n", n["data_iso"], n["numero"], troncaTitolo(n["titolo"]))
+			// Sulle leggi l'atto ("L.R. 14") si legge, il numero nudo ("14")
+			// no: a schermo vince il primo, nel JSON restano entrambi.
+			etichetta := n["numero"]
+			if n["atto"] != "" {
+				etichetta = n["atto"]
+			}
+			fmt.Fprintf(out, "    %s  %s  %s\n", n["data_iso"], etichetta, troncaTitolo(n["titolo"]))
 		}
 		if a.Nota != "" {
 			fmt.Fprintf(out, "    → %s\n", a.Nota)

@@ -89,7 +89,7 @@ func runLeggeCronologia(cmd *cobra.Command, flags *rootFlags, legisl, numero, an
 		return fmt.Errorf("ricerca legge: %w", err)
 	}
 	if len(recs) == 0 {
-		return notFoundErr(fmt.Errorf("nessuna legge trovata per legisl=%d numero=%d (aggiungi --anno per disambiguare numeri ripetuti tra anni diversi)", legisl, numero))
+		return notFoundErr(fmt.Errorf("%s", leggeNonTrovataMsg(legisl, numero, anno)))
 	}
 	law := recs[0]
 	warnAnnoNonPinnato(anno, numero, law.Fields["Data"])
@@ -131,6 +131,9 @@ func runLeggeCronologia(cmd *cobra.Command, flags *rootFlags, legisl, numero, an
 			ddls, derr := c2.Search(ctx, *arcDdl, icaro.SearchOptions{ISISRaw: expr, Limit: 5, MaxPages: 1})
 			if derr == nil {
 				for _, r := range ddls {
+					if n, aerr := strconv.Atoi(strings.TrimSpace(r.Fields["Numero"])); aerr == nil {
+						report.DdlOriginari = append(report.DdlOriginari, n)
+					}
 					report.Eventi = append(report.Eventi, iterEvent{
 						Fase:      "ddl_originario",
 						Data:      r.Fields["Data"],
@@ -192,6 +195,31 @@ func runLeggeCronologia(cmd *cobra.Command, flags *rootFlags, legisl, numero, an
 		fmt.Fprintf(out, "  [%s] %s — %s\n", e.Fase, e.Data, strings.TrimSpace(e.Sede+" "+e.Titolo))
 	}
 	return nil
+}
+
+// leggeNonTrovataMsg spiega perché la ricerca è tornata vuota, e la spiegazione
+// cambia a seconda che --anno sia stato dato o no.
+//
+// Senza --anno il consiglio giusto è darlo: lo stesso numero si ripete in anni
+// diversi della stessa legislatura. Ma con --anno già fornito quel consiglio
+// descrive un caso che non è quello in corso, e l'uscita si legge come «legge
+// inesistente» con un rimedio inapplicabile. Misurato sulla L.R. 21/2026,
+// promulgata il 4 agosto: l'archivio leggi arrivava al 22 luglio, quindi la
+// legge esisteva ed era solo troppo fresca per essere indicizzata.
+//
+// Il fronte della fonte NON si calcola qui. L'archivio leggi consegna dal più
+// vecchio (vedi novita.go), quindi una sonda da una riga stamperebbe la prima
+// legge dell'anno come «l'archivio arriva al…»: un numero sbagliato detto con
+// sicurezza, peggio di nessun numero. Leggerlo davvero vorrebbe dire scaricare
+// l'anno intero su un percorso d'errore. Si nomina invece il comando che quel
+// numero ce l'ha già.
+func leggeNonTrovataMsg(legisl, numero, anno int) string {
+	if anno == 0 {
+		return fmt.Sprintf("nessuna legge trovata per legisl=%d numero=%d (aggiungi --anno per disambiguare numeri ripetuti tra anni diversi)", legisl, numero)
+	}
+	return fmt.Sprintf(
+		"nessuna legge trovata per legisl=%d numero=%d anno=%d. Due cause possibili: la legge è stata promulgata da poco e l'archivio delle leggi non l'ha ancora indicizzata (`ars-sicilia-pp-cli novita --archivi leggi` dice fin dove arriva la fonte), oppure quella coppia numero-anno non esiste in questa legislatura (`ars-sicilia-pp-cli leggi cerca --legisl %d --anno %d` le elenca). Se la legge è recente, l'iter parlamentare si legge comunque dal lato ddl con `ars-sicilia-pp-cli ddl cerca` e `ddl iter`.",
+		legisl, numero, anno, legisl, anno)
 }
 
 // warnAnnoNonPinnato avverte su stderr quando il chiamante non ha fissato

@@ -99,10 +99,17 @@ type iterReport struct {
 	// `ddl iter`, la legge per `legge cronologia`. Stava solo dentro ogni
 	// evento, ripetuta identica, e nella radice del report — dove uno la
 	// cerca — non c'era.
-	URL      string       `json:"url,omitempty"`
-	Stralcio *stralcioOut `json:"stralcio,omitempty"`
-	Eventi   []iterEvent  `json:"eventi"`
-	Note     string       `json:"note,omitempty"`
+	URL string `json:"url,omitempty"`
+	// DdlOriginari sono i numeri dei disegni di legge da cui la legge nasce,
+	// popolati dalla sola `legge cronologia`. Il numero c'era già, ma dentro la
+	// frase `sede` dell'evento ddl_originario ("Disegno di legge n. 239"):
+	// leggibile da un umano, da estrarre con una regex per chi vuole
+	// incatenarci `ddl iter`, che è l'unica cosa che si fa con quel numero. È
+	// una lista perché una legge può nascere da più ddl abbinati.
+	DdlOriginari []int        `json:"ddl_originari,omitempty"`
+	Stralcio     *stralcioOut `json:"stralcio,omitempty"`
+	Eventi       []iterEvent  `json:"eventi"`
+	Note         string       `json:"note,omitempty"`
 }
 
 func runDdlIter(cmd *cobra.Command, flags *rootFlags, legisl, numero int) error {
@@ -194,6 +201,8 @@ func runDdlIter(cmd *cobra.Command, flags *rootFlags, legisl, numero int) error 
 	sort.SliceStable(report.Eventi, func(i, j int) bool {
 		return iterDateKey(report.Eventi[i].Data) < iterDateKey(report.Eventi[j].Data)
 	})
+	report.Note = uniscoNote(report.Note, avvisoStralcioAnteriore(report))
+	report.Note = uniscoNote(report.Note, avvisoApprovatoSenzaGurs(report.Eventi))
 	return emitIter(cmd, flags, report)
 }
 
@@ -938,4 +947,82 @@ func uniscoNote(nota, avviso string) string {
 	default:
 		return nota + " " + avviso
 	}
+}
+
+// avvisoStralcioAnteriore spiega la timeline di uno stralcio che comincia prima
+// della propria presentazione.
+//
+// Su `ddl iter 18 6030` il primo evento è l'assegnazione alla Commissione
+// QUARTA del 13 gennaio 2026, mentre la presentazione è del 27: letto senza
+// contesto sembra un dato sballato. Non lo è — lo stralcio nasce da una
+// decisione d'Aula che lo ritaglia dal ddl base e lo instrada alla commissione
+// competente, e come documento autonomo viene registrato giorni dopo.
+//
+// Per questo qui NON si usa `anomalia`. Quel marcatore dice «così come la fonte
+// lo dichiara, questo non può essere vero» (l'Aula tiene una seduta al giorno,
+// una seduta ha una data sola); applicarlo a un ordine spiegabile lo
+// svaluterebbe e produrrebbe a valle il falso buco che esiste per evitare.
+// Misurato il 21/08/2026: nessuno degli 8 ddl non-stralcio campionati ha un
+// evento anteriore alla presentazione, e fra gli stralci lo hanno solo 6030 e
+// 8030, entrambi con primo evento il 13 gennaio, cioè il giorno della delibera
+// di stralcio.
+func avvisoStralcioAnteriore(report iterReport) string {
+	if report.Stralcio == nil {
+		return ""
+	}
+	var presentazione, primo string
+	for _, ev := range report.Eventi {
+		k := iterDateKey(ev.Data)
+		if k == "" {
+			continue
+		}
+		if ev.Fase == "presentazione" && presentazione == "" {
+			presentazione = k
+		}
+		if primo == "" || k < primo {
+			primo = k
+		}
+	}
+	if presentazione == "" || primo == "" || primo >= presentazione {
+		return ""
+	}
+	return fmt.Sprintf(
+		"la cronologia comincia il %s, prima della presentazione del %s: è uno stralcio, e i lavori che lo hanno ritagliato dal ddl base precedono la sua registrazione come documento autonomo. Il ddl di provenienza è nel campo `stralcio`.",
+		primo, presentazione)
+}
+
+// avvisoApprovatoSenzaGurs dice perché un iter che finisce con l'approvazione
+// non porta la legge.
+//
+// I due archivi hanno ritardi diversi: il ddl arriva a 24 giorni, le leggi a
+// 30 (misurato il 21/08/2026 con `novita`). Chi parte da un ddl approvato di
+// recente trova la timeline che si ferma a «Approvato dall'Assemblea» o
+// «Inviato Presidenza della Regione», cerca la legge e non la trova — e non ha
+// modo di distinguere «non è ancora stata promulgata» da «l'archivio non l'ha
+// ancora indicizzata». È lo stesso buco che `legge cronologia` copre dall'altro
+// verso, e rimanda allo stesso comando.
+//
+// Il segnale è strutturale, non una soglia di giorni inventata: quando la fonte
+// ha registrato la pubblicazione, l'evento «Pubblicazione Gurs» sta nell'iter.
+// Verificato su quattro ddl approvati e promulgati da tempo (17/733, 17/587,
+// 18/4991, 18/1030): tutti e quattro ce l'hanno. Il ddl 6030, approvato il 29
+// luglio 2026 e pubblicato in Gazzetta il 7 agosto, no — ed è l'unico dei sei
+// campionati su cui la nota compare. Un ddl mai arrivato in Aula (18/1171) non
+// la riceve, perché manca l'approvazione.
+func avvisoApprovatoSenzaGurs(eventi []iterEvent) string {
+	var approvato string
+	for _, ev := range eventi {
+		if strings.Contains(strings.ToLower(ev.Titolo), "gurs") {
+			return ""
+		}
+		if strings.Contains(ev.Titolo, "Approvato dall'Assemblea") {
+			approvato = ev.Data
+		}
+	}
+	if approvato == "" {
+		return ""
+	}
+	return fmt.Sprintf(
+		"approvato dall'Assemblea il %s, ma la fonte non registra ancora la pubblicazione in Gazzetta: l'iter si ferma qui. Se cerchi la legge promulgata, l'archivio leggi pubblica con settimane di ritardo — `ars-sicilia-pp-cli novita --archivi leggi` dice fin dove arriva la fonte.",
+		approvato)
 }

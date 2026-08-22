@@ -126,21 +126,25 @@ func runCerca(cmd *cobra.Command, flags *rootFlags, archiveSlug string, p cercaP
 		if p.LimitLeggi > 0 && len(leggi) > p.LimitLeggi {
 			leggi = leggi[:p.LimitLeggi]
 		}
-		// Si avvisa solo quando la finestra di righe si è esaurita PRIMA di
-		// raccogliere le leggi chieste: lì l'elenco è incompleto e non si vede.
-		// Se le leggi chieste sono arrivate tutte, il troncamento delle righe è
-		// il normale effetto del limite, non una risposta monca.
-		var hint string
-		if truncated && mancanti {
-			hint = fmt.Sprintf(
-				"lette %d righe-articolo e trovate solo %d delle %d leggi chieste: l'elenco può essere incompleto. Alza --limit, oppure restringi con --anno/--numero.",
-				len(recs), len(leggi), p.LimitLeggi)
-		}
+		// Due modi di restare corti, e vanno detti tutti e due.
+		//
+		// `mancanti`: la finestra di righe si è esaurita prima di raccogliere le
+		// leggi chieste — l'elenco è incompleto e non si vede.
+		//
+		// L'altro è il limite raggiunto: le leggi chieste sono arrivate tutte,
+		// e proprio per questo la paginazione si è fermata senza sapere quante
+		// altre ce ne fossero. Qui il ramo taceva e l'envelope dichiarava
+		// `troncato: false`, cioè affermava una completezza che nessuno aveva
+		// verificato: `leggi cerca --legisl 18 --anno 2026` rispondeva 10 leggi
+		// su 14 e diceva che erano tutte. Ogni altra ricerca di questa CLI in
+		// quel caso avvisa; questa era l'unica a non farlo, ed è il percorso
+		// naturale della domanda «quali leggi nell'anno X».
+		hint := hintLeggiCorte(truncated, mancanti, len(recs), len(leggi), p.LimitLeggi)
 		// Questo ramo ha un hint tutto suo e ritorna prima di warnTruncated:
 		// senza il caso esplicito, `leggi cerca --envelope` sarebbe l'unica
 		// ricerca a non avere la busta, e in silenzio.
 		if envelopeWanted(cmd.OutOrStdout(), flags) {
-			return emitEnvelope(cmd.OutOrStdout(), leggi, truncated && mancanti, hint, flags)
+			return emitEnvelope(cmd.OutOrStdout(), leggi, truncated, hint, flags)
 		}
 		if err := printJSONFiltered(cmd.OutOrStdout(), leggi, flags); err != nil {
 			return err
@@ -528,6 +532,25 @@ func envelopeWanted(w io.Writer, flags *rootFlags) bool {
 
 // truncatedHint torna il testo dell'avviso, o "" quando non c'è nulla da dire.
 // Separato da warnTruncated per poterlo verificare senza catturare stderr.
+// hintLeggiCorte dice perché l'elenco aggregato può non essere tutto.
+//
+// Separato dal chiamante per poterlo verificare senza rete, come
+// truncatedHint. Torna "" quando non c'è nulla da dire.
+func hintLeggiCorte(truncated, mancanti bool, righe, leggi, limite int) string {
+	switch {
+	case !truncated:
+		return ""
+	case mancanti:
+		return fmt.Sprintf(
+			"lette %d righe-articolo e trovate solo %d delle %d leggi chieste: l'elenco può essere incompleto. Alza --limit, oppure restringi con --anno/--numero.",
+			righe, leggi, limite)
+	default:
+		return fmt.Sprintf(
+			"mostrate %d leggi, il massimo chiesto: l'archivio ne ha altre e la ricerca si è fermata qui. Alza --limit (es. --limit 50) prima di leggere questo elenco come completo.",
+			leggi)
+	}
+}
+
 func truncatedHint(truncated bool, shown int, slug string) string {
 	if !truncated {
 		return ""

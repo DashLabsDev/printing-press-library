@@ -84,3 +84,38 @@ func TestNovitaTagliaLElencoMaNonIlConteggio(t *testing.T) {
 		t.Errorf("conteggio=%d mostrati=%d, attesi 62 e 30", e.Conteggio, len(e.Nuovi))
 	}
 }
+
+// Sull'archivio leggi le righe sono per articolo: sette righe della stessa
+// legge devono uscire come una novità sola, con gli articoli contati accanto.
+func TestRigheNovitaLeggi(t *testing.T) {
+	arc := icaro.Archive{Slug: "leggi"}
+	recs := []icaro.Record{}
+	for i := 1; i <= 7; i++ {
+		recs = append(recs, icaro.Record{
+			Title:  "Disposizioni varie in materia di produzione energetica",
+			URL:    "https://dati.ars.sicilia.it/icaro/doc201-1.jsp",
+			Fields: map[string]string{"Legisl.": "18", "Atto": "L.R. 14", "Data": "22.07.2026", "Docum.": itoa(i)},
+		})
+	}
+	recs = append(recs, icaro.Record{
+		Title:  "Altra legge",
+		Fields: map[string]string{"Legisl.": "18", "Atto": "L.R. 13", "Data": "15.07.2026", "Docum.": "1"},
+	})
+
+	righe := righeNovitaLeggi(arc, recs)
+	if len(righe) != 2 {
+		t.Fatalf("otto righe-articolo di due leggi devono dare 2 novità, non %d", len(righe))
+	}
+	if righe[0]["atto"] != "L.R. 14" {
+		t.Errorf("atto = %q, atteso L.R. 14", righe[0]["atto"])
+	}
+	if righe[0]["numero"] != "14" {
+		t.Errorf("numero deve essere il numero nudo, quello che si passa a --numero: %q", righe[0]["numero"])
+	}
+	if righe[0]["articoli_trovati"] != "7" {
+		t.Errorf("articoli_trovati = %q, atteso 7", righe[0]["articoli_trovati"])
+	}
+	if righe[0]["data_iso"] != "2026-07-22" {
+		t.Errorf("data_iso = %q, atteso 2026-07-22", righe[0]["data_iso"])
+	}
+}
