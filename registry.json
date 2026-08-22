@@ -2638,6 +2638,48 @@
       }
     },
     {
+      "name": "benzinga",
+      "category": "other",
+      "api": "Benzinga",
+      "description": "Every Benzinga calendar, news, fundamentals, and signal endpoint as a typed command, plus an offline SQLite store, full-text search, cross-entity queries, and the first Benzinga MCP server.",
+      "search_terms": [
+        "benzinga",
+        "benzinga-pp-cli",
+        "Every Benzinga calendar, news, fundamentals, and signal endpoint as a typed command, plus an offline SQLite store, full-text search, cross-entity queries, and the first Benzinga MCP server.",
+        "Overnight watchlist change scan",
+        "watch",
+        "See everything that changed on your tickers since you last looked — new ratings, price-target moves, breaking news, and signals in one diff.",
+        "Single-ticker move explainer",
+        "why",
+        "Build one time-ordered catalyst timeline for a ticker by merging unusual options, block trades, halts, rating changes, and news.",
+        "Unified forward catalyst agenda",
+        "catalysts",
+        "One forward-dated agenda per ticker set unioning earnings, dividends, splits, IPOs, FDA dates, conference calls, guidance, and offerings.",
+        "Analyst & firm accuracy scorecard",
+        "analyst-accuracy",
+        "Rank rating-issuing firms and analysts by Benzinga's historical accuracy, and tag today's rating changes with the issuer's hit rate.",
+        "Earnings surprise tracker",
+        "earnings-season",
+        "Compute EPS and revenue beat/miss and surprise % from the earnings calendar and link each name to its conference call and transcript.",
+        "Clustered congressional buying",
+        "insider-cluster",
+        "Flag tickers where several distinct members of Congress filed purchases within a window — cluster detection beyond a single disclosure."
+      ],
+      "path": "library/other/benzinga",
+      "printer": "waveriderai",
+      "printer_name": "waveriderai",
+      "creator": {
+        "handle": "waveriderai",
+        "name": "waveriderai"
+      },
+      "contributors": [
+        {
+          "handle": "tmchow",
+          "name": "Trevin Chow"
+        }
+      ]
+    },
+    {
       "name": "bird",
       "category": "social-and-messaging",
       "api": "Bird",
