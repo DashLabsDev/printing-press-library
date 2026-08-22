@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.5 - 2026-08-22
+
+- feat(ars-sicilia): stop dropping a nested list under --select, and name laws the way you filter them (#1781).
+
 ## 2026.8.4 - 2026-08-21
 
 - fix(ars-sicilia): check sitting/date coherence both ways, drop the unmet emendamenti claim (#1772).

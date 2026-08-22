@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.4 - 2026-08-22
+
+- test(peloton): add live-round-14 turn-bit regression test (#1780).
+
 ## 2026.8.3 - 2026-08-21
 
 - feat(peloton): add classes_detail dependent sync, and the bugs found building it (#1774).
