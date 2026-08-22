@@ -3421,6 +3421,12 @@
         "Parse-only validator for cadastral references. Explains shape rules without hitting any API."
       ],
       "path": "library/other/catasto",
+      "release": {
+        "cli_name": "catasto-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-22T09:12:22Z",
+        "source_commit": "c6feec311cecf6db3841d32d812c024c740f8987"
+      },
       "printer": "robertobissanti",
       "printer_name": "Roberto Bissanti",
       "mcp": {
@@ -18937,9 +18943,9 @@
       "path": "library/other/scientific-consensus",
       "release": {
         "cli_name": "scientific-consensus-pp-cli",
-        "version": "2026.8.5",
-        "released_at": "2026-08-21T05:11:42Z",
-        "source_commit": "fbb8f22489730e8bd59a482c9dcf1c8ab2f0e6e2"
+        "version": "2026.8.6",
+        "released_at": "2026-08-22T09:12:22Z",
+        "source_commit": "ff450b44874dd1570e13f7e7d031409a9a9aa2f8"
       },
       "printer": "laci141",
       "printer_name": "laci141",
