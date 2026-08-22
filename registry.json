@@ -4677,6 +4677,54 @@
       }
     },
     {
+      "name": "cosmos",
+      "category": "productivity",
+      "api": "Cosmos",
+      "description": "Search, organize, export, and audit your Cosmos inspiration library from the terminal.",
+      "search_terms": [
+        "cosmos",
+        "cosmos-pp-cli",
+        "Search, organize, export, and audit your Cosmos inspiration library from the terminal.",
+        "Weekly library review",
+        "review",
+        "Turn recent saves, unfiled elements, duplicate connections, AI flags, and missing attribution into a deterministic maintenance queue.",
+        "Collection overlap",
+        "Compare two collections and report shared elements, duplicate media, and references unique to each side.",
+        "Search coverage gap",
+        "collection coverage",
+        "Compare live Cosmos search results with live collection membership and return promising references that are not already saved.",
+        "Provenance audit",
+        "Report missing source URLs or authors and show source concentration from live collection elements.",
+        "Similarity trail",
+        "element trail",
+        "Walk visual similarity results to a bounded depth and emit a deduplicated, source-aware graph.",
+        "Snapshot diff",
+        "Compare historical collection membership and show added, removed, and moved elements."
+      ],
+      "path": "library/productivity/cosmos",
+      "printer": "elliottrjacobs",
+      "printer_name": "Elliott Jacobs",
+      "creator": {
+        "handle": "elliottrjacobs",
+        "name": "Elliott Jacobs"
+      },
+      "mcp": {
+        "binary": "cosmos-pp-mcp",
+        "transports": [
+          "stdio"
+        ],
+        "tool_count": 53,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE",
+          "COSMOS_TOKEN"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "costco",
       "category": "commerce",
       "api": "Costco",
@@ -7799,9 +7847,9 @@
       "path": "library/travel/flight-goat",
       "release": {
         "cli_name": "flight-goat-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-22T09:11:11Z",
+        "source_commit": "abce8a310cc87310486bc3ff05a06b9a6a34155e"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -10766,6 +10814,55 @@
         "tool_count": 4,
         "public_tool_count": 0,
         "auth_type": "bearer_token",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "ihatepdf-cv",
+      "category": "productivity",
+      "api": "ihatepdf.cv",
+      "description": "Private PDF operations for agents, scripts, and offline pipelines.",
+      "search_terms": [
+        "ihatepdf-cv",
+        "ihatepdf.cv",
+        "ihatepdf-cv-pp-cli",
+        "Private PDF operations for agents, scripts, and offline pipelines.",
+        "Privacy audit before sharing",
+        "privacy-scan",
+        "Find content and metadata risks before a PDF leaves your machine.",
+        "Integrity trail",
+        "fingerprint",
+        "Record SHA-256, SHA-1, and MD5 hashes for inputs and outputs.",
+        "Agent-native inspection",
+        "inspect",
+        "Expose PDF structure, metadata, and hashes as compact JSON.",
+        "Local PDF text search",
+        "search",
+        "Search extracted text across local PDFs and return matching snippets.",
+        "Local PDF catalog",
+        "catalog index",
+        "Index PDF paths, hashes, page counts, and extracted text in a local SQLite catalog."
+      ],
+      "path": "library/productivity/ihatepdf-cv",
+      "printer": "SomSamantray",
+      "printer_name": "Som Samantray",
+      "creator": {
+        "handle": "SomSamantray",
+        "name": "Som Samantray"
+      },
+      "mcp": {
+        "binary": "ihatepdf-cv-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 1,
+        "public_tool_count": 1,
+        "auth_type": "none",
         "env_vars": [
           "PRINTING_PRESS_CLIENT_PROFILE"
         ],
