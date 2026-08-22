@@ -127,6 +127,13 @@ func buildAgentContext(rootCmd *cobra.Command) agentContext {
 			Sensitive:   true,
 			Description: "Set to your API credential.",
 		},
+		{
+			Name:        "BENZINGA_MARKET_API_KEY",
+			Kind:        "per_call",
+			Required:    false,
+			Sensitive:   true,
+			Description: "Optional market/super-token for calendar, movers, bars, short interest, and logos. Falls back to BENZINGA_API_KEY when unset.",
+		},
 	}
 	authMode := "api_key"
 	if authMode == "" {

@@ -202,6 +202,10 @@ These capabilities aren't available in any other tool for this API.
 - `benzinga-pp-cli quote-delayed get-v1` — Get delayed quotes for a list of symbols, ISINs, or CIKs
 - `benzinga-pp-cli quote-delayed get-v2` — Get delayed quotes for a list of symbols
 
+**search** — Offline full-text search
+
+- `benzinga-pp-cli search "<query>"` — Search synced local data (or the logos search API in live/auto mode). Local query tokens are alphanumeric only (letters, digits, underscore); every token is required (implicit AND). FTS5 operators such as AND, OR, NOT and quoted phrases are not supported.
+
 **sec** — Manage sec
 
 - `benzinga-pp-cli sec get-insider-transaction` — Returns insider transaction data from SEC Form 4 filings.

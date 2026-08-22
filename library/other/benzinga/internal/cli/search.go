@@ -91,6 +91,10 @@ func newSearchCmd(flags *rootFlags) *cobra.Command {
 		Long: `Search data using FTS5 full-text search on locally synced data,
 or hit the API's search endpoint when available.
 
+Local search keeps alphanumeric tokens (letters, digits, underscore) and
+requires every token (implicit AND). FTS5 operators such as AND, OR, NOT
+and quoted phrases are not supported; punctuation is stripped.
+
 In auto mode (default): uses the API search endpoint if the API has one,
 otherwise searches local data. Falls back to local on network failure.
 In live mode: uses the API search endpoint only.
@@ -138,7 +142,7 @@ In local mode: searches locally synced data only.`,
 				dbPath = defaultDBPath("benzinga-pp-cli")
 			}
 
-			db, err := store.OpenWithContext(cmd.Context(), dbPath)
+			db, err := store.OpenReadOnlyContext(cmd.Context(), dbPath)
 			if err != nil {
 				return fmt.Errorf("opening local database: %w\nRun 'benzinga-pp-cli sync' first to populate the local database.", err)
 			}

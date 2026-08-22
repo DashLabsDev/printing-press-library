@@ -40,7 +40,7 @@ Data must be synced first with the sync command.`,
 				dbPath = defaultDBPath("benzinga-pp-cli")
 			}
 
-			db, err := store.OpenWithContext(cmd.Context(), dbPath)
+			db, err := store.OpenReadOnlyContext(cmd.Context(), dbPath)
 			if err != nil {
 				return fmt.Errorf("opening local database: %w\nRun 'benzinga-pp-cli sync' first.", err)
 			}

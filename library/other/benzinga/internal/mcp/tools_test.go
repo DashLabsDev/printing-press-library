@@ -115,6 +115,15 @@ func TestMCPRegisterToolsPreservesTypedSpecialTools(t *testing.T) {
 	if !strings.Contains(searchTool.Tool.Description, "Full-text search across all synced data") {
 		t.Fatalf("search tool appears to have been overwritten by command mirror: %q", searchTool.Tool.Description)
 	}
+	queryDesc := mcpToolPropertyDescription(t, searchTool.Tool, "query")
+	if strings.Contains(queryDesc, "supports FTS5 syntax") || strings.Contains(queryDesc, "AND, OR, NOT") {
+		t.Fatalf("search query schema still advertises FTS5 operators: %q", queryDesc)
+	}
+	for _, want := range []string{"Alphanumeric", "implicit AND", "not supported"} {
+		if !strings.Contains(queryDesc, want) {
+			t.Fatalf("search query schema %q missing %q", queryDesc, want)
+		}
+	}
 	sqlTool, ok := tools["sql"]
 	if !ok {
 		t.Fatalf("typed sql tool missing from registered tools: %#v", tools)
@@ -267,6 +276,51 @@ func TestMCPSQLEmptyStoreReturnsActionableEnvelope(t *testing.T) {
 	}
 	if !strings.Contains(envelope.NextStep, "sync") {
 		t.Fatalf("empty-store SQL next_step should mention sync: %s", text)
+	}
+}
+
+func TestMCPSQLRowCapMarksTruncatedEnvelope(t *testing.T) {
+	resetMCPPathEnv(t)
+	path, err := mcpDBPath()
+	if err != nil {
+		t.Fatalf("mcpDBPath() error = %v", err)
+	}
+	db, err := store.Open(path)
+	if err != nil {
+		t.Fatalf("creating empty store: %v", err)
+	}
+	if err := db.Close(); err != nil {
+		t.Fatalf("closing empty store: %v", err)
+	}
+
+	query := "WITH RECURSIVE n(x) AS (SELECT 1 UNION ALL SELECT x+1 FROM n WHERE x < 600) SELECT x FROM n"
+	result, err := handleSQL(context.Background(), mcplib.CallToolRequest{Params: mcplib.CallToolParams{
+		Arguments: map[string]any{"query": query},
+	}})
+	if err != nil {
+		t.Fatalf("handleSQL returned transport error: %v", err)
+	}
+	if result == nil || result.IsError {
+		t.Fatalf("handleSQL row-cap IsError = %v, want false: %s", result != nil && result.IsError, mcpTextContent(t, result))
+	}
+	text := mcpTextContent(t, result)
+	var envelope struct {
+		Count     int              `json:"count"`
+		Rows      []map[string]any `json:"rows"`
+		Truncated bool             `json:"truncated"`
+		Limit     int              `json:"limit"`
+	}
+	if err := json.Unmarshal([]byte(text), &envelope); err != nil {
+		t.Fatalf("row-cap SQL result must be valid JSON: %v\n%s", err, text)
+	}
+	if !envelope.Truncated {
+		t.Fatalf("row-cap envelope missing truncated=true: %s", text)
+	}
+	if envelope.Limit != mcpSQLMaxRows {
+		t.Fatalf("limit = %d, want %d", envelope.Limit, mcpSQLMaxRows)
+	}
+	if envelope.Count != mcpSQLMaxRows || len(envelope.Rows) != mcpSQLMaxRows {
+		t.Fatalf("count/rows = %d/%d, want %d", envelope.Count, len(envelope.Rows), mcpSQLMaxRows)
 	}
 }
 
@@ -592,6 +646,29 @@ func TestMCPToolResultTextBoundsOversizedNonGETResponses(t *testing.T) {
 	if envelope.Preview == "" {
 		t.Fatalf("preview result should include a bounded preview")
 	}
+}
+
+func mcpToolPropertyDescription(t *testing.T, tool mcplib.Tool, name string) string {
+	t.Helper()
+	raw, ok := tool.InputSchema.Properties[name]
+	if !ok {
+		t.Fatalf("tool %q missing %q property: %#v", tool.Name, name, tool.InputSchema.Properties)
+	}
+	prop, _ := raw.(map[string]any)
+	if prop == nil {
+		encoded, err := json.Marshal(raw)
+		if err != nil {
+			t.Fatalf("marshal %q property: %v", name, err)
+		}
+		if err := json.Unmarshal(encoded, &prop); err != nil {
+			t.Fatalf("decode %q property: %v\n%s", name, err, encoded)
+		}
+	}
+	desc, _ := prop["description"].(string)
+	if desc == "" {
+		t.Fatalf("tool %q property %q has no description: %#v", tool.Name, name, raw)
+	}
+	return desc
 }
 
 func mcpTextContent(t *testing.T, result *mcplib.CallToolResult) string {

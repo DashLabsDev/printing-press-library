@@ -31,6 +31,16 @@ const (
 	// Keep them on the same polite-client limiter path instead of disabling
 	// pacing with rate=0; users can still tune human CLI calls with --rate-limit.
 	defaultMCPRateLimit = 2
+
+	// mcpSQLMaxRows is a hard cap on rows collected by handleSQL before
+	// bound.JSON. Unbounded SELECT * FROM resources can otherwise buffer
+	// the whole mirror in memory.
+	mcpSQLMaxRows = 500
+
+	// mcpSearchQueryDescription is the contract store.ftsMatchQuery
+	// actually implements: alphanumeric tokens, all required, no FTS5
+	// operators. Keep this in sync with the CLI search help and SKILL.md.
+	mcpSearchQueryDescription = "Alphanumeric tokens only (letters, digits, underscore). Every token is required (implicit AND). FTS5 operators such as AND, OR, NOT and quoted phrases are not supported; punctuation is stripped."
 )
 
 // RegisterTools registers all API operations as MCP tools.
@@ -42,7 +52,7 @@ func RegisterTools(s *server.MCPServer) {
 	s.AddTool(
 		mcplib.NewTool("search",
 			mcplib.WithDescription("Full-text search across all synced data. Faster than paginating list endpoints. Requires sync first."),
-			mcplib.WithString("query", mcplib.Required(), mcplib.Description("Search query (supports FTS5 syntax: AND, OR, NOT, quotes for phrases)")),
+			mcplib.WithString("query", mcplib.Required(), mcplib.Description(mcpSearchQueryDescription)),
 			mcplib.WithNumber("limit", mcplib.Description("Max results (default 25)")),
 			mcplib.WithReadOnlyHintAnnotation(true),
 			mcplib.WithDestructiveHintAnnotation(false),
@@ -453,7 +463,7 @@ func mcpSearchEnvelope(results []json.RawMessage, storeStatus mcpStoreStatusKind
 		if storeStatus == mcpStoreStatusEmpty {
 			out["next_step"] = mcpEmptyStoreNextStep()
 		} else {
-			out["next_step"] = "No local search matches. Try a broader query, a lower-specificity FTS expression, or sync again if data may be stale."
+			out["next_step"] = "No local search matches. Try fewer or broader alphanumeric tokens, or sync again if data may be stale."
 		}
 	}
 	return out
@@ -641,7 +651,12 @@ func handleSQL(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.CallToo
 		return mcplib.NewToolResultError(fmt.Sprintf("reading columns: %v", err)), nil
 	}
 	var results []map[string]any
+	truncated := false
 	for rows.Next() {
+		if len(results) >= mcpSQLMaxRows {
+			truncated = true
+			break
+		}
 		values := make([]any, len(cols))
 		ptrs := make([]any, len(cols))
 		for i := range values {
@@ -666,10 +681,10 @@ func handleSQL(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.CallToo
 		return mcplib.NewToolResultError(fmt.Sprintf("reading store status: %v", err)), nil
 	}
 
-	return toolResultJSON(mcpSQLEnvelope(results, cols, storeStatus))
+	return toolResultJSON(mcpSQLEnvelope(results, cols, storeStatus, truncated, mcpSQLMaxRows))
 }
 
-func mcpSQLEnvelope(rows []map[string]any, columns []string, storeStatus mcpStoreStatusKind) map[string]any {
+func mcpSQLEnvelope(rows []map[string]any, columns []string, storeStatus mcpStoreStatusKind, truncated bool, limit int) map[string]any {
 	if rows == nil {
 		rows = []map[string]any{}
 	}
@@ -679,6 +694,10 @@ func mcpSQLEnvelope(rows []map[string]any, columns []string, storeStatus mcpStor
 		"rows":         rows,
 		"store_status": storeStatus,
 		"resumable":    false,
+	}
+	if truncated {
+		out["truncated"] = true
+		out["limit"] = limit
 	}
 	if len(rows) == 0 {
 		if storeStatus == mcpStoreStatusEmpty {
@@ -746,6 +765,13 @@ func handleContext(_ context.Context, _ mcplib.CallToolRequest) (*mcplib.CallToo
 					"required":    false,
 					"sensitive":   true,
 					"description": "Set to your API credential.",
+				},
+				{
+					"name":        "BENZINGA_MARKET_API_KEY",
+					"kind":        "per_call",
+					"required":    false,
+					"sensitive":   true,
+					"description": "Optional market/super-token for calendar, movers, bars, short interest, and logos. Falls back to BENZINGA_API_KEY when unset.",
 				},
 			},
 		},

@@ -4,6 +4,11 @@
 
 Benzinga's licensed financial-data API is powerful but fragmented across ~60 endpoints and has only one complete client — a Python library with no CLI, no offline store, and no agent surface. This CLI covers the full documented REST surface as first-class commands, delta-syncs the calendar/news/signal families into a local database via the API's own updated cursors, and adds cross-entity commands the REST API cannot express in one call: watch a ticker set for overnight changes, explain why one name is moving, and rank analysts by accuracy.
 
+Created by [@waveriderai](https://github.com/waveriderai) (waveriderai).
+Contributors: [@tmchow](https://github.com/tmchow) (Trevin Chow).
+
+Local `search` keeps alphanumeric tokens only (letters, digits, underscore) and requires every token (implicit AND). FTS5 operators such as AND, OR, NOT and quoted phrases are not supported.
+
 ## Install
 
 The recommended path installs both the `benzinga-pp-cli` binary and the `pp-benzinga` agent skill (Claude Code, Codex, Cursor, Gemini CLI, GitHub Copilot, and other agents supported by the upstream [`skills`](https://github.com/vercel-labs/skills) CLI) in one shot:
@@ -523,6 +528,7 @@ Environment variables:
 | --- | --- | --- | --- |
 | `BENZINGA_API_KEY` | per_call | No | Set to your API credential. |
 | `CALENDAR_API_KEY` | per_call | No | Set to your API credential. |
+| `BENZINGA_MARKET_API_KEY` | per_call | No | Optional market/super-token for calendar, movers, bars, short interest, and logos. Falls back to `BENZINGA_API_KEY` when unset. |
 
 ### agentcookie (optional)
 
