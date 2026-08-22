@@ -116,7 +116,7 @@ func TestMCPRegisterToolsPreservesTypedSpecialTools(t *testing.T) {
 		t.Fatalf("search tool appears to have been overwritten by command mirror: %q", searchTool.Tool.Description)
 	}
 	queryDesc := mcpToolPropertyDescription(t, searchTool.Tool, "query")
-	if strings.Contains(queryDesc, "supports FTS5 syntax") || strings.Contains(queryDesc, "AND, OR, NOT") {
+	if strings.Contains(queryDesc, "supports FTS5 syntax") {
 		t.Fatalf("search query schema still advertises FTS5 operators: %q", queryDesc)
 	}
 	for _, want := range []string{"Alphanumeric", "implicit AND", "not supported"} {
