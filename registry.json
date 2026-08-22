@@ -7491,6 +7491,12 @@
         "Nightly bulk vs realtime efile distinction surfaced directly as commands."
       ],
       "path": "library/other/fec",
+      "release": {
+        "cli_name": "fec-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-22T09:24:56Z",
+        "source_commit": "cc0114961b07d92263a90da550dd8f1d7a4dff11"
+      },
       "printer": "mvanhorn",
       "printer_name": "Hunter Veltri",
       "creator": {
@@ -8563,6 +8569,46 @@
         ],
         "mcp_ready": "full",
         "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "gfonts",
+      "category": "developer-tools",
+      "api": "Google Fonts Metadata",
+      "description": "Search, browse, and download Google Fonts from the terminal. Zero auth required — uses the same public metadata endpoint that powers fonts.google.com.",
+      "search_terms": [
+        "gfonts",
+        "Google Fonts Metadata",
+        "gfonts-pp-cli",
+        "Search, browse, and download Google Fonts from the terminal. Zero auth required — uses the same public metadata endpoint that powers fonts.google.com.",
+        "Search fonts",
+        "search",
+        "Search fonts by name, category, or designer with relevance ranking",
+        "Browse fonts",
+        "list",
+        "Browse fonts with category filter, sort options, and limit",
+        "Font details",
+        "info",
+        "Show detailed metadata for a specific font",
+        "Download fonts",
+        "download",
+        "Download font files to local disk with variant and output options",
+        "Trending fonts",
+        "trending",
+        "Show trending and popular fonts",
+        "Font categories",
+        "categories",
+        "List all font categories with counts",
+        "Random font",
+        "random",
+        "Pick a random font with optional category filter"
+      ],
+      "path": "library/developer-tools/gfonts",
+      "printer": "neal-kyle",
+      "printer_name": "neal-kyle",
+      "creator": {
+        "handle": "neal-kyle",
+        "name": "neal-kyle"
       }
     },
     {
