@@ -1833,9 +1833,9 @@
       "path": "library/other/ars-sicilia",
       "release": {
         "cli_name": "ars-sicilia-pp-cli",
-        "version": "2026.8.4",
-        "released_at": "2026-08-21T04:59:06Z",
-        "source_commit": "537fd0d1808d2c38bda504f99c0be48beb6d5439"
+        "version": "2026.8.5",
+        "released_at": "2026-08-22T09:09:54Z",
+        "source_commit": "e50624009008a527c56d82013632fe23d7b28f60"
       },
       "printer": "aborruso",
       "printer_name": "aborruso"
@@ -3399,6 +3399,41 @@
         ],
         "mcp_ready": "full",
         "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "catasto",
+      "category": "other",
+      "api": "Catasto",
+      "description": "The free, single-binary Italian cadastre CLI — converts between cadastral references and GPS, online or offline, with agent-native JSON.",
+      "search_terms": [
+        "catasto",
+        "catasto-pp-cli",
+        "The free, single-binary Italian cadastre CLI — converts between cadastral references and GPS, online or offline, with agent-native JSON.",
+        "GPS to cadastral lookup",
+        "gps",
+        "Resolve a WGS84 lon/lat point to its Italian cadastral parcel (province, comune, foglio, particella). Supports single-point and streaming batch mode.",
+        "Cadastral to GPS lookup",
+        "cadastral",
+        "Reverse lookup: given a comune codice belfiore + foglio + particella, return the WGS84 centroid coordinates. Powered by the ondata/dati_catastali Parquet dataset, cached locally on first use.",
+        "Cadastral syntax validator",
+        "validate",
+        "Parse-only validator for cadastral references. Explains shape rules without hitting any API."
+      ],
+      "path": "library/other/catasto",
+      "printer": "robertobissanti",
+      "printer_name": "Roberto Bissanti",
+      "mcp": {
+        "binary": "catasto-pp-mcp",
+        "transports": [
+          "stdio"
+        ],
+        "tool_count": 1,
+        "public_tool_count": 1,
+        "auth_type": "none",
+        "env_vars": [],
+        "mcp_ready": "full",
+        "spec_format": "internal"
       }
     },
     {
@@ -5229,6 +5264,12 @@
         "Call DEVONthink's official local MCP tools from scripts when the local MCP server is enabled."
       ],
       "path": "library/productivity/devonthink",
+      "release": {
+        "cli_name": "devonthink-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-21T09:48:01Z",
+        "source_commit": "506626f1909597bea2c178964b306bfb696fffbe"
+      },
       "printer": "Rowdy",
       "printer_name": "Johns",
       "creator": {
@@ -12198,9 +12239,9 @@
       "path": "library/project-management/linear",
       "release": {
         "cli_name": "linear-pp-cli",
-        "version": "2026.8.4",
-        "released_at": "2026-08-17T09:26:48Z",
-        "source_commit": "7c4f3ebab9d0cc346090f666d5e95fa9a87a71bf"
+        "version": "2026.8.6",
+        "released_at": "2026-08-22T09:08:52Z",
+        "source_commit": "032edd037eb8a72d6e01127524c0cb299b0d4f7a"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -15906,9 +15947,9 @@
       "path": "library/health/peloton",
       "release": {
         "cli_name": "peloton-pp-cli",
-        "version": "2026.8.3",
-        "released_at": "2026-08-21T05:39:38Z",
-        "source_commit": "468965a6256a732add10cf35f442a9f52166e634"
+        "version": "2026.8.4",
+        "released_at": "2026-08-22T09:09:54Z",
+        "source_commit": "c290bac90ed5f79da0ce375c4cc959ba0b8caca2"
       },
       "printer": "itsmefelix-",
       "printer_name": "Felix Banuchi",
