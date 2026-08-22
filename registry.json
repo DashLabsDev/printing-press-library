@@ -4708,6 +4708,12 @@
         "Compare historical collection membership and show added, removed, and moved elements."
       ],
       "path": "library/productivity/cosmos",
+      "release": {
+        "cli_name": "cosmos-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-22T09:13:12Z",
+        "source_commit": "9f7e961a743a2b3f99c92a58a630baa590b45238"
+      },
       "printer": "elliottrjacobs",
       "printer_name": "Elliott Jacobs",
       "creator": {
@@ -7459,6 +7465,52 @@
         ],
         "mcp_ready": "full",
         "spec_format": "internal"
+      }
+    },
+    {
+      "name": "fec",
+      "category": "other",
+      "api": "Openfec",
+      "description": "This application programming interface (API)",
+      "search_terms": [
+        "fec",
+        "Openfec",
+        "fec-pp-cli",
+        "This application programming interface (API)",
+        "Money-window default",
+        "schedules list --committee-id <ID> --two-year-transaction-period <YYYY>",
+        "schedule_a queries pair committee + two-year period so bare lookups return live recent money instead of the upstream 504 the API returns for unfiltered schedule_a scans; sort defaults to contribution_receipt_date.",
+        "The API's most common journalist query works on the first try with no param archaeology.",
+        "Donor-first search flow",
+        "names list --q <name>",
+        "One name query fans out to candidate and committee matches, giving the FEC ID needed by schedules/totals in a single call before any money lookup.",
+        "Every workflow starts 'who is this person and what is their ID'; the CLI front-loads it.",
+        "Efile live feed",
+        "schedules list-schedulea-6 --min-date MM/DD/YYYY --max-date MM/DD/YYYY",
+        "Real-time electronic filings window for contributions as they post, separate from processed paper data.",
+        "Nightly bulk vs realtime efile distinction surfaced directly as commands."
+      ],
+      "path": "library/other/fec",
+      "printer": "mvanhorn",
+      "printer_name": "Hunter Veltri",
+      "creator": {
+        "handle": "mvanhorn",
+        "name": "Hunter Veltri"
+      },
+      "mcp": {
+        "binary": "fec-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 100,
+        "public_tool_count": 0,
+        "auth_type": "api_key",
+        "env_vars": [
+          "FEC_API_KEY_QUERY_AUTH"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
       }
     },
     {
@@ -10854,6 +10906,12 @@
         "Index PDF paths, hashes, page counts, and extracted text in a local SQLite catalog."
       ],
       "path": "library/productivity/ihatepdf-cv",
+      "release": {
+        "cli_name": "ihatepdf-cv-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-22T09:13:12Z",
+        "source_commit": "2fe0b6284ea52570bda4c71cb4f16760a92902be"
+      },
       "printer": "SomSamantray",
       "printer_name": "Som Samantray",
       "creator": {
