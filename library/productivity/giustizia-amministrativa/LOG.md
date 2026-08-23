@@ -1,5 +1,57 @@
 # LOG
 
+## 2026-08-22 — quattro interventi sul client del portale
+
+Confronto con un'altra implementazione della stessa fonte (`mcp-legal-it`, elencata ora nei
+progetti correlati del README). Quattro cose da prendere, misurate prima di scriverle.
+
+**La pagina di errore di `mdp` finiva nello store come documento.** Un `nomeFile` non piu'
+valido non produce un 404: il portale risponde 200 con la propria pagina "404 - Pagina non
+trovata", che `HTMLToMarkdown` converte in 136 caratteri di testo plausibile — non vuoti,
+quindi non intercettati dal controllo sul testo assente. Ora `isErrorPage` guarda il body
+(`<?xml`, `<GA`, `%PDF-` sono documenti veri) e `Document` restituisce un errore che dice di
+rifare la ricerca.
+
+**L'id della portlet e' letto dalla pagina.** Contiene un `_INSTANCE_<hash>` che il portale
+puo' cambiare a un redeploy, ed era una costante presente in ogni ricerca e nella verifica
+appello. L'handshake ora legge dalla pagina del form l'URL `action` — che porta insieme
+`p_p_id`, `p_p_lifecycle` e `p_auth` — e lo replica verbatim; le costanti restano come
+fallback. Il filtro anno resta server-side (`DataYearItem`): verificato, 5 risultati su 5 del
+2019.
+
+**`--sede` accetta le grafie che la CLI stessa stampa.** Emettevamo `ECLI:IT:TARLAZ:...` e poi
+rifiutavamo `--sede TARLAZ`. Ora valgono citta', regione (`lazio`, `tar-sicilia`), sede
+staccata (`sicilia-catania`) e codice ECLI, con i 31 codici presi dallo store e non supposti.
+Quando l'alias nomina una regione con due sedi, un avviso dice quale resta fuori. `TARBOL` e
+`TARABR` restano fuori di proposito: come abbreviazioni puntano a Bologna e all'Aquila.
+
+**`get --meta` legge i metadati di registro dall'XML.** `/visualizza/` serve la sorgente XML
+della stessa pagina resa da `/visualizzah2/`, e porta cio' che la resa perde: urn NIR, flag
+`omissis`, oggetto tenuto dal registro, presidente ed estensore etichettati. Opt-in: costa una
+seconda richiesta. Sui provvedimenti in PDF non c'e' XML, e il comando lo dichiara invece di
+inventare campi.
+
+Il primo rimedio all'opt-in era sbagliato in verso opposto, e l'ha visto la review: azzerando i
+metadati *prima* della scrittura, un `get` semplice li cancellava dallo store e costringeva il
+`--meta` successivo a riscaricarli. Ora si azzera solo la copia che va in output, dopo la
+scrittura. Cercando lo stesso schema altrove sono usciti altri due punti che nessuno aveva
+segnalato: `persistProvvedimenti` conservava il testo ma non i metadati, quindi bastava una
+ricerca a cancellarli; e `corpus build`, che risolve dallo store, avrebbe scritto schede
+diverse fra loro a seconda di quali provvedimenti qualcuno avesse gia' letto con `--meta`.
+
+Tre rilievi della review, tutti veri: i metadati salvati nello store riaffioravano in un `get`
+senza `--meta` (opt-in che valeva solo la prima volta), `data_pubblicazione` era documentata ma
+non emessa nel front matter, e l'`action` letta dalla pagina andava ripulita dall'escape HTML
+dei separatori — oggi il portale li scrive nudi, ma il nostro stesso test li aveva escapati
+senza che me ne accorgessi.
+
+Copertura misurata su 10 provvedimenti di 10 sedi diverse, dal 2010 al 2026: estensore, urn e
+data di pubblicazione 10 su 10; presidente 5 su 10 (nel documento la sua firma e' spesso
+vuota); oggetto di registro 4 su 10. `omissis` risulta vero sui provvedimenti anonimizzati.
+L'urn ha pero' numero e data a `00000-0000` in tutti e dieci: identifica organo, sezione e
+tipo, non il singolo provvedimento. Lo scrive cosi' il portale, e ora lo diciamo dove il campo
+viene documentato, invece di presentarlo come chiave di citazione.
+
 ## 2026-08-18 — primo uso del bundle MCPB in Claude Desktop
 
 ### `data_deposito` e' sempre vuoto in ricerca, e nessuno lo dice

@@ -12,7 +12,7 @@ import (
 
 func newNovelGetCmd(flags *rootFlags) *cobra.Command {
 	var format, sede, nrg, file, id string
-	var frontMatter bool
+	var frontMatter, meta bool
 
 	cmd := &cobra.Command{
 		Use:   "get [id]",
@@ -23,7 +23,8 @@ func newNovelGetCmd(flags *rootFlags) *cobra.Command {
 			"L'output md/text è preceduto per default da un blocco YAML con i metadati\n" +
 			"(ecli, sede, sezione, numero, anno, nrg, data_deposito, formato, url) — la fonte resta sempre\n" +
 			"risalibile anche quando il testo è troppo lungo per starci tutto. Usa --front-matter=false\n" +
-			"per il solo corpo del testo.",
+			"per il solo corpo del testo. Con --meta il blocco porta anche i metadati di registro\n" +
+			"(oggetto, presidente, estensore, urn NIR, omissis) letti dalla forma XML del documento.",
 		Example: strings.Trim(`
   giustizia-amministrativa-pp-cli get IT:TARLAZ:2026:11307SENT --format md
   giustizia-amministrativa-pp-cli get IT:TARLAZ:2026:11307SENT --front-matter=false
@@ -44,7 +45,7 @@ func newNovelGetCmd(flags *rootFlags) *cobra.Command {
 			if id == "" && sede == "" {
 				return cmd.Help()
 			}
-			return runGAGet(cmd, flags, id, format, sede, nrg, file, frontMatter)
+			return runGAGet(cmd, flags, id, format, sede, nrg, file, frontMatter, meta)
 		},
 	}
 	// The MCP mirror of this command has no way to declare a positional
@@ -59,6 +60,7 @@ func newNovelGetCmd(flags *rootFlags) *cobra.Command {
 	cmd.Flags().StringVar(&sede, "sede", "", "Schema sede (es. tar_rm) per il fetch diretto senza ricerca.")
 	cmd.Flags().StringVar(&nrg, "nrg", "", "NRG per il fetch diretto.")
 	cmd.Flags().StringVar(&file, "file", "", "nomeFile per il fetch diretto (es. 202611307_01.html).")
+	cmd.Flags().BoolVar(&meta, "meta", false, "Aggiungi i metadati di registro letti dalla forma XML del documento (oggetto, presidente, estensore, urn NIR della sezione, flag omissis). Costa una seconda richiesta al portale; i provvedimenti pubblicati in PDF non ne hanno.")
 	cmd.Flags().BoolVar(&frontMatter, "front-matter", true, "Anteponi un blocco YAML con i metadati, url incluso (solo output md/text). --front-matter=false per il solo testo.")
 	return cmd
 }

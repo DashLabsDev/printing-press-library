@@ -212,7 +212,14 @@ func newNovelCorpusBuildCmd(flags *rootFlags) *cobra.Command {
 				}
 				var header string
 				if frontMatter {
-					header = gaclient.FrontMatter(p) + "\n"
+					// I metadati di registro sono opt-in di `get --meta`: una
+					// riga risolta dallo store puo' portarli, e senza questo il
+					// corpus avrebbe schede diverse fra loro a seconda di quali
+					// provvedimenti qualcuno aveva gia' letto con quel flag.
+					// La riga nello store resta intatta: si azzera la copia.
+					scheda := p
+					scheda.Meta = nil
+					header = gaclient.FrontMatter(scheda) + "\n"
 				} else {
 					header = fmt.Sprintf("# %s\n\n- Tipo: %s\n- Sede: %s %s\n- Data deposito: %s\n- NRG: %s\n- URL: %s\n\n---\n\n",
 						provID(p), p.Tipo, p.Sede, p.Sezione, p.DataDeposito, p.Nrg, p.URL)

@@ -62,18 +62,27 @@ func provID(p gaclient.Provvedimento) string {
 }
 
 // persistProvvedimenti upserts rows into the local store, preserving any
-// previously stored full_text when the incoming row doesn't carry one.
+// previously stored full_text and registry metadata when the incoming row
+// doesn't carry them. A search result carries neither: without this, every
+// search would erase the text and the metadata already fetched for the same
+// provvedimento, and the next reader would go back to the portal for a
+// document the store already held.
 func persistProvvedimenti(st *store.Store, items []gaclient.Provvedimento) {
 	for _, p := range items {
 		id := provID(p)
 		if id == "" {
 			continue
 		}
-		if p.FullText == "" {
+		if p.FullText == "" || p.Meta == nil {
 			if existing, err := st.Get("provvedimenti", id); err == nil && len(existing) > 0 {
 				var prev gaclient.Provvedimento
-				if json.Unmarshal(existing, &prev) == nil && prev.FullText != "" {
-					p.FullText = prev.FullText
+				if json.Unmarshal(existing, &prev) == nil {
+					if p.FullText == "" && prev.FullText != "" {
+						p.FullText = prev.FullText
+					}
+					if p.Meta == nil && prev.Meta != nil {
+						p.Meta = prev.Meta
+					}
 				}
 			}
 		}
@@ -345,7 +354,7 @@ func resolveProvvedimento(ctx context.Context, st *store.Store, id string) (gacl
 // requested format (md, text, html, json). When frontMatter is set and the
 // format is md/text, a YAML front-matter block with the provvedimento metadata
 // is prepended (no-op for json/html, which already carry the fields).
-func runGAGet(cmd *cobra.Command, flags *rootFlags, id, format, sede, nrg, file string, frontMatter bool) error {
+func runGAGet(cmd *cobra.Command, flags *rootFlags, id, format, sede, nrg, file string, frontMatter, meta bool) error {
 	if gaSkip(flags) {
 		return emitSkip(cmd, flags)
 	}
@@ -379,6 +388,28 @@ func runGAGet(cmd *cobra.Command, flags *rootFlags, id, format, sede, nrg, file 
 	if p.DataDeposito == "" {
 		p.DataDeposito = gaclient.ExtractDataDeposito(docHTML)
 	}
+	if meta {
+		// Not fatal: the document is already in hand, and the metadata is an
+		// addition to it. Say what is missing and carry on.
+		m, merr := c.Meta(cmd.Context(), p)
+		switch {
+		case merr != nil:
+			fmt.Fprintf(cmd.ErrOrStderr(), "Attenzione: metadati non recuperati per %s: %v\n", noTextLabel(p), merr)
+		case m.Empty():
+			fmt.Fprintf(cmd.ErrOrStderr(), "Attenzione: %s non ha una forma XML con i metadati di registro (formato %s)\n", noTextLabel(p), documentFormat(p))
+		default:
+			p.Meta = &m
+			// Same date under two names: the portal prints it as "Pubblicato
+			// il" in the document, and that wording is one of the two that
+			// ExtractDataDeposito already reads into data_deposito. The XML
+			// value fills the field only where the document states none —
+			// measured on a sample of 10, one parere of the Consiglio di
+			// Stato where the date is in the registry and not in the text.
+			if p.DataDeposito == "" {
+				p.DataDeposito = m.DataPubblicazione
+			}
+		}
+	}
 	// A PDF's text layer is already plain text; running the HTML converter
 	// over it would mangle what it does not need to touch.
 	markdown := docHTML
@@ -404,6 +435,17 @@ func runGAGet(cmd *cobra.Command, flags *rootFlags, id, format, sede, nrg, file 
 			persistProvvedimenti(st, []gaclient.Provvedimento{p})
 			_ = st.Close()
 		}
+	}
+
+	// The store keeps whatever metadata a previous `--meta` run fetched, and
+	// resolveProvvedimento loads it back. Emitting it here would make the
+	// output of a plain `get` depend on whether someone once asked for the
+	// metadata: opt-in has to mean opt-in on every call. This runs after the
+	// write above, so a plain get does not erase what the store already has:
+	// dropping it there would send the next --meta back to the portal for a
+	// document it already holds.
+	if !meta {
+		p.Meta = nil
 	}
 
 	if noText {

@@ -143,6 +143,9 @@ These capabilities aren't available in any other tool for this API.
 
   ```bash
   giustizia-amministrativa-pp-cli get --sede tar_rm --nrg 202600422 --file 202611307_01.html --format md
+
+  # con i metadati di registro (oggetto, presidente, estensore, urn della sezione, omissis)
+  giustizia-amministrativa-pp-cli get IT:TARLAZ:2026:11307SENT --meta
   ```
 
 ### Stato locale che si accumula
@@ -288,3 +291,9 @@ Static request headers can be configured under `headers`; per-command header ove
 ### API-specific
 - **403 sulle ricerche** — il token p_auth e' scaduto: il CLI lo rinnova automaticamente al refresh dell'handshake; riprova.
 - **nessun risultato per una query certa** — verifica i filtri --tipo/--sede e prova la ricerca avanzata --all/--phrase.
+- **come si scrive una sede** — `--sede` accetta la citta' (`roma`, `milano`), il nome della regione (`lazio`, `tar-sicilia`), la sede staccata (`sicilia-catania`, `lombardia-brescia`) e il codice che compare nell'ECLI (`TARLAZ`, `TARMI`, `CDS`). Il nome della regione risolve alla sede principale: quando la regione ne ha due, la ricerca lo dichiara in un avviso.
+- **documento non disponibile** — schema, nrg e nome_file di una ricerca datata non restano validi: il portale risponde con la propria pagina di errore. Rifai la ricerca e riprova.
+
+## Progetti correlati
+
+- [mcp-legal-it](https://github.com/capazme/mcp-legal-it) — server MCP in Python sul diritto italiano: oltre alla giurisprudenza amministrativa copre Cassazione (Italgiure), normativa e altri domini.

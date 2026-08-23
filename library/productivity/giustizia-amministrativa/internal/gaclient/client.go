@@ -36,7 +36,13 @@ const (
 	politeRate = 2.0
 )
 
-var rePAuth = regexp.MustCompile(`p_auth=([A-Za-z0-9]+)`)
+var (
+	rePAuth = regexp.MustCompile(`p_auth=([A-Za-z0-9]+)`)
+	// The search form declares its own action, carrying p_p_id, p_p_lifecycle
+	// and p_auth together, and its id carries the portlet namespace.
+	reFormAction = regexp.MustCompile(`action="(https://[^"]*javax\.portlet\.action=search[^"]*)"`)
+	rePortletID  = regexp.MustCompile(`p_p_id=(decisioni_pareri_web[A-Za-z0-9_]*)`)
+)
 
 // Client talks to the giustizia-amministrativa public search over plain HTTP,
 // managing the Liferay session handshake (p_auth + affinity cookies).
@@ -45,8 +51,12 @@ type Client struct {
 	limiter *cliutil.AdaptiveLimiter
 	ua      string
 
-	mu    sync.Mutex
-	pAuth string
+	mu sync.Mutex
+	// pAuth is the CSRF token, action the search form's own action URL and
+	// portlet the portlet id read from the form page. See handshake.
+	pAuth   string
+	action  string
+	portlet string
 }
 
 // New returns a ready Client with a cookie jar and a polite adaptive limiter.
@@ -165,10 +175,52 @@ func (c *Client) handshake(ctx context.Context) error {
 	if m == nil {
 		return fmt.Errorf("handshake: token p_auth non trovato nella pagina del form")
 	}
+	action, portlet := parseForm(body)
 	c.mu.Lock()
 	c.pAuth = string(m[1])
+	c.action = action
+	c.portlet = portlet
 	c.mu.Unlock()
 	return nil
+}
+
+// parseForm reads from the search page the two things that identify the
+// portlet instance: the form's action URL and the portlet id. Both are
+// hardcoded as constants for the fallback, but the id embeds an
+// _INSTANCE_<hash> that the portal can change on a redeploy, and the action
+// carries p_p_id, p_p_lifecycle and p_auth at once — so a rename of any of
+// them survives as long as we replay what the page itself declares.
+func parseForm(body []byte) (action, portlet string) {
+	if m := reFormAction.FindSubmatch(body); m != nil {
+		// The portal writes the separators bare, but an HTML attribute is
+		// allowed to escape them: left as "&amp;" the query would parse into
+		// keys named "amp;p_p_lifecycle", and the search would fail after a
+		// handshake that looked successful.
+		action = strings.ReplaceAll(string(m[1]), "&amp;", "&")
+	}
+	if m := rePortletID.FindSubmatch(body); m != nil {
+		portlet = string(m[1])
+	}
+	return action, portlet
+}
+
+// portletNS returns the namespace prefixing every form field of the portlet
+// instance ("_" + portlet id), from the page when the handshake read it.
+func (c *Client) portletNS() string {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if c.portlet != "" {
+		return "_" + c.portlet
+	}
+	return portletPrefix
+}
+
+// searchAction returns the form action URL read from the page, or "" when the
+// handshake could not find it and the caller has to build one.
+func (c *Client) searchAction() string {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.action
 }
 
 func (c *Client) token() string {
@@ -178,16 +230,30 @@ func (c *Client) token() string {
 }
 
 // buildSearchURL constructs a paginated search action URL for page cur (1-based).
+// The base is the form's own action when the handshake could read it, so the
+// portlet id, the lifecycle and the token are the page's own; the constants
+// serve only as fallback.
 func (c *Client) buildSearchURL(opts SearchOptions, cur int) string {
+	base := BaseURL + formPath
+	ns := c.portletNS()
 	v := url.Values{}
-	v.Set("p_p_id", portletID)
-	v.Set("p_p_lifecycle", "1")
-	v.Set("p_p_state", "normal")
-	v.Set("p_p_mode", "view")
-	v.Set(portletPrefix+"_javax.portlet.action", "search")
+	if action := c.searchAction(); action != "" {
+		if u, err := url.Parse(action); err == nil {
+			v = u.Query()
+			u.RawQuery = ""
+			base = u.String()
+		}
+	}
+	if len(v) == 0 {
+		v.Set("p_p_id", portletID)
+		v.Set("p_p_lifecycle", "1")
+		v.Set("p_p_state", "normal")
+		v.Set("p_p_mode", "view")
+		v.Set(ns+"_javax.portlet.action", "search")
+	}
 	v.Set("p_auth", c.token())
 
-	p := func(name, val string) { v.Set(portletPrefix+"_"+name, val) }
+	p := func(name, val string) { v.Set(ns+"_"+name, val) }
 
 	advanced := opts.All != "" || opts.Any != "" || opts.Not != "" || opts.Phrase != ""
 	if advanced {
@@ -224,7 +290,7 @@ func (c *Client) buildSearchURL(opts SearchOptions, cur int) string {
 	p("pageSize", strconv.Itoa(defaultPageSize))
 	p("changePage", "true")
 	p("cur", strconv.Itoa(cur))
-	return BaseURL + formPath + "?" + v.Encode()
+	return base + "?" + v.Encode()
 }
 
 // SearchResult bundles the rows of a search with the reported total. Warnings
@@ -299,6 +365,9 @@ func (c *Client) Search(ctx context.Context, opts SearchOptions) (*SearchResult,
 	}
 	if err != nil {
 		return nil, err
+	}
+	if nota := sedeAliasWarning(opts.Sede); nota != "" && res != nil {
+		res.Warnings = append(res.Warnings, nota)
 	}
 	return applySnippetDedup(res), nil
 }
@@ -715,6 +784,10 @@ func (c *Client) Document(ctx context.Context, p Provvedimento) (Document, error
 	if status != http.StatusOK {
 		return Document{}, fmt.Errorf("testo integrale: HTTP %d", status)
 	}
+	if isErrorPage(body) {
+		return Document{}, fmt.Errorf("documento non disponibile: il portale ha risposto con la propria pagina di errore per %s. "+
+			"I riferimenti (schema, nrg, nome_file) di una ricerca datata non restano validi: rifai la ricerca e riprova", docURL)
+	}
 	if !bytes.HasPrefix(body, []byte("%PDF-")) {
 		return Document{Raw: string(body)}, nil
 	}
@@ -809,11 +882,10 @@ func validTipo(t string) bool {
 // through to the portal, which then matches nothing: the caller is told there
 // is no case law on the subject when they have in fact only mistyped a city.
 func validSede(s string) bool {
-	key := strings.ToLower(strings.TrimSpace(s))
-	if key == "" {
+	if strings.TrimSpace(s) == "" {
 		return true
 	}
-	if _, ok := sedeMap[key]; ok {
+	if _, ok := resolveSede(s); ok {
 		return true
 	}
 	for _, v := range sediSweepList {
@@ -827,7 +899,8 @@ func validSede(s string) bool {
 // sediSuggestion lists a few valid sedi for an error message.
 func sediSuggestion() string {
 	return "roma, milano, napoli, consiglio-di-stato, cgars e altre " +
-		strconv.Itoa(len(sediSweepList)-4) + " (una per ogni TAR)"
+		strconv.Itoa(len(sediSweepList)-4) + " (una per ogni TAR). " +
+		"Valgono anche il nome della regione (lazio, sicilia-catania) e il codice dell'ECLI (TARLAZ, TARMI)"
 }
 
 // sedeMap maps CLI-friendly sede slugs to portal option values.
@@ -846,12 +919,11 @@ var sedeMap = map[string]string{
 }
 
 func mapSede(s string) string {
-	key := strings.ToLower(strings.TrimSpace(s))
-	if key == "" {
+	if strings.TrimSpace(s) == "" {
 		return ""
 	}
-	if v, ok := sedeMap[key]; ok {
-		return v
+	if key, ok := resolveSede(s); ok {
+		return sedeMap[key]
 	}
 	// Accept an already-correct portal value as-is.
 	return strings.TrimSpace(s)

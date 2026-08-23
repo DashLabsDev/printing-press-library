@@ -9,6 +9,7 @@
 package gaclient
 
 import (
+	"bytes"
 	"regexp"
 	"strconv"
 	"strings"
@@ -38,13 +39,17 @@ type Provvedimento struct {
 	// snippet were folded into this one (ricorsi gemelli: multiple parties
 	// challenging the same provvedimento). It holds the total group size;
 	// the folded siblings are omitted from the result list.
-	Duplicati    int    `json:"duplicati,omitempty"`
+	Duplicati int `json:"duplicati,omitempty"`
 	// MatchCount is set (>0) when the full text was found in the local store
 	// and the search terms were counted in it. It distinguishes "1 match in
 	// an obiter" from "12 matches in the dispositivo" — the portal's snippet
 	// shows only one occurrence, so relevance is invisible without it.
 	// Absent when the text is not cached (first search on a fresh store).
-	MatchCount   int    `json:"match_count,omitempty"`
+	MatchCount int `json:"match_count,omitempty"`
+	// Meta holds the registry metadata read from the XML form of the
+	// document (see meta.go). Absent unless it was explicitly requested: it
+	// costs a second request to the portal.
+	Meta *Meta `json:"meta,omitempty"`
 }
 
 var (
@@ -158,6 +163,51 @@ func normalizeDocURL(u string) string {
 func isPDFPath(s string) bool {
 	low := strings.ToLower(s)
 	return strings.HasSuffix(low, ".pdf") || strings.Contains(low, ".pdf&") || strings.Contains(low, ".pdf?")
+}
+
+// isErrorPage reports whether the mdp subdomain answered with its own error
+// page instead of the document. A stale nomeFile/nrg does not produce a 404:
+// the response is HTTP 200 carrying a styled "404 - Pagina non trovata" page,
+// which converts to a short, plausible-looking Markdown body and would be
+// stored, exported and quoted as if it were the provvedimento.
+//
+// The check trusts the body, not the status or the file extension: the
+// document endpoint is polymorphic (XML for the HTML rulings, the file itself
+// for the PDF ones), so anything that begins as XML or PDF is a real document.
+func isErrorPage(body []byte) bool {
+	head := body
+	if len(head) > 4096 {
+		head = head[:4096]
+	}
+	trimmed := bytes.TrimLeft(head, " \t\r\n")
+	if bytes.HasPrefix(trimmed, []byte("%PDF-")) ||
+		bytes.HasPrefix(trimmed, []byte("<?xml")) ||
+		bytes.HasPrefix(trimmed, []byte("<GA")) {
+		return false
+	}
+	low := bytes.ToLower(trimmed)
+	// A real provvedimento served as HTML opens with the portal's own markup:
+	// the body class and the registry lines. Checking for them first keeps a
+	// ruling that happens to discuss a missing web page from being discarded
+	// as the error page.
+	for _, marker := range [][]byte{
+		[]byte(`class="corpo"`),
+		[]byte("reg.prov"),
+		[]byte("reg.ric"),
+	} {
+		if bytes.Contains(low, marker) {
+			return false
+		}
+	}
+	for _, marker := range [][]byte{
+		[]byte("pagina non trovata"),
+		[]byte("documento che stai cercando non esiste"),
+	} {
+		if bytes.Contains(low, marker) {
+			return true
+		}
+	}
+	return false
 }
 
 func normalizeTipo(t string) string {
