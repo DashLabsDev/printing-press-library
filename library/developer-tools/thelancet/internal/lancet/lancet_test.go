@@ -3,10 +3,20 @@ package lancet
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"testing"
 
 	_ "modernc.org/sqlite"
 )
+
+// stubFetcher returns a fixed OpenAlex payload for CurateLive / Refresh tests.
+type stubFetcher struct {
+	payload json.RawMessage
+}
+
+func (s stubFetcher) Get(context.Context, string, map[string]string) (json.RawMessage, error) {
+	return s.payload, nil
+}
 
 func TestLookup(t *testing.T) {
 	cases := []struct {
@@ -129,6 +139,195 @@ func TestCurate(t *testing.T) {
 	if len(rows) != 1 || rows[0].Title != "Cancer trial" {
 		t.Fatalf("got %+v, want the Cancer trial work", rows)
 	}
+}
+
+func TestCurateDecodesHTMLEntities(t *testing.T) {
+	db := newTestDB(t)
+	defer db.Close()
+	ctx := context.Background()
+	raw := rawWork{
+		ID:              "https://openalex.org/W-html",
+		DOI:             "https://doi.org/10.1/html",
+		Title:           "Bile Acid &amp; Tryptophan Metabolism",
+		PublicationYear: 2025,
+		PublicationDate: "2025-01-01",
+		CitedByCount:    1,
+	}
+	raw.PrimaryTopic = &struct {
+		DisplayName string `json:"display_name"`
+	}{DisplayName: "Metabolism &amp; Diet"}
+	stored := decodeWork(raw)
+	if _, err := StoreWorks(ctx, db, []decodedWork{stored}, "0140-6736", "The Lancet &amp; Infectious Diseases"); err != nil {
+		t.Fatalf("store: %v", err)
+	}
+	rows, err := Curate(ctx, db, "Bile Acid", "", "citations", false, 10)
+	if err != nil {
+		t.Fatalf("Curate: %v", err)
+	}
+	if len(rows) != 1 {
+		t.Fatalf("got %d rows, want 1", len(rows))
+	}
+	if rows[0].Title != "Bile Acid & Tryptophan Metabolism" {
+		t.Errorf("Title = %q, want decoded ampersand", rows[0].Title)
+	}
+	if rows[0].Topic != "Metabolism & Diet" {
+		t.Errorf("Topic = %q, want decoded ampersand", rows[0].Topic)
+	}
+	if rows[0].Journal != "The Lancet & Infectious Diseases" {
+		t.Errorf("Journal = %q, want decoded ampersand", rows[0].Journal)
+	}
+}
+
+func TestCurateMatchesDecodedAmpersandQuery(t *testing.T) {
+	db := newTestDB(t)
+	defer db.Close()
+	ctx := context.Background()
+	raw := rawWork{
+		ID:              "https://openalex.org/W-amp-query",
+		DOI:             "https://doi.org/10.1/amp-query",
+		Title:           "Bile Acid &amp; Tryptophan Metabolism",
+		PublicationYear: 2025,
+		PublicationDate: "2025-01-01",
+		CitedByCount:    1,
+	}
+	stored := decodeWork(raw)
+	if stored.Title != "Bile Acid & Tryptophan Metabolism" {
+		t.Fatalf("decodeWork Title = %q, want decoded-once ampersand", stored.Title)
+	}
+	if _, err := StoreWorks(ctx, db, []decodedWork{stored}, "0140-6736", "The Lancet"); err != nil {
+		t.Fatalf("store: %v", err)
+	}
+	rows, err := Curate(ctx, db, "Bile Acid & Tryptophan", "", "citations", false, 10)
+	if err != nil {
+		t.Fatalf("Curate: %v", err)
+	}
+	if len(rows) != 1 {
+		t.Fatalf("got %d rows, want 1 (decoded '&' query should LIKE a title ingested from &amp;)", len(rows))
+	}
+	if rows[0].Title != "Bile Acid & Tryptophan Metabolism" {
+		t.Errorf("Title = %q, want store-decoded title without a second CleanText", rows[0].Title)
+	}
+}
+
+func TestCurateLiveDecodesHTMLEntities(t *testing.T) {
+	ctx := context.Background()
+	live, err := CurateLive(ctx, stubFetcher{payload: curateLivePayload(
+		"Bile Acid &amp; Tryptophan Metabolism",
+		"10.1/html-live",
+		"Metabolism &amp; Diet",
+		"The Lancet &amp; Infectious Diseases",
+	)}, "Bile Acid", "", "citations", false, 10)
+	if err != nil {
+		t.Fatalf("CurateLive: %v", err)
+	}
+	if len(live) != 1 {
+		t.Fatalf("got %d rows, want 1", len(live))
+	}
+	if live[0].Title != "Bile Acid & Tryptophan Metabolism" {
+		t.Errorf("Title = %q, want decoded ampersand", live[0].Title)
+	}
+	if live[0].Topic != "Metabolism & Diet" {
+		t.Errorf("Topic = %q, want decoded ampersand", live[0].Topic)
+	}
+	if live[0].Journal != "The Lancet & Infectious Diseases" {
+		t.Errorf("Journal = %q, want decoded ampersand", live[0].Journal)
+	}
+}
+
+func TestCurateAndCurateLiveMatchOnNestedEntities(t *testing.T) {
+	const nested = "A &amp;amp; B"
+	const want = "A &amp; B"
+	ctx := context.Background()
+
+	raw := rawWork{
+		ID:              "https://openalex.org/W-nested",
+		DOI:             "https://doi.org/10.1/nested",
+		Title:           nested,
+		PublicationYear: 2025,
+		PublicationDate: "2025-01-01",
+		CitedByCount:    1,
+	}
+	raw.PrimaryTopic = &struct {
+		DisplayName string `json:"display_name"`
+	}{DisplayName: nested}
+	stored := decodeWork(raw)
+	if stored.Title != want || stored.Topic != want {
+		t.Fatalf("decodeWork Title=%q Topic=%q, want one-pass %q", stored.Title, stored.Topic, want)
+	}
+
+	db := newTestDB(t)
+	defer db.Close()
+	if _, err := StoreWorks(ctx, db, []decodedWork{stored}, "0140-6736", nested); err != nil {
+		t.Fatalf("store: %v", err)
+	}
+	storeRows, err := Curate(ctx, db, "A ", "", "citations", false, 10)
+	if err != nil {
+		t.Fatalf("Curate: %v", err)
+	}
+	if len(storeRows) != 1 {
+		t.Fatalf("Curate got %d rows, want 1", len(storeRows))
+	}
+
+	liveRows, err := CurateLive(ctx, stubFetcher{payload: curateLivePayload(nested, "10.1/nested", nested, nested)}, "A", "", "citations", false, 10)
+	if err != nil {
+		t.Fatalf("CurateLive: %v", err)
+	}
+	if len(liveRows) != 1 {
+		t.Fatalf("CurateLive got %d rows, want 1", len(liveRows))
+	}
+
+	if storeRows[0].Title != want {
+		t.Errorf("store Title = %q, want one-pass %q", storeRows[0].Title, want)
+	}
+	if liveRows[0].Title != want {
+		t.Errorf("live Title = %q, want one-pass %q", liveRows[0].Title, want)
+	}
+	if storeRows[0].Title != liveRows[0].Title {
+		t.Errorf("Title diverged: store %q vs live %q", storeRows[0].Title, liveRows[0].Title)
+	}
+	if storeRows[0].Topic != liveRows[0].Topic {
+		t.Errorf("Topic diverged: store %q vs live %q", storeRows[0].Topic, liveRows[0].Topic)
+	}
+	if storeRows[0].Journal != liveRows[0].Journal {
+		t.Errorf("Journal diverged: store %q vs live %q", storeRows[0].Journal, liveRows[0].Journal)
+	}
+	if storeRows[0].Topic != want || storeRows[0].Journal != want {
+		t.Errorf("store Topic/Journal = %q/%q, want one-pass %q", storeRows[0].Topic, storeRows[0].Journal, want)
+	}
+}
+
+func curateLivePayload(title, doi, topic, journal string) json.RawMessage {
+	type source struct {
+		DisplayName string `json:"display_name"`
+	}
+	type location struct {
+		Source *source `json:"source"`
+	}
+	type topicRow struct {
+		DisplayName string `json:"display_name"`
+	}
+	type result struct {
+		DOI             string    `json:"doi"`
+		Title           string    `json:"title"`
+		PublicationYear int       `json:"publication_year"`
+		CitedByCount    int       `json:"cited_by_count"`
+		PrimaryTopic    *topicRow `json:"primary_topic"`
+		PrimaryLocation *location `json:"primary_location"`
+	}
+	body, err := json.Marshal(struct {
+		Results []result `json:"results"`
+	}{Results: []result{{
+		DOI:             "https://doi.org/" + doi,
+		Title:           title,
+		PublicationYear: 2025,
+		CitedByCount:    1,
+		PrimaryTopic:    &topicRow{DisplayName: topic},
+		PrimaryLocation: &location{Source: &source{DisplayName: journal}},
+	}}})
+	if err != nil {
+		panic(err)
+	}
+	return body
 }
 
 func TestTopicDrift(t *testing.T) {
