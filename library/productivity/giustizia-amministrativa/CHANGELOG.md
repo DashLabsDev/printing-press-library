@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.4 - 2026-08-23
+
+- feat(giustizia-amministrativa): reject the portal's error page, read the portlet from the page, accept every spelling of a sede, expose registry metadata (#1791).
+
 ## 2026.8.3 - 2026-08-19
 
 - feat(giustizia-amministrativa): declare the date the search cannot return, and the sede skew (#1756).

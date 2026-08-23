@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.6 - 2026-08-23
+
+- feat(ars-sicilia): make --dry-run tell the truth about the request it would send (#1790).
+
 ## 2026.8.5 - 2026-08-22
 
 - feat(ars-sicilia): stop dropping a nested list under --select, and name laws the way you filter them (#1781).
