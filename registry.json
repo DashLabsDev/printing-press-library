@@ -1833,9 +1833,9 @@
       "path": "library/other/ars-sicilia",
       "release": {
         "cli_name": "ars-sicilia-pp-cli",
-        "version": "2026.8.5",
-        "released_at": "2026-08-22T09:09:54Z",
-        "source_commit": "e50624009008a527c56d82013632fe23d7b28f60"
+        "version": "2026.8.6",
+        "released_at": "2026-08-23T09:18:30Z",
+        "source_commit": "caf222efc992e0f9de881db73d463e5cef1f38be"
       },
       "printer": "aborruso",
       "printer_name": "aborruso",
@@ -8870,9 +8870,9 @@
       "path": "library/productivity/giustizia-amministrativa",
       "release": {
         "cli_name": "giustizia-amministrativa-pp-cli",
-        "version": "2026.8.3",
-        "released_at": "2026-08-19T09:14:36Z",
-        "source_commit": "c91441d1a9fb8ae8bad026c85a0e886377032d9a"
+        "version": "2026.8.4",
+        "released_at": "2026-08-23T09:18:30Z",
+        "source_commit": "58c7a2be155fbae6166fe8c3ca659883bffbcbe7"
       },
       "printer": "aborruso",
       "printer_name": "aborruso",
@@ -18948,6 +18948,58 @@
       }
     },
     {
+      "name": "rundown",
+      "category": "ai",
+      "api": "The Rundown University",
+      "description": "Search the community's AI workflows offline, and rank them by week - two things the site's own API cannot do.",
+      "search_terms": [
+        "rundown",
+        "The Rundown University",
+        "rundown-pp-cli",
+        "Search the community's AI workflows offline, and rank them by week - two things the site's own API cannot do.",
+        "Time-windowed top workflows",
+        "top",
+        "Rank the highest-upvoted workflows inside a time window like 7d or 30d.",
+        "Use-case finder",
+        "use-cases",
+        "Answer 'are there any workflows for X' by blending the server's semantic search with local full-text search, then ranking by upvotes.",
+        "Full workflow reader",
+        "show",
+        "Print one workflow in full - body, tools, industries, author and comments - in a single call.",
+        "Community digest",
+        "digest",
+        "Summarise a time window: how many workflows landed, the top posts, the most-used tools and the busiest authors.",
+        "Tool adoption ranking",
+        "tools rank",
+        "Rank AI tools by how often they appear in workflows and by the upvotes those workflows earned.",
+        "Tool co-occurrence stacks",
+        "stack",
+        "Show which other tools appear alongside a given tool, so you can see the stacks people really run."
+      ],
+      "path": "library/ai/rundown",
+      "printer": "amrbody71-commits",
+      "printer_name": "Abdelrahman Shaaban",
+      "creator": {
+        "handle": "amrbody71-commits",
+        "name": "Abdelrahman Shaaban"
+      },
+      "mcp": {
+        "binary": "rundown-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 4,
+        "public_tool_count": 4,
+        "auth_type": "none",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "running-race-results",
       "category": "other",
       "api": "Running Race Results",
@@ -24446,6 +24498,12 @@
         "Inspect a shared plan and report dates, sections, blocks, resources, and clone warnings before any write."
       ],
       "path": "library/travel/wanderlog",
+      "release": {
+        "cli_name": "wanderlog-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-23T09:17:50Z",
+        "source_commit": "af040d69905bc6a19b0b13e0e595a83835adb5ae"
+      },
       "printer": "zjsng",
       "printer_name": "zjsng",
       "creator": {
