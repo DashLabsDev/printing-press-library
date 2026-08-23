@@ -4,8 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-
-	"github.com/mvanhorn/printing-press-library/library/developer-tools/thelancet/internal/cliutil"
 )
 
 // AuthorRank is one row of the rank-authors output.
@@ -308,10 +306,7 @@ func Curate(ctx context.Context, db *sql.DB, topic, issn, sort string, openAcces
 		if err := rows.Scan(&title, &doi, &jn, &w.Year, &w.Cited, &tp); err != nil {
 			continue
 		}
-		w.Title = cliutil.CleanText(title.String)
-		w.DOI = doi.String
-		w.Journal = cliutil.CleanText(jn.String)
-		w.Topic = cliutil.CleanText(tp.String)
+		w.Title, w.DOI, w.Journal, w.Topic = title.String, doi.String, jn.String, tp.String
 		out = append(out, w)
 	}
 	return out, rows.Err()

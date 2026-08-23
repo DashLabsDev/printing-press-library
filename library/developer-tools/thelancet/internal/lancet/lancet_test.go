@@ -145,11 +145,19 @@ func TestCurateDecodesHTMLEntities(t *testing.T) {
 	db := newTestDB(t)
 	defer db.Close()
 	ctx := context.Background()
-	works := []decodedWork{{
-		ID: "W-html", DOI: "10.1/html", Title: "Bile Acid &amp; Tryptophan Metabolism",
-		Year: 2025, Date: "2025-01-01", Cited: 1, Topic: "Metabolism &amp; Diet",
-	}}
-	if _, err := StoreWorks(ctx, db, works, "0140-6736", "The Lancet &amp; Infectious Diseases"); err != nil {
+	raw := rawWork{
+		ID:              "https://openalex.org/W-html",
+		DOI:             "https://doi.org/10.1/html",
+		Title:           "Bile Acid &amp; Tryptophan Metabolism",
+		PublicationYear: 2025,
+		PublicationDate: "2025-01-01",
+		CitedByCount:    1,
+	}
+	raw.PrimaryTopic = &struct {
+		DisplayName string `json:"display_name"`
+	}{DisplayName: "Metabolism &amp; Diet"}
+	stored := decodeWork(raw)
+	if _, err := StoreWorks(ctx, db, []decodedWork{stored}, "0140-6736", "The Lancet &amp; Infectious Diseases"); err != nil {
 		t.Fatalf("store: %v", err)
 	}
 	rows, err := Curate(ctx, db, "Bile Acid", "", "citations", false, 10)
@@ -167,6 +175,37 @@ func TestCurateDecodesHTMLEntities(t *testing.T) {
 	}
 	if rows[0].Journal != "The Lancet & Infectious Diseases" {
 		t.Errorf("Journal = %q, want decoded ampersand", rows[0].Journal)
+	}
+}
+
+func TestCurateMatchesDecodedAmpersandQuery(t *testing.T) {
+	db := newTestDB(t)
+	defer db.Close()
+	ctx := context.Background()
+	raw := rawWork{
+		ID:              "https://openalex.org/W-amp-query",
+		DOI:             "https://doi.org/10.1/amp-query",
+		Title:           "Bile Acid &amp; Tryptophan Metabolism",
+		PublicationYear: 2025,
+		PublicationDate: "2025-01-01",
+		CitedByCount:    1,
+	}
+	stored := decodeWork(raw)
+	if stored.Title != "Bile Acid & Tryptophan Metabolism" {
+		t.Fatalf("decodeWork Title = %q, want decoded-once ampersand", stored.Title)
+	}
+	if _, err := StoreWorks(ctx, db, []decodedWork{stored}, "0140-6736", "The Lancet"); err != nil {
+		t.Fatalf("store: %v", err)
+	}
+	rows, err := Curate(ctx, db, "Bile Acid & Tryptophan", "", "citations", false, 10)
+	if err != nil {
+		t.Fatalf("Curate: %v", err)
+	}
+	if len(rows) != 1 {
+		t.Fatalf("got %d rows, want 1 (decoded '&' query should LIKE a title ingested from &amp;)", len(rows))
+	}
+	if rows[0].Title != "Bile Acid & Tryptophan Metabolism" {
+		t.Errorf("Title = %q, want store-decoded title without a second CleanText", rows[0].Title)
 	}
 }
 
@@ -212,8 +251,8 @@ func TestCurateAndCurateLiveMatchOnNestedEntities(t *testing.T) {
 		DisplayName string `json:"display_name"`
 	}{DisplayName: nested}
 	stored := decodeWork(raw)
-	if stored.Title != nested || stored.Topic != nested {
-		t.Fatalf("decodeWork cleaned persist fields: Title=%q Topic=%q, want raw %q", stored.Title, stored.Topic, nested)
+	if stored.Title != want || stored.Topic != want {
+		t.Fatalf("decodeWork Title=%q Topic=%q, want one-pass %q", stored.Title, stored.Topic, want)
 	}
 
 	db := newTestDB(t)

@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 	"time"
+
+	"github.com/mvanhorn/printing-press-library/library/developer-tools/thelancet/internal/cliutil"
 )
 
 // EnsureSchema creates the Lancet analytics tables if they do not exist. The
@@ -119,6 +121,7 @@ func StoreWorks(ctx context.Context, db *sql.DB, works []decodedWork, issn, jour
 	}
 	defer func() { _ = tx.Rollback() }()
 	syncedAt := time.Now().UTC().Format(time.RFC3339)
+	journalName = cliutil.CleanText(journalName)
 	n := 0
 	for _, w := range works {
 		if w.ID == "" {
