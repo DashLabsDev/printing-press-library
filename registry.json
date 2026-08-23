@@ -18977,6 +18977,12 @@
         "Show which other tools appear alongside a given tool, so you can see the stacks people really run."
       ],
       "path": "library/ai/rundown",
+      "release": {
+        "cli_name": "rundown-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-23T09:32:26Z",
+        "source_commit": "5b1cadcce84a0554503fea8a5acf255c90551b1b"
+      },
       "printer": "amrbody71-commits",
       "printer_name": "Abdelrahman Shaaban",
       "creator": {
@@ -19441,6 +19447,45 @@
           "PRINTING_PRESS_CLIENT_PROFILE"
         ],
         "mcp_ready": "partial"
+      }
+    },
+    {
+      "name": "scryfall",
+      "category": "media-and-entertainment",
+      "api": "Scryfall",
+      "description": "Magic: The Gathering card database CLI: search, prices, rulings, sets, and batch collection valuation against api.scryfall.com (keyless).",
+      "search_terms": [
+        "scryfall",
+        "scryfall-pp-cli",
+        "Magic: The Gathering card database CLI: search, prices, rulings, sets, and batch collection valuation against api.scryfall.com (keyless).",
+        "Batch collection valuation",
+        "cards post-collection --identifiers '[{\"name\":\"Lightning Bolt\"},{\"name\":\"Sol Ring\"}]'",
+        "Price up to 75 cards in one call; the binder/deck-list workflow the API is most used for and the endpoint the community spec was missing.",
+        "Marketplace ID lookup",
+        "cards get-by-tcgplayer-id <id> / cards get-by-cardmarket-id <id>",
+        "Collectors and store owners work in marketplace IDs, not Scryfall UUIDs.",
+        "Compact price-first output",
+        "cards get-named --exact 'Sol Ring' --compact",
+        "Name + USD + EUR is the answer; full card JSON on demand."
+      ],
+      "path": "library/media-and-entertainment/scryfall",
+      "printer": "veltri-23",
+      "printer_name": "Hunter Veltri",
+      "creator": {
+        "handle": "veltri-23",
+        "name": "Hunter Veltri"
+      },
+      "mcp": {
+        "binary": "scryfall-pp-mcp",
+        "transports": [
+          "stdio"
+        ],
+        "tool_count": 36,
+        "public_tool_count": 0,
+        "auth_type": "none",
+        "env_vars": [],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
       }
     },
     {
