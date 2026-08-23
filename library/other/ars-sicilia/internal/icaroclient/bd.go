@@ -95,6 +95,140 @@ func IsBDArchive(slug string) bool {
 	return ok
 }
 
+// BDEndpoint torna l'URL a cui il backend /bd/ riceve la POST di ricerca per
+// quell'archivio, e false se l'archivio non è servito da /bd/. Serve alle
+// anteprime --dry-run: senza, annunciano l'URL Icaro anche dove la richiesta
+// parte davvero verso /bd/, cioè dicono con sicurezza un endpoint che non
+// verrà interrogato — su un comando che esiste apposta per diagnosticare.
+func BDEndpoint(baseURL, slug string) (string, bool) {
+	spec, ok := bdArchives[slug]
+	if !ok {
+		return "", false
+	}
+	return strings.TrimSuffix(baseURL, "/") + "/bd/" + spec.path, true
+}
+
+// BDPreview descrive la POST che searchBD manderebbe, senza mandarla.
+//
+// Mostrare i filtri della riga di comando come se fossero i campi della POST
+// sarebbe una seconda bugia dell'anteprima, sorella di quella che il campo
+// `backend` ha appena chiuso: searchBD non li spedisce come li riceve. I nomi
+// passano per spec.fields (`legisl` → `$Ilegislatura`), i selettori di modalità
+// in spec.static viaggiano sempre, e tre filtri non sono affatto campi —
+// `--data` diventa un ciclo sul campo `anno` più un filtro client-side sulle
+// righe, mentre `--oratore` e `--commissione`/`--codcom` si risolvono da nome a
+// id leggendo le <option> del form, che è una richiesta e un dry run non la fa.
+//
+// Quindi si separano le due cose: PostFields sono i campi che partirebbero
+// esattamente così, Deferred nomina i filtri che si risolvono al momento della
+// richiesta e dice in che cosa si trasformano. Un'anteprima che tace la
+// differenza manda a cercare il guasto su parametri che nessuno spedisce.
+type BDPreviewResult struct {
+	Endpoint   string
+	PostFields map[string]string
+	Deferred   map[string]string
+	// Invalid non e' nil quando un filtro non si parsa: searchBD in quel caso
+	// esce con InvalidParamError PRIMA di mandare qualunque cosa, e l'anteprima
+	// deve fare lo stesso. Ignorare l'errore e stampare comunque una richiesta
+	// plausibile e' il peggiore dei casi: `--data 2025-01-01:garbage --dry-run`
+	// diceva «ecco cosa parte», mentre senza --dry-run lo stesso comando
+	// fallisce e non parte nulla.
+	Invalid error
+	// Anni sono i valori che il campo `anno` prende, uno per giro: con --data
+	// searchBD non manda UNA richiesta, ne manda una per anno dell'intervallo
+	// (e dentro ciascuna una per pagina). Dire solo «l'intervallo si risolve al
+	// momento della richiesta» lasciava credere a una richiesta sola, e da un
+	// dry run su un intervallo di piu' anni non si capiva quante ne partono ne'
+	// come rifarle a mano. Gli anni si ricavano senza rete — bdDateFilter parsa
+	// e basta — quindi tacerli era una scelta, non un limite.
+	Anni []string
+}
+
+// BDPreview torna false sugli archivi che /bd/ non serve.
+func BDPreview(baseURL, slug string, params map[string]string) (BDPreviewResult, bool) {
+	spec, ok := bdArchives[slug]
+	if !ok {
+		return BDPreviewResult{}, false
+	}
+	out := BDPreviewResult{
+		Endpoint:   strings.TrimSuffix(baseURL, "/") + "/bd/" + spec.path,
+		PostFields: map[string]string{},
+		Deferred:   map[string]string{},
+	}
+	for k, v := range spec.static {
+		out.PostFields[k] = v
+	}
+	// `page` viaggia su OGNI richiesta, e la prima di ogni giro e' sempre 1:
+	// metterlo qui rende la prima POST riproducibile alla lettera invece di
+	// lasciarla incompleta. Le successive non si possono enumerare — il numero
+	// di pagine (`total`) arriva DENTRO la risposta, quindi conoscerlo vorrebbe
+	// dire fare la richiesta che il dry run non fa: si dice la regola invece
+	// del numero, che e' l'unica cosa vera che si puo' dire.
+	out.PostFields["page"] = "1"
+	for k, v := range params {
+		v = strings.TrimSpace(v)
+		if v == "" {
+			continue
+		}
+		switch k {
+		case "data":
+			out.Deferred[k] = "il backend non ha un campo data: l'intervallo diventa una richiesta per ciascun anno in `anni`, che sono i valori che il campo `anno` prende uno per giro — nei campi c'e' il primo, cioe' quello della prima richiesta — piu' un filtro sulle righe ricevute per tagliare i giorni fuori intervallo. Dentro ogni anno `page` parte da 1 e cresce di uno fino al numero di pagine che la risposta dichiara, o finche' --limit e' pieno: quel numero sta nella risposta, quindi le pagine oltre la prima non sono anteprimabili"
+			// Stessa funzione del percorso vivo, cosi' l'anteprima non puo'
+			// divergere dall'elenco che searchBD scorre davvero — errore
+			// compreso: se non si parsa, searchBD non manda nulla.
+			anni, keep := bdDateFilter(v)
+			if anni == nil || keep == nil {
+				out.Invalid = &InvalidParamError{Filtro: "--data", Valore: v,
+					Rimedio: "usa YYYY-MM-DD, AAMMGG, o un intervallo YYYY-MM-DD:YYYY-MM-DD (AAMMGG/AAMMGG)"}
+				continue
+			}
+			out.Anni = anni
+		case "oratore":
+			out.Deferred[k] = "risolto da nome a id leggendo le <option> di " + spec.speakerField + " nel form, che richiede una richiesta"
+		case "codcom", "commissione":
+			out.Deferred[k] = "risolto in id per-legislatura leggendo le <option> di " + spec.commissioneField + " nel form, che richiede una richiesta"
+		default:
+			if field, ok := spec.fields[k]; ok {
+				out.PostFields[field] = v
+			} else {
+				out.Deferred[k] = "filtro non applicabile su questo archivio: la ricerca fallirebbe invece di ignorarlo (vedi bdUnsupported)"
+			}
+		}
+	}
+	// --anno e --data scrivono lo stesso campo server: searchBD li interseca
+	// (l'anno deve cadere nell'intervallo della data). L'anteprima fa lo stesso,
+	// altrimenti annuncia giri che non partirebbero — e nel caso vuoto annuncia
+	// una ricerca che invece non restituisce nulla.
+	if anno := strings.TrimSpace(params["anno"]); anno != "" && len(out.Anni) > 0 {
+		keep := out.Anni[:0]
+		for _, y := range out.Anni {
+			if y == anno {
+				keep = append(keep, y)
+			}
+		}
+		out.Anni = keep
+		if len(out.Anni) == 0 {
+			// searchBD in questo caso esce senza mandare nulla. Lasciare `anno`
+			// fra i campi mostrerebbe una richiesta plausibile che non parte:
+			// si toglie, e il motivo resta scritto fra i differiti.
+			delete(out.PostFields, "anno")
+			out.Deferred["anno"] = "fuori dall'intervallo di --data: nessun anno da interrogare, la ricerca non restituirebbe nulla e nessuna richiesta partirebbe"
+		}
+	}
+	// Il campo `anno` va fra i campi, non solo nell'elenco a parte: il ciclo lo
+	// imposta prima di OGNI post, e senza, rigiocando i campi mostrati si manda
+	// una richiesta senza vincolo d'anno — cioe' l'archivio intero invece della
+	// fetta che il comando chiede. Stesso ragionamento di `page`: si mette il
+	// valore della PRIMA richiesta, che e' l'unico dicibile senza indovinare,
+	// e l'elenco `Anni` dice quali altri valori prende quel campo, uno per giro.
+	// Dopo l'intersezione con --anno, cosi' il valore mostrato e' quello che
+	// partirebbe davvero; se non resta nessun anno non si mostra nulla.
+	if len(out.Anni) > 0 {
+		out.PostFields["anno"] = out.Anni[0]
+	}
+	return out, true
+}
+
 // bdOption è una <option> di un <select> del form (oratori o commissioni): id,
 // nome e le legislature associate (data-leg/data-legs). Per commissioni gli id
 // sono PER-LEGISLATURA (es. "I - Affari Istituzionali" ha id 116 in leg 18, 1 in

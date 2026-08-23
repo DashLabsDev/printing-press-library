@@ -848,18 +848,70 @@ func runGetExtra(cmd *cobra.Command, flags *rootFlags, archiveSlug string, legis
 		nota += fmt.Sprintf("; gli altri si vedono con `%s cerca --legisl %d --numero %d`.", arc.Slug, legisl, numero)
 		fmt.Fprintln(os.Stderr, "hint: "+nota)
 	}
-	if len(firm) > 0 || stralcio != nil || nota != "" {
-		return printJSONFiltered(cmd.OutOrStdout(), struct {
-			icaro.Doc
-			Firmatari []firmatario `json:"firmatari,omitempty"`
-			Stralcio  *stralcioOut `json:"stralcio,omitempty"`
-			Nota      string       `json:"nota,omitempty"`
-		}{doc, firm, stralcio, nota}, flags)
-	}
 	// printJSONFiltered (not the bare writeJSON) so --select/--compact/--csv
 	// behave the same as on generator-emitted commands — writeJSON always
 	// dumped the full payload regardless of --select.
-	return printJSONFiltered(cmd.OutOrStdout(), doc, flags)
+	return printJSONFiltered(cmd.OutOrStdout(), getOut{
+		Doc:       doc,
+		Legisl:    legisl,
+		Numero:    numero,
+		Data:      strings.TrimSpace(doc.Fields["Data"]),
+		Titolo:    titoloDoc(doc),
+		Fonte:     "icaro",
+		Firmatari: firm,
+		Stralcio:  stralcio,
+		Nota:      nota,
+	}, flags)
+}
+
+// getOut è la forma di `<archivio> get`, ed esiste per farne UNA sola.
+//
+// I tre archivi migrati a /bd/ hanno due percorsi: se l'indice Icaro il record
+// ce l'ha si risponde con la scheda Icaro, altrimenti con la scheda /bd/
+// (bdSchedaFallback). Le due uscite avevano forme diverse — la prima teneva
+// numero e data dentro `fields` (`fields.Numero`, `fields.Data`), la seconda in
+// radice — quindi lo stesso `--select numero,data_iso,titolo` rendeva sulla
+// seduta 268 e tornava `{}` sulla 147. Con exit 0: chi legge solo stdout
+// conclude che il documento non ha quei dati, o che non esiste.
+//
+// E il confine fra i due percorsi non è una proprietà del documento: è dove si
+// è fermato l'indice Icaro (il 2026-08-22, sui resoconti, alla seduta 232 del
+// 25.02.2026 — misurato: 232 annidata, 233 piatta). Si sposta quando il portale
+// aggiorna l'indice, quindi non è nemmeno una regola che si possa documentare:
+// la stessa seduta può cambiare forma da un giorno all'altro.
+//
+// Le coordinate stanno quindi in radice su entrambi i rami, con gli stessi nomi
+// e gli stessi tipi della scheda /bd/. `legisl` e `numero` vengono dagli
+// argomenti del comando, che sono interi e autorevoli, non da un campo di testo
+// da riparsare. `data` esce grezza come la scrive la fonte, così `data_iso` la
+// affianca il passaggio che lo fa già per tutti gli altri payload
+// (iniettaDataISO). `fields` resta dov'è: chi lo legge continua a funzionare,
+// perché questa è un'aggiunta, non uno spostamento.
+type getOut struct {
+	icaro.Doc
+	Legisl int    `json:"legisl,omitempty"`
+	Numero int    `json:"numero,omitempty"`
+	Data   string `json:"data,omitempty"`
+	Titolo string `json:"titolo,omitempty"`
+	// Fonte dice quale dei due percorsi ha risposto, come già faceva la scheda
+	// /bd/. Ora che la forma è una sola servirebbe a poco distinguere a occhio,
+	// e senza il marcatore non si distinguerebbe affatto: `body` presente o
+	// assente è un indizio, non una risposta.
+	Fonte     string       `json:"fonte,omitempty"`
+	Firmatari []firmatario `json:"firmatari,omitempty"`
+	Stralcio  *stralcioOut `json:"stralcio,omitempty"`
+	Nota      string       `json:"nota,omitempty"`
+}
+
+// titoloDoc sceglie il titolo dell'atto: la fonte lo mette nel titolo della
+// scheda su alcuni archivi e solo nel campo `Titolo` su altri — sui resoconti
+// la scheda ha titolo vuoto e il campo pieno («Ordine del giorno della seduta
+// successiva»), sui ddl è il contrario.
+func titoloDoc(doc icaro.Doc) string {
+	if t := strings.TrimSpace(doc.Title); t != "" {
+		return t
+	}
+	return strings.TrimSpace(doc.Fields["Titolo"])
 }
 
 // normalizeParams rewrites a few flag inputs to the shape the portal expects:
@@ -984,17 +1036,100 @@ func commissioneOrdinale(code string) string {
 	return ""
 }
 
+// dryRunTarget descrive, nella lingua del backend che serve davvero
+// l'archivio, la richiesta che il comando farebbe.
+//
+// Gli archivi delle sedute (sommari, resoconti, convocazioni) sono migrati al
+// backend /bd/ e Search ce li instrada (vedi icaroclient.Client.Search), ma
+// l'anteprima li descriveva tutti come query Icaro: `resoconti cerca --dry-run`
+// annunciava `/icaro/default.jsp?icaDB=217&icaQuery=(18.LEGISL)`, un URL che
+// quel comando non interroga. Su un flag che esiste per diagnosticare, un
+// endpoint sbagliato detto con sicurezza è peggio del silenzio: manda a
+// cercare il guasto sul backend che non c'entra.
+func dryRunTarget(arc icaro.Archive, params map[string]string, isisRaw string) (map[string]any, error) {
+	out := map[string]any{"archive": arc.Slug, "archive_id": arc.ID}
+	if bd, ok := icaro.BDPreview(icaro.DefaultBaseURL, arc.Slug, params); ok {
+		// Un filtro che non si parsa fa fallire searchBD prima di qualunque
+		// richiesta: l'anteprima esce con lo stesso errore invece di stampare
+		// una richiesta che non partirebbe.
+		if bd.Invalid != nil {
+			return nil, usageErr(bd.Invalid)
+		}
+		// Su /bd/ non c'è una query ISIS: i filtri viaggiano come campi di una
+		// POST. Ma non viaggiano come li scrive l'utente — i nomi cambiano, i
+		// selettori di modalità si aggiungono, e tre filtri si risolvono solo
+		// al momento della richiesta. Stamparli come sono arrivati sarebbe la
+		// stessa bugia dell'endpoint sbagliato, un livello più giù: vedi
+		// icaroclient.BDPreview.
+		out["backend"] = "bd"
+		out["would_post"] = bd.Endpoint
+		out["post_fields"] = bd.PostFields
+		if len(bd.Anni) > 0 {
+			// Con --data non parte una richiesta: ne parte una per anno, e
+			// dentro ciascuna una per pagina. Enumerarli e' l'unico modo perche'
+			// da un dry run si capisca quante ne partono e come rifarle a mano.
+			out["anni"] = bd.Anni
+			out["richieste"] = fmt.Sprintf("almeno %d, una per anno con `page` a 1; dentro ciascun anno `page` cresce fino al numero di pagine che la risposta dichiara, o finché --limit è pieno", len(bd.Anni))
+		}
+		if len(bd.Deferred) > 0 {
+			out["deferred"] = bd.Deferred
+		}
+		return out, nil
+	}
+	expr := icaro.BuildQuery(arc, params, isisRaw)
+	out["backend"] = "icaro"
+	out["isis_query"] = expr
+	out["would_fetch"] = fmt.Sprintf("%s/icaro/default.jsp?icaDB=%s&icaQuery=%s", icaro.DefaultBaseURL, arc.ID, expr)
+	return out, nil
+}
+
+// dryRunTargetBySlug è dryRunTarget per i comandi che conoscono l'archivio per
+// slug; torna nil sugli slug sconosciuti, così il chiamante li salta come li
+// salterebbe a runtime.
+//
+// I parametri NON vengono normalizzati qui: normalizeParams riscrive i valori
+// (fra l'altro dirotta `codcom: 6` su `commissione: SESTA`) e non tutti i
+// chiamanti ci passano — `commissione dossier` manda `codcom` grezzo al
+// backend /bd/. Applicarlo d'ufficio farebbe annunciare all'anteprima un
+// parametro diverso da quello che parte davvero, cioè il difetto che questa
+// anteprima esiste per non avere. Chi normalizza a runtime lo fa anche qui.
+func dryRunTargetBySlug(slug string, params map[string]string) (map[string]any, error) {
+	arc := icaro.BySlug(slug)
+	if arc == nil {
+		return nil, nil
+	}
+	return dryRunTarget(*arc, params, "")
+}
+
+// emitDryRunRequests stampa l'anteprima dei comandi che interrogano più di un
+// archivio: una riga per richiesta, nell'ordine in cui partirebbero.
+func emitDryRunRequests(cmd *cobra.Command, requests []map[string]any, note string) error {
+	out := map[string]any{"dry_run": true, "requests": requests}
+	if note != "" {
+		out["note"] = note
+	}
+	return writeJSON(cmd.OutOrStdout(), out)
+}
+
 // emitDryRun prints the would-be query without hitting the network, useful
 // for --dry-run flows and Printing Press verify checks.
 func emitDryRun(cmd *cobra.Command, arc icaro.Archive, p cercaParams) error {
-	expr := icaro.BuildQuery(arc, normalizeParams(arc, p.Params), p.ISISRaw)
-	out := map[string]any{
-		"archive":     arc.Slug,
-		"archive_id":  arc.ID,
-		"isis_query":  expr,
-		"would_fetch": fmt.Sprintf("%s/icaro/default.jsp?icaDB=%s&icaQuery=%s", icaro.DefaultBaseURL, arc.ID, expr),
-		"dry_run":     true,
+	// Stessa condizione di runCerca, e per lo stesso motivo: gli archivi /bd/
+	// ricevono i parametri grezzi, la loro traduzione avviene dentro searchBD.
+	// Applicare normalizeParams qui faceva annunciare all'anteprima un
+	// parametro diverso da quello che il comando processa — `--codcom 6`
+	// riscritto in `commissione: SESTA`, che su /bd/ non e' cio' che viaggia.
+	// Se questa riga e quella di runCerca divergono di nuovo, l'anteprima
+	// ricomincia a mentire: vanno lette insieme.
+	searchParams := p.Params
+	if !icaro.IsBDArchive(arc.Slug) {
+		searchParams = normalizeParams(arc, p.Params)
 	}
+	out, err := dryRunTarget(arc, searchParams, p.ISISRaw)
+	if err != nil {
+		return err
+	}
+	out["dry_run"] = true
 	return writeJSON(cmd.OutOrStdout(), out)
 }
 

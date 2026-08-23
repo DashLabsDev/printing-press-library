@@ -35,13 +35,20 @@ func newNovelDdlIterCmd(flags *rootFlags) *cobra.Command {
 				}
 				return usageErr(fmt.Errorf("richiesti 2 argomenti: <legisl> e <numero>"))
 			}
-			legisl, err := atoiArg(args[0], "legisl")
-			if err != nil {
-				return err
-			}
-			numero, err := atoiArg(args[1], "numero")
-			if err != nil {
-				return err
+			legisl, errL := atoiArg(args[0], "legisl")
+			numero, errN := atoiArg(args[1], "numero")
+			if errL != nil || errN != nil {
+				// Come in `legge cronologia`: sotto --dry-run e sotto verify gli
+				// argomenti possono essere segnaposto, e una sonda non deve
+				// uscire in errore per averli letti. Si ripiega sull'help, come
+				// il ramo degli argomenti mancanti qui sopra.
+				if dryRunOK(flags) || cliIsVerify() {
+					return cmd.Help()
+				}
+				if errL != nil {
+					return errL
+				}
+				return errN
 			}
 			if dryRunOK(flags) {
 				return emitDdlIterDryRun(cmd, legisl, numero)

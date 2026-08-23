@@ -34,12 +34,12 @@ func newNovelDeputatoProfiloCmd(flags *rootFlags) *cobra.Command {
 			if len(args) == 0 {
 				return cmd.Help()
 			}
-			if dryRunOK(flags) {
-				return nil
-			}
 			name := strings.TrimSpace(strings.Join(args, " "))
 			if name == "" {
 				return fmt.Errorf("nome del deputato richiesto (es. \"Rossi Mario\")")
+			}
+			if dryRunOK(flags) {
+				return emitDeputatoProfiloDryRun(cmd, name, flagLegisl, flagData)
 			}
 			return runDeputatoProfilo(cmd, flags, name, flagLegisl, flagData, flagLimit)
 		},
@@ -74,6 +74,62 @@ type profileReport struct {
 	Atti     []profileItem `json:"atti"`
 }
 
+// profiloFirmaArchives sono gli archivi in cui il deputato compare come
+// firmatario (campo FIRMAT). Condiviso con l'anteprima --dry-run, che deve
+// elencare le stesse richieste che il comando poi fa.
+var profiloFirmaArchives = []string{"ddl", "interrogazioni", "interpellanze", "mozioni", "odg", "risoluzioni"}
+
+// emitDeputatoProfiloDryRun elenca le richieste del profilo invece di uscire in
+// silenzio con exit 0. Il comando ne fa una per archivio, e l'anteprima serve
+// proprio a vedere che il nome viaggia in due modi diversi: come firmatario
+// (campo FIRMAT) sui sei archivi degli atti, e come testo libero sui resoconti,
+// dove l'oratore non è un campo. È la differenza che spiega perché lo stesso
+// nome renda su un archivio e non sull'altro.
+func emitDeputatoProfiloDryRun(cmd *cobra.Command, name string, legisl int, data string) error {
+	base := func() map[string]string {
+		p := map[string]string{}
+		if legisl > 0 {
+			p["legisl"] = itoa(legisl)
+		}
+		if data != "" {
+			p["data"] = data
+		}
+		return p
+	}
+	// runDeputatoProfilo passa da normalizeParams su ogni archivio: l'anteprima
+	// fa lo stesso, altrimenti annuncia una --data in formato diverso da quello
+	// che poi viaggia.
+	target := func(slug string, p map[string]string) (map[string]any, error) {
+		arc := icaro.BySlug(slug)
+		if arc == nil {
+			return nil, nil
+		}
+		return dryRunTargetBySlug(slug, normalizeParams(*arc, p))
+	}
+	requests := []map[string]any{}
+	for _, slug := range profiloFirmaArchives {
+		p := base()
+		p["firmatario"] = name
+		t, err := target(slug, p)
+		if err != nil {
+			return err
+		}
+		if t != nil {
+			requests = append(requests, t)
+		}
+	}
+	p := base()
+	p["testo"] = name
+	t, err := target("resoconti", p)
+	if err != nil {
+		return err
+	}
+	if t != nil {
+		requests = append(requests, t)
+	}
+	return emitDryRunRequests(cmd, requests, "una richiesta per archivio: il nome va come firmatario (FIRMAT) sugli archivi degli atti e come testo libero sui resoconti, dove l'oratore non è un campo filtrabile.")
+}
+
 func runDeputatoProfilo(cmd *cobra.Command, flags *rootFlags, name string, legisl int, data string, perArchive int) error {
 	ctx := cmd.Context()
 	if ctx == nil {
@@ -94,8 +150,7 @@ func runDeputatoProfilo(cmd *cobra.Command, flags *rootFlags, name string, legis
 	archivesContacted := 0
 
 	// Archivi con FIRMAT.
-	firmaArchives := []string{"ddl", "interrogazioni", "interpellanze", "mozioni", "odg", "risoluzioni"}
-	for _, slug := range firmaArchives {
+	for _, slug := range profiloFirmaArchives {
 		arc := icaro.BySlug(slug)
 		if arc == nil {
 			continue

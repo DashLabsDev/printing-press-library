@@ -102,6 +102,8 @@ da https://www.ars.sicilia.it/gruppi-parlamentari?idLeg=<N>. Una richiesta.
 Con --deputato "<nome>" legge anche le pagine dei singoli gruppi (una richiesta
 per gruppo) e restituisce i gruppi in cui il parlamentare compare, con ruolo e
 collegio di elezione: è la domanda inversa, «in quale gruppo sta X».`,
+		Example: "  ars-sicilia-pp-cli gruppi elenco --legisl 18 --json\n" +
+			"  ars-sicilia-pp-cli gruppi elenco --deputato \"Cracolici\" --legisl 18 --json",
 		// Niente `pp:endpoint`: quell'annotazione dice «questo comando ha già
 		// un tool MCP tipizzato», e cobratree salta i comandi che la portano
 		// (classify → commandEndpoint). Qui il tool tipizzato non esiste — i
@@ -274,6 +276,8 @@ L'argomento è lo slug della pagina (XVIII-misto, dall'elenco) oppure il nome
 del gruppo («misto», «Partito Democratico»), cercato con matching su substring
 nella legislatura --legisl (default 18). Con più corrispondenze elenca i
 candidati e esce.`,
+		Example: "  ars-sicilia-pp-cli gruppi get XVIII-misto --json\n" +
+			"  ars-sicilia-pp-cli gruppi get \"Partito Democratico\" --legisl 18 --json",
 		Annotations: map[string]string{"mcp:read-only": "true", "pp:happy-args": "gruppo=XVIII-misto"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := validateLegislaturaGruppi(flagLegisl); err != nil {

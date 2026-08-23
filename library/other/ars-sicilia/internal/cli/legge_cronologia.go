@@ -42,16 +42,26 @@ esiste in piu' anni della stessa legislatura.`,
 				}
 				return usageErr(fmt.Errorf("richiesti 2 argomenti: <legisl> e <numero>"))
 			}
+			legisl, errL := atoiArg(args[0], "legisl")
+			numero, errN := atoiArg(args[1], "numero")
+			if errL != nil || errN != nil {
+				// Sotto --dry-run (e sotto verify) gli argomenti possono essere
+				// segnaposto: la matrice di collaudo sonda i comandi scritti a
+				// mano con valori finti (`mock-value`), e prima di questa
+				// anteprima il ramo dry-run usciva 0 senza guardarli. Fallire
+				// qui trasformerebbe una sonda che passava in un errore, quindi
+				// si ripiega sull'help come fa il ramo degli argomenti mancanti
+				// qui sopra: un'uscita non muta, e con codice 0.
+				if dryRunOK(flags) || cliIsVerify() {
+					return cmd.Help()
+				}
+				if errL != nil {
+					return errL
+				}
+				return errN
+			}
 			if dryRunOK(flags) {
-				return nil
-			}
-			legisl, err := atoiArg(args[0], "legisl")
-			if err != nil {
-				return err
-			}
-			numero, err := atoiArg(args[1], "numero")
-			if err != nil {
-				return err
+				return emitLeggeCronologiaDryRun(cmd, legisl, numero, flagAnno)
 			}
 			return runLeggeCronologia(cmd, flags, legisl, numero, flagAnno)
 		},
@@ -60,6 +70,35 @@ esiste in piu' anni della stessa legislatura.`,
 	// L.R. 3/2024): --anno disambigua sul campo LEGANN, come in `leggi get`.
 	cmd.Flags().IntVar(&flagAnno, "anno", 0, "Anno della legge, per disambiguare numeri ripetuti tra anni diversi.")
 	return cmd
+}
+
+// emitLeggeCronologiaDryRun mostra la prima richiesta — quella che aggancia la
+// legge nell'archivio 201 — invece di uscire in silenzio con exit 0, che è
+// quello che faceva: il flag era accettato e scartato, e chi diagnosticava con
+// --dry-run (come `ddl iter`, che l'anteprima ce l'ha) leggeva l'uscita vuota
+// come un guasto del comando.
+//
+// Le richieste successive non si possono anteprimare: il ddl d'origine si
+// risolve dai campi P010/P012 della legge trovata, quindi la query dipende da
+// una risposta che il dry-run non chiede. Si dichiara il passo invece di
+// tacerlo o di inventarne la forma.
+func emitLeggeCronologiaDryRun(cmd *cobra.Command, legisl, numero, anno int) error {
+	params := map[string]string{"legisl": itoa(legisl), "numero": itoa(numero)}
+	if anno != 0 {
+		params["anno"] = itoa(anno)
+	}
+	target, err := dryRunTargetBySlug("leggi", params)
+	if err != nil {
+		return err
+	}
+	if target == nil {
+		return fmt.Errorf("archivio leggi non disponibile")
+	}
+	nota := "aggancia la legge, poi risale al DDL d'origine seguendo i campi P010/P012 della scheda trovata e ne legge l'iter: quelle richieste dipendono da questa risposta e non sono anteprimabili."
+	if anno == 0 {
+		nota += " Senza --anno l'archivio restituisce una sola delle leggi con questo numero, e la cronologia può riferirsi all'atto sbagliato."
+	}
+	return emitDryRunRequests(cmd, []map[string]any{target}, nota)
 }
 
 func runLeggeCronologia(cmd *cobra.Command, flags *rootFlags, legisl, numero, anno int) error {

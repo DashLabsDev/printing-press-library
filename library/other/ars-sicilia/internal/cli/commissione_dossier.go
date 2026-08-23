@@ -39,10 +39,10 @@ func newNovelCommissioneDossierCmd(flags *rootFlags) *cobra.Command {
 			if len(args) == 0 {
 				return cmd.Help()
 			}
-			if dryRunOK(flags) {
-				return nil
-			}
 			arg := strings.TrimSpace(strings.Join(args, " "))
+			if dryRunOK(flags) {
+				return emitCommissioneDossierDryRun(cmd, arg, flagLegisl)
+			}
 			return runCommissioneDossier(cmd, flags, arg, flagLegisl, flagLimit)
 		},
 	}
@@ -155,6 +155,43 @@ type dossierReport struct {
 	// fetched. Re-run with a higher --limit to see the rest.
 	Troncato []string         `json:"troncato,omitempty"`
 	Sezioni  []dossierSection `json:"sezioni"`
+}
+
+// emitCommissioneDossierDryRun elenca le quattro richieste del dossier invece
+// di uscire in silenzio con exit 0. È l'anteprima che serve di più delle tre,
+// perché mostra la traduzione fatta da resolveDossierCommissione: lo stesso
+// argomento parte come `codcom` verso /bd/ e come ordinale a lettere verso
+// l'ISIS dei pareri. Chi vede mezze sezioni vuote legge qui, senza indovinare,
+// quale delle due forme non ha agganciato.
+func emitCommissioneDossierDryRun(cmd *cobra.Command, arg string, legisl int) error {
+	bdParams, isisName := resolveDossierCommissione(arg)
+	sezione := func(slug string, params map[string]string) (map[string]any, error) {
+		if legisl > 0 {
+			params["legisl"] = itoa(legisl)
+		}
+		return dryRunTargetBySlug(slug, params)
+	}
+	requests := []map[string]any{}
+	for _, sez := range []struct {
+		slug   string
+		params map[string]string
+	}{
+		{"convocazioni", copyParams(bdParams)},
+		{"sommari", copyParams(bdParams)},
+		{"pareri", map[string]string{"commissione": isisName}},
+		// La sezione ddl è una ricerca testuale, non l'elenco degli assegnati:
+		// l'archivio 221 non espone l'assegnazione come campo filtrabile.
+		{"ddl", map[string]string{"testo": isisName}},
+	} {
+		r, err := sezione(sez.slug, sez.params)
+		if err != nil {
+			return err
+		}
+		if r != nil {
+			requests = append(requests, r)
+		}
+	}
+	return emitDryRunRequests(cmd, requests, fmt.Sprintf("l'argomento %q viaggia in due forme: %v verso il backend /bd/ (convocazioni, sommari) e %q verso l'ISIS di pareri e ddl. La sezione ddl è una ricerca testuale, non l'elenco dei ddl assegnati.", arg, bdParams, isisName))
 }
 
 func runCommissioneDossier(cmd *cobra.Command, flags *rootFlags, arg string, legisl, perSection int) error {
