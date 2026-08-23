@@ -24417,6 +24417,48 @@
       }
     },
     {
+      "name": "wanderlog",
+      "category": "travel",
+      "api": "Wanderlog",
+      "description": "Clone shared Wanderlog plans into editable trips, then mine guides and places for agent-ready planning.",
+      "search_terms": [
+        "wanderlog",
+        "wanderlog-pp-cli",
+        "Clone shared Wanderlog plans into editable trips, then mine guides and places for agent-ready planning.",
+        "Shared plan clone/fill",
+        "plan clone",
+        "Create a new Wanderlog trip from a shared or public source plan, then fill it with the source plan template.",
+        "Existing trip fill from template",
+        "plan fill",
+        "Fill an existing Wanderlog trip from a shared or public source plan with dry-run and force safeguards.",
+        "Clone preview and copyability report",
+        "plan preview",
+        "Inspect a shared plan and report dates, sections, blocks, resources, and clone warnings before any write."
+      ],
+      "path": "library/travel/wanderlog",
+      "printer": "zjsng",
+      "printer_name": "zjsng",
+      "creator": {
+        "handle": "zjsng",
+        "name": "zjsng"
+      },
+      "mcp": {
+        "binary": "wanderlog-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 19,
+        "public_tool_count": 14,
+        "auth_type": "api_key",
+        "env_vars": [
+          "WANDERLOG_COOKIE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "wanderlust-goat",
       "category": "travel",
       "api": "Wanderlust GOAT",
