@@ -1828,7 +1828,7 @@
         "Mostra per ognuno dei 12 archivi ARS: timestamp ultima sync, n. record locali, età della sync, eventuale segnalazione di staleness.",
         "Cronologia inversa di una legge",
         "legge cronologia",
-        "Partendo da una legge regionale promulgata (archivio 201), risale al DDL originario, ai pareri di commissione e al voto d'aula: l'inverso temporale di ddl iter."
+        "Partendo da una legge regionale promulgata (archivio 201), risale al DDL originario, agli emendamenti citati nei resoconti d'aula e ai pareri di commissione: l'inverso temporale di ddl iter."
       ],
       "path": "library/other/ars-sicilia",
       "release": {
@@ -1838,7 +1838,11 @@
         "source_commit": "e50624009008a527c56d82013632fe23d7b28f60"
       },
       "printer": "aborruso",
-      "printer_name": "aborruso"
+      "printer_name": "aborruso",
+      "creator": {
+        "handle": "aborruso",
+        "name": "aborruso"
+      }
     },
     {
       "name": "art-goat",
@@ -11871,6 +11875,12 @@
         "Check that Jules-generated changes comply with organizational policies (code review, security scanning, license, dependency, and API usage rules) before allowing submission."
       ],
       "path": "library/developer-tools/jules",
+      "release": {
+        "cli_name": "jules-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-23T09:17:07Z",
+        "source_commit": "82a35f508afcd4b66781e8d4927c73a4eed24f2d"
+      },
       "printer": "wryenmeek",
       "printer_name": "github-actionsbot",
       "creator": {
