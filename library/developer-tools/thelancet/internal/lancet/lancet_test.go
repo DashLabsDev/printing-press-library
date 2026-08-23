@@ -131,6 +131,35 @@ func TestCurate(t *testing.T) {
 	}
 }
 
+func TestCurateDecodesHTMLEntities(t *testing.T) {
+	db := newTestDB(t)
+	defer db.Close()
+	ctx := context.Background()
+	works := []decodedWork{{
+		ID: "W-html", DOI: "10.1/html", Title: "Bile Acid &amp; Tryptophan Metabolism",
+		Year: 2025, Date: "2025-01-01", Cited: 1, Topic: "Metabolism &amp; Diet",
+	}}
+	if _, err := StoreWorks(ctx, db, works, "0140-6736", "The Lancet &amp; Infectious Diseases"); err != nil {
+		t.Fatalf("store: %v", err)
+	}
+	rows, err := Curate(ctx, db, "Bile Acid", "", "citations", false, 10)
+	if err != nil {
+		t.Fatalf("Curate: %v", err)
+	}
+	if len(rows) != 1 {
+		t.Fatalf("got %d rows, want 1", len(rows))
+	}
+	if rows[0].Title != "Bile Acid & Tryptophan Metabolism" {
+		t.Errorf("Title = %q, want decoded ampersand", rows[0].Title)
+	}
+	if rows[0].Topic != "Metabolism & Diet" {
+		t.Errorf("Topic = %q, want decoded ampersand", rows[0].Topic)
+	}
+	if rows[0].Journal != "The Lancet & Infectious Diseases" {
+		t.Errorf("Journal = %q, want decoded ampersand", rows[0].Journal)
+	}
+}
+
 func TestTopicDrift(t *testing.T) {
 	db := newTestDB(t)
 	defer db.Close()

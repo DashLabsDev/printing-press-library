@@ -8,6 +8,8 @@ import (
 	"io"
 	"strconv"
 	"strings"
+
+	"github.com/mvanhorn/printing-press-library/library/developer-tools/thelancet/internal/cliutil"
 )
 
 // Fetcher is the minimal client surface the sync needs. The generated
@@ -82,14 +84,14 @@ func decodeWork(r rawWork) decodedWork {
 	w := decodedWork{
 		ID:    shortID(r.ID),
 		DOI:   strings.TrimPrefix(r.DOI, "https://doi.org/"),
-		Title: r.Title,
+		Title: cliutil.CleanText(r.Title),
 		Year:  r.PublicationYear,
 		Date:  r.PublicationDate,
 		Cited: r.CitedByCount,
 		IsOA:  r.OpenAccess.IsOA,
 	}
 	if r.PrimaryTopic != nil {
-		w.Topic = r.PrimaryTopic.DisplayName
+		w.Topic = cliutil.CleanText(r.PrimaryTopic.DisplayName)
 	}
 	for _, a := range r.Authorships {
 		da := decodedAuthor{ID: shortID(a.Author.ID), Name: a.Author.DisplayName}
@@ -166,7 +168,7 @@ func Refresh(ctx context.Context, c Fetcher, db *sql.DB, journ []Journal, fromYe
 			for _, r := range pg.Results {
 				batch = append(batch, decodeWork(r))
 			}
-			n, err := StoreWorks(ctx, db, batch, j.ISSN, j.Display)
+			n, err := StoreWorks(ctx, db, batch, j.ISSN, cliutil.CleanText(j.Display))
 			if err != nil {
 				return results, fmt.Errorf("storing %s: %w", j.Slug, err)
 			}
