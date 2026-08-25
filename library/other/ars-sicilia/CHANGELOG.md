@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.7 - 2026-08-25
+
+- refactor(ars-sicilia): build the /bd/ request once, and let the preview print it (#1799).
+
 ## 2026.8.6 - 2026-08-23
 
 - feat(ars-sicilia): make --dry-run tell the truth about the request it would send (#1790).

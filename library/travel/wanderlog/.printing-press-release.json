@@ -2,17 +2,17 @@
   "schema_version": 1,
   "slug": "wanderlog",
   "cli_name": "wanderlog-pp-cli",
-  "version": "2026.8.1",
-  "released_at": "2026-08-23T09:17:50Z",
-  "source_commit": "af040d69905bc6a19b0b13e0e595a83835adb5ae",
+  "version": "2026.8.2",
+  "released_at": "2026-08-25T09:27:30Z",
+  "source_commit": "5005e7bbdf918019ce36d2a5d17204a123eebfd4",
   "printing_press_version": "4.24.0",
   "run_id": "20260619-000132-cc275322",
   "changes": [
     {
-      "title": "feat(wanderlog): add wanderlog",
-      "pr": 1792,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/1792",
-      "commit": "af040d69905bc6a19b0b13e0e595a83835adb5ae"
+      "title": "fix(wanderlog): harden ShareDB id generation, dry-run guards, and --check payload",
+      "pr": 1803,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/1803",
+      "commit": "5005e7bbdf918019ce36d2a5d17204a123eebfd4"
     }
   ]
 }
