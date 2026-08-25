@@ -10,23 +10,23 @@ import (
 	"testing"
 )
 
-// TestNovelIntegrationsHelpWires smoke-tests that the integrations command
+// TestNovelFaultHelpWires smoke-tests that the fault command
 // resolves at runtime and renders useful --help output. Catches wiring
 // regressions (missing AddCommand, panicking RunE on --help, etc.) before
 // review. Keep this smoke test when adding behavior-specific cases.
-func TestNovelIntegrationsHelpWires(t *testing.T) {
+func TestNovelFaultHelpWires(t *testing.T) {
 	cmd := RootCmd()
-	cmd.SetArgs([]string{"integrations", "--help"})
+	cmd.SetArgs([]string{"fault", "--help"})
 	var out bytes.Buffer
 	cmd.SetOut(&out)
 	cmd.SetErr(&out)
 	if err := cmd.Execute(); err != nil {
-		t.Fatalf("integrations --help error = %v (novel command not wired correctly?)", err)
+		t.Fatalf("fault --help error = %v (novel command not wired correctly?)", err)
 	}
 	help := out.String()
-	for _, want := range []string{"Usage:", "integrations"} {
+	for _, want := range []string{"Usage:", "fault"} {
 		if !strings.Contains(help, want) {
-			t.Fatalf("integrations --help missing %q in output:\n%s", want, help)
+			t.Fatalf("fault --help missing %q in output:\n%s", want, help)
 		}
 	}
 }
