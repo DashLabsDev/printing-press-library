@@ -11,7 +11,7 @@
   "auth_context": {
     "type": "none"
   },
-  "source_fingerprint": "f78a4669d97608fa139b6999ef42a8fef35b70618809b60b4b8e3c728ce7d03d",
+  "source_fingerprint": "23f40f1c947be0ec49f8a5eb730d595c5a7b02dcc118dcaa3fadb5ea77e95ef8",
   "source_files": {
     "cmd/is-agentic-pp-cli/main.go": "330ee2d92c8118163de8a88a4c2fa6f3ad40f5a7395200956671c7281719e1ca",
     "cmd/is-agentic-pp-mcp/main.go": "f12edc63cbbeb88685cfe553a03da3da888e3d1be0f5887a38b808322400f6ff",
@@ -167,7 +167,8 @@
     "internal/store/candidates_test.go": "4ea8f49ebe5ef73470b9de639efb636a6e95cfb9783d6cde93e864dbd2ac20ac",
     "internal/store/events.go": "9c0994e59404c889aa34b496c78a3c680c723feee797a49c757fc47f00561607",
     "internal/store/events_test.go": "1c358c8cef56def50dc69d2372164efeea36b94a3c62000fb12ff5a0c2561d75",
-    "internal/store/extras.go": "02d398d6d60bfb5641cc55c42af6e779bed73576cf47aec7bfe7e1fc89e4847e",
+    "internal/store/extras.go": "e5b33e1021aca89ee57a23e57a65c5d89f4472d244bd0b7076b39f0218525baa",
+    "internal/store/extras_test.go": "65d12eb19787807dccde3c94589cd9d5f5c046ff981b20d7400cf1aa7c320b61",
     "internal/store/is_agentic.go": "a22318d6b74bd53eee281c72fecd1e700aaeb2320f723dc74d1c3f5046494c6a",
     "internal/store/learnings.go": "588ee87f98b185a682417c01ad75819087ead45794b310cae045b52da3a0f4d9",
     "internal/store/learnings_test.go": "60125f81dc8a701af5574e90a59959e29cfd0299cf273880a7ec953a9709f565",
