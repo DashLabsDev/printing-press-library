@@ -1945,6 +1945,42 @@
       }
     },
     {
+      "name": "ashby",
+      "category": "job-boards",
+      "api": "Ashby",
+      "description": "Unauthenticated, read-only access to currently published postings on a named Ashby job board.",
+      "search_terms": [
+        "ashby",
+        "ashby-pp-cli",
+        "Unauthenticated, read-only access to currently published postings on a named Ashby job board.",
+        "Visibility-safe structured job discovery",
+        "postings list",
+        "Lists only publicly listed Ashby jobs and supports structured filtering across department, team, location, workplace type, employment type, publication date, currency, and compensation range."
+      ],
+      "path": "library/job-boards/ashby",
+      "printer": "klubieniecki",
+      "printer_name": "klubieniecki",
+      "creator": {
+        "handle": "klubieniecki",
+        "name": "klubieniecki"
+      },
+      "mcp": {
+        "binary": "ashby-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 1,
+        "public_tool_count": 1,
+        "auth_type": "none",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "atlas-obscura",
       "category": "travel",
       "api": "Atlas Obscura",
@@ -19469,6 +19505,12 @@
         "Name + USD + EUR is the answer; full card JSON on demand."
       ],
       "path": "library/media-and-entertainment/scryfall",
+      "release": {
+        "cli_name": "scryfall-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-23T09:35:21Z",
+        "source_commit": "c1baf1b4c4dcbaa2383767a35778d342a9e16b4c"
+      },
       "printer": "veltri-23",
       "printer_name": "Hunter Veltri",
       "creator": {
@@ -22819,6 +22861,12 @@
         "Find authors whose citation impact is out of step with the prestige of the Lancet journals they publish in."
       ],
       "path": "library/developer-tools/thelancet",
+      "release": {
+        "cli_name": "thelancet-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-23T10:12:15Z",
+        "source_commit": "1a0cb603e4e6b53d46edcdd2c8c059e6da7e77ca"
+      },
       "printer": "laci141",
       "printer_name": "laci141",
       "creator": {
