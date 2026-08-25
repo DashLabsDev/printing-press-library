@@ -5079,9 +5079,9 @@
       "path": "library/devices/crestron",
       "release": {
         "cli_name": "crestron-pp-cli",
-        "version": "2026.8.3",
-        "released_at": "2026-08-25T09:20:48Z",
-        "source_commit": "465966486bff50431c785f5b72b97a63b6661e9d"
+        "version": "2026.8.4",
+        "released_at": "2026-08-25T09:30:29Z",
+        "source_commit": "6ab477bd4140d6d524a5fee21ac3cae548d8359a"
       },
       "printer": "Drummerms",
       "printer_name": "drummerms",
@@ -7356,9 +7356,9 @@
       "path": "library/devices/extron",
       "release": {
         "cli_name": "extron-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-25T09:20:48Z",
-        "source_commit": "465966486bff50431c785f5b72b97a63b6661e9d"
+        "version": "2026.8.3",
+        "released_at": "2026-08-25T09:30:29Z",
+        "source_commit": "6ab477bd4140d6d524a5fee21ac3cae548d8359a"
       },
       "printer": "Drummerms",
       "printer_name": "drummerms",
@@ -17752,38 +17752,38 @@
         "qsys",
         "Q-SYS",
         "qsys-pp-cli",
-        "Q-SYS product specs, configuration procedures, and connection guides in one local index - with equipment-list compatibility checks neither QSC website can do.",
+        "Q-SYS specs, configuration, wiring, compatibility, and fault articles in one offline index - answering equipment-list questions no QSC website can take as input.",
         "Unified product card",
         "product get",
-        "See a Q-SYS product's overview, spec-sheet text, configuration pages, and connection guidance in one record.",
-        "BOM compatibility check",
+        "See a Q-SYS product's specs, configuration pages, wiring guidance, known gotchas, and factory-reset procedure in one record.",
+        "BOM pre-quote sweep",
+        "bom verify",
+        "One report per model in an equipment list: Designer-version support, end-of-life status, LTS carry date, and spec-sheet availability.",
+        "BOM known-issue sweep",
+        "bom risks",
+        "Surface every known issue, awareness note, and troubleshooting article that touches any model on an equipment list, filtered to a Designer release.",
+        "Version-support verdict for a list",
         "compat check",
         "Check a whole equipment list against a Q-SYS Designer version and get back what is supported and what is not.",
-        "Deprecation sweep",
-        "compat deprecated",
-        "Flag which models in a list are deprecated or discontinued before they reach a quote.",
+        "Designer release brief",
+        "qds",
+        "For one Q-SYS Designer release: known issues, LTS status and end date, and which hardware was removed.",
+        "Designer fault-string lookup",
+        "fault",
+        "Paste the literal fault or status string Q-SYS Designer displays and get the article that explains it, plus the models it applies to.",
         "Connection guidance by model",
         "connect",
-        "Get the networking, wiring, and I/O guidance that actually applies to a given model.",
-        "BOM sweep — one report per model",
-        "bom verify",
-        "One report per model in an equipment list: version support, EOL status, and spec-sheet availability in a single pass.",
-        "Version-aware page reads",
-        "page get",
-        "Read a help page as of a specific Q-SYS Designer version from the versioned doc tree.",
-        "Extraction coverage report",
+        "Get the networking, wiring, and I/O guidance that actually applies to a given model, including third-party application notes.",
+        "Corpus extraction depth report",
         "coverage",
-        "Report how many products resolved a spec sheet and how many pages parsed, so extraction gaps are visible.",
-        "UC platform integration lookup",
-        "integrations",
-        "Find which UC platforms (Teams, Zoom, Meet) a device is certified or integrated with."
+        "Report per source how many pages parsed, how many spec-sheet PDFs were linked versus actually text-extracted, and how many support articles were indexed."
       ],
       "path": "library/devices/qsys",
       "release": {
         "cli_name": "qsys-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-25T09:20:48Z",
-        "source_commit": "465966486bff50431c785f5b72b97a63b6661e9d"
+        "version": "2026.8.3",
+        "released_at": "2026-08-25T09:30:29Z",
+        "source_commit": "6ab477bd4140d6d524a5fee21ac3cae548d8359a"
       },
       "printer": "Drummerms",
       "printer_name": "drummerms",
@@ -17797,14 +17797,14 @@
           "stdio",
           "http"
         ],
-        "tool_count": 10,
-        "public_tool_count": 10,
+        "tool_count": 12,
+        "public_tool_count": 12,
         "auth_type": "none",
         "env_vars": [
           "PRINTING_PRESS_CLIENT_PROFILE"
         ],
         "mcp_ready": "full",
-        "spec_format": "internal"
+        "spec_format": "local-sqlite"
       }
     },
     {
