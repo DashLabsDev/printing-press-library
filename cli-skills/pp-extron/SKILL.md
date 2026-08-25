@@ -60,6 +60,13 @@ Do not use this CLI for:
 These capabilities aren't available in any other tool for this API.
 
 ### Local catalog that compounds
+- **`catalog sync`** — Build the local Extron literature catalog, walking the alphabetical index the site only exposes a letter at a time. Bare `catalog sync` fetches the first index page per letter bucket — a fast baseline of roughly 1,200 documents, with large categories truncated at the page-1 ceiling. `--full` follows each category's pagination and is what produces the complete catalog (roughly 3,600 documents and up). A failed letter bucket is retried and skipped rather than aborting the crawl, so a 36-bucket `--full` walk survives a flaky bucket.
+
+  _Run this first — every local read depends on it, and it is not the same command as top-level `sync`._
+
+  ```bash
+  extron-pp-cli catalog sync --full --timeout 15m --max-duration 4h --json
+  ```
 - **`literature updates`** — See which downloaded spec sheets and manuals have a newer revision available upstream, so project shares never run stale docs.
 
   _Use this before commissioning or re-quoting to catch docs superseded since the last sync._
@@ -107,9 +114,34 @@ These capabilities aren't available in any other tool for this API.
 
 ## Command Reference
 
+**catalog sync** — Build the local literature catalog (run this first)
+
+- `extron-pp-cli catalog sync` — fetch the **first index page per letter bucket** (0-9, A-Z). A fast baseline of roughly 1,200 documents, **not the complete catalog**: any category with more than one page of results is truncated at the page-1 ceiling.
+- `extron-pp-cli catalog sync --full` — also follow each category's pagination. **This is what produces the complete catalog** (roughly 3,600 documents and up). Slower; budget it with `--max-duration`.
+- `extron-pp-cli catalog sync --letters A,B,C` — narrow to specific letter buckets
+- `extron-pp-cli catalog sync --full --max-duration 4h --retries 3` — long crawl with a bigger overall budget and more per-letter retries
+
+Use bare `catalog sync` to get something searchable quickly; use `--full` before any answer that depends on the catalog being complete — a rack doc binder, a completeness report, or a bid compliance check. `--max-pages` caps pagination per category and truncates in the same way `--full`'s absence does, so leave it unset for a genuinely complete crawl.
+
+A letter bucket that fails is retried (`--retries`, default 2) and then skipped, so one bad bucket does not discard the rest of the crawl. Skipped buckets are listed in the summary's `errors` array and counted in `letters_failed`; the run exits non-zero only when every bucket failed, or when `--strict` is passed. The root `--timeout` bounds each letter bucket; `--max-duration` (default 30m) bounds the whole crawl.
+
+**Do not confuse `catalog sync` with the top-level `sync`.** Top-level `sync` walks the generated `literature` endpoint resource and refreshes entity lookups — it does not build the catalog. Only `catalog sync` populates the store that `search`, `catalog completeness`, `catalog verify`, `literature recent`, and `literature updates` read.
+
 **literature** — Extron literature library index (spec sheets, manuals, guides)
 
 - `extron-pp-cli literature` — Fetch the alphabetical literature index for a letter
+- `extron-pp-cli literature list` — List literature from the local catalog, filterable by category and letter
+- `extron-pp-cli literature get` — Resolve a product or document name to its official Extron literature
+- `extron-pp-cli literature download` — Download official spec sheets and manuals as PDFs
+- `extron-pp-cli literature recent` — Newest literature across the whole library, ordered by date
+- `extron-pp-cli literature updates` — See which downloaded docs have a newer revision upstream
+- `extron-pp-cli literature family` — Every document for a product family (DTP, MAV, IPL, DVS, ...)
+- `extron-pp-cli literature rack` — Assemble the full doc set for every model in a rack BOM
+
+**catalog** — Local-catalog reporting
+
+- `extron-pp-cli catalog completeness` — Per-model gap report across Brochure, Declaration of Conformity, Design Guide, Product Guide, Manual, and Revit BIM
+- `extron-pp-cli catalog verify` — Compare local PDF sizes and revisions against the download ledger
 
 
 ### Finding the right command
@@ -123,6 +155,27 @@ extron-pp-cli which "<capability in your own words>"
 `which` resolves a natural-language capability query to the best matching command from this CLI's curated feature index. Exit code `0` means at least one match; exit code `2` means no confident match — fall back to `--help` or use a narrower query. Under `--json`/`--agent`, an unmatched query returns exit `0` with an empty `matches` array.
 
 ## Recipes
+
+### First run: build the catalog
+
+Everything local — `search`, `literature list`, `catalog completeness`, `catalog verify` — reads the catalog this builds, so run it before trusting any local result. There are two passes, and the difference matters:
+
+```bash
+# Fast baseline: first index page per letter bucket, ~1,200 docs.
+# Large categories are truncated here — this is NOT the complete catalog.
+extron-pp-cli catalog sync
+
+# Complete catalog: follows every category's pagination, ~3,600 docs and up.
+extron-pp-cli catalog sync --full --timeout 15m --max-duration 4h --json
+```
+
+Run the `--full` pass before any answer that depends on completeness — a rack doc binder, a completeness report, a bid compliance check. If you only ran the baseline, a document that exists at Extron can be missing from local search with no error to tell you.
+
+`--timeout` bounds each letter bucket, `--max-duration` bounds the whole crawl. Failed buckets are retried and then skipped; check `letters_failed` and `errors` in the summary, then re-run just those buckets:
+
+```bash
+extron-pp-cli catalog sync --letters A,Q --full --timeout 15m
+```
 
 ### What did Extron release this month
 
@@ -334,7 +387,7 @@ Graceful degradation: if `learnings confirm` is an unknown command, you are driv
 - `similar_shape_different_entity:<canonical>` (top-level): a structurally matching row exists but its canonical entity differs from the live query's. Treated as cold start; the warning carries the conflicting canonical as a hint, but the row is NOT promoted into Results.
 - `ambiguous_alias` (top-level): a single query entity resolved to multiple canonicals (e.g., "Cards" → Arizona Cardinals + St. Louis Cardinals). Surface the ambiguity from context before committing to a resource.
 - `candidates_present` (top-level): the envelope carries a `candidates` section. Handle it via the candidates branch in Step 2 before anything else.
-- `lookup_refresh_available` (top-level): an entity in the query has no lookup row yet, but synced data could provide one. Run `extron-pp-cli sync` to refresh entity lookups.
+- `lookup_refresh_available` (top-level): an entity in the query has no lookup row yet, but synced data could provide one. Run `extron-pp-cli sync` to refresh entity lookups. Note that top-level `sync` only walks the generated `literature` endpoint and refreshes lookups — it does not build the catalog. If local reads are also coming back empty, run `extron-pp-cli catalog sync` first; that is the corpus builder.
 - Top-level `no_learnings_for_query_family`: the table had no rows above the Jaccard floor. Pure cold start.
 
 ### Step 4: `teach &` after finalizing your response - always
