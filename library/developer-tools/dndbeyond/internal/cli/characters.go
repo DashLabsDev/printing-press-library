@@ -1,4 +1,4 @@
-// Copyright 2026 dndbeyond-community and contributors. Licensed under Apache-2.0.
+// Copyright 2026 Matthew Martin and contributors. Licensed under Apache-2.0.
 //
 // Local, read-only character snapshot importer. This is intentionally a
 // preserved novel command rather than a D&D Beyond endpoint mirror: D&D

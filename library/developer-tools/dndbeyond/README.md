@@ -5,6 +5,8 @@ normalization of user-supplied character-sheet snapshots and exported PDFs.
 
 Learn more at [Dndbeyond](https://www.dndbeyond.com).
 
+Created by [@wirelesstkd](https://github.com/wirelesstkd) (Matthew Martin).
+
 ## Install
 
 The recommended path installs both the `dndbeyond-pp-cli` binary and the `pp-dndbeyond` agent skill (Claude Code, Codex, Cursor, Gemini CLI, GitHub Copilot, and other agents supported by the upstream [`skills`](https://github.com/vercel-labs/skills) CLI) in one shot:

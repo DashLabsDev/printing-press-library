@@ -42,7 +42,7 @@ checksum:
 brews:
   - name: dndbeyond-pp-cli
     repository:
-      owner: dndbeyond-community
+      owner: Matthew Martin
       name: homebrew-tap
     homepage: "https://github.com/mvanhorn/printing-press-library"
     description: "Read public D&D Beyond rules pages from the terminal."

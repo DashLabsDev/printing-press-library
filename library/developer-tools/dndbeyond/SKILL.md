@@ -1,7 +1,7 @@
 ---
 name: pp-dndbeyond
 description: "Read public D&D Beyond rules pages and normalize user-supplied character snapshots or exported PDFs."
-author: "dndbeyond-community"
+author: "Matthew Martin"
 license: "Apache-2.0"
 argument-hint: "<command> [args] | install cli|mcp"
 allowed-tools: "Read Bash"
