@@ -83,11 +83,27 @@ func legislatureDaSlug(slug string) int {
 	return 0
 }
 
+// GruppiElencoReq e GruppoDettaglioReq dicono path e parametri delle due
+// richieste, e le usano sia il client sia l'anteprima --dry-run della CLI.
+// Prima l'anteprima li ricomponeva per conto suo a partire da GruppiPath: oggi
+// coincidevano, ma nulla li teneva agganciati, ed e' la forma da cui nascono le
+// anteprime che descrivono una richiesta diversa da quella che parte.
+func GruppiElencoReq(legisl int) (path string, params map[string]string) {
+	return GruppiPath, map[string]string{"idLeg": strconv.Itoa(legisl)}
+}
+
+// GruppoDettaglioReq: la pagina del gruppo non porta parametri, il gruppo sta
+// nel path.
+func GruppoDettaglioReq(slug string) (path string, params map[string]string) {
+	return GruppiPath + "/" + slug, nil
+}
+
 // GruppiElenco scarica e parsa l'elenco dei gruppi di una legislatura.
 // legislature valide: 16, 17, 18 (XVIII accetta anche 71 sul portale, ma
 // qui si normalizza subito al numero canonico).
 func (c *Client) GruppiElenco(ctx context.Context, legisl int) ([]Gruppo, error) {
-	body, err := c.Get(ctx, GruppiPath, map[string]string{"idLeg": strconv.Itoa(legisl)})
+	path, params := GruppiElencoReq(legisl)
+	body, err := c.Get(ctx, path, params)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +112,8 @@ func (c *Client) GruppiElenco(ctx context.Context, legisl int) ([]Gruppo, error)
 
 // GruppoDettaglio scarica e parsa la pagina di un gruppo.
 func (c *Client) GruppoDettaglio(ctx context.Context, slug string) (*DettaglioGruppo, error) {
-	body, err := c.Get(ctx, GruppiPath+"/"+slug, nil)
+	path, params := GruppoDettaglioReq(slug)
+	body, err := c.Get(ctx, path, params)
 	if err != nil {
 		return nil, err
 	}

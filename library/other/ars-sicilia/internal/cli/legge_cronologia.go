@@ -82,12 +82,18 @@ esiste in piu' anni della stessa legislatura.`,
 // risolve dai campi P010/P012 della legge trovata, quindi la query dipende da
 // una risposta che il dry-run non chiede. Si dichiara il passo invece di
 // tacerlo o di inventarne la forma.
-func emitLeggeCronologiaDryRun(cmd *cobra.Command, legisl, numero, anno int) error {
+// leggeSearchParams sono i parametri con cui si aggancia la legge, in un posto
+// solo: anteprima e ricerca vera devono partire dagli stessi.
+func leggeSearchParams(legisl, numero, anno int) map[string]string {
 	params := map[string]string{"legisl": itoa(legisl), "numero": itoa(numero)}
 	if anno != 0 {
 		params["anno"] = itoa(anno)
 	}
-	target, err := dryRunTargetBySlug("leggi", params)
+	return params
+}
+
+func emitLeggeCronologiaDryRun(cmd *cobra.Command, legisl, numero, anno int) error {
+	target, err := dryRunTargetBySlug("leggi", leggeSearchParams(legisl, numero, anno))
 	if err != nil {
 		return err
 	}
@@ -119,11 +125,7 @@ func runLeggeCronologia(cmd *cobra.Command, flags *rootFlags, legisl, numero, an
 	if arcLeggi == nil {
 		return fmt.Errorf("archivio leggi non disponibile")
 	}
-	params := map[string]string{"legisl": itoa(legisl), "numero": itoa(numero)}
-	if anno != 0 {
-		params["anno"] = itoa(anno)
-	}
-	recs, err := c.Search(ctx, *arcLeggi, icaro.SearchOptions{Params: params, Limit: 1})
+	recs, err := c.Search(ctx, *arcLeggi, icaro.SearchOptions{Params: leggeSearchParams(legisl, numero, anno), Limit: 1})
 	if err != nil {
 		return fmt.Errorf("ricerca legge: %w", err)
 	}

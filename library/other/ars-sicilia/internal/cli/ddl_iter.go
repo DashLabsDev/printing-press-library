@@ -1,8 +1,15 @@
 // pp:data-source live
 // pp:client-call
-// Novel feature — ricostruisce la cronologia completa di un DDL.
-// Combina ricerche su più archivi (DDL 221, sommari commissione 230,
-// resoconti d'aula 217) usando direttamente l'icaroclient.
+// Novel feature — ricostruisce la cronologia di un DDL leggendo il blocco
+// «Iter Storico» della sua scheda nell'archivio DDL (221), l'unico che questo
+// comando interroga.
+//
+// La testata dichiarava di combinare 221 con i sommari di commissione (230) e i
+// resoconti d'aula (217): non è mai stato vero, nel file c'è solo `BySlug("ddl")`.
+// Chi lo leggeva concludeva che un iter troncato dipendesse da altro, mentre
+// dipende proprio dal fatto che 230 non viene guardato — e l'Iter Storico può
+// essere indietro rispetto ai lavori reali (issue #3: sul ddl 18/779 l'iter si
+// ferma al 10/06/2026 mentre i sommari della I commissione arrivano al 22/07).
 
 package cli
 
@@ -138,7 +145,7 @@ func runDdlIter(cmd *cobra.Command, flags *rootFlags, legisl, numero int) error 
 		return emitIter(cmd, flags, report)
 	}
 	recs, err := c.Search(ctx, *arc, icaro.SearchOptions{
-		Params: map[string]string{"legisl": itoa(legisl), "numero": itoa(numero)},
+		Params: ddlIterSearchParams(legisl, numero),
 		Limit:  1,
 	})
 	if err != nil {
@@ -217,12 +224,18 @@ func runDdlIter(cmd *cobra.Command, flags *rootFlags, legisl, numero int) error 
 // the silent no-op this used to be, it mirrors the ISIS-query preview that
 // `*/cerca` commands already show — ddl iter's --dry-run should be as useful
 // a diagnostic as the rest of the CLI.
+// ddlIterSearchParams sono i parametri con cui si aggancia il ddl, in un posto
+// solo: anteprima e ricerca vera devono partire dagli stessi.
+func ddlIterSearchParams(legisl, numero int) map[string]string {
+	return map[string]string{"legisl": itoa(legisl), "numero": itoa(numero)}
+}
+
 func emitDdlIterDryRun(cmd *cobra.Command, legisl, numero int) error {
 	arc := icaro.BySlug("ddl")
 	if arc == nil {
 		return fmt.Errorf("archivio ddl non disponibile")
 	}
-	expr := icaro.BuildQuery(*arc, map[string]string{"legisl": itoa(legisl), "numero": itoa(numero)}, "")
+	expr := icaro.BuildQuery(*arc, ddlIterSearchParams(legisl, numero), "")
 	out := map[string]any{
 		"archive":     arc.Slug,
 		"archive_id":  arc.ID,

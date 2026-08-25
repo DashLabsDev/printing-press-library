@@ -155,77 +155,21 @@ func BDPreview(baseURL, slug string, params map[string]string) (BDPreviewResult,
 		PostFields: map[string]string{},
 		Deferred:   map[string]string{},
 	}
-	for k, v := range spec.static {
-		out.PostFields[k] = v
+	// sessionHTML vuoto = modo anteprima. La form e' quella che searchBD
+	// manderebbe, costruita dalla stessa funzione: non c'e' una seconda
+	// implementazione che possa divergere.
+	req, err := bdBuildForm(slug, spec, params, "", true)
+	if err != nil {
+		out.Invalid = err
+		return out, true
 	}
-	// `page` viaggia su OGNI richiesta, e la prima di ogni giro e' sempre 1:
-	// metterlo qui rende la prima POST riproducibile alla lettera invece di
-	// lasciarla incompleta. Le successive non si possono enumerare — il numero
-	// di pagine (`total`) arriva DENTRO la risposta, quindi conoscerlo vorrebbe
-	// dire fare la richiesta che il dry run non fa: si dice la regola invece
-	// del numero, che e' l'unica cosa vera che si puo' dire.
-	out.PostFields["page"] = "1"
-	for k, v := range params {
-		v = strings.TrimSpace(v)
-		if v == "" {
-			continue
-		}
-		switch k {
-		case "data":
-			out.Deferred[k] = "il backend non ha un campo data: l'intervallo diventa una richiesta per ciascun anno in `anni`, che sono i valori che il campo `anno` prende uno per giro — nei campi c'e' il primo, cioe' quello della prima richiesta — piu' un filtro sulle righe ricevute per tagliare i giorni fuori intervallo. Dentro ogni anno `page` parte da 1 e cresce di uno fino al numero di pagine che la risposta dichiara, o finche' --limit e' pieno: quel numero sta nella risposta, quindi le pagine oltre la prima non sono anteprimabili"
-			// Stessa funzione del percorso vivo, cosi' l'anteprima non puo'
-			// divergere dall'elenco che searchBD scorre davvero — errore
-			// compreso: se non si parsa, searchBD non manda nulla.
-			anni, keep := bdDateFilter(v)
-			if anni == nil || keep == nil {
-				out.Invalid = &InvalidParamError{Filtro: "--data", Valore: v,
-					Rimedio: "usa YYYY-MM-DD, AAMMGG, o un intervallo YYYY-MM-DD:YYYY-MM-DD (AAMMGG/AAMMGG)"}
-				continue
-			}
-			out.Anni = anni
-		case "oratore":
-			out.Deferred[k] = "risolto da nome a id leggendo le <option> di " + spec.speakerField + " nel form, che richiede una richiesta"
-		case "codcom", "commissione":
-			out.Deferred[k] = "risolto in id per-legislatura leggendo le <option> di " + spec.commissioneField + " nel form, che richiede una richiesta"
-		default:
-			if field, ok := spec.fields[k]; ok {
-				out.PostFields[field] = v
-			} else {
-				out.Deferred[k] = "filtro non applicabile su questo archivio: la ricerca fallirebbe invece di ignorarlo (vedi bdUnsupported)"
-			}
+	for k, vs := range req.Form {
+		if len(vs) > 0 {
+			out.PostFields[k] = vs[0]
 		}
 	}
-	// --anno e --data scrivono lo stesso campo server: searchBD li interseca
-	// (l'anno deve cadere nell'intervallo della data). L'anteprima fa lo stesso,
-	// altrimenti annuncia giri che non partirebbero — e nel caso vuoto annuncia
-	// una ricerca che invece non restituisce nulla.
-	if anno := strings.TrimSpace(params["anno"]); anno != "" && len(out.Anni) > 0 {
-		keep := out.Anni[:0]
-		for _, y := range out.Anni {
-			if y == anno {
-				keep = append(keep, y)
-			}
-		}
-		out.Anni = keep
-		if len(out.Anni) == 0 {
-			// searchBD in questo caso esce senza mandare nulla. Lasciare `anno`
-			// fra i campi mostrerebbe una richiesta plausibile che non parte:
-			// si toglie, e il motivo resta scritto fra i differiti.
-			delete(out.PostFields, "anno")
-			out.Deferred["anno"] = "fuori dall'intervallo di --data: nessun anno da interrogare, la ricerca non restituirebbe nulla e nessuna richiesta partirebbe"
-		}
-	}
-	// Il campo `anno` va fra i campi, non solo nell'elenco a parte: il ciclo lo
-	// imposta prima di OGNI post, e senza, rigiocando i campi mostrati si manda
-	// una richiesta senza vincolo d'anno — cioe' l'archivio intero invece della
-	// fetta che il comando chiede. Stesso ragionamento di `page`: si mette il
-	// valore della PRIMA richiesta, che e' l'unico dicibile senza indovinare,
-	// e l'elenco `Anni` dice quali altri valori prende quel campo, uno per giro.
-	// Dopo l'intersezione con --anno, cosi' il valore mostrato e' quello che
-	// partirebbe davvero; se non resta nessun anno non si mostra nulla.
-	if len(out.Anni) > 0 {
-		out.PostFields["anno"] = out.Anni[0]
-	}
+	out.Anni = req.Anni
+	out.Deferred = req.Deferred
 	return out, true
 }
 
@@ -439,121 +383,214 @@ func unescapeMini(s string) string {
 // paginati, parsando l'HTML in Record. Onora Limit/MaxPages/Truncated come
 // Search. Il filtro --data non ha un campo server (il portale filtra per
 // `anno`): si deriva l'anno per il server e si filtra client-side sulla data.
-func (c *Client) searchBD(ctx context.Context, arc Archive, opts SearchOptions) ([]Record, error) {
-	spec := bdArchives[arc.Slug]
-	bdURL := c.BaseURL + "/bd/" + spec.path
+// bdRequest e' la richiesta che il backend /bd/ riceverebbe: la form gia'
+// compilata, i giri sugli anni, il filtro client-side sulle date, e i filtri
+// che senza la sessione non si possono risolvere.
+//
+// Esiste perche' searchBD e l'anteprima --dry-run devono descrivere la stessa
+// cosa, e per un po' non l'hanno fatto: l'anteprima reimplementava a mano cio'
+// che searchBD costruisce, e sette rilievi di review hanno trovato altrettante
+// divergenze — endpoint sbagliato, nomi di campo non tradotti, gli anni taciuti,
+// `page` e `anno` assenti, `--codcom` riscritto, una data malformata accettata
+// in anteprima e rifiutata dal vivo, un filtro non supportato differito invece
+// che rifiutato. Due implementazioni parallele restano d'accordo solo per
+// ispezione, ed e' cosi' che le divergenze si accumulano senza che nulla lo
+// segnali. Con un costruttore solo, divergere non e' piu' possibile.
+type bdRequest struct {
+	Form     url.Values
+	Anni     []string
+	KeepDate func(rowDate string) bool
+	// Deferred e' popolato solo in modo anteprima: nomina i filtri che
+	// richiedono la sessione e dice in che cosa si trasformano.
+	Deferred map[string]string
+	// VuotoPerAnno segnala l'unico caso in cui il percorso vivo non manda
+	// nulla e non e' un errore: --anno fuori dall'intervallo di --data, dove
+	// l'intersezione dei filtri e' vuota e zero risultati e' la risposta giusta.
+	VuotoPerAnno bool
+}
 
-	// Sessione (cookie JSESSIONID nel jar del Client). La risposta contiene anche
-	// il form, incluso il <select> degli oratori: la teniamo per risolvere --oratore.
-	sessionHTML, err := c.get(ctx, bdURL)
-	if err != nil {
-		return nil, fmt.Errorf("bd session (%s): %w", arc.Slug, err)
+// bdBuildForm compila la richiesta per il backend /bd/.
+//
+// `anteprima` e' un parametro esplicito e non si deduce da sessionHTML vuoto.
+// Dedurlo sarebbe un guasto silenzioso: se la GET di sessione tornasse 200 con
+// corpo vuoto — portale che sbanda, risposta troncata — il percorso VIVO
+// scivolerebbe in modo anteprima, non risolverebbe --oratore e
+// --commissione/--codcom, e manderebbe la POST senza quel filtro. Il risultato
+// sarebbe piu' largo di quello chiesto, presentato come buono: esattamente il
+// filtro che sparisce in silenzio contro cui e' costruito il resto di questo
+// file. In anteprima --oratore e --commissione/--codcom non si risolvono perche'
+// leggono le <option> del form, cioe' una richiesta che un dry run non fa, e
+// finiscono in Deferred; dal vivo la risoluzione avviene e un valore che non
+// aggancia nulla produce UnresolvedFilterError come prima.
+func bdBuildForm(slug string, spec bdSpec, params map[string]string, sessionHTML string, anteprima bool) (bdRequest, error) {
+	out := bdRequest{Form: url.Values{}, Deferred: map[string]string{}}
+
+	// Un filtro che questo archivio non sa applicare fallisce, non viene
+	// ignorato: silenziosamente restituirebbe un set piu' largo di quello che
+	// la riga di comando chiede. Vale anche in anteprima, dove prima usciva
+	// come "differito" mentre il comando vero sarebbe fallito.
+	if err := bdUnsupportedParams(slug, spec, params); err != nil {
+		return out, err
 	}
 
-	// Un filtro che il backend /bd/ non sa applicare deve fallire, non essere
-	// ignorato: silenziosamente avrebbe restituito un set più largo di quello
-	// che la riga di comando chiede (vedi bdUnsupported).
-	if err := bdUnsupported(arc.Slug, spec, opts); err != nil {
-		return nil, err
-	}
-
-	form := url.Values{}
 	for k, v := range spec.static {
-		form.Set(k, v)
+		out.Form.Set(k, v)
 	}
-	var keepDate func(rowDate string) bool
-	var years []string
-	for k, v := range opts.Params {
+	// `page` viaggia su ogni richiesta e la prima di ogni giro e' sempre 1. Il
+	// ciclo di searchBD lo riscrive a ogni pagina con lo stesso valore di
+	// partenza: metterlo qui non cambia nulla al vivo e rende l'anteprima
+	// riproducibile alla lettera.
+	out.Form.Set("page", "1")
+
+	for k, v := range params {
 		v = strings.TrimSpace(v)
 		if v == "" {
 			continue
 		}
-		// L'anno server per --data lo imposta il loop sugli anni più sotto:
-		// qui si ricava solo l'intervallo (anni coinvolti + filtro client-side).
-		if k == "data" {
-			years, keepDate = bdDateFilter(v)
-			// Un valore che non si parsa lasciava entrambi a nil, e la ricerca
-			// proseguiva senza vincolo d'anno sul form e senza filtro
-			// client-side: `--data 2025-01-01:garbage` non restituiva «niente in
-			// quell'intervallo», restituiva l'archivio intero dall'inizio —
-			// resoconti fino al 12/04/1951 — presentandolo come esito buono. Il
-			// filtro che sparisce in silenzio e' peggio del filtro che fallisce.
-			if years == nil || keepDate == nil {
-				return nil, &InvalidParamError{Filtro: "--data", Valore: v,
+		switch k {
+		case "data":
+			// Il campo server `anno` accetta un anno solo: l'intervallo diventa
+			// un giro per anno piu' un filtro sulle righe ricevute.
+			anni, keep := bdDateFilter(v)
+			if anni == nil || keep == nil {
+				// Un valore che non si parsa lasciava entrambi a nil e la
+				// ricerca proseguiva senza vincolo d'anno sul form e senza
+				// filtro client-side: `--data 2025-01-01:garbage` non
+				// restituiva «niente in quell'intervallo», restituiva
+				// l'archivio intero dall'inizio — resoconti fino al 12/04/1951
+				// — presentandolo come esito buono. Il filtro che sparisce in
+				// silenzio e' peggio del filtro che fallisce.
+				return out, &InvalidParamError{Filtro: "--data", Valore: v,
 					Rimedio: "usa YYYY-MM-DD, AAMMGG, o un intervallo YYYY-MM-DD:YYYY-MM-DD (AAMMGG/AAMMGG)"}
 			}
-			continue
-		}
-		// oratore, codcom e commissione sono risolti sotto (servono le <option>).
-		if k == "oratore" || k == "codcom" || k == "commissione" {
-			continue
-		}
-		if field, ok := spec.fields[k]; ok {
-			form.Set(field, v)
+			out.Anni, out.KeepDate = anni, keep
+		case "oratore", "codcom", "commissione":
+			// Risolti sotto: servono le <option> della sessione.
+		default:
+			if field, ok := spec.fields[k]; ok {
+				out.Form.Set(field, v)
+			}
 		}
 	}
 
 	// --anno e --data scrivono lo stesso campo server `anno`: si intersecano in
 	// modo esplicito (l'anno deve cadere nell'intervallo della data), invece di
-	// lasciare che vinca l'ordine — casuale — di iterazione della mappa Params.
-	if anno := strings.TrimSpace(opts.Params["anno"]); anno != "" && len(years) > 0 {
-		keep := years[:0]
-		for _, y := range years {
+	// lasciare che vinca l'ordine — casuale — di iterazione della mappa params.
+	if anno := strings.TrimSpace(params["anno"]); anno != "" && len(out.Anni) > 0 {
+		keep := out.Anni[:0]
+		for _, y := range out.Anni {
 			if y == anno {
 				keep = append(keep, y)
 			}
 		}
-		years = keep
-		if len(years) == 0 {
-			return nil, nil // --anno fuori dall'intervallo di --data: nessun risultato
+		out.Anni = keep
+		if len(out.Anni) == 0 {
+			// Nessuna richiesta partirebbe: in anteprima si toglie anche il
+			// campo, o si annuncerebbe una richiesta plausibile che non parte.
+			out.Form.Del("anno")
+			out.Deferred["anno"] = "fuori dall'intervallo di --data: nessun anno da interrogare, la ricerca non restituirebbe nulla e nessuna richiesta partirebbe"
+			out.VuotoPerAnno = true
+			return out, nil
 		}
 	}
+	// Il primo giro e' l'unico valore dicibile senza indovinare; il ciclo di
+	// searchBD riscrive il campo a ogni anno.
+	if len(out.Anni) > 0 {
+		out.Form.Set("anno", out.Anni[0])
+		out.Deferred["data"] = "il backend non ha un campo data: l'intervallo diventa una richiesta per ciascun anno in `anni`, che sono i valori che il campo `anno` prende uno per giro — nei campi c'e' il primo, cioe' quello della prima richiesta — piu' un filtro sulle righe ricevute per tagliare i giorni fuori intervallo. Dentro ogni anno `page` parte da 1 e cresce di uno fino al numero di pagine che la risposta dichiara, o finche' --limit e' pieno: quel numero sta nella risposta, quindi le pagine oltre la prima non sono anteprimabili"
+	}
 
-	legisl := strings.TrimSpace(opts.Params["legisl"])
+	legisl := strings.TrimSpace(params["legisl"])
 
-	// Filtro --oratore: risolve il nome negli ID del <select> oratori del form
-	// (con le legislature in cui l'oratore è attivo) e li invia in modalità "or".
+	// --oratore: risolve il nome negli ID del <select> oratori del form (con le
+	// legislature in cui l'oratore e' attivo) e li invia in modalita' "or".
 	if spec.speakerField != "" {
-		if orat := strings.TrimSpace(opts.Params["oratore"]); orat != "" {
-			opts := parseSelectOptions(sessionHTML, spec.speakerField)
-			ids := resolveOptionIDs(opts, orat, legisl)
-			if len(ids) == 0 {
-				// Un risultato vuoto direbbe "non è mai intervenuto", che è
-				// un'altra affermazione: qui il nome non esiste in anagrafica.
-				return nil, &UnresolvedFilterError{Filtro: "--oratore", Valore: orat, Legisl: legisl,
-					Rimedio:     "Prova con il solo cognome, o con una porzione del nome.",
-					Disponibili: suggestOptionNames(opts, orat, legisl)}
+		if orat := strings.TrimSpace(params["oratore"]); orat != "" {
+			if anteprima {
+				out.Deferred["oratore"] = "risolto da nome a id leggendo le <option> di " + spec.speakerField + " nel form, che richiede una richiesta"
+			} else {
+				sel := parseSelectOptions(sessionHTML, spec.speakerField)
+				ids := resolveOptionIDs(sel, orat, legisl)
+				if len(ids) == 0 {
+					// Un risultato vuoto direbbe "non e' mai intervenuto", che
+					// e' un'altra affermazione: qui il nome non esiste in
+					// anagrafica.
+					return out, &UnresolvedFilterError{Filtro: "--oratore", Valore: orat, Legisl: legisl,
+						Rimedio:     "Prova con il solo cognome, o con una porzione del nome.",
+						Disponibili: suggestOptionNames(sel, orat, legisl)}
+				}
+				out.Form[spec.speakerField] = ids
+				out.Form.Set("$S"+spec.speakerField, "or")
 			}
-			form[spec.speakerField] = ids
-			form.Set("$S"+spec.speakerField, "or")
 		}
 	}
 
-	// Filtro --commissione / --codcom: risolve in id (per-legislatura) dal <select>.
+	// --commissione / --codcom: risolve in id (per-legislatura) dal <select>.
 	if spec.commissioneField != "" {
-		cod := strings.TrimSpace(opts.Params["codcom"])
-		com := strings.TrimSpace(opts.Params["commissione"])
+		cod := strings.TrimSpace(params["codcom"])
+		com := strings.TrimSpace(params["commissione"])
 		if cod != "" || com != "" {
-			selOpts := parseSelectOptions(sessionHTML, spec.commissioneField)
-			ids := resolveCommissioneIDs(selOpts, cod, com, legisl)
-			if len(ids) == 0 {
-				// Come per --oratore: zero record direbbe "questa commissione non
-				// ha lavori", che è un'altra affermazione.
-				val, filtro := com, "--commissione"
-				rimedio := "Usa il nome ordinale della commissione: PRIMA, SECONDA, TERZA, QUARTA, QUINTA, SESTA."
-				if val == "" {
-					val, filtro = cod, "--codcom"
-					rimedio = "Il codice commissione va da 1 a 6 (1=PRIMA, 2=SECONDA, ... 6=SESTA); per cercarla per nome usa --commissione."
+			if anteprima {
+				chiave := "commissione"
+				if com == "" {
+					chiave = "codcom"
 				}
-				return nil, &UnresolvedFilterError{Filtro: filtro, Valore: val, Legisl: legisl,
-					Disponibili: suggestOptionNames(selOpts, val, legisl), Rimedio: rimedio}
-			}
-			form[spec.commissioneField] = ids
-			if spec.commissioneMode != "" {
-				form.Set("$S"+spec.commissioneField, spec.commissioneMode)
+				out.Deferred[chiave] = "risolto in id per-legislatura leggendo le <option> di " + spec.commissioneField + " nel form, che richiede una richiesta"
+			} else {
+				selOpts := parseSelectOptions(sessionHTML, spec.commissioneField)
+				ids := resolveCommissioneIDs(selOpts, cod, com, legisl)
+				if len(ids) == 0 {
+					// Come per --oratore: zero record direbbe "questa
+					// commissione non ha lavori", che e' un'altra affermazione.
+					val, filtro := com, "--commissione"
+					rimedio := "Usa il nome ordinale della commissione: PRIMA, SECONDA, TERZA, QUARTA, QUINTA, SESTA."
+					if val == "" {
+						val, filtro = cod, "--codcom"
+						rimedio = "Il codice commissione va da 1 a 6 (1=PRIMA, 2=SECONDA, ... 6=SESTA); per cercarla per nome usa --commissione."
+					}
+					return out, &UnresolvedFilterError{Filtro: filtro, Valore: val, Legisl: legisl,
+						Disponibili: suggestOptionNames(selOpts, val, legisl), Rimedio: rimedio}
+				}
+				out.Form[spec.commissioneField] = ids
+				if spec.commissioneMode != "" {
+					out.Form.Set("$S"+spec.commissioneField, spec.commissioneMode)
+				}
 			}
 		}
 	}
+
+	return out, nil
+}
+
+func (c *Client) searchBD(ctx context.Context, arc Archive, opts SearchOptions) ([]Record, error) {
+	spec := bdArchives[arc.Slug]
+	bdURL := c.BaseURL + "/bd/" + spec.path
+
+	// Sessione (cookie JSESSIONID nel jar del Client). La risposta contiene anche
+	// il form, inclusi i <select> di oratori e commissioni: la teniamo per
+	// risolvere --oratore e --commissione/--codcom.
+	sessionHTML, err := c.get(ctx, bdURL)
+	if err != nil {
+		return nil, fmt.Errorf("bd session (%s): %w", arc.Slug, err)
+	}
+
+	// Un filtro che il backend non sa applicare deve fallire, non essere
+	// ignorato (vedi bdUnsupported).
+	if err := bdUnsupported(arc.Slug, spec, opts); err != nil {
+		return nil, err
+	}
+
+	// La form la costruisce bdBuildForm, la stessa che l'anteprima --dry-run
+	// stampa: e' l'unico modo perche' le due non possano descrivere richieste
+	// diverse (vedi bdRequest).
+	req, err := bdBuildForm(arc.Slug, spec, opts.Params, sessionHTML, false)
+	if err != nil {
+		return nil, err
+	}
+	if req.VuotoPerAnno {
+		return nil, nil // --anno fuori dall'intervallo di --data: nessun risultato
+	}
+	form, years, keepDate := req.Form, req.Anni, req.KeepDate
 
 	maxPages := opts.MaxPages
 	if maxPages <= 0 {
@@ -638,17 +675,26 @@ years:
 // perché un filtro caduto restituisce più record di quanti la riga di comando
 // ne chieda — un errore silenzioso, e quindi peggiore di un comando che fallisce.
 func bdUnsupported(slug string, spec bdSpec, opts SearchOptions) error {
+	// --isis-query non e' un parametro della form, quindi non passa dal
+	// costruttore: resta l'unico controllo che vive qui.
+	if strings.TrimSpace(opts.ISISRaw) != "" {
+		return fmt.Errorf("l'archivio %s è servito dal backend /bd/ del portale, che non supporta --isis-query: rimuovi il filtro (gli altri filtri restano validi)", slug)
+	}
+	return bdUnsupportedParams(slug, spec, opts.Params)
+}
+
+// bdUnsupportedParams e' la meta' che guarda i soli parametri della form, ed e'
+// chiamata anche da bdBuildForm: cosi' l'anteprima rifiuta gli stessi filtri
+// che il percorso vivo rifiuta, invece di presentarli come "differiti".
+func bdUnsupportedParams(slug string, spec bdSpec, params map[string]string) error {
 	unsupported := func(flag string) error {
 		return fmt.Errorf("l'archivio %s è servito dal backend /bd/ del portale, che non supporta --%s: rimuovi il filtro (gli altri filtri restano validi)", slug, flag)
 	}
-	if strings.TrimSpace(opts.ISISRaw) != "" {
-		return unsupported("isis-query")
-	}
 	// Ordine stabile: le mappe Go iterano a caso e il messaggio d'errore non
 	// deve dipendere dal giro.
-	keys := make([]string, 0, len(opts.Params))
-	for k := range opts.Params {
-		if strings.TrimSpace(opts.Params[k]) != "" {
+	keys := make([]string, 0, len(params))
+	for k := range params {
+		if strings.TrimSpace(params[k]) != "" {
 			keys = append(keys, k)
 		}
 	}

@@ -732,28 +732,11 @@ func runGetExtra(cmd *cobra.Command, flags *rootFlags, archiveSlug string, legis
 	if arc == nil {
 		return fmt.Errorf("unknown archive slug: %q", archiveSlug)
 	}
+	// I parametri si costruiscono PRIMA del ramo d'anteprima, cosi' l'anteprima
+	// descrive la ricerca che partirebbe davvero invece di comporne una propria.
+	params := getSearchParams(legisl, numero, extra)
 	if flags.dryRun || cliIsVerify() {
-		out := map[string]any{
-			"archive": arc.Slug,
-			"legisl":  legisl,
-			"numero":  numero,
-			"dry_run": true,
-			"would_fetch": fmt.Sprintf("%s/icaro/doc%s-1.jsp?icaDocId=N&legisl=%d&numero=%d",
-				icaro.DefaultBaseURL, arc.ID, legisl, numero),
-		}
-		return writeJSON(cmd.OutOrStdout(), out)
-	}
-	params := map[string]string{}
-	if legisl > 0 {
-		params["legisl"] = fmt.Sprintf("%d", legisl)
-	}
-	if numero > 0 {
-		params["numero"] = fmt.Sprintf("%d", numero)
-	}
-	for k, v := range extra {
-		if v = strings.TrimSpace(v); v != "" {
-			params[k] = v
-		}
+		return emitGetDryRun(cmd, *arc, legisl, numero, params)
 	}
 	c, err := icaro.New(nil)
 	if err != nil {
@@ -912,6 +895,46 @@ func titoloDoc(doc icaro.Doc) string {
 		return t
 	}
 	return strings.TrimSpace(doc.Fields["Titolo"])
+}
+
+// getSearchParams sono i parametri con cui `get` aggancia il documento, in un
+// posto solo: l'anteprima --dry-run e la ricerca vera devono partire dagli
+// stessi, o la prima smette di descrivere la seconda.
+func getSearchParams(legisl, numero int, extra map[string]string) map[string]string {
+	params := map[string]string{}
+	if legisl > 0 {
+		params["legisl"] = fmt.Sprintf("%d", legisl)
+	}
+	if numero > 0 {
+		params["numero"] = fmt.Sprintf("%d", numero)
+	}
+	for k, v := range extra {
+		if v = strings.TrimSpace(v); v != "" {
+			params[k] = v
+		}
+	}
+	return params
+}
+
+// emitGetDryRun mostra la ricerca che aggancia il documento.
+//
+// Prima stampava un URL composto a mano: `doc221-1.jsp?icaDocId=N&legisl=18&numero=1185`
+// — con una `N` letterale al posto dell'id, e due parametri che quell'URL non
+// porta. Non era una richiesta diversa da quella vera: non era una richiesta.
+// E taceva che `get` fa due passi, di cui il secondo dipende dal primo.
+func emitGetDryRun(cmd *cobra.Command, arc icaro.Archive, legisl, numero int, params map[string]string) error {
+	target, err := dryRunTargetBySlug(arc.Slug, normalizeParams(arc, params))
+	if err != nil {
+		return err
+	}
+	if target == nil {
+		return fmt.Errorf("archivio %s non disponibile", arc.Slug)
+	}
+	nota := "aggancia il documento, poi ne scarica la scheda: l'URL della scheda contiene l'id che questa ricerca restituisce, quindi non e' anteprimabile."
+	if icaro.IsBDArchive(arc.Slug) {
+		nota += " Su questo archivio la ricerca e' forzata sull'indice Icaro (serve l'id del documento); se l'indice non ha il record, `get` ripiega sulla scheda del backend /bd/ e restituisce `pdf_url`."
+	}
+	return emitDryRunRequests(cmd, []map[string]any{target}, nota)
 }
 
 // normalizeParams rewrites a few flag inputs to the shape the portal expects:

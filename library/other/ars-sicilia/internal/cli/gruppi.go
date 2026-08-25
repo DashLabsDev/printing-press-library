@@ -115,7 +115,8 @@ collegio di elezione: è la domanda inversa, «in quale gruppo sta X».`,
 				return err
 			}
 			if dryRunOK(flags) {
-				return emitGruppiDryRun(cmd, wwwclient.GruppiPath, map[string]string{"idLeg": itoa(flagLegisl)})
+				path, params := wwwclient.GruppiElencoReq(flagLegisl)
+				return emitGruppiDryRun(cmd, path, params)
 			}
 			ctx := cmd.Context()
 			www := wwwclient.New(flags.timeout, flags.rateLimit)
@@ -290,7 +291,8 @@ candidati e esce.`,
 				return usageErr(fmt.Errorf("richiesto 1 argomento: <slug-o-nome> del gruppo (vedi `ars-sicilia-pp-cli gruppi elenco`)"))
 			}
 			if dryRunOK(flags) {
-				return emitGruppiDryRun(cmd, wwwclient.GruppiPath+"/"+strings.TrimSpace(args[0]), nil)
+				path, params := wwwclient.GruppoDettaglioReq(strings.TrimSpace(args[0]))
+				return emitGruppiDryRun(cmd, path, params)
 			}
 			ctx := cmd.Context()
 			www := wwwclient.New(flags.timeout, flags.rateLimit)

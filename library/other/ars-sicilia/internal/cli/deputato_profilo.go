@@ -74,6 +74,22 @@ type profileReport struct {
 	Atti     []profileItem `json:"atti"`
 }
 
+// profiloSearchParams sono i parametri di una delle ricerche del profilo, in un
+// posto solo: il nome viaggia come `firmatario` sugli archivi degli atti e come
+// `testo` sui resoconti, dove l'oratore non e' un campo filtrabile. Anteprima e
+// ricerca vera devono partire dagli stessi, o la prima smette di descrivere la
+// seconda — e con sette archivi la deriva sarebbe anche difficile da vedere.
+func profiloSearchParams(campo, name string, legisl int, data string) map[string]string {
+	p := map[string]string{campo: name}
+	if legisl > 0 {
+		p["legisl"] = itoa(legisl)
+	}
+	if data != "" {
+		p["data"] = data
+	}
+	return p
+}
+
 // profiloFirmaArchives sono gli archivi in cui il deputato compare come
 // firmatario (campo FIRMAT). Condiviso con l'anteprima --dry-run, che deve
 // elencare le stesse richieste che il comando poi fa.
@@ -86,16 +102,6 @@ var profiloFirmaArchives = []string{"ddl", "interrogazioni", "interpellanze", "m
 // dove l'oratore non è un campo. È la differenza che spiega perché lo stesso
 // nome renda su un archivio e non sull'altro.
 func emitDeputatoProfiloDryRun(cmd *cobra.Command, name string, legisl int, data string) error {
-	base := func() map[string]string {
-		p := map[string]string{}
-		if legisl > 0 {
-			p["legisl"] = itoa(legisl)
-		}
-		if data != "" {
-			p["data"] = data
-		}
-		return p
-	}
 	// runDeputatoProfilo passa da normalizeParams su ogni archivio: l'anteprima
 	// fa lo stesso, altrimenti annuncia una --data in formato diverso da quello
 	// che poi viaggia.
@@ -108,9 +114,7 @@ func emitDeputatoProfiloDryRun(cmd *cobra.Command, name string, legisl int, data
 	}
 	requests := []map[string]any{}
 	for _, slug := range profiloFirmaArchives {
-		p := base()
-		p["firmatario"] = name
-		t, err := target(slug, p)
+		t, err := target(slug, profiloSearchParams("firmatario", name, legisl, data))
 		if err != nil {
 			return err
 		}
@@ -118,9 +122,7 @@ func emitDeputatoProfiloDryRun(cmd *cobra.Command, name string, legisl int, data
 			requests = append(requests, t)
 		}
 	}
-	p := base()
-	p["testo"] = name
-	t, err := target("resoconti", p)
+	t, err := target("resoconti", profiloSearchParams("testo", name, legisl, data))
 	if err != nil {
 		return err
 	}
@@ -159,13 +161,7 @@ func runDeputatoProfilo(cmd *cobra.Command, flags *rootFlags, name string, legis
 		if err != nil {
 			continue
 		}
-		params := map[string]string{"firmatario": name}
-		if legisl > 0 {
-			params["legisl"] = itoa(legisl)
-		}
-		if data != "" {
-			params["data"] = data
-		}
+		params := profiloSearchParams("firmatario", name, legisl, data)
 		var truncated bool
 		recs, err := c.Search(ctx, *arc, icaro.SearchOptions{
 			Params:    normalizeParams(*arc, params),
@@ -206,13 +202,7 @@ func runDeputatoProfilo(cmd *cobra.Command, flags *rootFlags, name string, legis
 		// Un errore di init non deve azzerare gli atti già raccolti sopra:
 		// si salta solo questo archivio.
 		if c, err := icaro.New(nil); err == nil {
-			params := map[string]string{"testo": name}
-			if legisl > 0 {
-				params["legisl"] = itoa(legisl)
-			}
-			if data != "" {
-				params["data"] = data
-			}
+			params := profiloSearchParams("testo", name, legisl, data)
 			var truncated bool
 			recs, err := c.Search(ctx, *arc, icaro.SearchOptions{
 				Params:    normalizeParams(*arc, params),
