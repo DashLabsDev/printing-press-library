@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.4 - 2026-08-25
+
+- feat(qsys): reprint under press 4.31.1 — support.qsys.com source, bom risks/fault/qds, SIGBUS honesty (#1808).
+
 ## 2026.8.3 - 2026-08-25
 
 - fix(devices): document the corpus builder for extron/qsys/crestron; harden extron catalog sync (#1804).
