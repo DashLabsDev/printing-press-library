@@ -1833,9 +1833,9 @@
       "path": "library/other/ars-sicilia",
       "release": {
         "cli_name": "ars-sicilia-pp-cli",
-        "version": "2026.8.6",
-        "released_at": "2026-08-23T09:18:30Z",
-        "source_commit": "caf222efc992e0f9de881db73d463e5cef1f38be"
+        "version": "2026.8.7",
+        "released_at": "2026-08-25T09:27:30Z",
+        "source_commit": "6567f5cc7df4341d54dd3d5c5dcd456eee13cf02"
       },
       "printer": "aborruso",
       "printer_name": "aborruso",
@@ -11543,9 +11543,9 @@
       "path": "library/developer-tools/isitagentready",
       "release": {
         "cli_name": "isitagentready-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T08:21:18Z",
-        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
+        "version": "2026.8.3",
+        "released_at": "2026-08-25T09:27:30Z",
+        "source_commit": "d74ab679aed2b542959b95ae4a998ba1c4c9c9e4"
       },
       "printer": "bobeglz",
       "printer_name": "bobe",
@@ -24736,9 +24736,9 @@
       "path": "library/travel/wanderlog",
       "release": {
         "cli_name": "wanderlog-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-23T09:17:50Z",
-        "source_commit": "af040d69905bc6a19b0b13e0e595a83835adb5ae"
+        "version": "2026.8.2",
+        "released_at": "2026-08-25T09:27:30Z",
+        "source_commit": "5005e7bbdf918019ce36d2a5d17204a123eebfd4"
       },
       "printer": "zjsng",
       "printer_name": "zjsng",
