@@ -1958,6 +1958,12 @@
         "Lists only publicly listed Ashby jobs and supports structured filtering across department, team, location, workplace type, employment type, publication date, currency, and compensation range."
       ],
       "path": "library/job-boards/ashby",
+      "release": {
+        "cli_name": "ashby-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-25T09:16:35Z",
+        "source_commit": "4929de7afa894f64ad68f60477d652b3592f6637"
+      },
       "printer": "klubieniecki",
       "printer_name": "klubieniecki",
       "creator": {
@@ -22408,6 +22414,42 @@
       }
     },
     {
+      "name": "synology",
+      "category": "devices",
+      "api": "Synology",
+      "description": "Query and operate Synology DSM NAS units - system health, storage, SMART, shares, users",
+      "search_terms": [
+        "synology",
+        "synology-pp-cli",
+        "Query and operate Synology DSM NAS units - system health, storage, SMART, shares, users",
+        "API namespace inventory",
+        "session apis",
+        "List every API namespace this particular NAS exposes, with its version range and CGI path.",
+        "SMART attribute table",
+        "storage smart",
+        "Read a drive's raw SMART attribute table; 'storage smart-schedule' reads the scheduled SMART test configuration."
+      ],
+      "path": "library/devices/synology",
+      "printer": "smoochy",
+      "printer_name": "smoochy",
+      "creator": {
+        "handle": "smoochy",
+        "name": "smoochy"
+      },
+      "mcp": {
+        "binary": "synology-pp-mcp",
+        "transports": [
+          "stdio"
+        ],
+        "tool_count": 45,
+        "public_tool_count": 2,
+        "auth_type": "session_handshake",
+        "env_vars": [],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "table-reservation-goat",
       "category": "food-and-dining",
       "api": "Table Reservation GOAT",
@@ -25148,6 +25190,57 @@
       "creator": {
         "handle": "Amit-Tabibi",
         "name": "Amit"
+      }
+    },
+    {
+      "name": "woolworths",
+      "category": "commerce",
+      "api": "Woolworths",
+      "description": "Every Woolworths catalogue, specials, store and trolley surface, plus a local price history that can tell a genuine half-price from an inflated was-price.",
+      "search_terms": [
+        "woolworths",
+        "woolworths-pp-cli",
+        "Every Woolworths catalogue, specials, store and trolley surface, plus a local price history that can tell a genuine half-price from an inflated was-price.",
+        "Genuine-special verdict",
+        "real-special",
+        "Tells you whether an advertised special is genuinely cheap or just a lower number next to an inflated was-price.",
+        "Half-price cycle forecast",
+        "cycle",
+        "Estimates when a product's next half-price window is likely to open, from its own recorded discount episodes.",
+        "Cheaper substitute finder",
+        "swap",
+        "Ranks in-stock alternatives by unit price normalised across different measure bases, so per-100g and per-1kg tiles compare correctly.",
+        "Basket costing from a list",
+        "basket",
+        "Prices a whole shopping list, showing which lines moved since the last time you ran it and what it did to the total.",
+        "Specials rollover diff",
+        "specials-diff",
+        "Shows what entered and left each specials group since your last sync, with how long since each entrant was last discounted.",
+        "Multi-buy effective unit price",
+        "multibuy",
+        "Works out what a multi-buy offer actually costs per unit at the quantity it demands, versus buying singly or buying a larger pack."
+      ],
+      "path": "library/commerce/woolworths",
+      "printer": "therichardgill",
+      "printer_name": "Richard Gill",
+      "creator": {
+        "handle": "therichardgill",
+        "name": "Richard Gill"
+      },
+      "mcp": {
+        "binary": "woolworths-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 16,
+        "public_tool_count": 13,
+        "auth_type": "cookie",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "partial",
+        "spec_format": "internal"
       }
     },
     {
