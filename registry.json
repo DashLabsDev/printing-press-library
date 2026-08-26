@@ -1945,6 +1945,55 @@
       }
     },
     {
+      "name": "asc",
+      "category": "developer-tools",
+      "api": "App Store Connect",
+      "description": "A read-only App Store Connect cockpit that shows every app you ship at once — review state, builds, downloads, and ratings in one glance.",
+      "search_terms": [
+        "asc",
+        "App Store Connect",
+        "asc-pp-cli",
+        "A read-only App Store Connect cockpit that shows every app you ship at once — review state, builds, downloads, and ratings in one glance.",
+        "Fleet cockpit",
+        "cockpit",
+        "One-glance board across all your apps: review state, latest build + processing state, and an action-needed flag.",
+        "In-flight review board with SLA aging",
+        "pipeline",
+        "Every version currently in the review pipeline across all apps, ranked by how long it has been waiting.",
+        "Traction leaderboard",
+        "traction",
+        "Ranks your apps by recent rating and review volume and flags apps whose rating is trending down; adds download counts when ASC_VENDOR_NUMBER is set.",
+        "Fleet feedback pulse",
+        "reviews recent",
+        "Newest written customer reviews across all your apps in one merged stream.",
+        "Action-needed blockers",
+        "blockers",
+        "Correlates failed/invalid builds, pending or absent submissions, and metadata rejections into one fleet blocker list."
+      ],
+      "path": "library/developer-tools/asc",
+      "printer": "justinwfu",
+      "printer_name": "justinwfu",
+      "creator": {
+        "handle": "justinwfu",
+        "name": "justinwfu"
+      },
+      "mcp": {
+        "binary": "asc-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 17,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "ASC_ITC_BEARER_TOKEN"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "ashby",
       "category": "job-boards",
       "api": "Ashby",
@@ -17781,9 +17830,9 @@
       "path": "library/devices/qsys",
       "release": {
         "cli_name": "qsys-pp-cli",
-        "version": "2026.8.3",
-        "released_at": "2026-08-25T09:30:29Z",
-        "source_commit": "6ab477bd4140d6d524a5fee21ac3cae548d8359a"
+        "version": "2026.8.4",
+        "released_at": "2026-08-25T09:33:25Z",
+        "source_commit": "23e5f868854e23f1faede224f759215c0f6ce036"
       },
       "printer": "Drummerms",
       "printer_name": "drummerms",
