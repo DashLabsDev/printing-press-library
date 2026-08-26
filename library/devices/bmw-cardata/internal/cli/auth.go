@@ -152,6 +152,13 @@ func newAuthLogoutCmd(flags *rootFlags) *cobra.Command {
 			if err := cfg.ClearTokens(); err != nil {
 				return configErr(fmt.Errorf("clearing tokens: %w", err))
 			}
+			// Device-code login also writes cardata_session.json (access,
+			// refresh, and id tokens for MQTT). ClearTokens only wipes the
+			// config/credentials files; remove the sidecar so logout does
+			// not leave usable OAuth credentials on disk.
+			if err := os.Remove(cardataSessionPath(cfg)); err != nil && !os.IsNotExist(err) {
+				return configErr(fmt.Errorf("clearing streaming session: %w", err))
+			}
 
 			// Identify which (if any) auth env var is still exported so the
 			// JSON envelope and the human prose can both surface it.
