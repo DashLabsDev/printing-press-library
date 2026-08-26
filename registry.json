@@ -1468,9 +1468,9 @@
       "path": "library/food-and-dining/anylist",
       "release": {
         "cli_name": "anylist-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T04:47:01Z",
-        "source_commit": "d48f568519d15ae3dd84e0d01a169adfbea94036"
+        "version": "2026.8.2",
+        "released_at": "2026-08-26T09:27:00Z",
+        "source_commit": "6b5c232364f49478675581bcd5d5a7202fc6e36d"
       },
       "printer": "jeeves",
       "printer_name": "Jeeves",
@@ -5862,6 +5862,43 @@
         ],
         "mcp_ready": "full",
         "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "dndbeyond",
+      "category": "developer-tools",
+      "api": "D&D Beyond",
+      "description": "Read public D&D Beyond rules pages from the terminal.",
+      "search_terms": [
+        "dndbeyond",
+        "D&D Beyond",
+        "dndbeyond-pp-cli",
+        "Read public D&D Beyond rules pages from the terminal.",
+        "This first print intentionally uses only public, unauthenticated pages.",
+        "Local character snapshot and PDF inspection",
+        "characters inspect",
+        "Normalize a user-supplied D&D Beyond or Beyond20 character snapshot or exported PDF."
+      ],
+      "path": "library/developer-tools/dndbeyond",
+      "printer": "wirelesstkd",
+      "printer_name": "Matthew Martin",
+      "creator": {
+        "handle": "wirelesstkd",
+        "name": "Matthew Martin"
+      },
+      "mcp": {
+        "binary": "dndbeyond-pp-mcp",
+        "transports": [
+          "stdio"
+        ],
+        "tool_count": 5,
+        "public_tool_count": 5,
+        "auth_type": "none",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
       }
     },
     {
@@ -11680,6 +11717,60 @@
         "env_vars": [],
         "mcp_ready": "full",
         "spec_format": "internal"
+      }
+    },
+    {
+      "name": "is-agentic",
+      "category": "developer-tools",
+      "api": "Is Agentic",
+      "description": "Turn Is Agentic reports into durable, scriptable readiness evidence.",
+      "search_terms": [
+        "is-agentic",
+        "Is Agentic",
+        "is-agentic-pp-cli",
+        "Turn Is Agentic reports into durable, scriptable readiness evidence.",
+        "Snapshot ledger",
+        "history",
+        "Keep a local, timestamped ledger of readiness reports and their provenance.",
+        "Cross-report diff",
+        "diff",
+        "See which readiness scores and findings changed between two retained audits.",
+        "Explainable policy gate",
+        "check",
+        "Fail CI with an explicit, machine-readable readiness policy decision.",
+        "Portfolio matrix",
+        "portfolio",
+        "Compare a fleet of public sites in one sortable score and issue matrix.",
+        "Issue lifecycle queue",
+        "issues",
+        "Track when readiness findings first appeared, last appeared, were fixed, or regressed.",
+        "Rate-aware fleet scheduler",
+        "Refresh many targets with bounded concurrency, deduplication, and Retry-After-aware pacing.",
+        "Evidence bundle",
+        "evidence",
+        "Package a report and its provenance into a portable evidence artifact."
+      ],
+      "path": "library/developer-tools/is-agentic",
+      "printer": "SomSamantray",
+      "printer_name": "Som Samantray",
+      "creator": {
+        "handle": "SomSamantray",
+        "name": "Som Samantray"
+      },
+      "mcp": {
+        "binary": "is-agentic-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 2,
+        "public_tool_count": 2,
+        "auth_type": "none",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
       }
     },
     {
