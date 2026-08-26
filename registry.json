@@ -3565,6 +3565,12 @@
         "Mirror personal CAROL ride history into local SQLite for dependable offline search and analysis."
       ],
       "path": "library/health/carol-bike",
+      "release": {
+        "cli_name": "carol-bike-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-26T09:29:35Z",
+        "source_commit": "922dc411079fb5600136cbeddffe8a9f202c87d1"
+      },
       "printer": "bricenice17",
       "printer_name": "bricenice17",
       "creator": {
@@ -11794,6 +11800,12 @@
         "Package a report and its provenance into a portable evidence artifact."
       ],
       "path": "library/developer-tools/is-agentic",
+      "release": {
+        "cli_name": "is-agentic-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-26T09:29:35Z",
+        "source_commit": "dc6a9c7a1d02e68e3ff839552566ab46469a5058"
+      },
       "printer": "SomSamantray",
       "printer_name": "Som Samantray",
       "creator": {
@@ -15336,6 +15348,62 @@
         "env_vars": [],
         "mcp_ready": "full",
         "spec_format": "internal"
+      }
+    },
+    {
+      "name": "openai-ads",
+      "category": "marketing",
+      "api": "OpenAI Ads",
+      "description": "The first OpenAI Ads client that can write, and the only one that keeps local history.",
+      "search_terms": [
+        "openai-ads",
+        "OpenAI Ads",
+        "openai-ads-pp-cli",
+        "The first OpenAI Ads client that can write, and the only one that keeps local history.",
+        "Budget pacing",
+        "pace",
+        "See whether a campaign will underspend or blow through its cap before the period ends.",
+        "Change drift",
+        "drift",
+        "Show what changed across campaigns, ad groups, and ads between two syncs.",
+        "Creative fatigue",
+        "fatigue",
+        "Rank ads by click-through decay so tired creative is obvious before spend is wasted.",
+        "Review watch",
+        "review-watch",
+        "Track approval and review status transitions across the account and every ad.",
+        "Bid and budget coherence",
+        "bid-check",
+        "Flag ad groups whose maximum bid is irrational against the parent campaign budget.",
+        "Structural audit",
+        "orphans",
+        "Find ad groups with no ads, campaigns with no delivery, and audiences nothing references.",
+        "Account tree",
+        "tree",
+        "Render the whole campaign, ad group, and ad hierarchy with status, budget, and review state.",
+        "Geo resolve",
+        "Turn the bare location IDs in campaign targeting into readable place names."
+      ],
+      "path": "library/marketing/openai-ads",
+      "printer": "bobeglz",
+      "printer_name": "bobe",
+      "creator": {
+        "handle": "bobeglz",
+        "name": "bobe"
+      },
+      "mcp": {
+        "binary": "openai-ads-pp-mcp",
+        "transports": [
+          "stdio"
+        ],
+        "tool_count": 41,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
       }
     },
     {
