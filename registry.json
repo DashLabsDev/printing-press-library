@@ -3551,6 +3551,43 @@
       }
     },
     {
+      "name": "carol-bike",
+      "category": "health",
+      "api": "CAROL Bike",
+      "description": "Read and locally mirror personal CAROL Bike workout data.",
+      "search_terms": [
+        "carol-bike",
+        "CAROL Bike",
+        "carol-bike-pp-cli",
+        "Read and locally mirror personal CAROL Bike workout data.",
+        "Private ride mirror",
+        "sync",
+        "Mirror personal CAROL ride history into local SQLite for dependable offline search and analysis."
+      ],
+      "path": "library/health/carol-bike",
+      "printer": "bricenice17",
+      "printer_name": "bricenice17",
+      "creator": {
+        "handle": "bricenice17",
+        "name": "bricenice17"
+      },
+      "mcp": {
+        "binary": "carol-bike-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 7,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "catapult-openfield-connect",
       "category": "health",
       "api": "Catapult OpenField",
@@ -5880,6 +5917,12 @@
         "Normalize a user-supplied D&D Beyond or Beyond20 character snapshot or exported PDF."
       ],
       "path": "library/developer-tools/dndbeyond",
+      "release": {
+        "cli_name": "dndbeyond-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-26T09:28:34Z",
+        "source_commit": "dda9b8239e7d1daec24543728204104eb4c11c33"
+      },
       "printer": "wirelesstkd",
       "printer_name": "Matthew Martin",
       "creator": {
