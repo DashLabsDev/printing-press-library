@@ -1971,6 +1971,12 @@
         "Correlates failed/invalid builds, pending or absent submissions, and metadata rejections into one fleet blocker list."
       ],
       "path": "library/developer-tools/asc",
+      "release": {
+        "cli_name": "asc-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-26T09:19:22Z",
+        "source_commit": "25fbced8ab4eec660dbc70de934c4597b2848a3f"
+      },
       "printer": "justinwfu",
       "printer_name": "justinwfu",
       "creator": {
@@ -3542,6 +3548,61 @@
         ],
         "mcp_ready": "full",
         "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "catapult-openfield-connect",
+      "category": "health",
+      "api": "Catapult OpenField",
+      "description": "Every Catapult GPS metric — ACWR, velocity benchmarks, load reports — from one command, with a local SQLite mirror for offline analysis.",
+      "search_terms": [
+        "catapult-openfield-connect",
+        "Catapult OpenField",
+        "catapult-openfield-connect-pp-cli",
+        "Every Catapult GPS metric — ACWR, velocity benchmarks, load reports — from one command, with a local SQLite mirror for offline analysis.",
+        "ACWR dashboard",
+        "acwr",
+        "Instant acute:chronic workload ratios for any athlete or the full squad, color-coded into safe (0.8-1.3), caution, and danger (>1.5) zones.",
+        "Weekly load report",
+        "report",
+        "One-command weekly summary — total Player Load, session count, ACWR, max velocity vs PB, monotony, strain, and risk flags — exportable as markdown or CSV.",
+        "Personal bests",
+        "pb",
+        "Compares recent session values against each athlete's all-time or rolling personal best, with readiness % and 3-session trend arrows.",
+        "Session diff",
+        "diff",
+        "Side-by-side comparison of two sessions (by ID, date, or last/prev) showing absolute and percentage change per metric and per athlete.",
+        "Positional benchmark",
+        "benchmark",
+        "Ranks any athlete against positional peers for a metric: percentile rank, squad median, and position median with outlier flags.",
+        "Return-to-play tracker",
+        "rtp",
+        "Tracks an injured athlete's load progression session-by-session as a percentage of squad average or a pre-injury baseline window.",
+        "Period intensity heatmap",
+        "heatmap",
+        "Renders an athlete-by-period intensity matrix for a session — ANSI heatmap on a terminal, JSON matrix for agents — surfacing where fatigue compounded."
+      ],
+      "path": "library/health/catapult-openfield-connect",
+      "printer": "erash11",
+      "printer_name": "Eric Rash",
+      "creator": {
+        "handle": "erash11",
+        "name": "Eric Rash"
+      },
+      "mcp": {
+        "binary": "catapult-openfield-connect-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 22,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
       }
     },
     {
@@ -11555,6 +11616,58 @@
         ],
         "mcp_ready": "full",
         "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "irail",
+      "category": "travel",
+      "api": "iRail",
+      "description": "Every Belgian rail lookup the existing tools offer, plus transfer-risk, delay history and accessibility data that none of them have.",
+      "search_terms": [
+        "irail",
+        "irail-pp-cli",
+        "Every Belgian rail lookup the existing tools offer, plus transfer-risk, delay history and accessibility data that none of them have.",
+        "Transfer risk under live delay",
+        "transfer-risk",
+        "Tells you whether the transfers in a journey still hold once today's delays are applied.",
+        "Route punctuality history",
+        "punctuality",
+        "Shows how reliable a train or route has actually been, from delay observations recorded on your machine.",
+        "Disruptions scoped to one journey",
+        "disruptions route",
+        "Filters the national disruption feed down to the stations your journey actually passes through.",
+        "Live observation capture",
+        "observe",
+        "Records what the board says right now into local SQLite, building the history other commands read.",
+        "Latest safe departure",
+        "leave-by",
+        "Answers the last train you can take and still arrive before a deadline, accounting for current delays.",
+        "Station facilities and accessibility",
+        "stations facilities",
+        "Reports step-free access, elevators, ramps, lockers, bike parking and ticket-desk hours for a station.",
+        "What changed since last check",
+        "changes",
+        "Reports new delays, cancellations and platform changes since the last time you looked."
+      ],
+      "path": "library/travel/irail",
+      "printer": "olli757",
+      "printer_name": "Olivier",
+      "creator": {
+        "handle": "olli757",
+        "name": "Olivier"
+      },
+      "mcp": {
+        "binary": "irail-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 7,
+        "public_tool_count": 7,
+        "auth_type": "none",
+        "env_vars": [],
+        "mcp_ready": "full",
+        "spec_format": "internal"
       }
     },
     {
@@ -25504,6 +25617,64 @@
       }
     },
     {
+      "name": "workspace-admin",
+      "category": "productivity",
+      "api": "Google Workspace Admin",
+      "description": "GAT-style Google Workspace auditing as an agent-native CLI: sync Directory, Drive, Gmail, Reports, and Alert Center into a local store, then run offline cross-API audits, offboarding, and OAuth-app risk checks that GAM and the official gws CLI cannot persist.",
+      "search_terms": [
+        "workspace-admin",
+        "Google Workspace Admin",
+        "workspace-admin-pp-cli",
+        "GAT-style Google Workspace auditing as an agent-native CLI: sync Directory, Drive, Gmail, Reports, and Alert Center into a local store, then run offline cross-API audits, offboarding, and OAuth-app risk checks that GAM and the official gws CLI cannot persist.",
+        "Offboard workflow",
+        "workflow offboard",
+        "Run a departing user's entire lifecycle in one command — suspend, sign out, revoke OAuth tokens, transfer Drive ownership, set Gmail delegation, remove from groups, and move to a suspended OU.",
+        "User 360 audit",
+        "audit user360",
+        "One per-user posture report joining the user's Drive footprint and quota, security (2SV, suspended), connected OAuth apps, devices, Gmail settings, group memberships, and recent activity.",
+        "External sharing audit",
+        "audit external-shares",
+        "Find every Drive file shared 'anyone with link' or with an external domain, joined to its owner and the owner's org unit.",
+        "OAuth app risk audit",
+        "audit app-risk",
+        "Roll up every third-party OAuth app authorized in the domain by a curated scope-to-risk tier (Low/Moderate/High), flag apps with Full Drive access, and count users-per-app with the member list.",
+        "Login and geo-failure audit",
+        "audit logins",
+        "Surface failed-login bursts, new-country logins, and dormant accounts (no login since N days) from synced login activity joined to users.",
+        "Incident reconstruction",
+        "audit reconstruct",
+        "Merge one user's login, admin, Drive, and token activity into a single ordered timeline for post-compromise review.",
+        "Email exposure sweep",
+        "audit email-exposure",
+        "Sweep every user's Gmail forwarding, sendAs, delegates, and filters for external forwarding, external send-as, delegates, and forward/delete rules — the standard business-email-compromise indicators.",
+        "Nested group expansion",
+        "groups expand",
+        "Recursively flatten nested groups into their effective direct-user membership, cycle-safe."
+      ],
+      "path": "library/productivity/workspace-admin",
+      "printer": "RyanGravetteIDLA",
+      "printer_name": "RyanGravetteIDLA",
+      "creator": {
+        "handle": "RyanGravetteIDLA",
+        "name": "RyanGravetteIDLA"
+      },
+      "mcp": {
+        "binary": "workspace-admin-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 266,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "GOOGLE_WORKSPACE_TOKEN"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "worten",
       "category": "commerce",
       "api": "Worten Reverse Engineered",
@@ -26280,6 +26451,12 @@
         "Sync cursors, row and FTS counts, and last-sync age from the local cache; 'cache reindex' rebuilds the FTS index from base tables with zero network."
       ],
       "path": "library/productivity/zotero-research-library",
+      "release": {
+        "cli_name": "zotero-research-library-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-26T09:20:32Z",
+        "source_commit": "d010c2bd2188e74e12d9d70867ce1306d0c5652f"
+      },
       "printer": "erash11",
       "printer_name": "Eric Rash",
       "creator": {
