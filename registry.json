@@ -1484,7 +1484,7 @@
           "stdio",
           "http"
         ],
-        "tool_count": 44,
+        "tool_count": 47,
         "public_tool_count": 0,
         "auth_type": "bearer_token",
         "env_vars": [
@@ -3583,6 +3583,12 @@
         "Renders an athlete-by-period intensity matrix for a session — ANSI heatmap on a terminal, JSON matrix for agents — surfacing where fatigue compounded."
       ],
       "path": "library/health/catapult-openfield-connect",
+      "release": {
+        "cli_name": "catapult-openfield-connect-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-26T09:21:43Z",
+        "source_commit": "07504744c5a458574956e25b828b147e06f6e164"
+      },
       "printer": "erash11",
       "printer_name": "Eric Rash",
       "creator": {
@@ -11650,6 +11656,12 @@
         "Reports new delays, cancellations and platform changes since the last time you looked."
       ],
       "path": "library/travel/irail",
+      "release": {
+        "cli_name": "irail-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-26T09:21:43Z",
+        "source_commit": "34ae63798e125234b21b70d6825c7df88818eeba"
+      },
       "printer": "olli757",
       "printer_name": "Olivier",
       "creator": {
@@ -19436,9 +19448,9 @@
       "path": "library/other/scientific-consensus",
       "release": {
         "cli_name": "scientific-consensus-pp-cli",
-        "version": "2026.8.6",
-        "released_at": "2026-08-22T09:12:22Z",
-        "source_commit": "ff450b44874dd1570e13f7e7d031409a9a9aa2f8"
+        "version": "2026.8.7",
+        "released_at": "2026-08-26T09:24:33Z",
+        "source_commit": "bbb92e65cb6271cd8ad72b181e30e2294ba81d8c"
       },
       "printer": "laci141",
       "printer_name": "laci141",
@@ -25652,6 +25664,12 @@
         "Recursively flatten nested groups into their effective direct-user membership, cycle-safe."
       ],
       "path": "library/productivity/workspace-admin",
+      "release": {
+        "cli_name": "workspace-admin-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-26T09:21:43Z",
+        "source_commit": "e1eb87226c0c86f92e514b5d6a2a08f29589cb4b"
+      },
       "printer": "RyanGravetteIDLA",
       "printer_name": "RyanGravetteIDLA",
       "creator": {
