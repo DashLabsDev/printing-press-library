@@ -26252,6 +26252,55 @@
         "mcp_ready": "full",
         "spec_format": "openapi3"
       }
+    },
+    {
+      "name": "zotero-research-library",
+      "category": "productivity",
+      "api": "Zotero",
+      "description": "Your entire Zotero research library, searchable offline — version-based incremental sync into SQLite with full-text search no other Zotero tool has.",
+      "search_terms": [
+        "zotero-research-library",
+        "Zotero",
+        "zotero-research-library-pp-cli",
+        "Your entire Zotero research library, searchable offline — version-based incremental sync into SQLite with full-text search no other Zotero tool has.",
+        "Offline research-grounding search",
+        "ground",
+        "Ranked full-text search over your synced library — title, abstract, creators, tags, and attachment full text — answered offline in under a second, with snippets and citation-ready metadata.",
+        "Recently-added triage",
+        "items recent",
+        "What landed in the library recently, sorted by dateAdded from the local cache, with a --days cutoff and pipeable keys.",
+        "Citekey bridge",
+        "cite",
+        "Resolves a Better BibTeX citekey to its item from the local cache and exports citekey-faithful BibTeX; sync backfills citekeys via the desktop's local JSON-RPC when available.",
+        "Cached collection tree",
+        "collections tree",
+        "Renders the full collection hierarchy with per-node item counts in one command — a shape the flat API cannot return in one call.",
+        "Cache health and offline reindex",
+        "cache status",
+        "Sync cursors, row and FTS counts, and last-sync age from the local cache; 'cache reindex' rebuilds the FTS index from base tables with zero network."
+      ],
+      "path": "library/productivity/zotero-research-library",
+      "printer": "erash11",
+      "printer_name": "Eric Rash",
+      "creator": {
+        "handle": "erash11",
+        "name": "Eric Rash"
+      },
+      "mcp": {
+        "binary": "zotero-research-library-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 17,
+        "public_tool_count": 0,
+        "auth_type": "api_key",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
     }
   ]
 }
