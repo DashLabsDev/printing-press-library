@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.2 - 2026-08-26
+
+- feat(anylist): expand meal planning and safe metadata workflows (#1818).
+
 ## 2026.8.1 - 2026-08-17
 
 - feat(anylist): add barcode lookup and harden dogfood workflows (#1728).
