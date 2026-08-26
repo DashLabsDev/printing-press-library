@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.7 - 2026-08-26
+
+- feat(scientific-consensus): carry authors and journal into study briefs (#1822).
+
 ## 2026.8.6 - 2026-08-22
 
 - feat(scientific-consensus): low-evidence guard and dispersion-aware confidence (#1763).

@@ -2,17 +2,17 @@
   "schema_version": 1,
   "slug": "scientific-consensus",
   "cli_name": "scientific-consensus-pp-cli",
-  "version": "2026.8.6",
-  "released_at": "2026-08-22T09:12:22Z",
-  "source_commit": "ff450b44874dd1570e13f7e7d031409a9a9aa2f8",
+  "version": "2026.8.7",
+  "released_at": "2026-08-26T09:24:33Z",
+  "source_commit": "bbb92e65cb6271cd8ad72b181e30e2294ba81d8c",
   "printing_press_version": "4.24.0",
   "run_id": "20260620-165352-e55cec69",
   "changes": [
     {
-      "title": "feat(scientific-consensus): low-evidence guard and dispersion-aware confidence",
-      "pr": 1763,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/1763",
-      "commit": "ff450b44874dd1570e13f7e7d031409a9a9aa2f8"
+      "title": "feat(scientific-consensus): carry authors and journal into study briefs",
+      "pr": 1822,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/1822",
+      "commit": "bbb92e65cb6271cd8ad72b181e30e2294ba81d8c"
     }
   ]
 }
