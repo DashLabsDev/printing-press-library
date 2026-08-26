@@ -2693,11 +2693,12 @@ func syncDependentResource(ctx context.Context, c interface {
 		fmt.Fprintf(os.Stderr, "\n")
 	}
 	if failedParents > 0 {
+		// Any parent fetch/upsert failure is a real resource error, including
+		// the partial case (some parents stored, others did not). Returning
+		// Warn here used to keep errCount at 0, so --strict still exited 0
+		// and the summary could look successful over an incomplete mirror.
 		failure := fmt.Errorf("%s failed to store data for %d of %d parents: %w", dep.Name, failedParents, len(parentRows), firstFailure)
-		if failedParents == len(parentRows) && totalCount == 0 {
-			return syncResult{Resource: dep.Name, Count: 0, Err: failure, Duration: time.Since(started)}
-		}
-		return syncResult{Resource: dep.Name, Count: totalCount, Warn: failure, Duration: time.Since(started)}
+		return syncResult{Resource: dep.Name, Count: totalCount, Err: failure, Duration: time.Since(started)}
 	}
 
 	if err := db.SaveSyncState(dep.Name, "", totalCount); err != nil {
