@@ -2958,6 +2958,63 @@
       }
     },
     {
+      "name": "bmw-cardata",
+      "category": "devices",
+      "api": "BMW CarData",
+      "description": "Your BMW's telemetry, on the command line — device-code login, live telematic snapshots, charging history, and a local SQLite store that turns raw VSS data into trends, cost, and fleet insight no other tool gives you.",
+      "search_terms": [
+        "bmw-cardata",
+        "BMW CarData",
+        "bmw-cardata-pp-cli",
+        "Your BMW's telemetry, on the command line — device-code login, live telematic snapshots, charging history, and a local SQLite store that turns raw VSS data into trends, cost, and fleet insight no other tool gives you.",
+        "SoC/range trends",
+        "soc-trends",
+        "See your battery state-of-charge and derived range as a time series you can chart.",
+        "Charging cost & efficiency",
+        "charging-cost",
+        "Reconcile your charging sessions against your electricity tariff and see DC charge efficiency.",
+        "Quota tracker",
+        "quota",
+        "See how many of your ~50 daily API calls you have spent and when the budget resets (midnight UTC).",
+        "Fleet status",
+        "One table of current SoC, range, charging state and last location across every vehicle on your account.",
+        "Descriptor search",
+        "descriptors search",
+        "Search the VSS telematic descriptor catalogue (e.g. batteryManagement, charging, navigation) to build containers.",
+        "Battery health",
+        "battery-health",
+        "Track battery capacity degradation by comparing observed max energy against the nameplate capacity.",
+        "Snapshot diff",
+        "vehicles diff",
+        "Show exactly what changed between two telematic snapshots (windows, charging, locks, location).",
+        "Trip reconstruction",
+        "trips",
+        "Reconstruct trips (start, end, elapsed, distance) from your vehicle's location breadcrumbs."
+      ],
+      "path": "library/devices/bmw-cardata",
+      "printer": "jvm",
+      "printer_name": "jvm",
+      "creator": {
+        "handle": "jvm",
+        "name": "jvm"
+      },
+      "mcp": {
+        "binary": "bmw-cardata-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 11,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "BMW_CARDATA_ACCESS_TOKEN"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "boardgamegeek",
       "category": "media-and-entertainment",
       "api": "BoardGameGeek",
@@ -15385,6 +15442,12 @@
         "Turn the bare location IDs in campaign targeting into readable place names."
       ],
       "path": "library/marketing/openai-ads",
+      "release": {
+        "cli_name": "openai-ads-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-26T09:36:09Z",
+        "source_commit": "06f620b4704d8e99ed3b90ba2f53adf17bfc6934"
+      },
       "printer": "bobeglz",
       "printer_name": "bobe",
       "creator": {
