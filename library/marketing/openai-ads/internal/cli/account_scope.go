@@ -76,7 +76,23 @@ func effectiveAdsCredential() string {
 	if err != nil || cfg == nil {
 		return ""
 	}
-	return strings.TrimSpace(cfg.OpenaiAdsApiKey)
+	// Hash the same secret AuthHeader() actually sends. auth set-token
+	// persists AccessToken (and optionally AuthHeaderVal); hashing only
+	// OpenaiAdsApiKey left a stored-token login for a second ad account
+	// on the shared data.db.
+	if v := strings.TrimSpace(cfg.AuthHeaderVal); v != "" {
+		return v
+	}
+	if v := strings.TrimSpace(cfg.OpenaiAdsApiKey); v != "" {
+		return v
+	}
+	if v := strings.TrimSpace(cfg.OpenaiAdsConversionsApiKey); v != "" {
+		return v
+	}
+	if v := strings.TrimSpace(cfg.AccessToken); v != "" {
+		return v
+	}
+	return ""
 }
 
 // scopedDBFilename returns the account-scoped SQLite filename.
