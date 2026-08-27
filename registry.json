@@ -415,6 +415,51 @@
       }
     },
     {
+      "name": "agentmail",
+      "category": "social-and-messaging",
+      "api": "AgentMail",
+      "description": "AgentMail operations with local memory, safe sends, and fleet-wide insight.",
+      "search_terms": [
+        "agentmail",
+        "agentmail-pp-cli",
+        "AgentMail operations with local memory, safe sends, and fleet-wide insight.",
+        "Triage queue",
+        "Rank unresolved inbound conversations across inboxes with age, direction, labels, and pending drafts.",
+        "Send check",
+        "Review a draft for deterministic recipient, attachment, schedule, duplicate, and idempotency risks before sending.",
+        "Thread rollup",
+        "Render compact conversation handoff context with participants, counts, latest direction, age, labels, and extracted reply content.",
+        "Fleet health",
+        "Report inbox, domain, webhook, list, metrics, API-key, pod, and organization readiness findings.",
+        "Schedule audit",
+        "Find scheduled drafts that are overdue, orphaned, duplicated, or missing review state.",
+        "Delivery reconcile",
+        "Reconcile outbound messages with status, thread placement, timestamps, and later inbound activity."
+      ],
+      "path": "library/social-and-messaging/agentmail",
+      "printer": "SomSamantray",
+      "printer_name": "Som Samantray",
+      "creator": {
+        "handle": "SomSamantray",
+        "name": "Som Samantray"
+      },
+      "mcp": {
+        "binary": "agentmail-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 130,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "agentpool",
       "category": "developer-tools",
       "api": "AgentPool",
@@ -445,6 +490,63 @@
       "creator": {
         "handle": "sidduHERE",
         "name": "sidduHERE"
+      }
+    },
+    {
+      "name": "agoda",
+      "category": "travel",
+      "api": "Agoda",
+      "description": "Search Agoda hotels with the true all-in price, and re-rank by what you will actually pay.",
+      "search_terms": [
+        "agoda",
+        "agoda-pp-cli",
+        "Search Agoda hotels with the true all-in price, and re-rank by what you will actually pay.",
+        "True all-in pricing",
+        "hotels search",
+        "Shows what you will actually pay, not the teaser rate, with the hidden tax-and-fee delta broken out per property.",
+        "Honest re-ranking",
+        "hotels rank",
+        "Re-sorts a destination's results by true all-in price instead of Agoda's teaser-price ranking.",
+        "Fee-gouge detection",
+        "hotels fees",
+        "Flags properties whose tax-and-fee ratio is an outlier against the destination median.",
+        "Cheapest-date sweep",
+        "prices cheapest",
+        "Returns the cheapest check-in dates across a flexible window for a destination.",
+        "AgodaVIP delta",
+        "vip delta",
+        "Runs the same search signed-in and anonymous, then diffs per property to show what your VIP tier is actually worth.",
+        "Price-drop watch",
+        "watch run",
+        "Surfaces only watched properties whose latest true all-in price dropped meaningfully below their trailing median.",
+        "Shortlist compare",
+        "compare",
+        "Puts finalist properties side by side on true all-in price, hidden fee share, review score, star rating, and free-cancellation deadline.",
+        "Offline corpus search",
+        "search",
+        "Full-text search over every property this CLI has already seen, with no network call."
+      ],
+      "path": "library/travel/agoda",
+      "printer": "devacto",
+      "printer_name": "Victor Wibisono",
+      "creator": {
+        "handle": "devacto",
+        "name": "Victor Wibisono"
+      },
+      "mcp": {
+        "binary": "agoda-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 2,
+        "public_tool_count": 2,
+        "auth_type": "none",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
       }
     },
     {
@@ -1468,9 +1570,9 @@
       "path": "library/food-and-dining/anylist",
       "release": {
         "cli_name": "anylist-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-26T09:27:00Z",
-        "source_commit": "6b5c232364f49478675581bcd5d5a7202fc6e36d"
+        "version": "2026.8.3",
+        "released_at": "2026-08-27T09:13:04Z",
+        "source_commit": "10cba8f2e78a102fa67d7c34af1793e2c964fd90"
       },
       "printer": "jeeves",
       "printer_name": "Jeeves",
@@ -2809,6 +2911,12 @@
         "Combines multiple lots' schedules into one view in a single command instead of visiting each lot's page separately."
       ],
       "path": "library/food-and-dining/bestfoodtrucks",
+      "release": {
+        "cli_name": "bestfoodtrucks-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-27T09:14:23Z",
+        "source_commit": "bb973defecfbf859948e6c11464101a5549c29ee"
+      },
       "printer": "enlewof",
       "printer_name": "Allen Lew"
     },
@@ -12527,6 +12635,97 @@
       }
     },
     {
+      "name": "keenable",
+      "category": "ai",
+      "api": "Keenable",
+      "description": "Keenable web search with reproducible research, citations, and a local evidence trail.",
+      "search_terms": [
+        "keenable",
+        "keenable-pp-cli",
+        "Keenable web search with reproducible research, citations, and a local evidence trail.",
+        "Reproducible research snapshot",
+        "research snapshot",
+        "Save an exact search and fetch run as an immutable local evidence snapshot.",
+        "Snapshot replay",
+        "research replay",
+        "Rerun a saved research recipe and report how current evidence changed.",
+        "Citation bundle export",
+        "research citations",
+        "Export source-linked Markdown or JSON citations from a saved research run.",
+        "Bounded multi-page fetch",
+        "research fetch-many",
+        "Fetch a bounded URL list with concurrency limits and explicit partial failures.",
+        "Offline local FTS recall",
+        "research local-search",
+        "Search saved titles, snippets, URLs, and Markdown without spending an upstream request.",
+        "Result and content drift comparison",
+        "research diff",
+        "Compare saved runs for URL changes, rank movement, metadata edits, and content-hash drift.",
+        "Domain and source coverage report",
+        "research coverage",
+        "Measure domain diversity, rank share, timestamp coverage, and missing metadata in a saved run."
+      ],
+      "path": "library/ai/keenable",
+      "printer": "SomSamantray",
+      "printer_name": "Som Samantray",
+      "creator": {
+        "handle": "SomSamantray",
+        "name": "Som Samantray"
+      },
+      "mcp": {
+        "binary": "keenable-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 4,
+        "public_tool_count": 2,
+        "auth_type": "api_key",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "kie",
+      "category": "ai",
+      "api": "Kie.ai",
+      "description": "Unified CLI for Kie.ai's AI generation platform: 120+ Market models (image, video, audio) via one create/query task pair, plus dedicated Suno, Veo3.1, Runway, Flux Kontext, 4o Image, and per-model chat completion endpoints.",
+      "search_terms": [
+        "kie",
+        "Kie.ai",
+        "kie-pp-cli",
+        "Unified CLI for Kie.ai's AI generation platform: 120+ Market models (image, video, audio) via one create/query task pair, plus dedicated Suno, Veo3.1, Runway, Flux Kontext, 4o Image, and per-model chat completion endpoints.",
+        "Unified Market Catalog Access",
+        "kie-ai-jobs market-create-task",
+        "Single create/query command pair that reaches all 120+ Kie.ai Market models via a --model identifier and JSON --input, instead of one generated command per model."
+      ],
+      "path": "library/ai/kie",
+      "printer": "kelvincushman",
+      "printer_name": "Kelvin Cushman",
+      "creator": {
+        "handle": "kelvincushman",
+        "name": "Kelvin Cushman"
+      },
+      "mcp": {
+        "binary": "kie-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 0,
+        "public_tool_count": 0,
+        "auth_type": "api_key",
+        "env_vars": [
+          "KIE_BEARER_AUTH"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "kit",
       "category": "marketing",
       "api": "Kit",
@@ -18336,6 +18535,70 @@
       }
     },
     {
+      "name": "quickcommerce",
+      "category": "commerce",
+      "api": "QuickCommerce API",
+      "description": "Compare live Indian product prices, stock, and delivery ETAs from the terminal, then keep the history locally.",
+      "search_terms": [
+        "quickcommerce",
+        "QuickCommerce API",
+        "quickcommerce-pp-cli",
+        "Compare live Indian product prices, stock, and delivery ETAs from the terminal, then keep the history locally.",
+        "Price and availability history",
+        "history prices",
+        "Query local observations to see price, stock, rating, and availability movement over time.",
+        "Observation diff",
+        "history diff",
+        "Show the field-level changes between the latest saved observations.",
+        "Fastest available delivery",
+        "delivery fastest",
+        "Rank currently available delivery options while preserving closed or unparseable platforms.",
+        "Credit-aware request planner",
+        "requests plan",
+        "Calculate fan-out credit cost and affordability before making paid platform requests.",
+        "Manual mirror ingestion",
+        "mirror ingest",
+        "Persist real QuickCommerce command responses and metadata into the local SQLite mirror.",
+        "Stale-observation report",
+        "mirror stale",
+        "Find saved product and ETA observations that are older than a chosen trust window.",
+        "Local platform/location coverage",
+        "mirror coverage",
+        "Report observed, missing, and stale platform coverage for a location.",
+        "Price-per-unit value view",
+        "prices value",
+        "Compare price per unit from explicit pack quantities without guessing missing units."
+      ],
+      "path": "library/commerce/quickcommerce",
+      "release": {
+        "cli_name": "quickcommerce-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-27T09:14:23Z",
+        "source_commit": "1dcc77576dd357a9ab6e71e802d8aa0281227971"
+      },
+      "printer": "SomSamantray",
+      "printer_name": "Som Samantray",
+      "creator": {
+        "handle": "SomSamantray",
+        "name": "Som Samantray"
+      },
+      "mcp": {
+        "binary": "quickcommerce-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 7,
+        "public_tool_count": 1,
+        "auth_type": "api_key",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "quranku",
       "category": "education",
       "api": "QuranKu",
@@ -18739,6 +19002,12 @@
         "Walk the full multi-hop 'blocks'/'blocked by' dependency chain for an issue, not just its direct relations."
       ],
       "path": "library/project-management/redmine",
+      "release": {
+        "cli_name": "redmine-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-27T09:14:23Z",
+        "source_commit": "ce031f152a17c612f2fbe93770289020626f1e32"
+      },
       "printer": "yosimasu",
       "printer_name": "Masu Lin",
       "contributors": [
