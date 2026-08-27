@@ -412,3 +412,44 @@ func TestHumanText_RolloutNotesScrubbedBeforeTruncate(t *testing.T) {
 		t.Fatalf("lost printable notes: %q", got)
 	}
 }
+
+func TestRolloutDone_ScrubsExpectedCompletion(t *testing.T) {
+	done := "Q2 \x1b[31m2026\x1b[0m\x07"
+	got := rolloutDone(seatwifi.Rollout{ExpectedCompletion: &done})
+	if strings.ContainsAny(got, "\x1b\x07") {
+		t.Fatalf("rolloutDone leaked control sequences: %q", got)
+	}
+	if !strings.Contains(got, "Q2") || !strings.Contains(got, "2026") {
+		t.Fatalf("lost printable completion: %q", got)
+	}
+}
+
+func TestPrintWifiAirlineRolloutsHuman_ScrubsExpectedCompletion(t *testing.T) {
+	done := "Q2 \x1b[31m2026\x1b[0m\x07"
+	res := &seatwifi.AirlineRolloutsResponse{
+		Airline: "UA",
+		Rollouts: []seatwifi.Rollout{{
+			AircraftType:       "737",
+			Status:             "active",
+			Notes:              "ok",
+			ExpectedCompletion: &done,
+		}},
+	}
+	cmd := &cobra.Command{}
+	var out, errb bytes.Buffer
+	cmd.SetOut(&out)
+	cmd.SetErr(&errb)
+	if err := printWifiAirlineRolloutsHuman(cmd, res); err != nil {
+		t.Fatalf("print: %v", err)
+	}
+	got := out.String() + errb.String()
+	if strings.ContainsAny(got, "\x1b\x07") {
+		t.Fatalf("single-airline rollout table leaked control sequences: %q", got)
+	}
+	if !strings.Contains(got, "COMPLETION") {
+		t.Fatalf("missing completion column: %q", got)
+	}
+	if !strings.Contains(got, "Q2") || !strings.Contains(got, "2026") {
+		t.Fatalf("lost printable completion: %q", got)
+	}
+}

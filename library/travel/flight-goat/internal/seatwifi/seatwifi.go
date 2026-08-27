@@ -187,7 +187,7 @@ func (c *Client) GetFlight(ctx context.Context, flightNumber string) (*FlightWif
 	}
 	var out FlightWifi
 	if err := json.Unmarshal(body, &out); err != nil {
-		return nil, fmt.Errorf("seatwifi flight decode: %w (body=%s)", err, truncate(body))
+		return nil, fmt.Errorf("seatwifi flight decode: %s (body=%s)", ScrubTerminal(err.Error()), truncate(body))
 	}
 	return &out, nil
 }
@@ -305,8 +305,26 @@ func (c *Client) Search(ctx context.Context, q string) ([]SearchResult, error) {
 
 func truncate(b []byte) string {
 	const max = 512
-	if len(b) <= max {
-		return string(b)
+	s := string(b)
+	if len(b) > max {
+		s = string(b[:max]) + "..."
 	}
-	return string(b[:max]) + "..."
+	// Error strings are printed to stderr via err.Error(); scrub so
+	// SeatWifi control sequences cannot reach the terminal.
+	return ScrubTerminal(s)
+}
+
+// ScrubTerminal strips ANSI / control sequences from untrusted SeatWifi
+// strings. Matches library cliutil.ScrubTerminal (flight-goat's generated
+// cliutil does not yet include that helper).
+func ScrubTerminal(s string) string {
+	return strings.Map(func(r rune) rune {
+		if r == '\t' || r == '\n' {
+			return ' '
+		}
+		if r < 0x20 || (r >= 0x7f && r <= 0x9f) {
+			return -1
+		}
+		return r
+	}, s)
 }

@@ -210,13 +210,7 @@ Without an airline code, returns totals + byAirline map. With a code
 			if wantJSON(cmd, flags) {
 				return printJSONFiltered(cmd.OutOrStdout(), res, flags)
 			}
-			fmt.Fprintf(cmd.ErrOrStderr(), "%s: %d rollouts\n", humanText(res.Airline), len(res.Rollouts))
-			tw := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 0, 2, ' ', 0)
-			fmt.Fprintln(tw, "AIRCRAFT\tSTATUS\tFLEET%\tCOMPLETION\tNOTES")
-			for _, r := range res.Rollouts {
-				fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\n", humanText(r.AircraftType), humanText(r.Status), rolloutPct(r), humanText(rolloutDone(r)), truncateRunes(humanText(r.Notes), 80))
-			}
-			return tw.Flush()
+			return printWifiAirlineRolloutsHuman(cmd, res)
 		},
 	}
 }
@@ -390,7 +384,17 @@ func rolloutDone(r seatwifi.Rollout) string {
 	if r.ExpectedCompletion == nil || *r.ExpectedCompletion == "" {
 		return "-"
 	}
-	return *r.ExpectedCompletion
+	return humanText(*r.ExpectedCompletion)
+}
+
+func printWifiAirlineRolloutsHuman(cmd *cobra.Command, res *seatwifi.AirlineRolloutsResponse) error {
+	fmt.Fprintf(cmd.ErrOrStderr(), "%s: %d rollouts\n", humanText(res.Airline), len(res.Rollouts))
+	tw := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 0, 2, ' ', 0)
+	fmt.Fprintln(tw, "AIRCRAFT\tSTATUS\tFLEET%\tCOMPLETION\tNOTES")
+	for _, r := range res.Rollouts {
+		fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\n", humanText(r.AircraftType), humanText(r.Status), rolloutPct(r), humanText(rolloutDone(r)), truncateRunes(humanText(r.Notes), 80))
+	}
+	return tw.Flush()
 }
 
 func printWifiFlightHuman(cmd *cobra.Command, res *seatwifi.FlightWifi) error {
@@ -456,15 +460,7 @@ func printWifiAirlineHuman(cmd *cobra.Command, res *seatwifi.Airline) error {
 // (flight-goat's generated cliutil does not yet include that helper). JSON
 // and other machine output must not use this.
 func humanText(s string) string {
-	return strings.Map(func(r rune) rune {
-		if r == '\t' || r == '\n' {
-			return ' '
-		}
-		if r < 0x20 || (r >= 0x7f && r <= 0x9f) {
-			return -1
-		}
-		return r
-	}, s)
+	return seatwifi.ScrubTerminal(s)
 }
 
 func truncateRunes(s string, max int) string {

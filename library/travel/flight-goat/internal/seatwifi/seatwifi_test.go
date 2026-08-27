@@ -305,3 +305,46 @@ func TestGet_RejectsOversizedErrorBody(t *testing.T) {
 		t.Fatalf("expected oversized-body error, got %v", err)
 	}
 }
+
+func TestGetFlight_HTTPErrorScrubsBody(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusBadGateway)
+		_, _ = w.Write([]byte("oops \x1b[31mred\x1b[0m\x07 boom"))
+	}))
+	defer srv.Close()
+	c := NewClient()
+	c.BaseURL = srv.URL
+	c.HTTP = srv.Client()
+	_, err := c.GetFlight(context.Background(), "UA1")
+	if err == nil {
+		t.Fatal("expected HTTP error")
+	}
+	msg := err.Error()
+	if strings.ContainsAny(msg, "\x1b\x07") {
+		t.Fatalf("HTTP error leaked control sequences: %q", msg)
+	}
+	if !strings.Contains(msg, "502") || !strings.Contains(msg, "oops") || !strings.Contains(msg, "red") || !strings.Contains(msg, "boom") {
+		t.Fatalf("lost printable error body: %q", msg)
+	}
+}
+
+func TestGetFlight_MalformedJSONScrubsBody(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte("\x1b[2Jnot-json \x1b[31mwipe\x1b[0m"))
+	}))
+	defer srv.Close()
+	c := NewClient()
+	c.BaseURL = srv.URL
+	c.HTTP = srv.Client()
+	_, err := c.GetFlight(context.Background(), "UA1")
+	if err == nil {
+		t.Fatal("expected decode error")
+	}
+	msg := err.Error()
+	if strings.ContainsAny(msg, "\x1b") {
+		t.Fatalf("decode error leaked ESC: %q", msg)
+	}
+	if !strings.Contains(msg, "flight decode") || !strings.Contains(msg, "not-json") || !strings.Contains(msg, "wipe") {
+		t.Fatalf("lost printable decode body: %q", msg)
+	}
+}
