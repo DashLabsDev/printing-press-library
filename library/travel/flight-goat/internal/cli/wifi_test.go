@@ -5,6 +5,7 @@ package cli
 
 import (
 	"bytes"
+	"context"
 	"os"
 	"strings"
 	"testing"
@@ -388,6 +389,7 @@ func TestPrintWifiAirlineHuman_ScrubsFleetInfo(t *testing.T) {
 func TestWifiCtx_AppliesCommandTimeout(t *testing.T) {
 	flags := &rootFlags{timeout: 45 * time.Second}
 	cmd := &cobra.Command{}
+	cmd.SetContext(context.Background())
 	ctx, cancel := wifiCtx(cmd, flags)
 	defer cancel()
 	deadline, ok := ctx.Deadline()

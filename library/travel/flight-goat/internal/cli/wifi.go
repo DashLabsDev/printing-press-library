@@ -329,7 +329,11 @@ func wifiCtx(cmd *cobra.Command, flags *rootFlags) (context.Context, context.Can
 	// Honor root --timeout (including the advertised 60s default). The
 	// SeatWifi HTTP client does not impose its own Timeout, so this deadline
 	// is the one that bounds live requests.
-	return boundCtx(cmd.Context(), flags)
+	ctx := cmd.Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	return boundCtx(ctx, flags)
 }
 
 func wantJSON(cmd *cobra.Command, flags *rootFlags) bool {

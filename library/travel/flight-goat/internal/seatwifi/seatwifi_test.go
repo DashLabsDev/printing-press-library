@@ -206,15 +206,18 @@ func TestNewClient_NoClientTimeout(t *testing.T) {
 func TestGet_PreservesCallerDeadlineLongerThanDefault(t *testing.T) {
 	var remaining time.Duration
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if d, ok := r.Context().Deadline(); ok {
-			remaining = time.Until(d)
-		}
 		_ = json.NewEncoder(w).Encode(map[string]any{"flight_number": "UA1"})
 	}))
 	defer srv.Close()
+	inner := srv.Client().Transport
 	c := NewClient()
 	c.BaseURL = srv.URL
-	c.HTTP = srv.Client()
+	c.HTTP = &http.Client{Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {
+		if d, ok := req.Context().Deadline(); ok {
+			remaining = time.Until(d)
+		}
+		return inner.RoundTrip(req)
+	})}
 	ctx, cancel := context.WithTimeout(context.Background(), 45*time.Second)
 	defer cancel()
 	if _, err := c.GetFlight(ctx, "UA1"); err != nil {
@@ -223,6 +226,12 @@ func TestGet_PreservesCallerDeadlineLongerThanDefault(t *testing.T) {
 	if remaining < 40*time.Second {
 		t.Fatalf("request deadline remaining = %v; 45s caller deadline was capped", remaining)
 	}
+}
+
+type roundTripFunc func(*http.Request) (*http.Response, error)
+
+func (f roundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
+	return f(req)
 }
 
 func TestGet_DefaultTimeoutWhenNoDeadline(t *testing.T) {
