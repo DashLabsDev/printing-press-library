@@ -87,42 +87,7 @@ known, Starlink likelihood, and a human details string.`,
 			if wantJSON(cmd, flags) {
 				return printJSONFiltered(cmd.OutOrStdout(), res, flags)
 			}
-			tw := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 0, 2, ' ', 0)
-			fmt.Fprintln(tw, "FIELD\tVALUE")
-			fmt.Fprintf(tw, "flight\t%s\n", res.FlightNumber)
-			fmt.Fprintf(tw, "airline\t%s (%s)\n", res.Airline, res.AirlineCode)
-			fmt.Fprintf(tw, "provider\t%s\n", res.WifiProvider)
-			fmt.Fprintf(tw, "confidence\t%.2f\n", res.Confidence)
-			if res.AircraftType != "" {
-				fmt.Fprintf(tw, "aircraft\t%s\n", res.AircraftType)
-			}
-			if res.TailNumber != "" {
-				fmt.Fprintf(tw, "tail\t%s\n", res.TailNumber)
-			}
-			if res.StarlinkStatus != "" {
-				fmt.Fprintf(tw, "starlink\t%s (%s)\n", res.StarlinkStatus, res.StarlinkLikelihood)
-			}
-			if res.FleetPercentage != nil {
-				fmt.Fprintf(tw, "fleet %%\t%d%%\n", *res.FleetPercentage)
-			}
-			if res.Method != "" {
-				fmt.Fprintf(tw, "method\t%s\n", res.Method)
-			}
-			if res.Source != "" {
-				fmt.Fprintf(tw, "source\t%s\n", res.Source)
-			}
-			if res.LastVerified != nil && *res.LastVerified != "" {
-				fmt.Fprintf(tw, "verified\t%s\n", *res.LastVerified)
-			}
-			tw.Flush()
-			if res.Details != nil && *res.Details != "" {
-				fmt.Fprintln(cmd.OutOrStdout(), "\ndetails:")
-				fmt.Fprintln(cmd.OutOrStdout(), *res.Details)
-			}
-			if res.Explanation != "" {
-				fmt.Fprintf(cmd.OutOrStdout(), "\nnote: %s\n", res.Explanation)
-			}
-			return nil
+			return printWifiFlightHuman(cmd, res)
 		},
 	}
 }
@@ -152,18 +117,7 @@ func newWifiAirlineCmd(flags *rootFlags) *cobra.Command {
 			if wantJSON(cmd, flags) {
 				return printJSONFiltered(cmd.OutOrStdout(), res, flags)
 			}
-			tw := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 0, 2, ' ', 0)
-			fmt.Fprintln(tw, "FIELD\tVALUE")
-			fmt.Fprintf(tw, "code\t%s\n", res.Code)
-			fmt.Fprintf(tw, "name\t%s\n", res.Name)
-			fmt.Fprintf(tw, "providers\t%s\n", strings.Join(res.WifiProvider, ", "))
-			fmt.Fprintf(tw, "updated\t%s\n", res.LastUpdated)
-			tw.Flush()
-			if res.FleetInfo != "" {
-				fmt.Fprintln(cmd.OutOrStdout(), "\nfleetInfo:")
-				fmt.Fprintln(cmd.OutOrStdout(), res.FleetInfo)
-			}
-			return nil
+			return printWifiAirlineHuman(cmd, res)
 		},
 	}
 }
@@ -193,7 +147,7 @@ func newWifiAirlinesCmd(flags *rootFlags) *cobra.Command {
 			tw := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 0, 2, ' ', 0)
 			fmt.Fprintln(tw, "CODE\tNAME\tPROVIDERS\tUPDATED")
 			for _, a := range list {
-				fmt.Fprintf(tw, "%s\t%s\t%s\t%s\n", a.Code, a.Name, strings.Join(a.WifiProvider, ","), a.LastUpdated)
+				fmt.Fprintf(tw, "%s\t%s\t%s\t%s\n", humanText(a.Code), humanText(a.Name), humanText(strings.Join(a.WifiProvider, ",")), humanText(a.LastUpdated))
 			}
 			return tw.Flush()
 		},
@@ -244,7 +198,7 @@ Without an airline code, returns totals + byAirline map. With a code
 				sort.Strings(codes)
 				for _, ac := range codes {
 					for _, r := range res.ByAirline[ac] {
-						fmt.Fprintf(tw, "%s	%s	%s	%s	%s\n", ac, r.AircraftType, r.Status, rolloutPct(r), rolloutDone(r))
+						fmt.Fprintf(tw, "%s	%s	%s	%s	%s\n", humanText(ac), humanText(r.AircraftType), humanText(r.Status), rolloutPct(r), humanText(rolloutDone(r)))
 					}
 				}
 				return tw.Flush()
@@ -256,11 +210,11 @@ Without an airline code, returns totals + byAirline map. With a code
 			if wantJSON(cmd, flags) {
 				return printJSONFiltered(cmd.OutOrStdout(), res, flags)
 			}
-			fmt.Fprintf(cmd.ErrOrStderr(), "%s: %d rollouts\n", res.Airline, len(res.Rollouts))
+			fmt.Fprintf(cmd.ErrOrStderr(), "%s: %d rollouts\n", humanText(res.Airline), len(res.Rollouts))
 			tw := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 0, 2, ' ', 0)
 			fmt.Fprintln(tw, "AIRCRAFT\tSTATUS\tFLEET%\tCOMPLETION\tNOTES")
 			for _, r := range res.Rollouts {
-				fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\n", r.AircraftType, r.Status, rolloutPct(r), rolloutDone(r), truncateRunes(r.Notes, 80))
+				fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\n", humanText(r.AircraftType), humanText(r.Status), rolloutPct(r), humanText(rolloutDone(r)), truncateRunes(humanText(r.Notes), 80))
 			}
 			return tw.Flush()
 		},
@@ -358,7 +312,7 @@ func newWifiSearchCmd(flags *rootFlags) *cobra.Command {
 					airlineOnly++
 					continue
 				}
-				fmt.Fprintf(tw, "%s\t%s (%s)\t%s\t%s\t%.2f\n", r.FlightNumber, r.Airline.Name, r.Airline.Code, r.Aircraft, r.WifiStatus, r.Confidence)
+				fmt.Fprintf(tw, "%s\t%s (%s)\t%s\t%s\t%.2f\n", humanText(r.FlightNumber), humanText(r.Airline.Name), humanText(r.Airline.Code), humanText(r.Aircraft), humanText(r.WifiStatus), r.Confidence)
 			}
 			if err := tw.Flush(); err != nil {
 				return err
@@ -372,11 +326,10 @@ func newWifiSearchCmd(flags *rootFlags) *cobra.Command {
 }
 
 func wifiCtx(cmd *cobra.Command, flags *rootFlags) (context.Context, context.CancelFunc) {
-	ctx := cmd.Context()
-	if cmd.Flags().Changed("timeout") && flags.timeout > 0 {
-		return context.WithTimeout(ctx, flags.timeout)
-	}
-	return ctx, func() {}
+	// Honor root --timeout (including the advertised 60s default). The
+	// SeatWifi HTTP client does not impose its own Timeout, so this deadline
+	// is the one that bounds live requests.
+	return boundCtx(cmd.Context(), flags)
 }
 
 func wantJSON(cmd *cobra.Command, flags *rootFlags) bool {
@@ -416,7 +369,7 @@ func printSpeedStats(cmd *cobra.Command, flags *rootFlags, kind, id string, res 
 	if len(res.ByProvider) > 0 {
 		fmt.Fprintln(cmd.OutOrStdout(), "\nby provider:")
 		for k, v := range res.ByProvider {
-			fmt.Fprintf(cmd.OutOrStdout(), "  %s: %s\n", k, string(v))
+			fmt.Fprintf(cmd.OutOrStdout(), "  %s: %s\n", humanText(k), humanText(string(v)))
 		}
 	}
 	return nil
@@ -434,6 +387,80 @@ func rolloutDone(r seatwifi.Rollout) string {
 		return "-"
 	}
 	return *r.ExpectedCompletion
+}
+
+func printWifiFlightHuman(cmd *cobra.Command, res *seatwifi.FlightWifi) error {
+	tw := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 0, 2, ' ', 0)
+	fmt.Fprintln(tw, "FIELD\tVALUE")
+	fmt.Fprintf(tw, "flight\t%s\n", humanText(res.FlightNumber))
+	fmt.Fprintf(tw, "airline\t%s (%s)\n", humanText(res.Airline), humanText(res.AirlineCode))
+	fmt.Fprintf(tw, "provider\t%s\n", humanText(res.WifiProvider))
+	fmt.Fprintf(tw, "confidence\t%.2f\n", res.Confidence)
+	if res.AircraftType != "" {
+		fmt.Fprintf(tw, "aircraft\t%s\n", humanText(res.AircraftType))
+	}
+	if res.TailNumber != "" {
+		fmt.Fprintf(tw, "tail\t%s\n", humanText(res.TailNumber))
+	}
+	if res.StarlinkStatus != "" {
+		fmt.Fprintf(tw, "starlink\t%s (%s)\n", humanText(res.StarlinkStatus), humanText(res.StarlinkLikelihood))
+	}
+	if res.FleetPercentage != nil {
+		fmt.Fprintf(tw, "fleet %%\t%d%%\n", *res.FleetPercentage)
+	}
+	if res.Method != "" {
+		fmt.Fprintf(tw, "method\t%s\n", humanText(res.Method))
+	}
+	if res.Source != "" {
+		fmt.Fprintf(tw, "source\t%s\n", humanText(res.Source))
+	}
+	if res.LastVerified != nil && *res.LastVerified != "" {
+		fmt.Fprintf(tw, "verified\t%s\n", humanText(*res.LastVerified))
+	}
+	if err := tw.Flush(); err != nil {
+		return err
+	}
+	if res.Details != nil && *res.Details != "" {
+		fmt.Fprintln(cmd.OutOrStdout(), "\ndetails:")
+		fmt.Fprintln(cmd.OutOrStdout(), humanText(*res.Details))
+	}
+	if res.Explanation != "" {
+		fmt.Fprintf(cmd.OutOrStdout(), "\nnote: %s\n", humanText(res.Explanation))
+	}
+	return nil
+}
+
+func printWifiAirlineHuman(cmd *cobra.Command, res *seatwifi.Airline) error {
+	tw := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 0, 2, ' ', 0)
+	fmt.Fprintln(tw, "FIELD\tVALUE")
+	fmt.Fprintf(tw, "code\t%s\n", humanText(res.Code))
+	fmt.Fprintf(tw, "name\t%s\n", humanText(res.Name))
+	fmt.Fprintf(tw, "providers\t%s\n", humanText(strings.Join(res.WifiProvider, ", ")))
+	fmt.Fprintf(tw, "updated\t%s\n", humanText(res.LastUpdated))
+	if err := tw.Flush(); err != nil {
+		return err
+	}
+	if res.FleetInfo != "" {
+		fmt.Fprintln(cmd.OutOrStdout(), "\nfleetInfo:")
+		fmt.Fprintln(cmd.OutOrStdout(), humanText(res.FleetInfo))
+	}
+	return nil
+}
+
+// humanText strips ANSI / control sequences from untrusted SeatWifi strings
+// before writing them to a terminal. Matches library cliutil.ScrubTerminal
+// (flight-goat's generated cliutil does not yet include that helper). JSON
+// and other machine output must not use this.
+func humanText(s string) string {
+	return strings.Map(func(r rune) rune {
+		if r == '\t' || r == '\n' {
+			return ' '
+		}
+		if r < 0x20 || (r >= 0x7f && r <= 0x9f) {
+			return -1
+		}
+		return r
+	}, s)
 }
 
 func truncateRunes(s string, max int) string {

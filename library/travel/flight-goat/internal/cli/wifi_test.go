@@ -8,6 +8,10 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
+
+	"github.com/mvanhorn/printing-press-library/library/travel/flight-goat/internal/seatwifi"
+	"github.com/spf13/cobra"
 )
 
 func runWifiCmd(t *testing.T, args ...string) (stdout, stderr string, err error) {
@@ -295,5 +299,114 @@ func TestWifiMachineFlagsSkipHumanTable(t *testing.T) {
 		if wantsHumanTable(os.Stdout, flags) {
 			t.Errorf("%s: still chose human table on TTY", name)
 		}
+	}
+}
+
+func TestHumanText_StripsANSIAndControlSequences(t *testing.T) {
+	in := "keep\tcolumns\nlines\x00\x07\x1b[31mred\x1b[0m\x7f\u0085\u009b31m"
+	got := humanText(in)
+	if strings.ContainsAny(got, "\x00\x07\x1b\x7f") {
+		t.Fatalf("control/ANSI bytes survived: %q", got)
+	}
+	if strings.ContainsRune(got, '\t') || strings.ContainsRune(got, '\n') {
+		t.Fatalf("tab/newline should become spaces: %q", got)
+	}
+	if !strings.Contains(got, "keep") || !strings.Contains(got, "columns") || !strings.Contains(got, "red") {
+		t.Fatalf("lost printable content: %q", got)
+	}
+	want := "keep columns lines[31mred[0m31m"
+	if got != want {
+		t.Fatalf("humanText = %q, want %q", got, want)
+	}
+}
+
+func TestPrintWifiFlightHuman_ScrubsDetailsAndExplanation(t *testing.T) {
+	details := "hi \x1b[31mred\x1b[0m\x07"
+	res := &seatwifi.FlightWifi{
+		FlightNumber: "UA1",
+		Airline:      "United",
+		AirlineCode:  "UA",
+		WifiProvider: "starlink",
+		Details:      &details,
+		Explanation:  "note \x1b]0;title\x07 done",
+	}
+	cmd := &cobra.Command{}
+	var out bytes.Buffer
+	cmd.SetOut(&out)
+	if err := printWifiFlightHuman(cmd, res); err != nil {
+		t.Fatalf("print: %v", err)
+	}
+	got := out.String()
+	if strings.ContainsAny(got, "\x1b\x07") {
+		t.Fatalf("human path leaked control sequences: %q", got)
+	}
+	if !strings.Contains(got, "details:") || !strings.Contains(got, "note:") {
+		t.Fatalf("missing details/note blocks: %q", got)
+	}
+	if !strings.Contains(got, "red") || !strings.Contains(got, "done") {
+		t.Fatalf("lost printable content: %q", got)
+	}
+}
+
+func TestPrintWifiFlightJSON_PreservesControlSequences(t *testing.T) {
+	details := "hi \x1b[31mred"
+	res := &seatwifi.FlightWifi{FlightNumber: "UA1", Details: &details, Explanation: "n\x1bote"}
+	flags := &rootFlags{asJSON: true}
+	cmd := &cobra.Command{}
+	var out bytes.Buffer
+	cmd.SetOut(&out)
+	if err := printJSONFiltered(cmd.OutOrStdout(), res, flags); err != nil {
+		t.Fatalf("json: %v", err)
+	}
+	got := out.String()
+	if !strings.Contains(got, `\u001b`) {
+		t.Fatalf("JSON path should keep ESC as \\u001b, got %s", got)
+	}
+}
+
+func TestPrintWifiAirlineHuman_ScrubsFleetInfo(t *testing.T) {
+	res := &seatwifi.Airline{
+		Code:      "AS",
+		Name:      "Alaska",
+		FleetInfo: "Starlink \x1b[2Jwipe\x1b[0m fleet",
+	}
+	cmd := &cobra.Command{}
+	var out bytes.Buffer
+	cmd.SetOut(&out)
+	if err := printWifiAirlineHuman(cmd, res); err != nil {
+		t.Fatalf("print: %v", err)
+	}
+	got := out.String()
+	if strings.ContainsRune(got, '\x1b') {
+		t.Fatalf("fleetInfo leaked ESC: %q", got)
+	}
+	if !strings.Contains(got, "fleetInfo:") || !strings.Contains(got, "Starlink") {
+		t.Fatalf("missing fleetInfo content: %q", got)
+	}
+}
+
+func TestWifiCtx_AppliesCommandTimeout(t *testing.T) {
+	flags := &rootFlags{timeout: 45 * time.Second}
+	cmd := &cobra.Command{}
+	ctx, cancel := wifiCtx(cmd, flags)
+	defer cancel()
+	deadline, ok := ctx.Deadline()
+	if !ok {
+		t.Fatal("expected deadline from --timeout")
+	}
+	remaining := time.Until(deadline)
+	if remaining < 40*time.Second || remaining > 45*time.Second {
+		t.Fatalf("deadline remaining = %v, want ~45s", remaining)
+	}
+}
+
+func TestHumanText_RolloutNotesScrubbedBeforeTruncate(t *testing.T) {
+	notes := "\x1b[31m" + strings.Repeat("x", 100)
+	got := truncateRunes(humanText(notes), 80)
+	if strings.ContainsRune(got, '\x1b') {
+		t.Fatalf("truncated notes leaked ESC: %q", got)
+	}
+	if !strings.Contains(got, "xxx") {
+		t.Fatalf("lost printable notes: %q", got)
 	}
 }

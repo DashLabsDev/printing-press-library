@@ -3,12 +3,14 @@
 package seatwifi
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestGetFlight_Parses(t *testing.T) {
@@ -188,5 +190,109 @@ func TestClient_HTTPError(t *testing.T) {
 	_, err := c.GetAirline(context.Background(), "ZZ")
 	if err == nil || !strings.Contains(err.Error(), "404") {
 		t.Fatalf("expected 404, got %v", err)
+	}
+}
+
+func TestNewClient_NoClientTimeout(t *testing.T) {
+	c := NewClient()
+	if c.HTTP == nil {
+		t.Fatal("HTTP client is nil")
+	}
+	if c.HTTP.Timeout != 0 {
+		t.Fatalf("HTTP.Timeout = %v, want 0 so the request context owns the deadline", c.HTTP.Timeout)
+	}
+}
+
+func TestGet_PreservesCallerDeadlineLongerThanDefault(t *testing.T) {
+	var remaining time.Duration
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if d, ok := r.Context().Deadline(); ok {
+			remaining = time.Until(d)
+		}
+		_ = json.NewEncoder(w).Encode(map[string]any{"flight_number": "UA1"})
+	}))
+	defer srv.Close()
+	c := NewClient()
+	c.BaseURL = srv.URL
+	c.HTTP = srv.Client()
+	ctx, cancel := context.WithTimeout(context.Background(), 45*time.Second)
+	defer cancel()
+	if _, err := c.GetFlight(ctx, "UA1"); err != nil {
+		t.Fatalf("GetFlight: %v", err)
+	}
+	if remaining < 40*time.Second {
+		t.Fatalf("request deadline remaining = %v; 45s caller deadline was capped", remaining)
+	}
+}
+
+func TestGet_DefaultTimeoutWhenNoDeadline(t *testing.T) {
+	orig := defaultTimeout
+	defaultTimeout = 50 * time.Millisecond
+	t.Cleanup(func() { defaultTimeout = orig })
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		<-r.Context().Done()
+	}))
+	defer srv.Close()
+	c := NewClient()
+	c.BaseURL = srv.URL
+	c.HTTP = srv.Client()
+	start := time.Now()
+	_, err := c.GetFlight(context.Background(), "UA1")
+	if err == nil {
+		t.Fatal("expected timeout error")
+	}
+	if elapsed := time.Since(start); elapsed > 2*time.Second {
+		t.Fatalf("took %v, want defaultTimeout to fire quickly", elapsed)
+	}
+}
+
+func TestGet_HonorsCanceledContext(t *testing.T) {
+	started := make(chan struct{})
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		close(started)
+		<-r.Context().Done()
+	}))
+	defer srv.Close()
+	c := NewClient()
+	c.BaseURL = srv.URL
+	c.HTTP = srv.Client()
+	ctx, cancel := context.WithCancel(context.Background())
+	go func() {
+		<-started
+		cancel()
+	}()
+	_, err := c.GetFlight(ctx, "UA1")
+	if err == nil {
+		t.Fatal("expected canceled context error")
+	}
+}
+
+func TestGet_RejectsOversizedSuccessBody(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write(bytes.Repeat([]byte("x"), maxResponseBodyBytes+1))
+	}))
+	defer srv.Close()
+	c := NewClient()
+	c.BaseURL = srv.URL
+	c.HTTP = srv.Client()
+	_, err := c.GetAirline(context.Background(), "UA")
+	if err == nil || !strings.Contains(err.Error(), "exceeds") {
+		t.Fatalf("expected oversized-body error, got %v", err)
+	}
+}
+
+func TestGet_RejectsOversizedErrorBody(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write(bytes.Repeat([]byte("e"), maxResponseBodyBytes+1))
+	}))
+	defer srv.Close()
+	c := NewClient()
+	c.BaseURL = srv.URL
+	c.HTTP = srv.Client()
+	_, err := c.GetAirline(context.Background(), "UA")
+	if err == nil || !strings.Contains(err.Error(), "exceeds") {
+		t.Fatalf("expected oversized-body error, got %v", err)
 	}
 }

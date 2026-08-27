@@ -26,6 +26,16 @@ import (
 // DefaultBaseURL is the SeatWifi JSON API root (see https://seatwifi.com/for-developers).
 const DefaultBaseURL = "https://seatwifi.com"
 
+// maxResponseBodyBytes caps a single SeatWifi success or error body. The
+// public JSON endpoints are small (flight/airline/rollout/search payloads);
+// this stops a runaway or unexpected body from ballooning the heap.
+const maxResponseBodyBytes = 4 << 20 // 4 MiB
+
+// defaultTimeout is used only when the caller did not set a context deadline.
+// Live `wifi` commands pass --timeout via context; this is a safety net for
+// library callers using context.Background(). Tests may shorten it.
+var defaultTimeout = 30 * time.Second
+
 // Client talks to the SeatWifi JSON API.
 type Client struct {
 	BaseURL string
@@ -36,7 +46,10 @@ type Client struct {
 func NewClient() *Client {
 	return &Client{
 		BaseURL: strings.TrimRight(DefaultBaseURL, "/"),
-		HTTP:    &http.Client{Timeout: 30 * time.Second},
+		// No client-level Timeout: the request context owns the deadline so a
+		// caller --timeout longer than 30s is not silently capped. get()
+		// applies defaultTimeout when the caller did not set a deadline.
+		HTTP: &http.Client{},
 	}
 }
 
@@ -126,6 +139,11 @@ type SearchResult struct {
 }
 
 func (c *Client) get(ctx context.Context, path string, query url.Values) ([]byte, error) {
+	if _, ok := ctx.Deadline(); !ok {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, defaultTimeout)
+		defer cancel()
+	}
 	u, err := url.Parse(c.BaseURL + path)
 	if err != nil {
 		return nil, err
@@ -144,9 +162,12 @@ func (c *Client) get(ctx context.Context, path string, query url.Values) ([]byte
 		return nil, fmt.Errorf("seatwifi %s: %w", path, err)
 	}
 	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
+	body, err := io.ReadAll(io.LimitReader(resp.Body, maxResponseBodyBytes+1))
 	if err != nil {
 		return nil, fmt.Errorf("seatwifi %s: read body: %w", path, err)
+	}
+	if len(body) > maxResponseBodyBytes {
+		return nil, fmt.Errorf("seatwifi %s: response exceeds %d-byte limit", path, maxResponseBodyBytes)
 	}
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("seatwifi %s: HTTP %d: %s", path, resp.StatusCode, truncate(body))
