@@ -2787,6 +2787,32 @@
       ]
     },
     {
+      "name": "bestfoodtrucks",
+      "category": "food-and-dining",
+      "api": "bestfoodtrucks",
+      "description": "The only Best Food Trucks client that can tell you where a truck goes, not just what's parked outside today.",
+      "search_terms": [
+        "bestfoodtrucks",
+        "bestfoodtrucks-pp-cli",
+        "Digest",
+        "lot digest",
+        "Turns a lot's upcoming schedule into ready-to-paste announcement text instead of raw structured data.",
+        "Cuisine Alert",
+        "trucks find",
+        "Finds every upcoming shift at a lot matching a cuisine, without opening each shift page one at a time.",
+        "Truck Schedule",
+        "Shows every lot a specific truck visits, past and future — a view the Best Food Trucks website itself never built.",
+        "Market Hotlist",
+        "Ranks trucks operating in a city by review signal, a cross-truck aggregate the site never computes.",
+        "Route Planner",
+        "lots digest",
+        "Combines multiple lots' schedules into one view in a single command instead of visiting each lot's page separately."
+      ],
+      "path": "library/food-and-dining/bestfoodtrucks",
+      "printer": "enlewof",
+      "printer_name": "Allen Lew"
+    },
+    {
       "name": "bird",
       "category": "social-and-messaging",
       "api": "Bird",
@@ -18683,6 +18709,58 @@
         "env_vars": [],
         "mcp_ready": "full",
         "spec_format": "internal"
+      }
+    },
+    {
+      "name": "redmine",
+      "category": "project-management",
+      "api": "Redmine",
+      "description": "Every Redmine feature, plus a local mirror that finally answers the cross-project questions the Roadmap page never could.",
+      "search_terms": [
+        "redmine",
+        "redmine-pp-cli",
+        "Every Redmine feature, plus a local mirror that finally answers the cross-project questions the Roadmap page never could.",
+        "Roadmap Burndown",
+        "See open/closed issue counts, average completion, and logged-vs-estimated hours for a release version — the Roadmap page Redmine never exposed as an API.",
+        "Assignee Workload Report",
+        "workload",
+        "See every assignee's open-issue count and estimated hours in one aggregate view, with a flag for anyone over threshold.",
+        "Stale Issue Detection",
+        "issues stale",
+        "Find open issues nobody has touched in N days — Redmine has no built-in staleness concept.",
+        "Since-Last-Sync Digest",
+        "digest",
+        "A personal activity report of what was created, updated, or closed in a time window, optionally scoped to issues assigned to or watched by you.",
+        "Cycle-Time by Tracker",
+        "issues cycle-time",
+        "Average days from creation to close, grouped by tracker or project — real duration math the API can't do.",
+        "Transitive Blocker Chain",
+        "issues blockers",
+        "Walk the full multi-hop 'blocks'/'blocked by' dependency chain for an issue, not just its direct relations."
+      ],
+      "path": "library/project-management/redmine",
+      "printer": "yosimasu",
+      "printer_name": "Masu Lin",
+      "contributors": [
+        {
+          "handle": "yosimasu",
+          "name": "Masu Lin"
+        }
+      ],
+      "mcp": {
+        "binary": "redmine-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 93,
+        "public_tool_count": 0,
+        "auth_type": "api_key",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
       }
     },
     {
