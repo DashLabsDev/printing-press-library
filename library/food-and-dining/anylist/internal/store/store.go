@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -32,6 +33,8 @@ type ItemRow struct {
 	ID              string
 	ListID          string
 	Name            string
+	ProductUpc      string
+	PackageSize     *pb.PBItemPackageSize
 	Quantity        string
 	Details         string
 	Category        string
@@ -39,6 +42,8 @@ type ItemRow struct {
 	Checked         bool
 	SortIndex       int
 	StoreIDs        []string
+	Prices          []*pb.PBItemPrice
+	PhotoIDs        []string
 }
 
 type RecipeRow struct {
@@ -53,6 +58,7 @@ type RecipeRow struct {
 	CookTime          int
 	Timestamp         float64
 	CreationTimestamp float64
+	PhotoIDs          []string
 }
 
 type IngredientRow struct {
@@ -133,12 +139,27 @@ type ListFolderRow struct {
 // way. The database's user_version pragma is compared against this constant on
 // every open; a mismatch means the cache was written by a different code version
 // and must be rebuilt (delete the .db file and re-run sync).
-const StoreSchemaVersion = 1
+const StoreSchemaVersion = 2
 
 // Store wraps a SQLite database.
 type Store struct {
 	db *sql.DB
 }
+
+// ErrListNotFound identifies an expected cache miss when resolving a list by
+// name. Callers can handle that case without treating database errors as an
+// empty list.
+var ErrListNotFound = errors.New("list not found")
+
+type listNotFoundError struct {
+	name string
+}
+
+func (e listNotFoundError) Error() string {
+	return fmt.Sprintf("list %q not found — run 'anylist-pp-cli sync' first", e.name)
+}
+
+func (e listNotFoundError) Unwrap() error { return ErrListNotFound }
 
 // DB exposes the raw database connection.
 func (s *Store) DB() *sql.DB {
@@ -150,10 +171,19 @@ func (s *Store) Close() error {
 	return s.db.Close()
 }
 
-// Open opens (or creates) the SQLite database adjacent to the config file.
+// Open opens (or creates) the SQLite database adjacent to the config file,
+// unless cfg.DatabasePath supplies an explicit per-invocation path.
 func Open(cfg *config.Config) (*Store, error) {
-	dir := filepath.Dir(cfg.Path)
-	dbPath := filepath.Join(dir, "anylist.db")
+	dbPath := strings.TrimSpace(cfg.DatabasePath)
+	if dbPath == "" {
+		dir := filepath.Dir(cfg.Path)
+		dbPath = filepath.Join(dir, "anylist.db")
+	}
+	if dir := filepath.Dir(dbPath); dir != "." {
+		if err := os.MkdirAll(dir, 0o700); err != nil {
+			return nil, fmt.Errorf("creating store directory: %w", err)
+		}
+	}
 	dsn := dbPath + "?_journal=WAL&_foreign_keys=on"
 	db, err := sql.Open("sqlite", dsn)
 	if err != nil {
@@ -172,7 +202,7 @@ func (s *Store) migrate() error {
 	if err := s.db.QueryRow(`PRAGMA user_version`).Scan(&dbVersion); err != nil {
 		return fmt.Errorf("reading user_version: %w", err)
 	}
-	if dbVersion != 0 && dbVersion != StoreSchemaVersion {
+	if dbVersion > StoreSchemaVersion {
 		return fmt.Errorf("schema version mismatch: db=%d code=%d — delete the cache file and re-run sync", dbVersion, StoreSchemaVersion)
 	}
 
@@ -190,13 +220,17 @@ CREATE TABLE IF NOT EXISTS items (
     id TEXT PRIMARY KEY,
     list_id TEXT NOT NULL,
     name TEXT NOT NULL,
+    product_upc TEXT DEFAULT '',
+    package_size TEXT DEFAULT '',
     quantity TEXT DEFAULT '',
     details TEXT DEFAULT '',
     category TEXT DEFAULT '',
     category_match_id TEXT DEFAULT '',
     checked INTEGER NOT NULL DEFAULT 0,
     manual_sort_index INTEGER DEFAULT 0,
-    store_ids TEXT DEFAULT '[]'
+    store_ids TEXT DEFAULT '[]',
+    prices TEXT DEFAULT '[]',
+    photo_ids TEXT DEFAULT '[]'
 );
 
 CREATE VIRTUAL TABLE IF NOT EXISTS items_fts USING fts5(name, content='items', content_rowid='rowid');
@@ -212,7 +246,8 @@ CREATE TABLE IF NOT EXISTS recipes (
     cook_time INTEGER DEFAULT 0,
     servings TEXT DEFAULT '',
     timestamp REAL DEFAULT 0,
-    creation_timestamp REAL DEFAULT 0
+    creation_timestamp REAL DEFAULT 0,
+    photo_ids TEXT DEFAULT '[]'
 );
 
 CREATE VIRTUAL TABLE IF NOT EXISTS recipes_fts USING fts5(name, note, content='recipes', content_rowid='rowid');
@@ -328,6 +363,21 @@ END;
 		return err
 	}
 	if err := s.ensureColumn("lists", "new_list_item_position", "INTEGER DEFAULT 0"); err != nil {
+		return err
+	}
+	if err := s.ensureColumn("items", "product_upc", "TEXT DEFAULT ''"); err != nil {
+		return err
+	}
+	if err := s.ensureColumn("items", "package_size", "TEXT DEFAULT ''"); err != nil {
+		return err
+	}
+	if err := s.ensureColumn("items", "prices", "TEXT DEFAULT '[]'"); err != nil {
+		return err
+	}
+	if err := s.ensureColumn("items", "photo_ids", "TEXT DEFAULT '[]'"); err != nil {
+		return err
+	}
+	if err := s.ensureColumn("recipes", "photo_ids", "TEXT DEFAULT '[]'"); err != nil {
 		return err
 	}
 	_, err := s.db.Exec(fmt.Sprintf("PRAGMA user_version = %d", StoreSchemaVersion))
@@ -492,6 +542,12 @@ func (s *Store) SyncFromUserData(userData *pb.PBUserDataResponse) error {
 
 	// Sync starter lists (user starters and favorites)
 	if slr := userData.GetStarterListsResponse(); slr != nil {
+		// The user-data response contains the current starter/favorite snapshot.
+		// Clear the old rows first so a verified removal cannot remain visible in
+		// the local cache after a fresh sync.
+		if _, err := tx.Exec(`DELETE FROM starter_items`); err != nil {
+			return fmt.Errorf("clearing starter items: %w", err)
+		}
 		syncStarterBatch := func(batch interface {
 			GetListResponses() []*pb.StarterListResponse
 		}, listType string) error {
@@ -600,13 +656,31 @@ func upsertItem(tx *sql.Tx, item *pb.ListItem) error {
 	if item.GetChecked() {
 		checked = 1
 	}
+	packageSizeJSON := ""
+	if packageSize := item.GetPackageSizePb(); packageSize != nil {
+		encoded, marshalErr := json.Marshal(packageSize)
+		if marshalErr != nil {
+			return fmt.Errorf("encoding package size: %w", marshalErr)
+		}
+		packageSizeJSON = string(encoded)
+	}
+	pricesJSON, err := json.Marshal(item.GetPrices())
+	if err != nil {
+		pricesJSON = []byte("[]")
+	}
+	photoIDsJSON, err := json.Marshal(item.GetPhotoIds())
+	if err != nil {
+		photoIDsJSON = []byte("[]")
+	}
 	_, err = tx.Exec(
 		`INSERT OR REPLACE INTO items
-		 (id, list_id, name, quantity, details, category, category_match_id, checked, manual_sort_index, store_ids)
-		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		 (id, list_id, name, product_upc, package_size, quantity, details, category, category_match_id, checked, manual_sort_index, store_ids, prices, photo_ids)
+		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		item.GetIdentifier(),
 		item.GetListId(),
 		item.GetName(),
+		item.GetProductUpc(),
+		packageSizeJSON,
 		item.GetQuantity(),
 		item.GetDetails(),
 		item.GetCategory(),
@@ -614,15 +688,21 @@ func upsertItem(tx *sql.Tx, item *pb.ListItem) error {
 		checked,
 		int(item.GetManualSortIndex()),
 		string(storeIDsJSON),
+		string(pricesJSON),
+		string(photoIDsJSON),
 	)
 	return err
 }
 
 func upsertRecipe(tx *sql.Tx, recipe *pb.PBRecipe) error {
-	_, err := tx.Exec(
+	photoIDsJSON, err := json.Marshal(recipe.GetPhotoIds())
+	if err != nil {
+		photoIDsJSON = []byte("[]")
+	}
+	_, err = tx.Exec(
 		`INSERT OR REPLACE INTO recipes
-		 (id, name, note, source_name, source_url, rating, prep_time, cook_time, servings, timestamp, creation_timestamp)
-		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		 (id, name, note, source_name, source_url, rating, prep_time, cook_time, servings, timestamp, creation_timestamp, photo_ids)
+		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		recipe.GetIdentifier(),
 		recipe.GetName(),
 		recipe.GetNote(),
@@ -634,6 +714,7 @@ func upsertRecipe(tx *sql.Tx, recipe *pb.PBRecipe) error {
 		recipe.GetServings(),
 		recipe.GetTimestamp(),
 		recipe.GetCreationTimestamp(),
+		string(photoIDsJSON),
 	)
 	return err
 }
@@ -757,12 +838,39 @@ func (s *Store) FindListByName(name string) (*ListRow, error) {
 			return &all[i], nil
 		}
 	}
-	return nil, fmt.Errorf("list %q not found — run 'anylist-pp-cli sync' first", name)
+	return nil, listNotFoundError{name: name}
+}
+
+// DeleteList removes a list and its list-scoped cache rows after a live delete
+// has been verified. It intentionally does not touch folders or other lists.
+func (s *Store) DeleteList(listID string) error {
+	listID = strings.TrimSpace(listID)
+	if listID == "" {
+		return errors.New("list ID must not be empty")
+	}
+	tx, err := s.db.Begin()
+	if err != nil {
+		return fmt.Errorf("beginning list deletion: %w", err)
+	}
+	defer tx.Rollback() //nolint:errcheck
+	if _, err := tx.Exec(`DELETE FROM items WHERE list_id = ?`, listID); err != nil {
+		return fmt.Errorf("deleting list items: %w", err)
+	}
+	if _, err := tx.Exec(`DELETE FROM stores WHERE list_id = ?`, listID); err != nil {
+		return fmt.Errorf("deleting list stores: %w", err)
+	}
+	if _, err := tx.Exec(`DELETE FROM lists WHERE id = ?`, listID); err != nil {
+		return fmt.Errorf("deleting list: %w", err)
+	}
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("committing list deletion: %w", err)
+	}
+	return nil
 }
 
 // GetItems returns items for a list, optionally filtered by checked state.
 func (s *Store) GetItems(listID string, checked *bool) ([]ItemRow, error) {
-	query := `SELECT id, list_id, name, quantity, details, category, category_match_id, checked, manual_sort_index, store_ids
+	query := `SELECT id, list_id, name, product_upc, package_size, quantity, details, category, category_match_id, checked, manual_sort_index, store_ids, prices, photo_ids
 	          FROM items WHERE list_id = ?`
 	args := []any{listID}
 	if checked != nil {
@@ -786,7 +894,7 @@ func (s *Store) GetItems(listID string, checked *bool) ([]ItemRow, error) {
 func (s *Store) FindItemByName(listID, name string) (*ItemRow, error) {
 	lower := strings.ToLower(name)
 	rows, err := s.db.Query(
-		`SELECT id, list_id, name, quantity, details, category, category_match_id, checked, manual_sort_index, store_ids
+		`SELECT id, list_id, name, product_upc, package_size, quantity, details, category, category_match_id, checked, manual_sort_index, store_ids, prices, photo_ids
 		 FROM items WHERE list_id = ?`, listID)
 	if err != nil {
 		return nil, err
@@ -822,7 +930,7 @@ func (s *Store) FindItemByName(listID, name string) (*ItemRow, error) {
 // FindItemByID finds an item in a list by exact item identifier.
 func (s *Store) FindItemByID(listID, itemID string) (*ItemRow, error) {
 	rows, err := s.db.Query(
-		`SELECT id, list_id, name, quantity, details, category, category_match_id, checked, manual_sort_index, store_ids
+		`SELECT id, list_id, name, product_upc, package_size, quantity, details, category, category_match_id, checked, manual_sort_index, store_ids, prices, photo_ids
 		 FROM items WHERE list_id = ? AND id = ?`, listID, itemID)
 	if err != nil {
 		return nil, err
@@ -840,10 +948,10 @@ func (s *Store) FindItemByID(listID, itemID string) (*ItemRow, error) {
 
 // SearchItems searches items across all lists using FTS5.
 func (s *Store) SearchItems(query string) ([]ItemSearchResult, error) {
-	ftsQuery := query + "*"
+	ftsQuery := ftsPrefixQuery(query)
 	sqlQuery := `
-		SELECT i.id, i.list_id, i.name, i.quantity, i.details, i.category, i.category_match_id,
-		       i.checked, i.manual_sort_index, i.store_ids, l.name as list_name
+		SELECT i.id, i.list_id, i.name, i.product_upc, i.package_size, i.quantity, i.details, i.category, i.category_match_id,
+		       i.checked, i.manual_sort_index, i.store_ids, i.prices, i.photo_ids, l.name as list_name
 		FROM items i
 		JOIN lists l ON i.list_id = l.id
 		WHERE i.rowid IN (SELECT rowid FROM items_fts WHERE items_fts MATCH ?)
@@ -859,15 +967,24 @@ func (s *Store) SearchItems(query string) ([]ItemSearchResult, error) {
 	for rows.Next() {
 		var r ItemSearchResult
 		var checkedInt int
+		var packageSizeStr string
 		var storeIDsStr string
+		var pricesStr string
+		var photoIDsStr string
 		if err := rows.Scan(
-			&r.ID, &r.ListID, &r.Name, &r.Quantity, &r.Details, &r.Category,
-			&r.CategoryMatchID, &checkedInt, &r.SortIndex, &storeIDsStr, &r.ListName,
+			&r.ID, &r.ListID, &r.Name, &r.ProductUpc, &packageSizeStr, &r.Quantity, &r.Details,
+			&r.Category, &r.CategoryMatchID, &checkedInt, &r.SortIndex, &storeIDsStr, &pricesStr, &photoIDsStr, &r.ListName,
 		); err != nil {
 			return nil, err
 		}
 		r.Checked = checkedInt != 0
+		var err error
+		if r.PackageSize, err = parsePackageSize(packageSizeStr); err != nil {
+			return nil, err
+		}
 		r.StoreIDs = parseStoreIDs(storeIDsStr)
+		r.Prices = parsePrices(pricesStr)
+		r.PhotoIDs = parsePhotoIDs(photoIDsStr)
 		results = append(results, r)
 	}
 	return results, rows.Err()
@@ -876,8 +993,8 @@ func (s *Store) SearchItems(query string) ([]ItemSearchResult, error) {
 // GetListsByStore returns unchecked items grouped by store for a list.
 func (s *Store) GetListsByStore(listID string) ([]StoreGroup, error) {
 	sqlQuery := `
-		SELECT i.id, i.list_id, i.name, i.quantity, i.details, i.category, i.category_match_id,
-		       i.checked, i.manual_sort_index, i.store_ids,
+		SELECT i.id, i.list_id, i.name, i.product_upc, i.package_size, i.quantity, i.details, i.category, i.category_match_id,
+		       i.checked, i.manual_sort_index, i.store_ids, i.prices, i.photo_ids,
 		       COALESCE(s.name, 'Unassigned') as store_name, COALESCE(s.sort_index, 9999) as ssi
 		FROM items i
 		LEFT JOIN (
@@ -905,18 +1022,26 @@ func (s *Store) GetListsByStore(listID string) ([]StoreGroup, error) {
 	for rows.Next() {
 		var item ItemRow
 		var checkedInt int
+		var packageSizeStr string
 		var storeIDsStr string
+		var pricesStr string
+		var photoIDsStr string
 		var storeName string
 		var ssi int
 		if err := rows.Scan(
-			&item.ID, &item.ListID, &item.Name, &item.Quantity, &item.Details,
+			&item.ID, &item.ListID, &item.Name, &item.ProductUpc, &packageSizeStr, &item.Quantity, &item.Details,
 			&item.Category, &item.CategoryMatchID, &checkedInt, &item.SortIndex,
-			&storeIDsStr, &storeName, &ssi,
+			&storeIDsStr, &pricesStr, &photoIDsStr, &storeName, &ssi,
 		); err != nil {
 			return nil, err
 		}
 		item.Checked = checkedInt != 0
+		if item.PackageSize, err = parsePackageSize(packageSizeStr); err != nil {
+			return nil, err
+		}
 		item.StoreIDs = parseStoreIDs(storeIDsStr)
+		item.Prices = parsePrices(pricesStr)
+		item.PhotoIDs = parsePhotoIDs(photoIDsStr)
 		groupMap[storeName] = append(groupMap[storeName], item)
 		if !seen[storeName] {
 			seen[storeName] = true
@@ -944,7 +1069,7 @@ func (s *Store) GetCheckedItems(listID string) ([]ItemRow, error) {
 func (s *Store) GetRecipes() ([]RecipeRow, error) {
 	rows, err := s.db.Query(
 		`SELECT id, name, note, source_name, source_url, rating, prep_time, cook_time,
-		        servings, timestamp, creation_timestamp
+		        servings, timestamp, creation_timestamp, photo_ids
 		 FROM recipes ORDER BY name`)
 	if err != nil {
 		return nil, err
@@ -956,14 +1081,15 @@ func (s *Store) GetRecipes() ([]RecipeRow, error) {
 // FindRecipeByID returns a recipe by its stable AnyList identifier.
 func (s *Store) FindRecipeByID(id string) (*RecipeRow, error) {
 	var r RecipeRow
+	var photoIDsStr string
 	err := s.db.QueryRow(
 		`SELECT id, name, note, source_name, source_url, rating, prep_time, cook_time,
-		        servings, timestamp, creation_timestamp FROM recipes WHERE id = ?`,
+		        servings, timestamp, creation_timestamp, photo_ids FROM recipes WHERE id = ?`,
 		id,
 	).Scan(
 		&r.ID, &r.Name, &r.Note, &r.SourceName, &r.SourceURL,
 		&r.Rating, &r.PrepTime, &r.CookTime, &r.Servings,
-		&r.Timestamp, &r.CreationTimestamp,
+		&r.Timestamp, &r.CreationTimestamp, &photoIDsStr,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -971,6 +1097,7 @@ func (s *Store) FindRecipeByID(id string) (*RecipeRow, error) {
 		}
 		return nil, err
 	}
+	r.PhotoIDs = parsePhotoIDs(photoIDsStr)
 	return &r, nil
 }
 
@@ -979,7 +1106,7 @@ func (s *Store) FindRecipeByName(name string) (*RecipeRow, error) {
 	lower := strings.ToLower(name)
 	rows, err := s.db.Query(
 		`SELECT id, name, note, source_name, source_url, rating, prep_time, cook_time,
-		        servings, timestamp, creation_timestamp FROM recipes`)
+		        servings, timestamp, creation_timestamp, photo_ids FROM recipes`)
 	if err != nil {
 		return nil, err
 	}
@@ -1048,7 +1175,7 @@ func (s *Store) SearchRecipesByIngredient(ingredient string) ([]RecipeIngredient
 	lower := "%" + strings.ToLower(ingredient) + "%"
 	sqlQuery := `
 		SELECT r.id, r.name, r.note, r.source_name, r.source_url, r.rating, r.prep_time, r.cook_time,
-		       r.servings, r.timestamp, r.creation_timestamp, i.name as ingredient_name
+		       r.servings, r.timestamp, r.creation_timestamp, r.photo_ids, i.name as ingredient_name
 		FROM recipes r
 		JOIN ingredients i ON i.recipe_id = r.id
 		WHERE LOWER(i.name) LIKE ?
@@ -1064,10 +1191,11 @@ func (s *Store) SearchRecipesByIngredient(ingredient string) ([]RecipeIngredient
 	seen := map[string]bool{}
 	for rows.Next() {
 		var r RecipeIngredientResult
+		var photoIDsStr string
 		if err := rows.Scan(
 			&r.ID, &r.Name, &r.Note, &r.SourceName, &r.SourceURL,
 			&r.Rating, &r.PrepTime, &r.CookTime, &r.Servings,
-			&r.Timestamp, &r.CreationTimestamp, &r.IngredientName,
+			&r.Timestamp, &r.CreationTimestamp, &photoIDsStr, &r.IngredientName,
 		); err != nil {
 			return nil, err
 		}
@@ -1081,10 +1209,10 @@ func (s *Store) SearchRecipesByIngredient(ingredient string) ([]RecipeIngredient
 
 // SearchRecipesByName searches recipes by name using FTS5.
 func (s *Store) SearchRecipesByName(query string) ([]RecipeRow, error) {
-	ftsQuery := query + "*"
+	ftsQuery := ftsPrefixQuery(query)
 	sqlQuery := `
 		SELECT r.id, r.name, r.note, r.source_name, r.source_url, r.rating, r.prep_time, r.cook_time,
-		       r.servings, r.timestamp, r.creation_timestamp
+		       r.servings, r.timestamp, r.creation_timestamp, r.photo_ids
 		FROM recipes r
 		WHERE r.rowid IN (SELECT rowid FROM recipes_fts WHERE recipes_fts MATCH ?)
 		ORDER BY r.name`
@@ -1097,10 +1225,27 @@ func (s *Store) SearchRecipesByName(query string) ([]RecipeRow, error) {
 	return scanRecipes(rows)
 }
 
+// ftsPrefixQuery turns each whitespace-delimited search term into a quoted
+// FTS5 prefix phrase. Quoting keeps punctuation such as the hyphen in
+// "example-value" from being parsed as an operator or column name while
+// retaining prefix matching for every term.
+func ftsPrefixQuery(query string) string {
+	terms := strings.Fields(strings.TrimSpace(query))
+	if len(terms) == 0 {
+		return `""`
+	}
+	quoted := make([]string, len(terms))
+	for i, term := range terms {
+		term = strings.ReplaceAll(term, `"`, `""`)
+		quoted[i] = `"` + term + `"*`
+	}
+	return strings.Join(quoted, " AND ")
+}
+
 // FilterRecipes filters recipes by prep time, cook time, rating, servings, and collection.
 func (s *Store) FilterRecipes(maxPrepTime, maxCookTime, minRating, servings int, collection string) ([]RecipeRow, error) {
 	query := `SELECT id, name, note, source_name, source_url, rating, prep_time, cook_time,
-	                 servings, timestamp, creation_timestamp FROM recipes`
+		                 servings, timestamp, creation_timestamp, photo_ids FROM recipes`
 	var conditions []string
 	var args []any
 
@@ -1122,7 +1267,7 @@ func (s *Store) FilterRecipes(maxPrepTime, maxCookTime, minRating, servings int,
 	}
 	if collection != "" {
 		query = `SELECT r.id, r.name, r.note, r.source_name, r.source_url, r.rating, r.prep_time, r.cook_time,
-		                r.servings, r.timestamp, r.creation_timestamp
+			                r.servings, r.timestamp, r.creation_timestamp, r.photo_ids
 		         FROM recipes r
 		         JOIN recipe_collection_members rcm ON rcm.recipe_id = r.id
 		         JOIN recipe_collections rc ON rc.id = rcm.collection_id`
@@ -1410,20 +1555,40 @@ func (s *Store) GetStores() ([]StoreRow, error) {
 
 // --- helpers ---
 
+func parsePackageSize(encoded string) (*pb.PBItemPackageSize, error) {
+	if strings.TrimSpace(encoded) == "" {
+		return nil, nil
+	}
+	var packageSize pb.PBItemPackageSize
+	if err := json.Unmarshal([]byte(encoded), &packageSize); err != nil {
+		return nil, fmt.Errorf("decoding cached package size: %w", err)
+	}
+	return &packageSize, nil
+}
+
 func scanItems(rows *sql.Rows) ([]ItemRow, error) {
 	var items []ItemRow
 	for rows.Next() {
 		var it ItemRow
 		var checkedInt int
+		var packageSizeStr string
 		var storeIDsStr string
+		var pricesStr string
+		var photoIDsStr string
 		if err := rows.Scan(
-			&it.ID, &it.ListID, &it.Name, &it.Quantity, &it.Details,
-			&it.Category, &it.CategoryMatchID, &checkedInt, &it.SortIndex, &storeIDsStr,
+			&it.ID, &it.ListID, &it.Name, &it.ProductUpc, &packageSizeStr, &it.Quantity, &it.Details,
+			&it.Category, &it.CategoryMatchID, &checkedInt, &it.SortIndex, &storeIDsStr, &pricesStr, &photoIDsStr,
 		); err != nil {
 			return nil, err
 		}
 		it.Checked = checkedInt != 0
+		var err error
+		if it.PackageSize, err = parsePackageSize(packageSizeStr); err != nil {
+			return nil, err
+		}
 		it.StoreIDs = parseStoreIDs(storeIDsStr)
+		it.Prices = parsePrices(pricesStr)
+		it.PhotoIDs = parsePhotoIDs(photoIDsStr)
 		items = append(items, it)
 	}
 	return items, rows.Err()
@@ -1433,13 +1598,15 @@ func scanRecipes(rows *sql.Rows) ([]RecipeRow, error) {
 	var recipes []RecipeRow
 	for rows.Next() {
 		var r RecipeRow
+		var photoIDsStr string
 		if err := rows.Scan(
 			&r.ID, &r.Name, &r.Note, &r.SourceName, &r.SourceURL,
 			&r.Rating, &r.PrepTime, &r.CookTime, &r.Servings,
-			&r.Timestamp, &r.CreationTimestamp,
+			&r.Timestamp, &r.CreationTimestamp, &photoIDsStr,
 		); err != nil {
 			return nil, err
 		}
+		r.PhotoIDs = parsePhotoIDs(photoIDsStr)
 		recipes = append(recipes, r)
 	}
 	return recipes, rows.Err()
@@ -1466,4 +1633,20 @@ func parseStoreIDs(s string) []string {
 		return nil
 	}
 	return ids
+}
+
+func parsePhotoIDs(s string) []string {
+	var ids []string
+	if err := json.Unmarshal([]byte(s), &ids); err != nil {
+		return nil
+	}
+	return ids
+}
+
+func parsePrices(s string) []*pb.PBItemPrice {
+	var prices []*pb.PBItemPrice
+	if err := json.Unmarshal([]byte(s), &prices); err != nil {
+		return nil
+	}
+	return prices
 }

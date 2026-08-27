@@ -50,9 +50,10 @@ func RegisterTools(s *server.MCPServer) {
 		handleSearch,
 	)
 
-	// Runtime Cobra-tree mirror — exposes every user-facing command that is
-	// not already covered by a typed endpoint or framework MCP tool.
-	cobratree.RegisterAll(s, cli.RootCmd(), cobratree.SiblingCLIPath)
+	// Runtime Cobra-tree mirror — endpoint commands are included because the
+	// compact orchestration surface intentionally suppresses typed endpoint
+	// tools. Mutations therefore retain the companion CLI's preview/apply gate.
+	cobratree.RegisterAllIncludingEndpoints(s, cli.RootCmd(), cobratree.SiblingCLIPath)
 }
 
 type mcpParamBinding struct {
@@ -219,9 +220,9 @@ func handleContext(_ context.Context, _ mcplib.CallToolRequest) (*mcplib.CallToo
 		"api":         "anylist",
 		"description": "Every AnyList feature in your terminal — plus offline search, store routing, and cron-safe automations no mobile...",
 		"archetype":   "content",
-		"tool_count":  43,
+		"tool_count":  64,
 		// tool_surface tells agents which surface a capability lives on.
-		"tool_surface": "MCP exposes typed endpoint tools plus a runtime mirror of user-facing CLI commands. Endpoint tools keep typed schemas; command-mirror tools shell out to the companion anylist-pp-cli binary.",
+		"tool_surface": "MCP exposes anylist_search + anylist_execute over explicitly read-only endpoints (GET lookups and safe POST data-fetch routes only) plus a runtime mirror of user-facing CLI commands. anylist_execute fails closed before any request for mutation or unclassified endpoints; writes must go through the command-mirror tools, which shell out to the companion anylist-pp-cli binary that owns preview/apply, read-after-write verification, and cache synchronization.",
 		"auth": map[string]any{
 			"type": "bearer_token",
 			"env_vars": []map[string]any{
@@ -237,36 +238,41 @@ func handleContext(_ context.Context, _ mcplib.CallToolRequest) (*mcplib.CallToo
 		"resources": []map[string]any{
 			{
 				"name":        "categories",
-				"description": "View item categories",
-				"endpoints":   []string{"list"},
+				"description": "View item categories; custom category create, delete, rename, and reorder are available through the CLI mirror with explicit apply gates and fresh read-back verification",
+				"endpoints":   []string{"create", "delete", "list", "reorder", "rename"},
 			},
 			{
 				"name":        "collections",
-				"description": "Manage recipe collections",
+				"description": "Manage recipe collections with live read-after-write verification and local cache sync",
 				"endpoints":   []string{"add", "create", "delete", "list", "remove"},
 				"searchable":  true,
 			},
 			{
 				"name":        "favorites",
-				"description": "View favorite items",
-				"endpoints":   []string{"list"},
+				"description": "Manage favorite items with explicit apply gates and fresh read-after-write verification; photo and price mutation remain separate capabilities",
+				"endpoints":   []string{"add", "list", "remove"},
+			},
+			{
+				"name":        "export",
+				"description": "Export a complete AnyList protobuf snapshot as JSON",
+				"endpoints":   []string{"export"},
 			},
 			{
 				"name":        "folders",
-				"description": "Organize shopping lists into folders",
-				"endpoints":   []string{"create", "delete", "list"},
+				"description": "Organize shopping-list folders; create, delete, rename, parent movement, and child ordering are live-supported with fresh verification",
+				"endpoints":   []string{"create", "delete", "list", "update"},
 				"searchable":  true,
 			},
 			{
 				"name":        "items",
-				"description": "Manage items within a shopping list",
-				"endpoints":   []string{"add", "check", "list", "recent", "remove", "search", "uncheck", "update"},
+				"description": "Manage items within a shopping list; item photo upload is available through the explicitly gated CLI command items photo attach, with fresh read-back verification and local photo-ID cache persistence",
+				"endpoints":   []string{"add", "check", "list", "lookup", "recent", "remove", "search", "uncheck", "update"},
 				"searchable":  true,
 			},
 			{
 				"name":        "lists",
-				"description": "Manage shopping lists",
-				"endpoints":   []string{"by-store", "create", "delete", "list", "reset", "settings"},
+				"description": "Manage shopping lists; rename, selected settings, notification locations, and invite-add are available through explicitly applied CLI commands with fresh verification",
+				"endpoints":   []string{"by-store", "create", "delete", "list", "rename", "reset", "settings", "sharing"},
 				"searchable":  true,
 			},
 			{
@@ -277,18 +283,18 @@ func handleContext(_ context.Context, _ mcplib.CallToolRequest) (*mcplib.CallToo
 			},
 			{
 				"name":        "recipes",
-				"description": "Manage recipes — import, organize, and add to shopping lists",
-				"endpoints":   []string{"add-to-list", "batch-add", "create", "delete", "filter", "import", "list", "missing", "scale", "search", "show"},
+				"description": "Manage recipes — import, organize, add to shopping lists, and manage recipe-sharing links with explicit apply gates and fresh read-back verification",
+				"endpoints":   []string{"add-to-list", "batch-add", "create", "delete", "filter", "import", "import-paprika", "link", "list", "missing", "photo", "scale", "search", "sharing", "show", "update"},
 				"searchable":  true,
 			},
 			{
 				"name":        "starters",
-				"description": "Manage starter list items (template items for new lists)",
-				"endpoints":   []string{"list"},
+				"description": "Manage user starter-list items with explicit apply gates and fresh read-after-write verification; photo and price mutation remain separate capabilities",
+				"endpoints":   []string{"add", "list", "remove"},
 			},
 			{
 				"name":        "stores",
-				"description": "View and manage stores and store filters",
+				"description": "View stores and store filters (write operations are not exposed); AnyList has no ZIP-aware Walmart price or availability query",
 				"endpoints":   []string{"list"},
 			},
 		},
