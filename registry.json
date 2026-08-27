@@ -437,6 +437,12 @@
         "Reconcile outbound messages with status, thread placement, timestamps, and later inbound activity."
       ],
       "path": "library/social-and-messaging/agentmail",
+      "release": {
+        "cli_name": "agentmail-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-27T09:16:49Z",
+        "source_commit": "dd645aad133c3e17d1e14f00eee6ce82d17deb6f"
+      },
       "printer": "SomSamantray",
       "printer_name": "Som Samantray",
       "creator": {
@@ -527,6 +533,12 @@
         "Full-text search over every property this CLI has already seen, with no network call."
       ],
       "path": "library/travel/agoda",
+      "release": {
+        "cli_name": "agoda-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-27T09:16:49Z",
+        "source_commit": "f2179c8d6f25abf3a9c732f95b1ed13302d5f29c"
+      },
       "printer": "devacto",
       "printer_name": "Victor Wibisono",
       "creator": {
@@ -12666,6 +12678,12 @@
         "Measure domain diversity, rank share, timestamp coverage, and missing metadata in a saved run."
       ],
       "path": "library/ai/keenable",
+      "release": {
+        "cli_name": "keenable-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-27T09:16:49Z",
+        "source_commit": "bd306e7ceaef16e97de408be0da317f423af6cea"
+      },
       "printer": "SomSamantray",
       "printer_name": "Som Samantray",
       "creator": {
@@ -12703,6 +12721,12 @@
         "Single create/query command pair that reaches all 120+ Kie.ai Market models via a --model identifier and JSON --input, instead of one generated command per model."
       ],
       "path": "library/ai/kie",
+      "release": {
+        "cli_name": "kie-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-27T09:16:49Z",
+        "source_commit": "8bc459ef6a47876dd6745fa928ba73d79b0845b3"
+      },
       "printer": "kelvincushman",
       "printer_name": "Kelvin Cushman",
       "creator": {
