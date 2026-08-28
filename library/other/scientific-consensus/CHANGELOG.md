@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.8 - 2026-08-28
+
+- feat(scientific-consensus): wire retraction exclusion into the live path (#1841).
+
 ## 2026.8.7 - 2026-08-26
 
 - feat(scientific-consensus): carry authors and journal into study briefs (#1822).
