@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.4 - 2026-08-28
+
+- refactor(anylist): split oversized sources by responsibility (from #1845) (#1852).
+
 ## 2026.8.3 - 2026-08-27
 
 - fix(anylist): fail closed for unverified collection writes (#1838).
