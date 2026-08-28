@@ -2,7 +2,7 @@
 
 **A CLI and MCP server for your Forkable office-lunch program, with a local database and history, spend, and preference queries the web app cannot answer, plus commands to set, confirm, and skip meal orders (dry-run by default; --confirm to apply).**
 
-Forkable exposes no public API. This CLI reverse-engineers the my-account app's GraphQL surface into a Go binary with clean read commands and agent-native output. On top of the raw reads it adds longitudinal views the product never shows — served-meal history, preference-vs-served drift, spend trends, allowance utilization, venue rotation, and a week-ahead digest — all fetched live from Forkable. It also exposes the my-account app's own meal-management mutations as meal set, meal set-all, meal confirm, meal skip, and reorder; these are dry-run by default and only place, confirm, or skip real orders when you pass --confirm.
+Forkable exposes no public API. This CLI reverse-engineers the my-account app's GraphQL surface into a Go binary with clean read commands and agent-native output. On top of the raw reads it adds longitudinal views the product never shows — served-meal history, preference-vs-served drift, spend trends, allowance utilization, venue rotation, and a week-ahead digest — all fetched live from Forkable. It also exposes the my-account app's own meal-management mutations as meal set, meal set-all, meal confirm, meal skip, and reorder; these are dry-run by default and only place, confirm, or skip real orders when you pass --confirm. A fifth meal command, `meal feedback`, reports a problem with a delivered meal to Forkable via whichever of two real mechanisms actually handles it: `addMemberReportedIssue`, a real GraphQL mutation for missing-item/missing-side reports with refund/credit resolution tracking and a same-day cutoff, or the REST "Contact Support" endpoint for everything else.
 
 Learn more at [Forkable](https://forkable.com).
 
@@ -258,6 +258,15 @@ forkable-pp-cli upcoming-digest --agent
 
 One compact line per upcoming day for a quick agent-readable briefing.
 
+### Flag a problem with today's meal
+
+```bash
+forkable-pp-cli meal feedback 12345 --category missing-item --note "Rice was missing, that was pictured" --piece <uuid> --confirm
+forkable-pp-cli meal feedback list --delivery 12345 --agent
+```
+
+Files a real "Missing Meal" report with Forkable before the same-day cutoff (dry-run without `--confirm` — preview it first), then checks its live resolution status. Find the `deliveryId`/`--piece` via `upcoming-digest` or `deliveries list`. Past the cutoff, use `--category quality`/`other` instead to reach Forkable support through the always-available contact form.
+
 ## Usage
 
 Run `forkable-pp-cli --help` for the full command reference and flag list.
@@ -379,6 +388,15 @@ These commands place real orders and spend against your account. They are **dry-
 - **`forkable-pp-cli meal confirm <deliveryId> [--unconfirm] [--confirm]`** - Confirm (or `--unconfirm`) a delivery day (`confirmDelivery`).
 - **`forkable-pp-cli meal skip <deliveryId> [--confirm]`** - Skip / cancel one or more delivery days (`removeDelivery`).
 - **`forkable-pp-cli reorder <fromDate> --onto <deliveryId> [--replace-piece <uuid>] [--confirm]`** - Repeat the meal you had on a past date onto an upcoming delivery day.
+- **`forkable-pp-cli meal feedback <deliveryId> --category <missing-item|missing-side|wrong-item|quality|late|other> [--note <text>] [--piece <uuid>] [--item <name>] [--venue <name>] [--request-refund|--request-credit] [--confirm]`** - Report a problem with a delivered meal to Forkable via whichever real mechanism handles the category. Dry-run by default like the four mutations above.
+- **`meal feedback list [--limit N]`** shows this CLI's own local record of past attempts; **`meal feedback list --delivery <id>`** instead fetches Forkable's own `myReportedIssues` live for that delivery.
+
+**`meal feedback` uses two real mechanisms, picked by `--category` — neither is documented anywhere.**
+
+1. `missing-item`/`missing-side` → **`addMemberReportedIssue`**, a real GraphQL mutation (same wire shape as the four mutations above) backing the my-account app's per-meal "Report Missing Item" widget, discovered by static analysis of the app's JS bundle (module 372, `MealReportIssue`). Requires `--piece`; the order id is resolved automatically. Supports `--request-refund`/`--request-credit`. **Time-gated**: Forkable enforces a same-day cutoff (confirmed live as 1pm local restaurant time) — this CLI checks it proactively and fails fast rather than attempting a doomed live call.
+2. `wrong-item`/`quality`/`late`/`other` → **`POST /submit_contact_form`**, a plain REST call (module 29822) behind the generic "Contact Support" modal, with `{name, email, subject, message, market_id}`. Not time-gated — always available, including as a fallback once the missing-item cutoff has passed. Delivery id/venue/item/piece have no dedicated field here, so they're folded into the message text alongside `--note`.
+
+Building an accurate preview for either mechanism touches the network even without `--confirm`. Every `--confirm` attempt (submitted or rejected by Forkable) is also appended to a local `meal-feedback.jsonl` ledger under the CLI's data dir — a preview-only run makes no live-writing attempt, so it is not logged. This ledger is distinct from the top-level `feedback` command (which is for friction with this CLI, not with a meal).
 
 **`--replace-piece` is effectively always required for `meal set` and `reorder`.** Forkable auto-selects a candidate meal for every delivery day before you ever touch it — in practice there is no delivery day with a genuinely empty slot, so omitting `--replace-piece` is a rare/theoretical path, not the default case. **Dry-run mode does not validate this.** A dry-run without `--replace-piece` renders a plausible-looking mutation preview and only fails at `--confirm` time, with a raw GraphQL error (`oldPieceId ... Expected value to not be null`). Before running `--confirm`, always look up the target delivery's current piece id via `deliveries list` (its `orders[].pieces[].id`) and pass it with `--replace-piece`. `meal set-all` has no `--replace-piece` flag — `replaceAllPieces` takes no old-piece id at all, so this caveat doesn't apply to it.
 
@@ -429,7 +447,7 @@ This CLI is designed for AI agent consumption:
 - **Pipeable** - `--json` output to stdout, errors to stderr
 - **Filterable** - `--select id,name` returns only fields you need
 - **Previewable** - `--dry-run` shows the request without sending
-- **Safe writes** - read commands query Forkable; the write commands (`meal set`, `meal set-all`, `meal confirm`, `meal skip`, `reorder`) are dry-run by default and only mutate your account when you pass `--confirm`
+- **Safe writes** - read commands query Forkable; the write commands (`meal set`, `meal set-all`, `meal confirm`, `meal skip`, `reorder`, `meal feedback`) are dry-run by default and only mutate your account (or, for `meal feedback`, submit a real support request) when you pass `--confirm`
 - **Live fetch** - commands query Forkable directly over GraphQL; there is no local sync/cache step
 - **Agent-safe by default** - no colors or formatting unless `--human-friendly` is set
 
