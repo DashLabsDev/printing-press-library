@@ -8460,6 +8460,61 @@
       }
     },
     {
+      "name": "flighty",
+      "category": "travel",
+      "api": "Flighty Airports",
+      "description": "Every Flighty Airports meltdown map feature, plus cross-airport intelligence no web page can answer.",
+      "search_terms": [
+        "flighty",
+        "Flighty Airports",
+        "flighty-pp-cli",
+        "Every Flighty Airports meltdown map feature, plus cross-airport intelligence no web page can answer.",
+        "Worst-airports ranking",
+        "airports worst",
+        "Rank the network's airports right now by cumulative delay and cancellations — the web map color-codes but never ranks.",
+        "Flight lookup by number",
+        "airports find-flight",
+        "Find one flight by number across arrivals and departures boards — status, original vs actual time, gate, belt, terminal.",
+        "Network airline disruption",
+        "airports airline",
+        "One airline's delay/cancel/divert footprint aggregated across every synced airport — impossible per-airport on the site.",
+        "Airport comparison",
+        "airports compare",
+        "Side-by-side status, delays, warnings, and flight rules for two airports.",
+        "Route disruption check",
+        "airports route",
+        "Both directions of one origin-destination pair's delay/cancel/divert stats, joined from each side's disrupted routes.",
+        "Healthy-alternates finder",
+        "airports nearby",
+        "Distance-ranked nearby airports, flagging which have normal operations right now.",
+        "Change diff since last sync",
+        "airports diff",
+        "What changed since the last sync: status transitions, new/cleared warnings, delay deltas."
+      ],
+      "path": "library/travel/flighty",
+      "printer": "SomSamantray",
+      "printer_name": "Som Samantray",
+      "creator": {
+        "handle": "SomSamantray",
+        "name": "Som Samantray"
+      },
+      "mcp": {
+        "binary": "flighty-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 5,
+        "public_tool_count": 0,
+        "auth_type": "none",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "food52",
       "category": "food-and-dining",
       "api": "Food52",
@@ -13811,6 +13866,12 @@
         "Surface near-identical listings from different authors within a category."
       ],
       "path": "library/developer-tools/mcpmarket",
+      "release": {
+        "cli_name": "mcpmarket-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-28T09:19:31Z",
+        "source_commit": "bf5c70997e60a6d267fe2df559da2d6d725b4993"
+      },
       "printer": "SomSamantray",
       "printer_name": "Som Samantray",
       "creator": {
@@ -18781,6 +18842,54 @@
         ],
         "mcp_ready": "full",
         "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "rapidapi",
+      "category": "developer-tools",
+      "api": "Rapidapi",
+      "description": "RapidAPI Hub marketplace CLI - search APIs, browse categories & collections, inspect providers",
+      "search_terms": [
+        "rapidapi",
+        "rapidapi-pp-cli",
+        "RapidAPI Hub marketplace CLI - search APIs, browse categories & collections, inspect providers",
+        "Offline sync & search",
+        "sync",
+        "Sync marketplace data into a local SQLite store with sync-state tracking, then search it offline.",
+        "Hub analytics with aggregation",
+        "analytics",
+        "Hub-wide metrics plus per-day API traffic aggregated from the local store (SUM, AVG, error rates).",
+        "Marketplace export",
+        "export",
+        "Export cached marketplace records to JSON or CSV for offline analysis.",
+        "Chrome TLS transport",
+        "system csrf",
+        "uTLS Chrome-fingerprint HTTP/2 transport that passes the Cloudflare bot gate, enabling live CLI access to the hub gateway.",
+        "Cache freshness doctor",
+        "doctor",
+        "Doctor reports cache freshness with schema-gated auto-refresh."
+      ],
+      "path": "library/developer-tools/rapidapi",
+      "printer": "SomSamantray",
+      "printer_name": "Som Samantray",
+      "creator": {
+        "handle": "SomSamantray",
+        "name": "Som Samantray"
+      },
+      "mcp": {
+        "binary": "rapidapi-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 13,
+        "public_tool_count": 0,
+        "auth_type": "api_key",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
       }
     },
     {
@@ -24963,6 +25072,69 @@
         "auth_type": "api_key",
         "env_vars": [
           "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "unipile",
+      "category": "social-and-messaging",
+      "api": "Unipile",
+      "description": "Every Unipile endpoint as a typed command, plus a local mirror that makes cross-provider search possible and an invitation ledger that shows how much LinkedIn headroom you have left.",
+      "search_terms": [
+        "unipile",
+        "unipile-pp-cli",
+        "Every Unipile endpoint as a typed command, plus a local mirror that makes cross-provider search possible and an invitation ledger that shows how much LinkedIn headroom you have left.",
+        "Rate-budget ledger",
+        "budget",
+        "See how many LinkedIn invitations you have left today and this week, counted from your synced invitation history.",
+        "Offline cross-provider search",
+        "search",
+        "Full-text search every message, email, attendee, and relation across all connected providers at once, offline.",
+        "Contact 360",
+        "contact",
+        "Everything the local mirror knows about one person: connection state, invitation history, and every conversation with per-direction message counts.",
+        "Unified unread inbox",
+        "inbox",
+        "One table of everything unread across LinkedIn, WhatsApp, Telegram, Instagram, Messenger, and email.",
+        "Silence detection",
+        "silent",
+        "Find conversations where you sent the last message and got no reply for N days.",
+        "Accepted but not messaged",
+        "accepted",
+        "New LinkedIn connections since your last sync that you have not messaged yet.",
+        "Invitation funnel",
+        "funnel",
+        "Sent, accepted, and replied counts with conversion rates over a time window.",
+        "Cross-provider digest",
+        "digest",
+        "What changed across every connected provider since the last sync.",
+        "Resolved thread view",
+        "thread",
+        "Read one conversation end to end with attendee IDs resolved to real names.",
+        "Post engagement crossmatch",
+        "engagement",
+        "Who reacted to or commented on your posts, flagged by whether they are already a connection."
+      ],
+      "path": "library/social-and-messaging/unipile",
+      "printer": "fuushyn",
+      "printer_name": "fuushyn",
+      "creator": {
+        "handle": "fuushyn",
+        "name": "fuushyn"
+      },
+      "mcp": {
+        "binary": "unipile-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 94,
+        "public_tool_count": 0,
+        "auth_type": "api_key",
+        "env_vars": [
+          "UNIPILE_API_KEY"
         ],
         "mcp_ready": "full",
         "spec_format": "openapi3"
