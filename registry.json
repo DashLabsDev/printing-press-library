@@ -8492,6 +8492,12 @@
         "What changed since the last sync: status transitions, new/cleared warnings, delay deltas."
       ],
       "path": "library/travel/flighty",
+      "release": {
+        "cli_name": "flighty-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-28T09:20:44Z",
+        "source_commit": "e36d496e172ccc9bff64db18a3f48b555cc43ab6"
+      },
       "printer": "SomSamantray",
       "printer_name": "Som Samantray",
       "creator": {
@@ -8716,9 +8722,9 @@
       "path": "library/food-and-dining/forkable",
       "release": {
         "cli_name": "forkable-pp-cli",
-        "version": "2026.8.4",
-        "released_at": "2026-08-21T08:29:25Z",
-        "source_commit": "c8f05ea0f30474bafd6488e47c019f223d88e9f4"
+        "version": "2026.8.5",
+        "released_at": "2026-08-28T09:20:44Z",
+        "source_commit": "ccc5ef2cf0359f1d4a234dbeb957b9d99278454b"
       },
       "printer": "enlewof",
       "printer_name": "Allen Lew",
@@ -12917,6 +12923,37 @@
         ],
         "mcp_ready": "full",
         "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "kuma",
+      "category": "monitoring",
+      "api": "Uptime Kuma Operator",
+      "description": "Inspect Uptime Kuma v2 monitors, heartbeats, and incident context; retry changes are explicitly gated.",
+      "search_terms": [
+        "kuma",
+        "Uptime Kuma Operator",
+        "kuma-pp-cli",
+        "Inspect Uptime Kuma v2 monitors, heartbeats, and incident context; retry changes are explicitly gated.",
+        "Incident context composite",
+        "incident-context",
+        "Combines monitor identity, recent heartbeat timeline, and current status into one redacted operator brief.",
+        "No single Kuma call provides an incident-ready context packet.",
+        "Complete-object retry safety gate",
+        "set-retries",
+        "Previews and, only with explicit --yes, applies a complete monitor edit while preserving unrelated fields and verifying readback.",
+        "Kuma editMonitor is full replacement; a narrow patch risks silently clearing settings.",
+        "Socket.IO heartbeat normalization",
+        "heartbeats",
+        "Normalizes Kuma Socket.IO heartbeat records into a bounded time-window timeline with redacted output.",
+        "Kuma exposes management data over Socket.IO, not a conventional REST resource."
+      ],
+      "path": "library/monitoring/kuma",
+      "printer": "keithah",
+      "printer_name": "Keith",
+      "creator": {
+        "handle": "keithah",
+        "name": "Keith"
       }
     },
     {
@@ -18870,6 +18907,12 @@
         "Doctor reports cache freshness with schema-gated auto-refresh."
       ],
       "path": "library/developer-tools/rapidapi",
+      "release": {
+        "cli_name": "rapidapi-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-28T09:20:44Z",
+        "source_commit": "4fc07f8a51821077b7247e6c0e054bca5a9cb1ed"
+      },
       "printer": "SomSamantray",
       "printer_name": "Som Samantray",
       "creator": {
@@ -20237,9 +20280,9 @@
       "path": "library/other/scientific-consensus",
       "release": {
         "cli_name": "scientific-consensus-pp-cli",
-        "version": "2026.8.7",
-        "released_at": "2026-08-26T09:24:33Z",
-        "source_commit": "bbb92e65cb6271cd8ad72b181e30e2294ba81d8c"
+        "version": "2026.8.8",
+        "released_at": "2026-08-28T09:23:38Z",
+        "source_commit": "c881166853bf23c5cacefde1f332702093a6fce5"
       },
       "printer": "laci141",
       "printer_name": "laci141",
@@ -25118,6 +25161,12 @@
         "Who reacted to or commented on your posts, flagged by whether they are already a connection."
       ],
       "path": "library/social-and-messaging/unipile",
+      "release": {
+        "cli_name": "unipile-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-28T09:20:44Z",
+        "source_commit": "5d4b45af88ca8c9f4336fc7f123791ae1dea61eb"
+      },
       "printer": "fuushyn",
       "printer_name": "fuushyn",
       "creator": {
