@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.9 - 2026-08-28
+
+- feat(scientific-consensus): refutation override and PICO relevance gate (#1760).
+
 ## 2026.8.8 - 2026-08-28
 
 - feat(scientific-consensus): wire retraction exclusion into the live path (#1841).
