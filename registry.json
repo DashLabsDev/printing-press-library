@@ -8416,9 +8416,9 @@
       "path": "library/travel/flight-goat",
       "release": {
         "cli_name": "flight-goat-pp-cli",
-        "version": "2026.8.3",
-        "released_at": "2026-08-22T09:11:11Z",
-        "source_commit": "abce8a310cc87310486bc3ff05a06b9a6a34155e"
+        "version": "2026.8.4",
+        "released_at": "2026-08-27T18:01:13Z",
+        "source_commit": "2a3d45a2b1ab809e861c18060e4a01fdb759c3b6"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -23650,6 +23650,69 @@
         "auth_type": "bearer_token",
         "env_vars": [
           "TESLA_AUTH_TOKEN"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
+      "name": "teslatracker",
+      "category": "commerce",
+      "api": "TeslaTracker",
+      "description": "Every used Tesla TeslaTracker lists, in a local store that answers questions the site cannot — price paths, cohort placement, warranty left, and what already left the lot.",
+      "search_terms": [
+        "teslatracker",
+        "teslatracker-pp-cli",
+        "Every used Tesla TeslaTracker lists, in a local store that answers questions the site cannot — price paths, cohort placement, warranty left, and what already left the lot.",
+        "Remaining-warranty ledger",
+        "warranty",
+        "See exactly how many months and miles of Tesla warranty are left on the day you would take delivery, and which limit runs out first.",
+        "Range delta with cohort placement",
+        "degradation",
+        "Compare a car's actual range against its rated range, and see where that gap sits among every similar car in your local store.",
+        "Cohort price placement",
+        "comps",
+        "See where one car's landed cost sits in the distribution of comparable cars, with the sample size and the arithmetic shown.",
+        "Departure log",
+        "gone",
+        "See which cars left inventory, at what landed price, and after how many days listed.",
+        "Per-VIN price trajectory",
+        "price-history",
+        "See a single car's full observed price path: every cut, its size, and how long it has held the current price.",
+        "Configuration premium analysis",
+        "premium",
+        "See what a configuration attribute actually costs across the market, computed within matched cohorts.",
+        "Aging leaderboard",
+        "stale",
+        "Rank the corpus by days listed and flag cars that are both long-listed and have never had a price cut.",
+        "Landed-cost distance curve",
+        "radius",
+        "See how the price floor and median change as you widen your search radius, with real transport fees included at every step.",
+        "Saved searches with a change cursor",
+        "watch",
+        "Save a named search and see only what is new, price-changed, or departed since the last time you ran it.",
+        "Mirror provenance and gap report",
+        "coverage",
+        "See how complete and how fresh your local mirror is, field by field, including whether any pages were dropped during sync."
+      ],
+      "path": "library/commerce/teslatracker",
+      "printer": "michegz",
+      "printer_name": "michegz",
+      "creator": {
+        "handle": "michegz",
+        "name": "michegz"
+      },
+      "mcp": {
+        "binary": "teslatracker-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 3,
+        "public_tool_count": 3,
+        "auth_type": "none",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
         ],
         "mcp_ready": "full",
         "spec_format": "internal"
