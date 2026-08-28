@@ -31,6 +31,12 @@ type workBrief struct {
 	// maxAbstractChars so downstream LLM prompts built from this JSON stay
 	// bounded. Empty string when the source has no abstract.
 	Abstract string `json:"abstract"`
+	// Retraction and RetractionNote are set only for works a retraction
+	// signal kept out of the score. They are omitempty so the JSON of an
+	// ordinary study is byte-identical to what it was before retraction
+	// exclusion existed.
+	Retraction     scengine.Retraction `json:"retraction,omitempty"`
+	RetractionNote string              `json:"retraction_note,omitempty"`
 }
 
 type consensusOutput struct {
@@ -47,12 +53,18 @@ type consensusOutput struct {
 	Mixed            int                       `json:"mixed"`
 	Inconclusive     int                       `json:"inconclusive"`
 	TotalCitations   int                       `json:"total_citations"`
-	Method           string                    `json:"stance_method"`
-	TopSupporting    []workBrief               `json:"top_supporting"`
-	TopRefuting      []workBrief               `json:"top_refuting"`
+	// RetractedExcluded counts works kept out of the score by a retraction
+	// signal. Reported separately from StudyCount so a reader can see that
+	// works were dropped and why, rather than inferring it from a gap.
+	RetractedExcluded int         `json:"retracted_excluded,omitempty"`
+	Method            string      `json:"stance_method"`
+	TopSupporting     []workBrief `json:"top_supporting"`
+	TopRefuting       []workBrief `json:"top_refuting"`
 	// AllStudies lists every analyzed work (post relevance gate) in fetch
 	// (relevance) order, so content-aware consumers can re-filter by
-	// abstract instead of trusting the top lists alone.
+	// abstract instead of trusting the top lists alone. Retraction-excluded
+	// works are appended at the end carrying their reason, because a work
+	// dropped from the score must remain visible to the reader.
 	AllStudies []workBrief `json:"all_studies"`
 	Note       string      `json:"note,omitempty"`
 }
@@ -133,6 +145,11 @@ func newNovelConsensusCmd(flags *rootFlags) *cobra.Command {
 			works = filterRelevant(claim, works)
 			dropped := fetched - len(works)
 
+			// Retraction gate: a retracted work is not evidence, so it is
+			// dropped before enrichment and scoring. The excluded works are
+			// kept in retracted for the study list, with their reason.
+			works, retracted := filterRetracted(works)
+
 			if enrich {
 				enrichPubTypes(ctx, works, 50)
 			}
@@ -152,23 +169,14 @@ func newNovelConsensusCmd(flags *rootFlags) *cobra.Command {
 				ApexDesign: result.ApexDesign, StudyCount: result.StudyCount,
 				Supporting: result.Supporting, Refuting: result.Refuting, Mixed: result.Mixed,
 				Inconclusive: result.Inconclusive, TotalCitations: result.TotalCitations,
-				NearUnanimous: result.NearUnanimous,
-				Method:        stanceMethodLabel(stances),
+				NearUnanimous:     result.NearUnanimous,
+				RetractedExcluded: len(retracted),
+				Method:            stanceMethodLabel(stances),
 			}
 			out.TopSupporting = topByStance(stances, scengine.StanceSupporting, 3)
 			out.TopRefuting = topByStance(stances, scengine.StanceRefuting, 3)
-			out.AllStudies = allStudyBriefs(stances)
-			if result.StudyCount == 0 {
-				out.Note = "no works found; try a broader claim or --data-source live"
-			} else if result.Verdict == scengine.VerdictInsufficient {
-				out.Note = "fewer than 3 directional studies; treat as preliminary"
-			}
-			if dropped > 0 {
-				if out.Note != "" {
-					out.Note += "; "
-				}
-				out.Note += fmt.Sprintf("%d off-topic work(s) excluded by relevance gate", dropped)
-			}
+			out.AllStudies = append(allStudyBriefs(stances), retractedBriefs(retracted)...)
+			out.Note = consensusNote(result.StudyCount, len(retracted), dropped, result.Verdict)
 
 			return emit(cmd, flags, out, func(w io.Writer) { renderConsensus(w, out) })
 		},
@@ -177,6 +185,41 @@ func newNovelConsensusCmd(flags *rootFlags) *cobra.Command {
 	cmd.Flags().IntVar(&yearFrom, "year-from", 0, "only include works published from this year onward")
 	cmd.Flags().BoolVar(&enrich, "enrich", true, "enrich study-design classification with PubMed publication types")
 	return cmd
+}
+
+// consensusNote is the single home for the advisory note on a consensus
+// result. Two distinct populations feed it and they are not interchangeable:
+// dropped counts works the relevance gate removed from everything fetched,
+// while retracted counts works that already passed that gate and were then
+// excluded as retracted. So retracted works are described as "relevant" and
+// dropped works as "fetched" or "off-topic" — and an empty score with
+// retractions is never reported as "no works found", because works were
+// found. Every branch lives here so the wording cannot drift between stages.
+func consensusNote(studyCount, retracted, dropped int, verdict scengine.Verdict) string {
+	if studyCount == 0 {
+		switch {
+		case retracted > 0 && dropped > 0:
+			return fmt.Sprintf("no scorable works remained; %d relevant work(s) were excluded as retracted and %d off-topic work(s) were excluded by the relevance gate", retracted, dropped)
+		case retracted > 0:
+			return fmt.Sprintf("all %d relevant work(s) were excluded as retracted; try a broader claim, different sources, or review the retraction labels", retracted)
+		case dropped > 0:
+			return fmt.Sprintf("no relevant works remained; %d fetched work(s) were excluded by the relevance gate", dropped)
+		default:
+			return "no works found; try a broader claim or --data-source live"
+		}
+	}
+
+	var frags []string
+	if verdict == scengine.VerdictInsufficient {
+		frags = append(frags, "fewer than 3 directional studies; treat as preliminary")
+	}
+	if dropped > 0 {
+		frags = append(frags, fmt.Sprintf("%d off-topic work(s) excluded by relevance gate", dropped))
+	}
+	if retracted > 0 {
+		frags = append(frags, fmt.Sprintf("%d retracted work(s) excluded from the score", retracted))
+	}
+	return strings.Join(frags, "; ")
 }
 
 // stanceMethodLabel summarizes how stance was classified across the analyzed
@@ -238,6 +281,22 @@ func allStudyBriefs(stances []workStance) []workBrief {
 	return out
 }
 
+// retractedBriefs converts retraction-excluded works into workBriefs carrying
+// the reason they were dropped. Stance and Design are deliberately left empty:
+// these works were never classified, and emitting a zero-value stance would
+// read as "inconclusive finding" rather than "not assessed".
+func retractedBriefs(works []scWork) []workBrief {
+	out := make([]workBrief, 0, len(works))
+	for _, w := range works {
+		out = append(out, workBrief{
+			Title: w.Title, Year: w.Year, DOI: w.DOI, CitedBy: w.CitedBy,
+			Abstract:   clipAbstract(w.Abstract),
+			Retraction: w.Retraction, RetractionNote: w.Retraction.Label(),
+		})
+	}
+	return out
+}
+
 func renderConsensus(w io.Writer, o consensusOutput) {
 	fmt.Fprintf(w, "Claim: %s\n\n", o.Claim)
 	fmt.Fprintf(w, "  Verdict:           %s\n", o.Verdict)
@@ -250,6 +309,9 @@ func renderConsensus(w io.Writer, o consensusOutput) {
 	fmt.Fprintf(w, "  Studies analyzed:  %d  (support %d / refute %d / mixed %d / inconclusive %d)\n",
 		o.StudyCount, o.Supporting, o.Refuting, o.Mixed, o.Inconclusive)
 	fmt.Fprintf(w, "  Total citations:   %d\n", o.TotalCitations)
+	if o.RetractedExcluded > 0 {
+		fmt.Fprintf(w, "  Retracted:         %d excluded from the score\n", o.RetractedExcluded)
+	}
 	fmt.Fprintf(w, "  Stance method:     %s\n", o.Method)
 	if len(o.TopSupporting) > 0 {
 		fmt.Fprintln(w, "\n  Top supporting:")
