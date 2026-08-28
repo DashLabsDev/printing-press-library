@@ -13781,6 +13781,44 @@
       }
     },
     {
+      "name": "mcpmarket",
+      "category": "developer-tools",
+      "api": "mcpmarket",
+      "description": "Every MCP Market search, leaderboard, and skill lookup — plus trending deltas, sync diffs, and author portfolios no other tool tracks.",
+      "search_terms": [
+        "mcpmarket",
+        "mcpmarket-pp-cli",
+        "Trending Delta",
+        "trending",
+        "See which MCP servers/skills are rising fastest vs. holding steady, computed from your own browse history.",
+        "Sync Diff",
+        "diff",
+        "See exactly which servers, clients, or skills were added, removed, or changed between two snapshots.",
+        "Author Portfolio",
+        "author",
+        "See everything one GitHub org has published across servers, skills, and clients in one view.",
+        "Time-Travel Leaderboard",
+        "leaderboard",
+        "See what the top-100 leaderboard looked like on a past date, not just right now.",
+        "Stack Recommendation",
+        "stack",
+        "Chain the similar-tools recommendation graph multiple hops to build a ranked shortlist around a server you already use.",
+        "Category Watch",
+        "watch category",
+        "Flag newly-appeared listings in a category since your last check.",
+        "Duplicate Detector",
+        "dedupe",
+        "Surface near-identical listings from different authors within a category."
+      ],
+      "path": "library/developer-tools/mcpmarket",
+      "printer": "SomSamantray",
+      "printer_name": "Som Samantray",
+      "creator": {
+        "handle": "SomSamantray",
+        "name": "Som Samantray"
+      }
+    },
+    {
       "name": "medium-reader",
       "category": "media-and-entertainment",
       "api": "Medium Reader",
@@ -23696,6 +23734,12 @@
         "See how complete and how fresh your local mirror is, field by field, including whether any pages were dropped during sync."
       ],
       "path": "library/commerce/teslatracker",
+      "release": {
+        "cli_name": "teslatracker-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-28T09:15:30Z",
+        "source_commit": "0b297efef2a18eda9e0894aff88b3c651314cff8"
+      },
       "printer": "michegz",
       "printer_name": "michegz",
       "creator": {
