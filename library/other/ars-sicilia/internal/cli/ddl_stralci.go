@@ -51,6 +51,21 @@ Il verso opposto — da uno stralcio al suo ddl base — è nel campo 'stralcio'
 			}
 			legisl, errL := atoiArg(args[0], "legisl")
 			numero, errN := atoiArg(args[1], "numero")
+			// «1030/A» è la forma con cui sommari e stampa citano il testo
+			// emendato del ddl base, ed è quella che chi parte da una notizia
+			// scrive. Qui — a differenza degli altri comandi, dove il suffisso
+			// distingue un documento da un altro — la famiglia di stralci è la
+			// stessa: il free-text sul numero base la recupera tutta (il 6030
+			// si presenta proprio come «1030/A Stralcio IV»). Si accetta quindi
+			// la forma con la barra, e si dice perché la risposta coincide con
+			// quella del numero nudo, invece di scartarla in silenzio come
+			// faceva la vecchia lettura permissiva dell'argomento.
+			suffisso := ""
+			if errN != nil {
+				if base, suf, ok := numeroConSuffisso(args[1]); ok {
+					numero, suffisso, errN = base, suf, nil
+				}
+			}
 			if errL != nil || errN != nil {
 				// Come sugli altri comandi con posizionali: sotto --dry-run e
 				// sotto verify gli argomenti possono essere segnaposto, e una
@@ -76,10 +91,17 @@ Il verso opposto — da uno stralcio al suo ddl base — è nel campo 'stralcio'
 				if target == nil {
 					return fmt.Errorf("archivio ddl non disponibile")
 				}
-				return emitDryRunRequests(cmd, []map[string]any{target},
-					"cerca il numero base come testo libero: il riferimento dello stralcio lo contiene. Le righe candidate vengono poi filtrate leggendo il campo Riferimenti di ciascuna.")
+				// L'anteprima dice anche la rilettura dell'argomento: la
+				// richiesta parte col numero base, e un'anteprima che tace su
+				// come ci è arrivata descrive qualcosa di diverso da ciò che
+				// succede dal vivo.
+				notaDry := "cerca il numero base come testo libero: il riferimento dello stralcio lo contiene. Le righe candidate vengono poi filtrate leggendo il campo Riferimenti di ciascuna."
+				if suffisso != "" {
+					notaDry += fmt.Sprintf(" Il suffisso %q è stato letto e scartato: l'archivio non numera a parte il testo emendato, quindi la ricerca parte dal ddl %d.", suffisso, numero)
+				}
+				return emitDryRunRequests(cmd, []map[string]any{target}, notaDry)
 			}
-			return runDdlStralci(cmd, flags, legisl, numero, flagLimit)
+			return runDdlStralci(cmd, flags, legisl, numero, suffisso, flagLimit)
 		},
 	}
 	cmd.Flags().IntVar(&flagLimit, "limit", 30, "Max righe candidate da esaminare.")
@@ -115,7 +137,7 @@ func stralciSearchParams(legisl, numero int) map[string]string {
 	return map[string]string{"legisl": itoa(legisl), "testo": itoa(numero)}
 }
 
-func runDdlStralci(cmd *cobra.Command, flags *rootFlags, legisl, numero, limit int) error {
+func runDdlStralci(cmd *cobra.Command, flags *rootFlags, legisl, numero int, suffisso string, limit int) error {
 	ctx := cmd.Context()
 	if ctx == nil {
 		ctx = context.Background()
@@ -164,6 +186,15 @@ func runDdlStralci(cmd *cobra.Command, flags *rootFlags, legisl, numero, limit i
 	}
 
 	report := stralciReport{Legisl: legisl, Numero: numero, Stralci: []stralcioRow{}}
+	if suffisso != "" {
+		// L'esempio resta quello reale del 1030 e non si costruisce sul numero
+		// chiesto: interpolato diventava «il ddl 6030 si presenta come 6030/A
+		// Stralcio IV», che è falso — quella riga dice 1030/A.
+		report.Note = uniscoNote(report.Note, fmt.Sprintf(
+			"chiesto il ddl %d%s: la barra indica il testo emendato del ddl %d, e l'archivio non lo numera a parte — gli stralci sono gli stessi, ed è per questo che la risposta è quella del %d. La forma con la barra si legge nel riferimento che ogni stralcio porta con sé (il ddl 6030 si presenta come «1030/A Stralcio IV»), non nel campo Numero.",
+			numero, suffisso, numero, numero))
+		fmt.Fprintln(cmd.ErrOrStderr(), "hint: "+report.Note)
+	}
 	for _, n := range ordine {
 		r := migliori[n]
 		if n == numero {
@@ -207,7 +238,11 @@ func runDdlStralci(cmd *cobra.Command, flags *rootFlags, legisl, numero, limit i
 		return report.Stralci[i].Numero < report.Stralci[j].Numero
 	})
 	if len(report.Stralci) == 0 {
-		report.Note = fmt.Sprintf("nessuno stralcio dichiarato per il ddl %d nella legislatura %d. Verifica il numero con `ars-sicilia-pp-cli ddl get %d %d`.", numero, legisl, legisl, numero)
+		// uniscoNote e non un'assegnazione: su una base senza stralci l'assegnazione
+		// cancellava la nota del suffisso, e chi legge solo `note` si trovava
+		// davanti un numero che non aveva scritto senza sapere che la barra era
+		// stata riletta. È lo stesso difetto che questa modifica sta chiudendo.
+		report.Note = uniscoNote(report.Note, fmt.Sprintf("nessuno stralcio dichiarato per il ddl %d nella legislatura %d. Verifica il numero con `ars-sicilia-pp-cli ddl get %d %d`.", numero, legisl, legisl, numero))
 		fmt.Fprintln(cmd.ErrOrStderr(), "hint: "+report.Note)
 	}
 	return printJSONFiltered(cmd.OutOrStdout(), report, flags)

@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -831,6 +832,25 @@ func runGetExtra(cmd *cobra.Command, flags *rootFlags, archiveSlug string, legis
 		nota += fmt.Sprintf("; gli altri si vedono con `%s cerca --legisl %d --numero %d`.", arc.Slug, legisl, numero)
 		fmt.Fprintln(os.Stderr, "hint: "+nota)
 	}
+	// Le leggi riusano lo stesso numero ogni anno e l'archivio ne restituisce
+	// una sola: senza --anno `leggi get 17 9` apriva la L.R. 9/2018 («Bilancio
+	// di previsione 2018-2020») al posto della 9/2020, con stderr vuoto e
+	// nessuna nota — cioè con l'aria di aver risposto alla domanda. L'avviso
+	// del ramo sopra non copre il caso: unDocPerNumero tace sulle leggi, dove
+	// più righe per numero sono la norma (una per articolo) e segnalarle
+	// sarebbe rumore. È la stessa ambiguità su cui `legge cronologia` avverte
+	// già, quindi si riusa il suo testo: dire quale legge si è aperta basta,
+	// chi legge la data riconosce subito l'atto sbagliato.
+	//
+	// Va calcolato qui e non prima: la data arriva dalla riga di short-list e
+	// sta in doc.Fields solo dopo il merge, e annoNonPinnatoHint su data vuota
+	// tace.
+	if arc.Slug == "leggi" && strings.TrimSpace(extra["anno"]) == "" {
+		if msg := annoNonPinnatoHint(0, numero, strings.TrimSpace(doc.Fields["Data"])); msg != "" {
+			fmt.Fprintln(os.Stderr, msg)
+			nota = uniscoNote(nota, strings.TrimPrefix(msg, "hint: "))
+		}
+	}
 	// printJSONFiltered (not the bare writeJSON) so --select/--compact/--csv
 	// behave the same as on generator-emitted commands — writeJSON always
 	// dumped the full payload regardless of --select.
@@ -933,6 +953,12 @@ func emitGetDryRun(cmd *cobra.Command, arc icaro.Archive, legisl, numero int, pa
 	nota := "aggancia il documento, poi ne scarica la scheda: l'URL della scheda contiene l'id che questa ricerca restituisce, quindi non e' anteprimabile."
 	if icaro.IsBDArchive(arc.Slug) {
 		nota += " Su questo archivio la ricerca e' forzata sull'indice Icaro (serve l'id del documento); se l'indice non ha il record, `get` ripiega sulla scheda del backend /bd/ e restituisce `pdf_url`."
+	}
+	// Stessa avvertenza che emitLeggeCronologiaDryRun dà gia' sulla stessa
+	// ambiguita': dal vivo `leggi get` senza --anno avverte, e un'anteprima che
+	// tace su cio' su cui il percorso vivo parla non lo sta descrivendo.
+	if arc.Slug == "leggi" && strings.TrimSpace(params["anno"]) == "" {
+		nota += " Senza --anno l'archivio restituisce una sola delle leggi con questo numero, e puo' essere quella di un altro anno della stessa legislatura."
 	}
 	return emitDryRunRequests(cmd, []map[string]any{target}, nota)
 }
@@ -1348,10 +1374,67 @@ func itoa(n int) string {
 
 // atoiArg parses a positional CLI argument as an int, returning a
 // human-friendly Italian error when the input is malformed.
+//
+// strconv.Atoi e non Sscanf("%d"): Sscanf legge le cifre iniziali e scarta il
+// resto senza errore, quindi `ddl stralci 18 1030/A` diventava `1030` in
+// silenzio e rispondeva su un documento che non era quello chiesto. Il portale
+// numera davvero i testi emendati con la barra («ddl n. 1030/A Stralcio IV»),
+// quindi quella forma arriva dalla lettura di un sommario o di un articolo, non
+// da un errore di battitura: va detto che è stata ignorata, non lasciata
+// passare per buona.
 func atoiArg(s, name string) (int, error) {
-	var n int
-	if _, err := fmt.Sscanf(strings.TrimSpace(s), "%d", &n); err != nil {
+	t := strings.TrimSpace(s)
+	n, err := strconv.Atoi(t)
+	if err != nil {
+		if base, suffisso, ok := numeroConSuffisso(t); ok {
+			return 0, fmt.Errorf("argomento %q non valido: %s. Il suffisso %q indica il testo emendato, ma l'archivio indicizza per numero base: ripeti con %d",
+				name, s, suffisso, base)
+		}
+		// Coda dopo la barra che non è la variante nota: non si dice che cosa
+		// significhi, perché non lo sappiamo. Il numero base però si nomina.
+		if m := reCodaDopoBarra.FindStringSubmatch(t); m != nil {
+			if base, cerr := strconv.Atoi(m[1]); cerr == nil && base > 0 {
+				return 0, fmt.Errorf("argomento %q non valido: %s. Il suffisso %q non è una variante che il portale usi per numerare un ddl (l'unica è la forma «/A», il testo emendato): se cercavi il ddl %d, ripeti con %d",
+					name, s, "/"+m[2], base, base)
+			}
+		}
 		return 0, fmt.Errorf("argomento %q non valido (atteso numero intero): %s", name, s)
 	}
 	return n, nil
+}
+
+// reNumeroConSuffisso riconosce la forma con cui il portale numera il testo
+// emendato di un atto: il numero base, una barra e la lettera A («1030/A»). Non
+// è un numero d'atto a sé: l'archivio indicizza per numero base, e la barra per
+// giunta rompe la query ISIS.
+//
+// Solo «/A», non una lettera qualunque: misurato sui riferimenti dei ddl nelle
+// legislature XVI-XVIII, è l'unica variante che il portale scriva in quella
+// posizione (24 occorrenze, nessun'altra forma). Accettare «/B» perché è
+// plausibile sarebbe di nuovo dire per vero qualcosa che non è stato
+// verificato — il difetto che questa modifica sta togliendo — e per giunta in
+// contraddizione col messaggio d'errore, che quella misura la dichiara.
+// Se un giorno il portale usasse «/B», il costo è un errore che nomina
+// comunque il numero base, non una risposta sbagliata data per buona.
+var reNumeroConSuffisso = regexp.MustCompile(`^(\d+)\s*/\s*[Aa]$`)
+
+// numeroConSuffisso scompone «1030/A» in (1030, "/A", true). Su qualunque altra
+// forma torna ok=false, così chi la chiama distingue il suffisso del portale da
+// un argomento semplicemente sbagliato e può dire due cose diverse.
+//
+// reCodaDopoBarra è il caso intermedio: una coda che non è la variante nota. Non
+// si accetta, ma il numero base si nomina lo stesso — chi ha scritto «1030/XYZ»
+// il ddl 1030 lo sta comunque cercando.
+var reCodaDopoBarra = regexp.MustCompile(`^(\d+)\s*/\s*(\S+)$`)
+
+func numeroConSuffisso(s string) (int, string, bool) {
+	m := reNumeroConSuffisso.FindStringSubmatch(strings.TrimSpace(s))
+	if m == nil {
+		return 0, "", false
+	}
+	n, err := strconv.Atoi(m[1])
+	if err != nil || n <= 0 {
+		return 0, "", false
+	}
+	return n, "/A", true
 }

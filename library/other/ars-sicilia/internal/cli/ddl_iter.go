@@ -871,7 +871,13 @@ func iterSede(action string) string {
 // event and not about the committee ("Commissione PRIMA (Articolo 3
 // stralciato)"), and at a newline, because the Body fallback of docIterEvents
 // is not flattened and a capture must not run past its own row.
-var reSedeSuffisso = regexp.MustCompile(`(?i)\bseduta"*\s+n\.?\s*\d+\s*(?:\d{4})?\s*(commissione\b[^(\n]*)`)
+// Il codice si cattura invece di scartarlo: su parte delle righe recenti il
+// portale scrive il codice e omette l'ordinale — «Seduta n. 255 0100
+// Commissione», ddl 779, dal 25.03.2026 in poi — e la sede usciva come
+// «Commissione» nuda, indistinguibile fra le sei e inutile a raggruppare. Il
+// dato non manca: sta nel codice, che le righe più vecchie dello stesso iter
+// scrivono accanto al nome («0100 Commissione PRIMA»).
+var reSedeSuffisso = regexp.MustCompile(`(?i)\bseduta"*\s+n\.?\s*\d+\s*(\d{4})?\s*(commissione\b[^(\n]*)`)
 
 // sedeDaSuffissoSeduta returns the committee declared in the sitting suffix, or
 // "". It must run on the untruncated action: indiceSeduta cuts exactly the
@@ -888,10 +894,20 @@ var reSedeSuffisso = regexp.MustCompile(`(?i)\bseduta"*\s+n\.?\s*\d+\s*(?:\d{4})
 // the CLI accepts (`commissioni sommari --commissione SECONDA`). The informal
 // name of the last case is not lost: `titolo` keeps the action verbatim.
 func sedeDaSuffissoSeduta(action string) string {
-	if m := reSedeSuffisso.FindStringSubmatch(action); m != nil {
-		return strings.Join(strings.Fields(m[1]), " ")
+	m := reSedeSuffisso.FindStringSubmatch(action)
+	if m == nil {
+		return ""
 	}
-	return ""
+	sede := strings.Join(strings.Fields(m[2]), " ")
+	// Il nome vince sul codice quando c'è: le commissioni speciali hanno nomi
+	// veri sotto lo stesso codice 1200 («Commissione riforma statuto» e
+	// «Commissione sp- eciale per lo Statuto della Regione» sono entrambe il
+	// 1200 sul ddl 66), e risolvere il codice le appiattirebbe su un ordinale
+	// che non hanno. Il codice serve solo dove il nome manca del tutto.
+	if m[1] != "" && strings.EqualFold(sede, "commissione") {
+		return risolviCodiceCommissione("Commissione " + m[1])
+	}
+	return sede
 }
 
 // iterSedeRisolta prefers the committee read from the sitting suffix and falls

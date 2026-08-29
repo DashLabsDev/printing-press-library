@@ -210,7 +210,10 @@ These capabilities aren't available in any other tool for this API.
 
   ```bash
   ars-sicilia-pp-cli ddl stralci 18 1030 --json
+  ars-sicilia-pp-cli ddl stralci 18 1030/A --json   # stessa risposta, con una nota che dice perché
   ```
+
+  Il numero si dà **base**: sommari e stampa citano il testo emendato come `1030/A`, ma l'archivio non lo numera a parte e la famiglia di stralci è la stessa. Quella forma è accettata e il perché finisce in `note`; su `ddl get` e `ddl iter` è invece un errore esplicito che indica il numero base, perché lì il documento chiesto sarebbe un altro.
 
   Il legame è **dichiarato dal portale**, non calcolato: ogni stralcio porta con sé il riferimento al ddl base (`ddl n. 1030/A Stralcio IV`). Due casi che l'output rende espliciti invece di nascondere: uno stralcio può nascere da **più ddl abbinati** (`di` con due voci), e per una parte degli atti della XVII legislatura il portale scrive l'id interno al posto del numero base — lì `base_dichiarata` è `false` e `di` resta vuoto, perché dedurre la base dalla numerazione sarebbe un'invenzione.
 - **`deputato profilo`** — Aggrega in un'unica vista tutti gli atti firmati o pronunciati da un deputato: DDL, interrogazioni, interpellanze, mozioni, ordini del giorno, risoluzioni e interventi in resoconti d'aula. `--data` (range `YYYY-MM-DD:YYYY-MM-DD`) filtra per data di presentazione/seduta su tutti i sotto-archivi, per query storiche mirate senza dover alzare `--limit`.
@@ -447,7 +450,7 @@ Interrogazioni parlamentari (archivio 233).
 Leggi della Regione Siciliana (archivio 201): cerca e scarica le leggi regionali.
 
 - **`ars-sicilia-pp-cli leggi cerca`** - Cerca leggi regionali per legislatura, anno, numero o testo.
-- **`ars-sicilia-pp-cli leggi get`** - Scarica una singola legge regionale.
+- **`ars-sicilia-pp-cli leggi get`** - Scarica una singola legge regionale. Da usare con `--anno`: lo stesso numero si ripete ogni anno della legislatura e l'archivio ne restituisce una sola (`leggi get 17 9` senza `--anno` apre la L.R. 9/2018, non la 9/2020). Il comando dichiara su stderr e in `nota` quale legge ha aperto.
 
 ### mozioni
 

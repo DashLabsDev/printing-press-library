@@ -326,6 +326,19 @@ func TestSedeDaSuffissoSeduta(t *testing.T) {
 		{"Esitato per Aula (epa) Seduta n. 29 1200 Commissione sp- eciale per lo Statuto della Regione", "Commissione sp- eciale per lo Statuto della Regione"},
 		// La parentesi annota l'evento, non la commissione: la sede finisce lì.
 		{"Esaminato in commissione Seduta n. 12 0100 Commissione PRIMA (Articolo 3 stralciato)", "Commissione PRIMA"},
+		// Testo reale del ddl 779 dal 25.03.2026: il portale scrive il codice e
+		// omette l'ordinale. Senza risolverlo la sede resta «Commissione» nuda,
+		// indistinguibile fra le sei — ed è la forma delle righe più recenti,
+		// cioè proprio quelle su cui si parte da una notizia.
+		{"Esaminato in commissione Seduta n. 255 0100 Commissione", "Commissione PRIMA"},
+		{"Esaminato in commissione Seduta n. 262 0100 Commissione", "Commissione PRIMA"},
+		// Il 1200 sono le speciali, che un ordinale non ce l'hanno: resta il
+		// codice grezzo, come già faceva risolviCodiceCommissione. Meglio del
+		// generico, e non inventa una commissione che non esiste.
+		{"Esaminato in commissione Seduta n. 3 1200 Commissione", "Commissione 1200"},
+		// Codice assente e nome nudo: non c'è niente da risolvere, e inventare
+		// una commissione sarebbe peggio del generico.
+		{"Esaminato in commissione Seduta n. 255 Commissione", "Commissione"},
 	}
 	for _, c := range cases {
 		if got := sedeDaSuffissoSeduta(c.in); got != c.want {
