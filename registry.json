@@ -1582,9 +1582,9 @@
       "path": "library/food-and-dining/anylist",
       "release": {
         "cli_name": "anylist-pp-cli",
-        "version": "2026.8.3",
-        "released_at": "2026-08-27T09:13:04Z",
-        "source_commit": "10cba8f2e78a102fa67d7c34af1793e2c964fd90"
+        "version": "2026.8.4",
+        "released_at": "2026-08-28T09:32:36Z",
+        "source_commit": "00a18551788f440b6276456889156fba7c41a5d4"
       },
       "printer": "jeeves",
       "printer_name": "Jeeves",
@@ -10602,6 +10602,59 @@
       }
     },
     {
+      "name": "groq",
+      "category": "ai",
+      "api": "Groq Cloud",
+      "description": "Every Groq endpoint in your terminal, plus a local ledger that tracks token cost and rate-limit budget.",
+      "search_terms": [
+        "groq",
+        "Groq Cloud",
+        "groq-pp-cli",
+        "Every Groq endpoint in your terminal, plus a local ledger that tracks token cost and rate-limit budget.",
+        "Groq API key (create one at console.groq.com/keys).",
+        "Rate-limit budget",
+        "rate-limits",
+        "See remaining per-model request/token budget from every API call, with reset windows.",
+        "Cost ledger analytics",
+        "costs",
+        "Aggregate token and dollar spend from your local completion history, grouped by model or day.",
+        "Multi-model prompt runner",
+        "compare",
+        "Run one prompt across several models and rank them by latency, tokens/sec, usage, and cost.",
+        "Batch request pre-flight",
+        "batch validate",
+        "Validate every line of a .jsonl batch request file against the endpoint schema and estimate tokens/cost before uploading.",
+        "Batch results diagnosis",
+        "batch diagnose",
+        "Tabulate a completed batch's per-line status codes and errors, highlighting retry-worthy failures.",
+        "Paced bulk audio runner",
+        "audio batch",
+        "Transcribe, translate, or synthesize speech over many audio files with rate-limit-aware pacing and a results manifest."
+      ],
+      "path": "library/ai/groq",
+      "printer": "SomSamantray",
+      "printer_name": "Som Samantray",
+      "creator": {
+        "handle": "SomSamantray",
+        "name": "Som Samantray"
+      },
+      "mcp": {
+        "binary": "groq-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 23,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "GROQ_API_KEY"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "grubhub",
       "category": "commerce",
       "api": "Grubhub",
@@ -12949,6 +13002,12 @@
         "Kuma exposes management data over Socket.IO, not a conventional REST resource."
       ],
       "path": "library/monitoring/kuma",
+      "release": {
+        "cli_name": "kuma-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-28T09:31:02Z",
+        "source_commit": "00d100d4448ee37c769539c14082314b6c697b69"
+      },
       "printer": "keithah",
       "printer_name": "Keith",
       "creator": {
@@ -20280,9 +20339,9 @@
       "path": "library/other/scientific-consensus",
       "release": {
         "cli_name": "scientific-consensus-pp-cli",
-        "version": "2026.8.8",
-        "released_at": "2026-08-28T09:23:38Z",
-        "source_commit": "c881166853bf23c5cacefde1f332702093a6fce5"
+        "version": "2026.8.9",
+        "released_at": "2026-08-28T09:31:02Z",
+        "source_commit": "64a9473fa380f4dd76efefaaeee36572feeb4858"
       },
       "printer": "laci141",
       "printer_name": "laci141",
