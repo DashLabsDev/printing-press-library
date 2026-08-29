@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.8 - 2026-08-29
+
+- fix(ars-sicilia): three silences that made the CLI cite the wrong document (#1855).
+
 ## 2026.8.7 - 2026-08-25
 
 - refactor(ars-sicilia): build the /bd/ request once, and let the preview print it (#1799).
