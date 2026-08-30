@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026.8.2 - 2026-08-30
+
+- fix: bump github.com/enetx/http to v1.0.29 across 68 modules (#1865).
+
 ## 2026.8.1 - 2026-08-17
 
 - Baseline release metadata added for this published CLI.

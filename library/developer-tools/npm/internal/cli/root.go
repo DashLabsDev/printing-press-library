@@ -18,7 +18,7 @@ import (
 	"github.com/mvanhorn/printing-press-library/library/developer-tools/npm/internal/config"
 )
 
-var version = "2026.8.3"
+var version = "2026.8.4"
 
 type rootFlags struct {
 	asJSON        bool

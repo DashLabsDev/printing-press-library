@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "slug": "gohighlevel",
-  "cli_name": "gohighlevel-pp-cli",
-  "version": "2026.8.3",
+  "slug": "ifood",
+  "cli_name": "ifood-pp-cli",
+  "version": "2026.8.1",
   "released_at": "2026-08-30T09:08:18Z",
   "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44",
-  "printing_press_version": "4.9.0",
-  "run_id": "20260519-151335",
+  "printing_press_version": "4.30.2",
+  "run_id": "20260814-042201-817ea5ed",
   "changes": [
     {
       "title": "fix: bump github.com/enetx/http to v1.0.29 across 68 modules",

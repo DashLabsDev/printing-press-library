@@ -2,6 +2,14 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.12 - 2026-08-30
+
+- fix(scientific-consensus): raise claimStemLen to 6 so common prefixes stop matching (#1857).
+
+## 2026.8.11 - 2026-08-30
+
+- fix(scientific-consensus): make each gap finding name the sample it read (#1861).
+
 ## 2026.8.10 - 2026-08-30
 
 - fix(scientific-consensus): count inconclusive works in controversies (#1873).
