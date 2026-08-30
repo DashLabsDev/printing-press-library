@@ -1947,9 +1947,9 @@
       "path": "library/other/ars-sicilia",
       "release": {
         "cli_name": "ars-sicilia-pp-cli",
-        "version": "2026.8.7",
-        "released_at": "2026-08-25T09:27:30Z",
-        "source_commit": "6567f5cc7df4341d54dd3d5c5dcd456eee13cf02"
+        "version": "2026.8.8",
+        "released_at": "2026-08-29T09:19:25Z",
+        "source_commit": "175af0b59471c510f08875cdc406846bb6d90b18"
       },
       "printer": "aborruso",
       "printer_name": "aborruso",
@@ -10632,6 +10632,12 @@
         "Transcribe, translate, or synthesize speech over many audio files with rate-limit-aware pacing and a results manifest."
       ],
       "path": "library/ai/groq",
+      "release": {
+        "cli_name": "groq-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-29T09:18:32Z",
+        "source_commit": "e8f1be2a9d246bdda7ef23352e9c34f3d8eb1a96"
+      },
       "printer": "SomSamantray",
       "printer_name": "Som Samantray",
       "creator": {
@@ -16761,9 +16767,9 @@
       "path": "library/project-management/paperclip-self-hosted",
       "release": {
         "cli_name": "paperclip-pp-cli",
-        "version": "2026.7.1",
-        "released_at": "2026-07-20T22:21:21Z",
-        "source_commit": "193cbef34a2c90008ea2e061c16cf26692129082"
+        "version": "2026.8.1",
+        "released_at": "2026-08-30T09:05:02Z",
+        "source_commit": "ca452d7a56a9a7bb443505f6d490f8add00bb542"
       },
       "printer": "mvanhorn",
       "printer_name": "cli-printing-press",
