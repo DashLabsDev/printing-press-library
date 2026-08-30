@@ -97,7 +97,7 @@ npx -y @mvanhorn/printing-press-library install espn sentry dub
 npx -y @mvanhorn/printing-press-library install starter-pack cal-com
 ```
 
-Under the hood: the npm package is a thin orchestrator that reads the live catalog in `registry.json`, resolves each CLI's Go module path, runs `go install`, and installs the matching skill from `cli-skills/pp-<name>`.
+Under the hood: the npm package is a thin orchestrator that reads the live catalog in `registry.json`, resolves each CLI's Go module path, and pins released Go CLI builds to the catalog's full `source_commit` (falling back to `@latest` only for legacy entries without release metadata). This prevents accidental drift from a later `main` update; it does not authenticate the mutable live catalog or the separately versioned skill installer. The matching skill comes from `cli-skills/pp-<name>`.
 
 Useful commands:
 

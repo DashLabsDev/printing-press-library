@@ -302,7 +302,7 @@ resources:
             checkin:
                 method: POST
                 path: /api/texasroadhouse/waitlist/{waitlist_id}/checkin
-                description: Check in once the party is at the host stand. Do not fire without a yes.
+                description: Confirm arrival after the guest receives the Texas Roadhouse text and replies HERE. Do not fire without a yes.
                 params:
                     - name: waitlist_id
                       type: string

@@ -165,7 +165,7 @@ function parseRegistryEntry(value: unknown): RegistryEntry {
           cli_name: requiredString(value.release, "cli_name"),
           version: requiredString(value.release, "version"),
           released_at: requiredString(value.release, "released_at"),
-          source_commit: requiredString(value.release, "source_commit"),
+          source_commit: requiredCommit(value.release, "source_commit"),
         }
       : undefined,
   };
@@ -196,6 +196,14 @@ function requiredString(value: Record<string, unknown>, key: string): string {
     throw new Error(`registry entry missing string field: ${key}`);
   }
   return value[key];
+}
+
+function requiredCommit(value: Record<string, unknown>, key: string): string {
+  const commit = requiredString(value, key);
+  if (!/^[0-9a-f]{40}$/i.test(commit)) {
+    throw new Error(`registry entry field ${key} must be a full 40-character Git commit SHA`);
+  }
+  return commit.toLowerCase();
 }
 
 function requiredNumber(value: Record<string, unknown>, key: string): number {

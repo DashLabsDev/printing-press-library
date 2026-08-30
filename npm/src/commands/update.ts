@@ -31,7 +31,7 @@ interface UpdateDeps {
 // `which`/`where` probes are cheap but the detection sweep covers the whole
 // catalog (hundreds of entries), so cap the fan-out to avoid a process storm.
 const DETECT_CONCURRENCY = 16;
-// Installs are network-bound (go-proxy `@latest` resolution + skill fetch), the
+// Installs are network-bound (go-proxy commit resolution + skill fetch), the
 // dominant cost in a bulk update. Run several at once, but cap to share the
 // proxy politely and bound concurrent global skill writes.
 const INSTALL_CONCURRENCY = 6;

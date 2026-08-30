@@ -13,7 +13,7 @@ const COMMANDS: Record<string, CommandHandler> = {
   install: installCommand,
   update: updateCommand,
   // `reinstall` is an alias for `update`: both rebuild the binary from the
-  // latest catalog code (`go install …@latest`) and re-add the skill. It exists
+  // catalog release commit (legacy entries fall back to @latest) and re-add the skill. It exists
   // because "reinstall" is the verb users reach for; the mechanics are identical.
   reinstall: updateCommand,
   list: listCommand,

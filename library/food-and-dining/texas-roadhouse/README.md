@@ -2,6 +2,10 @@
 
 Waitlist CLI for Texas Roadhouse. Find a nearby store, read the quote, join and leave the list.
 
+> **Unofficial integration.** This project is not affiliated with or endorsed by Texas Roadhouse. It uses browser-observed, undocumented endpoints that can change without notice. Joining the waitlist sends guest name, email address, phone number, and party details to Texas Roadhouse. The current CLI still accepts those values as command-line flags; this disclosure does not remove them from shell history or process arguments. Use only a private shell, clear sensitive history afterward, and never paste command or `--dry-run` output containing real PII into shared logs. Use placeholders for structural `--dry-run` checks, then pass `--yes` only after privately verifying the real store and party details.
+
+**Last endpoint verification:** 2026-08-29. A Cloudflare challenge or HTTP 403 can mean the browser-facing endpoint changed or rejected the Chrome-compatible transport; retrying a mutation is unsafe until `--dry-run` and a fresh read request succeed.
+
 Learn more at [Texas Roadhouse](https://www.texasroadhouse.com).
 
 ## Install
@@ -123,7 +127,7 @@ This checks your configuration.
 ### 3. Try Your First Command
 
 ```bash
-texas-roadhouse-pp-cli mapbox mock-value
+texas-roadhouse-pp-cli mapbox 65804
 ```
 
 ## Usage
@@ -198,7 +202,7 @@ Operations on near
 Operations on test
 
 - **`texas-roadhouse-pp-cli texasroadhouse cancel`** - Cancel a waitlist request. Live cancel requires `--yes`; `--dry-run` previews without POSTing.
-- **`texas-roadhouse-pp-cli texasroadhouse checkin`** - Check in once the party is at the host stand. Live check-in requires `--yes`; `--dry-run` previews without POSTing.
+- **`texas-roadhouse-pp-cli texasroadhouse checkin`** - Confirm arrival after the guest receives the Texas Roadhouse text and replies `HERE`. Live check-in requires `--yes`; `--dry-run` previews without POSTing.
 - **`texas-roadhouse-pp-cli texasroadhouse get-quote`** - GET /api/texasroadhouse/waitlist/{waitlist_id}/quote
 - **`texas-roadhouse-pp-cli texasroadhouse get-settings`** - GET /api/texasroadhouse/waitlist/{waitlist_id}/settings
 - **`texas-roadhouse-pp-cli texasroadhouse get-status`** - GET waitlist request status. Query clientid=texasroadhouse.
@@ -227,18 +231,18 @@ The local store's schema version stamp is one-way: once this version of `texas-r
 
 ```bash
 # Human-readable table (default in terminal, JSON when piped)
-texas-roadhouse-pp-cli mapbox mock-value
+texas-roadhouse-pp-cli mapbox 65804
 
 # JSON for scripting and agents
-texas-roadhouse-pp-cli mapbox mock-value --json
+texas-roadhouse-pp-cli mapbox 65804 --json
 # Filter to specific fields
-texas-roadhouse-pp-cli mapbox mock-value --json --select bbox,center,context
+texas-roadhouse-pp-cli mapbox 65804 --json --select bbox,center,context
 
 # Dry run — show the request without sending
-texas-roadhouse-pp-cli mapbox mock-value --dry-run
+texas-roadhouse-pp-cli mapbox 65804 --dry-run
 
 # Agent mode — JSON + compact + no prompts in one flag
-texas-roadhouse-pp-cli mapbox mock-value --agent
+texas-roadhouse-pp-cli mapbox 65804 --agent
 ```
 
 ## Agent Usage
@@ -274,7 +278,7 @@ Static request headers can be configured under `headers`; per-command header ove
 ## Troubleshooting
 **Not found errors (exit code 3)**
 - Check the resource ID is correct
-- Run the `list` command to see available items
+- For a store lookup, run `texas-roadhouse-pp-cli stores --latitude <lat> --longitude <lon>` and use the returned store `extref`; this CLI has no top-level `list` command
 
 ## HTTP Transport
 

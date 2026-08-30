@@ -44,6 +44,34 @@ test("parseRegistry validates and returns registry entries", () => {
   });
 });
 
+test("parseRegistry rejects mutable or malformed release source refs", () => {
+  const warnings: string[] = [];
+  const registry = parseRegistry(
+    {
+      schema_version: 2,
+      entries: [
+        {
+          name: "espn",
+          category: "sports",
+          api: "ESPN",
+          description: "Sports scores",
+          path: "library/sports/espn",
+          release: {
+            cli_name: "espn-pp-cli",
+            version: "2026.8.1",
+            released_at: "2026-08-17T00:00:00Z",
+            source_commit: "main",
+          },
+        },
+      ],
+    },
+    (message) => warnings.push(message),
+  );
+
+  assert.equal(registry.entries.length, 0);
+  assert.ok(warnings.some((message) => message.includes("source_commit")));
+});
+
 test("parseRegistry treats null optional search_terms as absent", () => {
   const registry = parseRegistry({
     schema_version: 2,

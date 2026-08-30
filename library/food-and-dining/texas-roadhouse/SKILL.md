@@ -35,6 +35,8 @@ If `--version` reports "command not found" after install, the runtime cannot see
 
 Waitlist CLI for Texas Roadhouse. Find a nearby store, read the quote, join and leave the list.
 
+**Unofficial integration:** This skill is not affiliated with or endorsed by Texas Roadhouse. It uses browser-observed, undocumented endpoints that may change without notice. A waitlist submission sends the guest's name, email address, phone number, and party details to Texas Roadhouse. The current CLI accepts those values as flags; this disclosure does not redesign that argv flow. Do not place real PII in shared logs, transcripts, or reusable agent memory. Use only a private shell/process environment, clear sensitive shell history afterward, and never share command or `--dry-run` output containing real PII. Use placeholders for structural `--dry-run` checks; use `--yes` only after the user privately confirms the real store and party details.
+
 ## HTTP Transport
 
 This CLI uses Chrome-compatible HTTP transport for browser-facing endpoints. It does not require a resident browser process for normal API calls.
@@ -59,7 +61,7 @@ This CLI was generated with browser-observed traffic context.
 **texasroadhouse** — Operations on test
 
 - `texas-roadhouse-pp-cli texasroadhouse cancel` — Cancel a waitlist request. Live cancel requires `--yes`; `--dry-run` previews without POSTing.
-- `texas-roadhouse-pp-cli texasroadhouse checkin` — Check in once the party is at the host stand. Live check-in requires `--yes`; `--dry-run` previews without POSTing.
+- `texas-roadhouse-pp-cli texasroadhouse checkin` — Confirm arrival after the guest receives the Texas Roadhouse text and replies `HERE`. Live check-in requires `--yes`; `--dry-run` previews without POSTing.
 - `texas-roadhouse-pp-cli texasroadhouse get-quote` — GET /api/texasroadhouse/waitlist/{waitlist_id}/quote
 - `texas-roadhouse-pp-cli texasroadhouse get-settings` — GET /api/texasroadhouse/waitlist/{waitlist_id}/settings
 - `texas-roadhouse-pp-cli texasroadhouse get-status` — GET waitlist request status. Query clientid=texasroadhouse.
@@ -91,7 +93,7 @@ Add `--agent` to any command. Expands to: `--json --compact --no-input --no-colo
 - **Filterable** — `--select` keeps a subset of fields. Dotted paths descend into nested structures; arrays traverse element-wise. Critical for keeping context small on verbose APIs:
 
   ```bash
-  texas-roadhouse-pp-cli mapbox mock-value --agent --select bbox,center,context
+  texas-roadhouse-pp-cli mapbox 65804 --agent --select bbox,center,context
   ```
 - **Previewable** — `--dry-run` shows the request without sending
 - **Offline-friendly** — sync/search commands can use the local SQLite store when available
@@ -363,7 +365,7 @@ A profile is a saved set of flag values, reused across invocations. Use it when 
 
 ```
 texas-roadhouse-pp-cli profile save briefing --json
-texas-roadhouse-pp-cli --profile briefing mapbox mock-value
+texas-roadhouse-pp-cli --profile briefing mapbox 65804
 texas-roadhouse-pp-cli profile list --json
 texas-roadhouse-pp-cli profile show briefing
 texas-roadhouse-pp-cli profile delete briefing --yes

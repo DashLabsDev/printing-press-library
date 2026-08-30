@@ -17,7 +17,7 @@ func newTexasroadhouseCheckinCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:         "checkin <waitlist_id>",
-		Short:       "Check in once the party is at the host stand. Live check-in requires --yes; --dry-run previews without POSTing.",
+		Short:       "Confirm arrival after the guest receives the Texas Roadhouse text and replies HERE. Live check-in requires --yes; --dry-run previews without POSTing.",
 		Example:     "  texas-roadhouse-pp-cli texasroadhouse checkin 550e8400-e29b-41d4-a716-446655440000",
 		Annotations: map[string]string{"pp:endpoint": "texasroadhouse.checkin", "pp:method": "POST", "pp:path": "/api/texasroadhouse/waitlist/{waitlist_id}/checkin"},
 		RunE: func(cmd *cobra.Command, args []string) error {
