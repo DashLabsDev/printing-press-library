@@ -2,17 +2,17 @@
   "schema_version": 1,
   "slug": "scientific-consensus",
   "cli_name": "scientific-consensus-pp-cli",
-  "version": "2026.8.12",
-  "released_at": "2026-08-30T09:08:18Z",
-  "source_commit": "01260a424c00f5b9414bd8b5da06a2c364e3a5e4",
+  "version": "2026.8.13",
+  "released_at": "2026-08-30T09:12:06Z",
+  "source_commit": "24744f700c4257a7498dc099a02572ec69e3d637",
   "printing_press_version": "4.24.0",
   "run_id": "20260620-165352-e55cec69",
   "changes": [
     {
-      "title": "fix(scientific-consensus): raise claimStemLen to 6 so common prefixes stop matching",
-      "pr": 1857,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/1857",
-      "commit": "01260a424c00f5b9414bd8b5da06a2c364e3a5e4"
+      "title": "feat(scientific-consensus): give the pyramid's example a DOI and a year",
+      "pr": 1859,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/1859",
+      "commit": "24744f700c4257a7498dc099a02572ec69e3d637"
     }
   ]
 }

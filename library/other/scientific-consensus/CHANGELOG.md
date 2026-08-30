@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.13 - 2026-08-30
+
+- feat(scientific-consensus): give the pyramid's example a DOI and a year (#1859).
+
 ## 2026.8.12 - 2026-08-30
 
 - fix(scientific-consensus): raise claimStemLen to 6 so common prefixes stop matching (#1857).
