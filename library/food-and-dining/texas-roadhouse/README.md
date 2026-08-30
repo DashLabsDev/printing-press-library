@@ -278,7 +278,7 @@ Static request headers can be configured under `headers`; per-command header ove
 ## Troubleshooting
 **Not found errors (exit code 3)**
 - Check the resource ID is correct
-- For a store lookup, run `texas-roadhouse-pp-cli stores --latitude <lat> --longitude <lon>` and use the returned store `extref`; this CLI has no top-level `list` command
+- For a store lookup, run `texas-roadhouse-pp-cli stores --lat <lat> --long <lon>` and use the returned store `extref`; this CLI has no top-level `list` command
 
 ## HTTP Transport
 

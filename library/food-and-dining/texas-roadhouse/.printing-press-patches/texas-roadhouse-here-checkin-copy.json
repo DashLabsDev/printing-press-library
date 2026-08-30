@@ -1,0 +1,16 @@
+{
+  "schema_version": 2,
+  "id": "texas-roadhouse-here-checkin-copy",
+  "applied_at": "2026-08-30",
+  "base_run_id": "20260829-221218",
+  "base_printing_press_version": "4.31.2",
+  "summary": "Describe check-in consistently as the guest replying HERE to the Texas Roadhouse text.",
+  "reason": "The published CLI and MCP help incorrectly directed guests to the host stand instead of preserving the browser-observed text reply flow.",
+  "files": [
+    "internal/cli/texasroadhouse_checkin.go",
+    "internal/mcp/tools.go",
+    "spec.yaml",
+    "tools-manifest.json"
+  ],
+  "validated_outcome": "CLI, MCP, spec, manifest, README, and skill guidance use the HERE text flow; regression coverage rejects stale host-stand help."
+}
