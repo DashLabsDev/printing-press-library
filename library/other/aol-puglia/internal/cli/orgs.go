@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/spf13/cobra"
@@ -67,4 +68,17 @@ func ListAziende() {
 		fmt.Fprintf(w, "  %-20s %s\n", a.Key, a.ParametroDB)
 	}
 	w.Flush()
+}
+
+// resolveAzienda maps s onto the name the API expects, accepting either the key
+// printed in the first column of `orgs` or the API name itself, and reports
+// whether it matched one of the 13 organisations. The comparison is
+// case-insensitive: the API names carry mixed case and quotes.
+func resolveAzienda(s string) (string, bool) {
+	for _, a := range aziende {
+		if strings.EqualFold(s, a.Key) || strings.EqualFold(s, a.ParametroDB) {
+			return a.ParametroDB, true
+		}
+	}
+	return "", false
 }

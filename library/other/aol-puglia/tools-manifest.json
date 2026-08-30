@@ -324,5 +324,32 @@
         }
       ]
     }
+  ],
+  "novel_features": [
+    {
+      "name": "Auto-auth OAuth2",
+      "command": "doctor",
+      "description": "Il CLI ottiene automaticamente un token OAuth2 client_credentials pubblico senza che l'utente debba configurare credenziali."
+    },
+    {
+      "name": "Elenco aziende sanitarie",
+      "command": "orgs",
+      "description": "Lista le 13 aziende sanitarie pugliesi con i valori esatti da usare nei flag --azienda."
+    },
+    {
+      "name": "Ricerca atti paginata",
+      "command": "atti search",
+      "description": "Ricerca per parola chiave, data, proponente, CIG su bandi, concorsi, delibere e determine."
+    },
+    {
+      "name": "Download allegati",
+      "command": "atti download-allegato",
+      "description": "Scarica PDF e altri allegati decodificando automaticamente il base64 restituito dall'API."
+    },
+    {
+      "name": "Esportazione CSV",
+      "command": "fileexport",
+      "description": "Esporta i risultati di una ricerca come file CSV lato server (fino a 500 record)."
+    }
   ]
 }

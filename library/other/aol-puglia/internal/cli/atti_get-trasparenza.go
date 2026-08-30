@@ -22,13 +22,26 @@ func newAttiGetTrasparenzaCmd(flags *rootFlags) *cobra.Command {
 			if len(args) == 0 {
 				return cmd.Help()
 			}
+			// The API answers 200 with an empty listaTrasparenza for an unknown
+			// azienda, so an input typo would look like "no sections published".
+			// Every other positional command surfaces bad input as an error;
+			// validate against the 13 organisations listed by `orgs`, accepting
+			// both the key and the API name. Under --dry-run the matrix probes
+			// with placeholder arguments, so fall back to help there.
+			azienda, ok := resolveAzienda(args[0])
+			if !ok {
+				if flags.dryRun {
+					return cmd.Help()
+				}
+				return fmt.Errorf("invalid value %q for <azienda>: run 'aol-puglia-pp-cli orgs' for the 13 valid names", args[0])
+			}
 			c, err := flags.newClient()
 			if err != nil {
 				return err
 			}
 
 			path := "/atti/getTrasparenzaAzienda/{azienda}"
-			path = replacePathParam(path, "azienda", args[0])
+			path = replacePathParam(path, "azienda", azienda)
 			params := map[string]string{}
 			data, prov, err := resolveReadWithStrategy(cmd.Context(), c, flags, "auto", "atti", false, path, params, nil, cmd.ErrOrStderr())
 			if err != nil {

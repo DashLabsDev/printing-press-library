@@ -68,7 +68,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("atti_search",
-			mcplib.WithDescription("Ricerca paginata degli atti pubblicati. Senza autenticazione utente sono visibili solo bandi e concorsi (logged=false). Supporta filtri per data, proponente, oggetto, CIG. Required: azienda, logged, numElementi, page, tipoItem. Optional: annoRepertorio, dataAdozioneAl, dataAdozioneDal (plus 8 more). Returns array of Atto."),
+			mcplib.WithDescription("Ricerca paginata degli atti pubblicati: bando, concorso, delibera, determina (la disponibilità per tipo varia per azienda; alcune ASL non pubblicano delibere/determine). Il valore repertorio restituisce la vista aggregata di tutti i tipi. Supporta filtri per data, proponente, oggetto, CIG. Required: azienda, logged, numElementi, page, tipoItem. Optional: annoRepertorio, dataAdozioneAl, dataAdozioneDal (plus 8 more). Returns array of Atto."),
 			mcplib.WithNumber("annoRepertorio", mcplib.Description("Anno repertorio")),
 			mcplib.WithString("azienda", mcplib.Required(), mcplib.Description("Nome dell'azienda sanitaria.")),
 			mcplib.WithString("dataAdozioneAl", mcplib.Description("Filtro data adozione a (ISO 8601)")),
@@ -84,7 +84,7 @@ func RegisterTools(s *server.MCPServer) {
 			mcplib.WithString("proponenteSelezionato", mcplib.Description("Codice proponente (es. 'AGT')")),
 			mcplib.WithString("statoAtto", mcplib.Description("Stato atto. Inviare null quando logged=false.")),
 			mcplib.WithString("tipoDocumentazione", mcplib.Description("Tipo documentazione")),
-			mcplib.WithString("tipoItem", mcplib.Required(), mcplib.Description("Tipo documento. Senza login solo bando e concorso sono visibili.")),
+			mcplib.WithString("tipoItem", mcplib.Required(), mcplib.Description("Tipo documento: bando, concorso, delibera, determina, repertorio (vista aggregata). Disponibilità variabile per azienda.")),
 			mcplib.WithReadOnlyHintAnnotation(true),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),

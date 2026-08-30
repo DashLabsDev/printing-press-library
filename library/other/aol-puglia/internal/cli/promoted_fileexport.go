@@ -145,7 +145,7 @@ func newFileexportPromotedCmd(flags *rootFlags) *cobra.Command {
 	cmd.Flags().IntVar(&bodyNumeroRepertorio, "numero-repertorio", 0, "Numero repertorio")
 	cmd.Flags().StringVar(&bodyOggetto, "oggetto", "", "Testo libero da cercare nell'oggetto")
 	cmd.Flags().StringVar(&bodyProponenteSelezionato, "proponente-selezionato", "", "Codice proponente")
-	cmd.Flags().StringVar(&bodyTipoItem, "tipo-item", "", "Tipo documento: bando, concorso, delibera, determina (richiesto). La disponibilità per tipo varia per azienda.")
+	cmd.Flags().StringVar(&bodyTipoItem, "tipo-item", "", "Tipo documento: bando, concorso, delibera, determina, repertorio (vista aggregata, richiesto). La disponibilità per tipo varia per azienda.")
 	cmd.Flags().StringVar(&outputPath, "output", "", "File CSV di output (default: export.csv)")
 
 	return cmd
