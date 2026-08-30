@@ -908,9 +908,9 @@
       "path": "library/travel/airhint",
       "release": {
         "cli_name": "airhint-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "jvm",
       "printer_name": "jvm",
@@ -952,9 +952,9 @@
       "path": "library/travel/alaska-airlines",
       "release": {
         "cli_name": "alaska-airlines-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -1048,9 +1048,9 @@
       "path": "library/food-and-dining/allrecipes",
       "release": {
         "cli_name": "allrecipes-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "tmchow",
       "printer_name": "Trevin Chow",
@@ -1716,9 +1716,9 @@
       "path": "library/other/apartments",
       "release": {
         "cli_name": "apartments-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "rderwin",
       "printer_name": "rderwin",
@@ -3324,9 +3324,9 @@
       "path": "library/travel/booking-com",
       "release": {
         "cli_name": "booking-com-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -4475,9 +4475,9 @@
       "path": "library/cloud/cloud-run-admin",
       "release": {
         "cli_name": "cloud-run-admin-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "cathrynlavery",
       "printer_name": "Cathryn Lavery",
@@ -4799,9 +4799,9 @@
       "path": "library/productivity/concur",
       "release": {
         "cli_name": "concur-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-21T04:59:06Z",
-        "source_commit": "9b9f298193109d3c0ffbdcb28cb856ecf322407c"
+        "version": "2026.8.2",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "enlewof",
       "printer_name": "Allen Lew",
@@ -5226,9 +5226,9 @@
       "path": "library/commerce/costco",
       "release": {
         "cli_name": "costco-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "richie305",
       "printer_name": "David Richie",
@@ -5732,9 +5732,9 @@
       "path": "library/travel/delta-trip",
       "release": {
         "cli_name": "delta-trip-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "paulbockewitz",
       "printer_name": "Paul Bockewitz",
@@ -5932,9 +5932,9 @@
       "path": "library/media-and-entertainment/digg",
       "release": {
         "cli_name": "digg-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -6374,9 +6374,9 @@
       "path": "library/food-and-dining/dominos",
       "release": {
         "cli_name": "dominos-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -6488,9 +6488,9 @@
       "path": "library/education/dreaming",
       "release": {
         "cli_name": "dreaming-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T05:47:06Z",
-        "source_commit": "d6b74e6df2b2c66612e1f6e29433c0c0aae531e6"
+        "version": "2026.8.2",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "paulbockewitz",
       "printer_name": "Paul Bockewitz",
@@ -6802,9 +6802,9 @@
       "path": "library/commerce/ebay",
       "release": {
         "cli_name": "ebay-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -7185,9 +7185,9 @@
       "path": "library/marketing/erank",
       "release": {
         "cli_name": "erank-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "horknfbr",
       "printer_name": "horknfbr",
@@ -7334,9 +7334,9 @@
       "path": "library/commerce/etsy-seller-dashboard",
       "release": {
         "cli_name": "etsy-seller-dashboard-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-21T08:29:25Z",
-        "source_commit": "948566a1a3201bef916e09e4a1b4e0426cef4292"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "horknfbr",
       "printer_name": "horknfbr",
@@ -7709,9 +7709,9 @@
       "path": "library/productivity/expensify",
       "release": {
         "cli_name": "expensify-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -7877,9 +7877,9 @@
       "path": "library/commerce/facebook-marketplace",
       "release": {
         "cli_name": "facebook-marketplace-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "cathrynlavery",
       "printer_name": "Cathryn Lavery",
@@ -8417,6 +8417,12 @@
         "Show the cost, model, and byte deltas between two past renders."
       ],
       "path": "library/ai/fish-audio",
+      "release": {
+        "cli_name": "fish-audio-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-30T09:12:06Z",
+        "source_commit": "a5bf3f16632ea42325e7e60b7e06d021bafb18df"
+      },
       "printer": "jongouveia",
       "printer_name": "Jon Gouveia",
       "creator": {
@@ -8606,9 +8612,9 @@
       "path": "library/food-and-dining/food52",
       "release": {
         "cli_name": "food52-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "tmchow",
       "printer_name": "Trevin Chow",
@@ -8668,9 +8674,9 @@
       "path": "library/food-and-dining/foodpanda",
       "release": {
         "cli_name": "foodpanda-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-21T05:08:21Z",
-        "source_commit": "7979876b0dc483fcd3decb5f3e28b9bd97806fbd"
+        "version": "2026.8.2",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "qazmataz",
       "printer_name": "qazmataz",
@@ -8869,9 +8875,9 @@
       "path": "library/other/fpi-india",
       "release": {
         "cli_name": "fpi-india-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "lavs9",
       "printer_name": "Mayank Lavania",
@@ -8930,9 +8936,9 @@
       "path": "library/developer-tools/framer",
       "release": {
         "cli_name": "framer-pp-cli",
-        "version": "2026.8.3",
-        "released_at": "2026-08-18T18:57:59Z",
-        "source_commit": "a29aa29d089080aa13398d96d1a90c4a09db06e2"
+        "version": "2026.8.4",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "ioncom",
       "printer_name": "ioncom",
@@ -9269,9 +9275,9 @@
       "path": "library/other/gisis",
       "release": {
         "cli_name": "gisis-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "6myfzqx6bv-ctrl",
       "printer_name": "ivory_elephant",
@@ -9746,9 +9752,9 @@
       "path": "library/sales-and-crm/gohighlevel",
       "release": {
         "cli_name": "gohighlevel-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "jenwilliams-eng",
       "printer_name": "Jen Williams",
@@ -9793,9 +9799,9 @@
       "path": "library/media-and-entertainment/goodreads",
       "release": {
         "cli_name": "goodreads-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "zaydiscold",
       "printer_name": "zaydiscold",
@@ -10297,9 +10303,9 @@
       "path": "library/marketing/google-trends",
       "release": {
         "cli_name": "google-trends-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "kmorebetter",
       "printer_name": "Kerry Morrison",
@@ -10521,9 +10527,9 @@
       "path": "library/other/gravitus",
       "release": {
         "cli_name": "gravitus-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "azaaron",
       "printer_name": "mvanhorn",
@@ -10586,9 +10592,9 @@
       "path": "library/other/greatclips",
       "release": {
         "cli_name": "greatclips-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -10907,9 +10913,9 @@
       "path": "library/commerce/harris-teeter",
       "release": {
         "cli_name": "harris-teeter-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "jwmoss",
       "printer_name": "Jonathan Moss",
@@ -11587,6 +11593,12 @@
         "Resolve product terms into an exact read-only cart-item preview."
       ],
       "path": "library/food-and-dining/ifood",
+      "release": {
+        "cli_name": "ifood-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
+      },
       "printer": "matheuscoelhomalta",
       "printer_name": "Matheus Coêlho",
       "creator": {
@@ -11637,9 +11649,9 @@
       "path": "library/productivity/ihatepdf-cv",
       "release": {
         "cli_name": "ihatepdf-cv-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-22T09:13:12Z",
-        "source_commit": "2fe0b6284ea52570bda4c71cb4f16760a92902be"
+        "version": "2026.8.2",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "SomSamantray",
       "printer_name": "Som Samantray",
@@ -12350,9 +12362,9 @@
       "path": "library/food-and-dining/jimmy-johns",
       "release": {
         "cli_name": "jimmy-johns-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "omarshahine",
       "printer_name": "Omar Shahine",
@@ -13651,9 +13663,9 @@
       "path": "library/commerce/loopnet",
       "release": {
         "cli_name": "loopnet-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "melanson633",
       "printer_name": "melanson633",
@@ -14059,9 +14071,9 @@
       "path": "library/media-and-entertainment/medium-reader",
       "release": {
         "cli_name": "medium-reader-pp-cli",
-        "version": "2026.8.3",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.4",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "maxswinguy",
       "printer_name": "Maxime Delavergne",
@@ -14272,9 +14284,9 @@
       "path": "library/ai/midjourney",
       "release": {
         "cli_name": "midjourney-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "dave-agent-cerebro",
       "printer_name": "Dave Fano",
@@ -14427,9 +14439,9 @@
       "path": "library/media-and-entertainment/mobalytics-lol",
       "release": {
         "cli_name": "mobalytics-lol-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "QuantumGlitch",
       "printer_name": "QuantumGlitch",
@@ -14789,9 +14801,9 @@
       "path": "library/productivity/myfitnesspal",
       "release": {
         "cli_name": "myfitnesspal-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "nickscarabosio",
       "printer_name": "Nick Scarabosio",
@@ -14961,9 +14973,9 @@
       "path": "library/health/nejm",
       "release": {
         "cli_name": "nejm-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-21T04:55:07Z",
-        "source_commit": "8c6c417e7affcead94062c679863e10158c285cc"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "laci141",
       "printer_name": "laci141",
@@ -15208,9 +15220,9 @@
       "path": "library/developer-tools/npm",
       "release": {
         "cli_name": "npm-pp-cli",
-        "version": "2026.8.3",
-        "released_at": "2026-08-18T18:57:59Z",
-        "source_commit": "a29aa29d089080aa13398d96d1a90c4a09db06e2"
+        "version": "2026.8.4",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "hnshah",
       "printer_name": "Hiten Shah",
@@ -15690,9 +15702,9 @@
       "path": "library/commerce/offerup",
       "release": {
         "cli_name": "offerup-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "tmchow",
       "printer_name": "Trevin Chow",
@@ -16075,9 +16087,9 @@
       "path": "library/ai/openart",
       "release": {
         "cli_name": "openart-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-18T18:57:59Z",
-        "source_commit": "a29aa29d089080aa13398d96d1a90c4a09db06e2"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -16728,9 +16740,9 @@
       "path": "library/food-and-dining/pagliacci",
       "release": {
         "cli_name": "pagliacci-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "tmchow",
       "printer_name": "Trevin Chow",
@@ -17243,9 +17255,9 @@
       "path": "library/travel/peerspace",
       "release": {
         "cli_name": "peerspace-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "nspage",
       "printer_name": "nspage",
@@ -17513,9 +17525,9 @@
       "path": "library/marketing/placeit",
       "release": {
         "cli_name": "placeit-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "vcolombo",
       "printer_name": "Vincent Colombo",
@@ -17804,9 +17816,9 @@
       "path": "library/travel/pointhound",
       "release": {
         "cli_name": "pointhound-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "salmonumbrella",
       "printer_name": "salmonumbrella",
@@ -18094,9 +18106,9 @@
       "path": "library/developer-tools/postman-explore",
       "release": {
         "cli_name": "postman-explore-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "tmchow",
       "printer_name": "Trevin Chow",
@@ -18217,6 +18229,12 @@
         "See your own success/failure rate with a specific designer, pooled across every site they publish on."
       ],
       "path": "library/media-and-entertainment/printgoat",
+      "release": {
+        "cli_name": "printgoat-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
+      },
       "printer": "nate-d-olson",
       "printer_name": "Nate Olson",
       "creator": {
@@ -18972,9 +18990,9 @@
       "path": "library/productivity/raindrop",
       "release": {
         "cli_name": "raindrop-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "srijits",
       "printer_name": "srijits",
@@ -19209,9 +19227,9 @@
       "path": "library/food-and-dining/recipe-goat",
       "release": {
         "cli_name": "recipe-goat-pp-cli",
-        "version": "2026.8.3",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.4",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "tmchow",
       "printer_name": "Trevin Chow",
@@ -19276,9 +19294,9 @@
       "path": "library/other/redfin",
       "release": {
         "cli_name": "redfin-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "rderwin",
       "printer_name": "rderwin",
@@ -19335,9 +19353,9 @@
       "path": "library/project-management/redmine",
       "release": {
         "cli_name": "redmine-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-27T09:14:23Z",
-        "source_commit": "ce031f152a17c612f2fbe93770289020626f1e32"
+        "version": "2026.8.2",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "yosimasu",
       "printer_name": "Masu Lin",
@@ -19895,6 +19913,50 @@
       }
     },
     {
+      "name": "rightbrain",
+      "category": "ai",
+      "api": "rightbrain",
+      "description": "The first Rightbrain CLI that reaches past tasks — agents, approvals, evals, triggers and audit, plus a local mirror that makes credit spend and latency regressions queryable.",
+      "search_terms": [
+        "rightbrain",
+        "rightbrain-pp-cli",
+        "Eval release gate",
+        "gate",
+        "Decide whether a candidate task revision is safe to promote, by comparing its eval pass rate against the last recorded result for a different revision of the same task.",
+        "Rollout reality check",
+        "rollout",
+        "Show what traffic each task revision actually received versus the weight you configured, with failure rate, credits, and p50/p95 latency per revision.",
+        "Stalled approval triage",
+        "approvals",
+        "Triage every pending agent approval request by how long it has been parked and how soon it expires, with expired requests separated from actionable ones.",
+        "Agent run trace",
+        "agent-trace",
+        "Reconstruct one agent run as an indented timeline of paired tool calls and results with per-step elapsed time and a tool-duration histogram.",
+        "Cost and latency drift",
+        "drift",
+        "Compare this window against the previous one across every task and agent — mean credits, tokens, p95 latency, failure rate — and flag what moved.",
+        "Named, verified changelog",
+        "changelog",
+        "What changed in the project over a window, with resource UUIDs resolved to task, agent, skill, and collection names, plus an optional tamper-evidence verdict via --verify.",
+        "Eval flake ranking",
+        "eval-flake",
+        "Rank a task's eval test cases by how often they fail, separating genuine flake from cases that fail consistently."
+      ],
+      "path": "library/ai/rightbrain",
+      "printer": "papaonlegs",
+      "printer_name": "Farouk Umar",
+      "creator": {
+        "handle": "papaonlegs",
+        "name": "Farouk Umar"
+      },
+      "contributors": [
+        {
+          "handle": "papaonlegs",
+          "name": "Farouk Umar"
+        }
+      ]
+    },
+    {
       "name": "roadside-america",
       "category": "travel",
       "api": "Roadside America",
@@ -20397,9 +20459,9 @@
       "path": "library/other/scientific-consensus",
       "release": {
         "cli_name": "scientific-consensus-pp-cli",
-        "version": "2026.8.10",
-        "released_at": "2026-08-30T09:06:47Z",
-        "source_commit": "9f9b634537912a9e1bfdb16f3b1a865f841bfe4a"
+        "version": "2026.8.13",
+        "released_at": "2026-08-30T09:12:06Z",
+        "source_commit": "24744f700c4257a7498dc099a02572ec69e3d637"
       },
       "printer": "laci141",
       "printer_name": "laci141",
@@ -20639,9 +20701,9 @@
       "path": "library/media-and-entertainment/scryfall",
       "release": {
         "cli_name": "scryfall-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-23T09:35:21Z",
-        "source_commit": "c1baf1b4c4dcbaa2383767a35778d342a9e16b4c"
+        "version": "2026.8.2",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "veltri-23",
       "printer_name": "Hunter Veltri",
@@ -21170,9 +21232,9 @@
       "path": "library/monitoring/sentry",
       "release": {
         "cli_name": "sentry-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "cathrynlavery",
       "printer_name": "Cathryn Lavery",
@@ -21863,9 +21925,9 @@
       "path": "library/media-and-entertainment/skool",
       "release": {
         "cli_name": "skool-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "quoxientzero",
       "printer_name": "Zain Haseeb",
@@ -22000,9 +22062,9 @@
       "path": "library/commerce/slickdeals",
       "release": {
         "cli_name": "slickdeals-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "beetz12",
       "printer_name": "David He",
@@ -23307,9 +23369,9 @@
       "path": "library/health/suppco",
       "release": {
         "cli_name": "suppco-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.2",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "itsmefelix-",
       "printer_name": "Felix Banuchi",
@@ -23369,9 +23431,9 @@
       "path": "library/other/surfline",
       "release": {
         "cli_name": "surfline-pp-cli",
-        "version": "2026.8.3",
-        "released_at": "2026-08-17T08:21:18Z",
-        "source_commit": "bc4b586302c2f3040178080f61960f98fff3529d"
+        "version": "2026.8.4",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "Shoffner",
       "printer_name": "Shoffner",
@@ -23607,9 +23669,9 @@
       "path": "library/food-and-dining/table-reservation-goat",
       "release": {
         "cli_name": "table-reservation-goat-pp-cli",
-        "version": "2026.8.4",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.5",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "pejmanjohn",
       "printer_name": "Pejman Pour-Moezzi",
@@ -24101,6 +24163,12 @@
         "List nearby restaurants; waitlist paths use store extref, not the internal store id."
       ],
       "path": "library/food-and-dining/texas-roadhouse",
+      "release": {
+        "cli_name": "texas-roadhouse-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "14285394309fe23641659dcdacdb84fd59437c45"
+      },
       "printer": "DashLabsDev",
       "printer_name": "Thomas McCormick",
       "creator": {
@@ -24212,9 +24280,9 @@
       "path": "library/media-and-entertainment/ticketdata",
       "release": {
         "cli_name": "ticketdata-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -24462,9 +24530,9 @@
       "path": "library/productivity/tiimo",
       "release": {
         "cli_name": "tiimo-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "vcolombo",
       "printer_name": "Vincent Colombo"
@@ -24615,9 +24683,9 @@
       "path": "library/travel/travelclick",
       "release": {
         "cli_name": "travelclick-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-21T09:10:51Z",
-        "source_commit": "b6357e247080787066b80ee9efa239ff5f8bbe0e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "enlewof",
       "printer_name": "Allen Lew",
@@ -24860,9 +24928,9 @@
       "path": "library/marketing/trustpilot",
       "release": {
         "cli_name": "trustpilot-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -25040,9 +25108,9 @@
       "path": "library/media-and-entertainment/twitch",
       "release": {
         "cli_name": "twitch-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "coopdogGGs",
       "printer_name": "ryanc00per",
@@ -25488,9 +25556,9 @@
       "path": "library/developer-tools/uspto-tsdr",
       "release": {
         "cli_name": "uspto-tsdr-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "H179922",
       "printer_name": "H179922",
@@ -25867,9 +25935,9 @@
       "path": "library/devices/wahoo",
       "release": {
         "cli_name": "wahoo-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "stellato",
       "printer_name": "Greg Stellato",
@@ -26592,9 +26660,9 @@
       "path": "library/food-and-dining/wolt",
       "release": {
         "cli_name": "wolt-pp-cli",
-        "version": "2026.8.2",
-        "released_at": "2026-08-17T07:57:07Z",
-        "source_commit": "40363ac0936c4f406625f8399d8ad9b57673170e"
+        "version": "2026.8.3",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "Amit-Tabibi",
       "printer_name": "Amit",
@@ -26634,9 +26702,9 @@
       "path": "library/commerce/woolworths",
       "release": {
         "cli_name": "woolworths-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-25T09:17:49Z",
-        "source_commit": "a76e493201851fbff785446ae81e9a08c44fcba9"
+        "version": "2026.8.2",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "therichardgill",
       "printer_name": "Richard Gill",
@@ -26677,9 +26745,9 @@
       "path": "library/commerce/woot",
       "release": {
         "cli_name": "woot-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T09:25:00Z",
-        "source_commit": "c6be916f966d099fa8558102cca5f59517ad2cb2"
+        "version": "2026.8.2",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "TheFabulousMoolah",
       "printer_name": "Matthew Vassallo",
@@ -27168,9 +27236,9 @@
       "path": "library/developer-tools/yeswehack",
       "release": {
         "cli_name": "yeswehack-pp-cli",
-        "version": "2026.8.3",
-        "released_at": "2026-08-18T18:57:59Z",
-        "source_commit": "a29aa29d089080aa13398d96d1a90c4a09db06e2"
+        "version": "2026.8.4",
+        "released_at": "2026-08-30T09:08:18Z",
+        "source_commit": "d97ee8c93245eee634bbf3f75541341e48fbfc44"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
