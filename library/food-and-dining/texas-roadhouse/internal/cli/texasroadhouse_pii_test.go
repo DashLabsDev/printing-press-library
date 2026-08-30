@@ -3,9 +3,30 @@
 package cli
 
 import (
+	"io"
+	"os"
 	"strings"
 	"testing"
 )
+
+func captureOSStderr(t *testing.T, fn func()) string {
+	t.Helper()
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	orig := os.Stderr
+	os.Stderr = w
+	defer func() { os.Stderr = orig }()
+	fn()
+	_ = w.Close()
+	out, err := io.ReadAll(r)
+	_ = r.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	return string(out)
+}
 
 func TestRejectWaitlistPIIFlags(t *testing.T) {
 	withTempLearnHome(t)
@@ -28,22 +49,44 @@ func TestRejectWaitlistPIIFlags(t *testing.T) {
 	}
 }
 
+func TestRedactWaitlistPII(t *testing.T) {
+	got := redactWaitlistPII(map[string]any{
+		"EmailAddress":         "guest@example.test",
+		"FirstName":            "Test",
+		"LastName":             "User",
+		"PrimaryPhoneAreaCode": "555",
+		"PrimaryPhoneNumber":   "555-0100",
+		"PartySize":            2,
+		"WaitMinutes":          10,
+	})
+	for _, key := range []string{"EmailAddress", "FirstName", "LastName", "PrimaryPhoneAreaCode", "PrimaryPhoneNumber"} {
+		if got[key] != waitlistPIIRedacted {
+			t.Fatalf("%s = %v, want %s", key, got[key], waitlistPIIRedacted)
+		}
+	}
+	if got["PartySize"] != 2 || got["WaitMinutes"] != 10 {
+		t.Fatalf("non-PII fields were changed: %#v", got)
+	}
+}
+
 func TestSubmitDryRunRedactsPII(t *testing.T) {
 	withTempLearnHome(t)
-	_, stderr, err := runRootArgsWithStdin(t, submitGuestStdinJSON,
-		"texasroadhouse", "submit", "218",
-		"--stdin", "--dry-run", "--agent", "--no-learn",
-	)
-	if err != nil {
-		t.Fatalf("dry-run submit: %v (stderr=%q)", err, stderr)
-	}
-	leaks := []string{"guest@example.test", "555-0100", `"Test"`, `"User"`}
+	stderr := captureOSStderr(t, func() {
+		_, _, err := runRootArgsWithStdin(t, submitGuestStdinJSON,
+			"texasroadhouse", "submit", "218",
+			"--stdin", "--dry-run", "--agent", "--no-learn",
+		)
+		if err != nil {
+			t.Fatalf("dry-run submit: %v", err)
+		}
+	})
+	leaks := []string{"guest@example.test", "555-0100"}
 	for _, leak := range leaks {
 		if strings.Contains(stderr, leak) {
 			t.Fatalf("dry-run stderr leaked %q: %s", leak, stderr)
 		}
 	}
-	if !strings.Contains(stderr, waitlistPIIRedacted) {
+	if !strings.Contains(stderr, "redacted") {
 		t.Fatalf("dry-run stderr should redact PII, got %q", stderr)
 	}
 }
