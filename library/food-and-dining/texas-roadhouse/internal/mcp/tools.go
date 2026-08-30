@@ -82,7 +82,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("texasroadhouse_checkin",
-			mcplib.WithDescription("Check in once the party is at the host stand (destructive). Live check-in requires yes=true; dry-run=true previews without POSTing. Required: waitlist_id. Optional: yes, dry-run. Returns the new WaitlistCheckinResult."),
+			mcplib.WithDescription("Mark the party HERE after the guest texts HERE once everyone has arrived (text REMOVE to leave). Not a host-stand visit (destructive). Live check-in requires yes=true; dry-run=true previews without POSTing. Required: waitlist_id. Optional: yes, dry-run. Returns the new WaitlistCheckinResult."),
 			mcplib.WithString("waitlist_id", mcplib.Required(), mcplib.Description("Store extref (not internal store id). Springfield MO is 218.")),
 			mcplib.WithBoolean("yes", mcplib.Description("Required for a live check-in. Same meaning as CLI --yes.")),
 			mcplib.WithBoolean("dry-run", mcplib.Description("Preview the request body without POSTing. Same meaning as CLI --dry-run.")),
@@ -135,7 +135,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("texasroadhouse_submit",
-			mcplib.WithDescription("Join a store waitlist (destructive). Live join requires yes=true; dry-run=true previews without POSTing. Required: waitlist_id, EmailAddress, FirstName, LastName, PrimaryPhoneAreaCode, PrimaryPhoneNumber, PartySize, WaitMinutes. Optional: IsSmoking, PrimaryPhoneExtension, PrimaryPhoneType, Platform, yes, dry-run. Returns the new WaitlistSubmitResult."),
+			mcplib.WithDescription("Join a store waitlist (destructive). Unofficial sniffed endpoint; get guest consent before sending name/email/phone. Live join requires yes=true; dry-run=true previews a redacted body without POSTing. Required: waitlist_id, EmailAddress, FirstName, LastName, PrimaryPhoneAreaCode, PrimaryPhoneNumber, PartySize, WaitMinutes. Optional: IsSmoking, PrimaryPhoneExtension, PrimaryPhoneType, Platform, yes, dry-run. Returns the new WaitlistSubmitResult."),
 			mcplib.WithString("waitlist_id", mcplib.Required(), mcplib.Description("Store extref (not internal store id). Springfield MO is 218.")),
 			mcplib.WithString("EmailAddress", mcplib.Required(), mcplib.Description("Guest email")),
 			mcplib.WithString("FirstName", mcplib.Required(), mcplib.Description("Guest first name")),
@@ -292,6 +292,7 @@ func makeAPIHandler(method, pathTemplate string, readOnly bool, binaryResponse b
 		if !readOnly && mcpMutationDryRun(args) {
 			c.DryRun = true
 		}
+		redactMCPBody := !readOnly && mcpMutationDryRun(args)
 		if platformSession != nil {
 			defer platformSession.ZeroCredentials()
 		}
@@ -391,6 +392,10 @@ func makeAPIHandler(method, pathTemplate string, readOnly bool, binaryResponse b
 			}
 		}
 
+		if redactMCPBody && len(bodyArgs) > 0 {
+			bodyArgs = cli.RedactWaitlistPII(bodyArgs)
+		}
+
 		var data json.RawMessage
 		switch method {
 		case "GET":
@@ -470,6 +475,9 @@ func makeAPIHandler(method, pathTemplate string, readOnly bool, binaryResponse b
 					"\n      See API docs: https://www.texasroadhouse.com" +
 					"\n      Run 'texas-roadhouse-pp-cli doctor' to check auth status."), nil
 			case strings.Contains(msg, "HTTP 403"):
+				if cli.LooksLikeCloudflareChallenge(msg) {
+					return mcpToolError(cli.CloudflareChallengeToolMessage(msg)), nil
+				}
 				return mcpToolError("permission denied: " + msg +
 					"\nhint: this API is configured without credentials; the service may be blocking the request by rate limit, geography, bot protection, or endpoint policy." +
 					"\n      See API docs: https://www.texasroadhouse.com" +
@@ -478,7 +486,7 @@ func makeAPIHandler(method, pathTemplate string, readOnly bool, binaryResponse b
 				if method == "DELETE" {
 					return mcpToolTextWithPlatform("already deleted (no-op)", platformSession), nil
 				}
-				return mcpToolError("not found: " + msg), nil
+				return mcpToolError("not found: " + msg + "\nhint: this CLI has no list command; use stores --lat/--long or texasroadhouse get-quote <extref>."), nil
 			case strings.Contains(msg, "HTTP 429"):
 				return mcpToolError("rate limited: " + msg), nil
 			default:

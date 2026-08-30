@@ -6,7 +6,6 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -27,9 +26,9 @@ func newTexasroadhouseSubmitCmd(flags *rootFlags) *cobra.Command {
 	var stdinBody bool
 
 	cmd := &cobra.Command{
-		Use:         "submit <waitlist_id>",
-		Short:       "Join a store waitlist. Live join requires --yes; --dry-run previews without POSTing.",
-		Example:     "  texas-roadhouse-pp-cli texasroadhouse submit 550e8400-e29b-41d4-a716-446655440000 --email-address 123 Test St, Anytown, ST 12345",
+		Use:   "submit <waitlist_id>",
+		Short: "Join a store waitlist. Guest PII comes from stdin JSON or a prompt, never argv flags. Live join requires --yes; --dry-run previews a redacted body without POSTing.",
+		Example: "  printf '%s\\n' '{\"EmailAddress\":\"<email>\",\"FirstName\":\"<first>\",\"LastName\":\"<last>\",\"PrimaryPhoneAreaCode\":\"<area>\",\"PrimaryPhoneNumber\":\"<number>\",\"PartySize\":2,\"WaitMinutes\":10}' | texas-roadhouse-pp-cli texasroadhouse submit 901 --stdin --dry-run",
 		Annotations: map[string]string{"pp:endpoint": "texasroadhouse.submit", "pp:method": "POST", "pp:path": "/api/texasroadhouse/waitlist/{waitlist_id}/submit"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Bare invocation of a command with required input prints help
@@ -65,28 +64,8 @@ func newTexasroadhouseSubmitCmd(flags *rootFlags) *cobra.Command {
 				}
 				return usageErr(fmt.Errorf("missing required argument\nUsage: %s%s", cmd.CommandPath(), " <waitlist_id>"))
 			}
-			if !stdinBody {
-				if !cmd.Flags().Changed("email-address") && !flags.dryRun {
-					return fmt.Errorf("required flag \"%s\" not set", "email-address")
-				}
-				if !cmd.Flags().Changed("first-name") && !flags.dryRun {
-					return fmt.Errorf("required flag \"%s\" not set", "first-name")
-				}
-				if !cmd.Flags().Changed("last-name") && !flags.dryRun {
-					return fmt.Errorf("required flag \"%s\" not set", "last-name")
-				}
-				if !cmd.Flags().Changed("primary-phone-area-code") && !flags.dryRun {
-					return fmt.Errorf("required flag \"%s\" not set", "primary-phone-area-code")
-				}
-				if !cmd.Flags().Changed("primary-phone-number") && !flags.dryRun {
-					return fmt.Errorf("required flag \"%s\" not set", "primary-phone-number")
-				}
-				if !cmd.Flags().Changed("party-size") && !flags.dryRun {
-					return fmt.Errorf("required flag \"%s\" not set", "party-size")
-				}
-				if !cmd.Flags().Changed("wait-minutes") && !flags.dryRun {
-					return fmt.Errorf("required flag \"%s\" not set", "wait-minutes")
-				}
+			if err := rejectWaitlistPIIFlags(cmd); err != nil {
+				return err
 			}
 			path := "/api/texasroadhouse/waitlist/{waitlist_id}/submit"
 			if len(args) < 1 || args[0] == "" {
@@ -101,53 +80,19 @@ func newTexasroadhouseSubmitCmd(flags *rootFlags) *cobra.Command {
 				return err
 			}
 			params := map[string]string{}
-			var body any
-			if stdinBody {
-				stdinData, err := io.ReadAll(os.Stdin)
-				if err != nil {
-					return fmt.Errorf("reading stdin: %w", err)
-				}
-				var jsonBody map[string]any
-				if err := json.Unmarshal(stdinData, &jsonBody); err != nil {
-					return fmt.Errorf("parsing stdin JSON: %w", err)
-				}
-				body = jsonBody
-			} else {
-				bodyMap := map[string]any{}
-				body = bodyMap
-				if cmd.Flags().Changed("email-address") || bodyEmailAddress != "" {
-					bodyMap["EmailAddress"] = bodyEmailAddress
-				}
-				if cmd.Flags().Changed("first-name") || bodyFirstName != "" {
-					bodyMap["FirstName"] = bodyFirstName
-				}
-				if cmd.Flags().Changed("last-name") || bodyLastName != "" {
-					bodyMap["LastName"] = bodyLastName
-				}
-				if cmd.Flags().Changed("is-smoking") {
-					bodyMap["IsSmoking"] = bodyIsSmoking
-				}
-				if cmd.Flags().Changed("primary-phone-area-code") || bodyPrimaryPhoneAreaCode != "" {
-					bodyMap["PrimaryPhoneAreaCode"] = bodyPrimaryPhoneAreaCode
-				}
-				if cmd.Flags().Changed("primary-phone-extension") || bodyPrimaryPhoneExtension != "" {
-					bodyMap["PrimaryPhoneExtension"] = bodyPrimaryPhoneExtension
-				}
-				if cmd.Flags().Changed("primary-phone-number") || bodyPrimaryPhoneNumber != "" {
-					bodyMap["PrimaryPhoneNumber"] = bodyPrimaryPhoneNumber
-				}
-				if cmd.Flags().Changed("primary-phone-type") || bodyPrimaryPhoneType != 0 {
-					bodyMap["PrimaryPhoneType"] = bodyPrimaryPhoneType
-				}
-				if cmd.Flags().Changed("party-size") || bodyPartySize != 0.0 {
-					bodyMap["PartySize"] = bodyPartySize
-				}
-				if cmd.Flags().Changed("wait-minutes") || bodyWaitMinutes != 0 {
-					bodyMap["WaitMinutes"] = bodyWaitMinutes
-				}
-				if cmd.Flags().Changed("platform") || bodyPlatform != "" {
-					bodyMap["Platform"] = bodyPlatform
-				}
+			guest, err := collectWaitlistGuestPII(cmd, flags, stdinBody)
+			if err != nil {
+				return err
+			}
+			bodyMap := map[string]any{}
+			mergeWaitlistJSON(bodyMap, guest)
+			applyWaitlistNonPIIFlags(cmd, bodyMap, bodyIsSmoking, bodyPartySize, bodyWaitMinutes, bodyPlatform, bodyPrimaryPhoneType)
+			if err := requireWaitlistSubmitFields(bodyMap, flags.dryRun); err != nil {
+				return err
+			}
+			var body any = bodyMap
+			if flags.dryRun {
+				body = RedactWaitlistPII(bodyMap)
 			}
 			data, statusCode, err := c.PostWithParams(cmd.Context(), path, params, body)
 			if err != nil {
@@ -305,18 +250,24 @@ func newTexasroadhouseSubmitCmd(flags *rootFlags) *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().StringVar(&bodyEmailAddress, "email-address", "", "Guest email")
-	cmd.Flags().StringVar(&bodyFirstName, "first-name", "", "Guest first name")
-	cmd.Flags().StringVar(&bodyLastName, "last-name", "", "Guest last name")
+	cmd.Flags().StringVar(&bodyEmailAddress, "email-address", "", "Do not use: guest email belongs on stdin JSON")
+	cmd.Flags().StringVar(&bodyFirstName, "first-name", "", "Do not use: guest first name belongs on stdin JSON")
+	cmd.Flags().StringVar(&bodyLastName, "last-name", "", "Do not use: guest last name belongs on stdin JSON")
 	cmd.Flags().BoolVar(&bodyIsSmoking, "is-smoking", false, "Always false in the web app")
-	cmd.Flags().StringVar(&bodyPrimaryPhoneAreaCode, "primary-phone-area-code", "", "3-digit area code")
-	cmd.Flags().StringVar(&bodyPrimaryPhoneExtension, "primary-phone-extension", "", "Usually empty")
-	cmd.Flags().StringVar(&bodyPrimaryPhoneNumber, "primary-phone-number", "", "Local number as xxx-xxxx")
+	cmd.Flags().StringVar(&bodyPrimaryPhoneAreaCode, "primary-phone-area-code", "", "Do not use: guest phone belongs on stdin JSON")
+	cmd.Flags().StringVar(&bodyPrimaryPhoneExtension, "primary-phone-extension", "", "Do not use: guest phone belongs on stdin JSON")
+	cmd.Flags().StringVar(&bodyPrimaryPhoneNumber, "primary-phone-number", "", "Do not use: guest phone belongs on stdin JSON")
 	cmd.Flags().IntVar(&bodyPrimaryPhoneType, "primary-phone-type", 0, "Web app sends 1")
 	cmd.Flags().Float64Var(&bodyPartySize, "party-size", 0.0, "Party size, max 6")
 	cmd.Flags().IntVar(&bodyWaitMinutes, "wait-minutes", 0, "From quote MinQuote for this party size")
 	cmd.Flags().StringVar(&bodyPlatform, "platform", "", "Web app sends web")
-	cmd.Flags().BoolVar(&stdinBody, "stdin", false, "Read request body as JSON from stdin")
+	cmd.Flags().BoolVar(&stdinBody, "stdin", false, "Read guest PII and submit body as JSON from stdin (default for agents)")
+	_ = cmd.Flags().MarkHidden("email-address")
+	_ = cmd.Flags().MarkHidden("first-name")
+	_ = cmd.Flags().MarkHidden("last-name")
+	_ = cmd.Flags().MarkHidden("primary-phone-area-code")
+	_ = cmd.Flags().MarkHidden("primary-phone-extension")
+	_ = cmd.Flags().MarkHidden("primary-phone-number")
 
 	return cmd
 }

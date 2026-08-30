@@ -3,6 +3,7 @@
 package cli
 
 import (
+	"bytes"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -12,13 +13,17 @@ import (
 	"github.com/mvanhorn/printing-press-library/library/food-and-dining/texas-roadhouse/internal/client"
 )
 
+const submitGuestStdinJSON = `{"EmailAddress":"guest@example.test","FirstName":"Test","LastName":"User","PrimaryPhoneAreaCode":"555","PrimaryPhoneNumber":"555-0100","PartySize":2,"WaitMinutes":10}`
+
 func waitlistMutationCases() []struct {
-	name string
-	args []string
+	name  string
+	args  []string
+	stdin string
 } {
 	return []struct {
-		name string
-		args []string
+		name  string
+		args  []string
+		stdin string
 	}{
 		{
 			name: "checkin",
@@ -29,20 +34,23 @@ func waitlistMutationCases() []struct {
 			args: []string{"texasroadhouse", "cancel", "--waitlist-request-id", "1", "--site-id", "218", "--no-learn"},
 		},
 		{
-			name: "submit",
-			args: []string{
-				"texasroadhouse", "submit", "218",
-				"--email-address", "guest@example.test",
-				"--first-name", "Test",
-				"--last-name", "User",
-				"--primary-phone-area-code", "555",
-				"--primary-phone-number", "555-0100",
-				"--party-size", "2",
-				"--wait-minutes", "10",
-				"--no-learn",
-			},
+			name:  "submit",
+			args:  []string{"texasroadhouse", "submit", "218", "--stdin", "--no-learn"},
+			stdin: submitGuestStdinJSON,
 		},
 	}
+}
+
+func runRootArgsWithStdin(t *testing.T, stdin string, args ...string) (string, string, error) {
+	t.Helper()
+	rootCmd := RootCmd()
+	var stdout, stderr bytes.Buffer
+	rootCmd.SetOut(&stdout)
+	rootCmd.SetErr(&stderr)
+	rootCmd.SetIn(strings.NewReader(stdin))
+	rootCmd.SetArgs(args)
+	err := rootCmd.Execute()
+	return stdout.String(), stderr.String(), err
 }
 
 func TestWaitlistMutationsRefuseWithoutYes(t *testing.T) {
@@ -50,7 +58,7 @@ func TestWaitlistMutationsRefuseWithoutYes(t *testing.T) {
 	for _, tc := range waitlistMutationCases() {
 		t.Run(tc.name, func(t *testing.T) {
 			args := append(append([]string{}, tc.args...), "--agent")
-			_, stderr, err := runRootArgs(t, args...)
+			_, stderr, err := runRootArgsWithStdin(t, tc.stdin, args...)
 			if err == nil {
 				t.Fatalf("expected refuse without --yes, stderr=%q", stderr)
 			}
@@ -78,7 +86,7 @@ func TestWaitlistMutationsDryRunDoesNotPost(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			posts.Store(0)
 			args := append(append([]string{}, tc.args...), "--dry-run", "--agent")
-			_, stderr, err := runRootArgs(t, args...)
+			_, stderr, err := runRootArgsWithStdin(t, tc.stdin, args...)
 			if err != nil {
 				t.Fatalf("dry-run should succeed: %v (stderr=%q)", err, stderr)
 			}
@@ -106,7 +114,7 @@ func TestWaitlistMutationsYesPosts(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			posts.Store(0)
 			args := append(append([]string{}, tc.args...), "--yes", "--agent")
-			_, stderr, err := runRootArgs(t, args...)
+			_, stderr, err := runRootArgsWithStdin(t, tc.stdin, args...)
 			if err != nil {
 				t.Fatalf("--yes should POST: %v (stderr=%q)", err, stderr)
 			}

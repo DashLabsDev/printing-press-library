@@ -615,10 +615,9 @@ func classifyAPIErrorOnly(err error) error {
 			"\n      See API docs: https://www.texasroadhouse.com"+
 			"\n      Run 'texas-roadhouse-pp-cli doctor' to check auth status.", err))
 	case strings.Contains(msg, "HTTP 403"):
-		return authErr(fmt.Errorf("%w\nhint: permission denied. This API is configured without credentials, so the service may be blocking the request by rate limit, geography, bot protection, or endpoint policy."+
-			"\n      Run 'texas-roadhouse-pp-cli doctor' to check connectivity.", err))
+		return classifyWaitlistHTTP403(err)
 	case strings.Contains(msg, "HTTP 404"):
-		return notFoundErr(fmt.Errorf("%w\nhint: resource not found. Run the 'list' command to see available items", err))
+		return classifyWaitlistHTTP404(err)
 	case strings.Contains(msg, "HTTP 429"):
 		return rateLimitErr(err)
 	default:

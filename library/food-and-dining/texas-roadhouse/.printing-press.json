@@ -50,7 +50,7 @@
     {
       "name": "Sniffed waitlist check-in",
       "command": "texasroadhouse checkin",
-      "description": "Check in at the host stand via sniffed POST /waitlist/{extref}/checkin (no public API)."
+      "description": "Mark the party HERE after the guest texts HERE once everyone has arrived (REMOVE to leave) via sniffed POST /waitlist/{extref}/checkin. Not a host-stand visit."
     },
     {
       "name": "Quote MinQuote lookup",

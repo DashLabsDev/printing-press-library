@@ -33,6 +33,8 @@ texas-roadhouse-pp-cli <command> --dry-run --agent
 
 When a command requires confirmation, pass `--yes` explicitly only after the target, arguments, and side effects are clear. `--agent` does not imply `--yes`.
 
+Guest first name, last name, email, and phone must not appear on argv flags. Pass stdin JSON (or use the interactive prompt). `--dry-run` redacts those fields. Check-in is the guest texting HERE once everyone has arrived (REMOVE to leave), not a host-stand visit.
+
 ## Novel Command Data Sources
 
 Every hand-written novel command must declare its strategy in a Go line comment:

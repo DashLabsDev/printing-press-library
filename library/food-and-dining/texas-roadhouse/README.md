@@ -2,6 +2,14 @@
 
 Waitlist CLI for Texas Roadhouse. Find a nearby store, read the quote, join and leave the list.
 
+This is an **unofficial** tool. It is **not affiliated with or endorsed by** Texas Roadhouse, Inc. It talks to **sniffed unofficial endpoints** (no public API). Those endpoints can change or break without notice. Use is subject to the [Texas Roadhouse website terms](https://www.texasroadhouse.com).
+
+**PII / consent:** joining a waitlist sends the guest's first name, last name, email, and phone to Texas Roadhouse. Get the guest's consent first. Do not put that identity on argv flags (shell history / `ps` leak). Pass stdin JSON, or use the interactive prompt.
+
+**Local retention:** successful waitlist responses may be written to the local SQLite store under the resolved data dir.
+
+**Last verified:** live-tested late Aug 2026. Naked HTTP gets Cloudflare 403; this CLI uses Chrome-compatible transport. A Cloudflare-challenge error means the origin returned `cf-mitigated` / "Just a moment" instead of the waitlist API — run `texas-roadhouse-pp-cli doctor`.
+
 Learn more at [Texas Roadhouse](https://www.texasroadhouse.com).
 
 ## Install
@@ -123,7 +131,8 @@ This checks your configuration.
 ### 3. Try Your First Command
 
 ```bash
-texas-roadhouse-pp-cli mapbox mock-value
+texas-roadhouse-pp-cli stores --lat 36.643 --long -93.218 --limit 4
+texas-roadhouse-pp-cli texasroadhouse get-quote 901
 ```
 
 ## Usage
@@ -197,13 +206,15 @@ Operations on near
 
 Operations on test
 
+Before `submit`, confirm: unofficial sniffed endpoints; guest consented to send name/email/phone; PII stays on stdin or a prompt (never argv); local store may retain the response; live join/check-in/cancel need `--yes`.
+
 - **`texas-roadhouse-pp-cli texasroadhouse cancel`** - Cancel a waitlist request. Live cancel requires `--yes`; `--dry-run` previews without POSTing.
-- **`texas-roadhouse-pp-cli texasroadhouse checkin`** - Check in once the party is at the host stand. Live check-in requires `--yes`; `--dry-run` previews without POSTing.
+- **`texas-roadhouse-pp-cli texasroadhouse checkin`** - Mark the party HERE after the guest texts HERE once everyone has arrived (text REMOVE to leave). Not a host-stand visit. Live check-in requires `--yes`; `--dry-run` previews without POSTing.
 - **`texas-roadhouse-pp-cli texasroadhouse get-quote`** - GET /api/texasroadhouse/waitlist/{waitlist_id}/quote
 - **`texas-roadhouse-pp-cli texasroadhouse get-settings`** - GET /api/texasroadhouse/waitlist/{waitlist_id}/settings
 - **`texas-roadhouse-pp-cli texasroadhouse get-status`** - GET waitlist request status. Query clientid=texasroadhouse.
 - **`texas-roadhouse-pp-cli texasroadhouse get-test`** - GET /api/texasroadhouse/waitlist/{waitlist_id}/test
-- **`texas-roadhouse-pp-cli texasroadhouse submit`** - Join a store waitlist. Live join requires `--yes`; `--dry-run` previews without POSTing.
+- **`texas-roadhouse-pp-cli texasroadhouse submit`** - Join a store waitlist. Guest PII comes from stdin JSON or a prompt, never argv flags. Live join requires `--yes`; `--dry-run` previews a redacted body without POSTing.
 
 
 ### Self-learning loop
@@ -227,25 +238,25 @@ The local store's schema version stamp is one-way: once this version of `texas-r
 
 ```bash
 # Human-readable table (default in terminal, JSON when piped)
-texas-roadhouse-pp-cli mapbox mock-value
+texas-roadhouse-pp-cli stores --lat 36.643 --long -93.218 --limit 4
 
 # JSON for scripting and agents
-texas-roadhouse-pp-cli mapbox mock-value --json
+texas-roadhouse-pp-cli texasroadhouse get-quote 901 --json
 # Filter to specific fields
-texas-roadhouse-pp-cli mapbox mock-value --json --select bbox,center,context
+texas-roadhouse-pp-cli stores --lat 36.643 --long -93.218 --limit 4 --json --select name,extref,city,distance
 
 # Dry run — show the request without sending
-texas-roadhouse-pp-cli mapbox mock-value --dry-run
+texas-roadhouse-pp-cli texasroadhouse get-quote 901 --dry-run
 
 # Agent mode — JSON + compact + no prompts in one flag
-texas-roadhouse-pp-cli mapbox mock-value --agent
+texas-roadhouse-pp-cli stores --lat 36.643 --long -93.218 --limit 4 --agent
 ```
 
 ## Agent Usage
 
 This CLI is designed for AI agent consumption:
 
-- **Non-interactive** - never prompts, every input is a flag
+- **Non-interactive** - `--agent` never prompts; guest name/email/phone belong on stdin JSON, not argv flags
 - **Pipeable** - `--json` output to stdout, errors to stderr
 - **Filterable** - `--select <field>[,<field>...]` returns only fields you need
 - **Previewable** - `--dry-run` shows the request without sending
@@ -273,8 +284,13 @@ Static request headers can be configured under `headers`; per-command header ove
 
 ## Troubleshooting
 **Not found errors (exit code 3)**
-- Check the resource ID is correct
-- Run the `list` command to see available items
+- Check the store `extref` (not the internal store id)
+- Look up stores with `stores --lat <lat> --long <long>` and quotes with `texasroadhouse get-quote <extref>`
+- This CLI has no `list` command
+
+**Cloudflare challenge (HTTP 403)**
+- Naked HTTP gets Cloudflare 403. This CLI uses Chrome-compatible transport (live-tested late Aug 2026)
+- If the error names a Cloudflare challenge (`cf-mitigated` / Just a moment), the origin returned the interstitial instead of the waitlist API. Run `texas-roadhouse-pp-cli doctor`
 
 ## HTTP Transport
 
