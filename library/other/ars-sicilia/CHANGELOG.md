@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.9 - 2026-08-30
+
+- fix(ars-sicilia): the portal's refusal page was read as zero results (#1858).
+
 ## 2026.8.8 - 2026-08-29
 
 - fix(ars-sicilia): three silences that made the CLI cite the wrong document (#1855).

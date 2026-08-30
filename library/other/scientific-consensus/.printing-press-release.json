@@ -2,17 +2,17 @@
   "schema_version": 1,
   "slug": "scientific-consensus",
   "cli_name": "scientific-consensus-pp-cli",
-  "version": "2026.8.9",
-  "released_at": "2026-08-28T09:31:02Z",
-  "source_commit": "64a9473fa380f4dd76efefaaeee36572feeb4858",
+  "version": "2026.8.10",
+  "released_at": "2026-08-30T09:06:47Z",
+  "source_commit": "9f9b634537912a9e1bfdb16f3b1a865f841bfe4a",
   "printing_press_version": "4.24.0",
   "run_id": "20260620-165352-e55cec69",
   "changes": [
     {
-      "title": "feat(scientific-consensus): refutation override and PICO relevance gate",
-      "pr": 1760,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/1760",
-      "commit": "64a9473fa380f4dd76efefaaeee36572feeb4858"
+      "title": "fix(scientific-consensus): count inconclusive works in controversies",
+      "pr": 1873,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/1873",
+      "commit": "9f9b634537912a9e1bfdb16f3b1a865f841bfe4a"
     }
   ]
 }
