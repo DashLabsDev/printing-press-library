@@ -70,8 +70,14 @@ type profileReport struct {
 	// Troncato lists the archive slugs where Conteggio is a --limit cap, not
 	// the true total: the portal had more matching records than were
 	// fetched. Re-run with a higher --limit to see the rest.
-	Troncato []string      `json:"troncato,omitempty"`
-	Atti     []profileItem `json:"atti"`
+	Troncato []string `json:"troncato,omitempty"`
+	// NonRaggiunti elenca gli archivi che non hanno risposto. Senza, il profilo
+	// si presentava completo con dei pezzi mancanti: su un periodo lungo il
+	// portale rifiutava le ricerche su ddl e interrogazioni, quelle due sezioni
+	// sparivano, e il report mostrava le altre cinque come se fossero tutto.
+	// Un conteggio che tace ciò che non ha potuto contare è peggio di un errore.
+	NonRaggiunti []string      `json:"non_raggiunti,omitempty"`
+	Atti         []profileItem `json:"atti"`
 }
 
 // profiloSearchParams sono i parametri di una delle ricerche del profilo, in un
@@ -177,6 +183,7 @@ func runDeputatoProfilo(cmd *cobra.Command, flags *rootFlags, name string, legis
 			if invalido := new(icaro.InvalidParamError); errors.As(err, &invalido) {
 				return usageErr(err)
 			}
+			report.NonRaggiunti = append(report.NonRaggiunti, slug)
 			continue
 		}
 		archivesContacted++
@@ -212,6 +219,9 @@ func runDeputatoProfilo(cmd *cobra.Command, flags *rootFlags, name string, legis
 			})
 			if invalido := new(icaro.InvalidParamError); errors.As(err, &invalido) {
 				return usageErr(err)
+			}
+			if err != nil {
+				report.NonRaggiunti = append(report.NonRaggiunti, "resoconti")
 			}
 			if err == nil {
 				archivesContacted++
@@ -275,6 +285,12 @@ func runDeputatoProfilo(cmd *cobra.Command, flags *rootFlags, name string, legis
 			suffix = " (troncato, aumenta --limit)"
 		}
 		fmt.Fprintf(out, "  %-15s %d%s\n", k, v, suffix)
+	}
+	// Un archivio che non ha risposto non compare fra i conteggi: senza questa
+	// riga la sua assenza si legge come «quel deputato non ha atti di quel tipo».
+	if len(report.NonRaggiunti) > 0 {
+		fmt.Fprintf(out, "\nArchivi che non hanno risposto: %s\n", strings.Join(report.NonRaggiunti, ", "))
+		fmt.Fprintf(out, "  I conteggi qui sopra NON li comprendono. Restringi il periodo e riprova.\n")
 	}
 	fmt.Fprintf(out, "\nAtti (%d totali):\n", len(report.Atti))
 	for _, a := range report.Atti {

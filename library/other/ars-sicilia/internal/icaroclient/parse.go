@@ -391,6 +391,37 @@ func extractTotalPages(root *html.Node) int {
 	return 1
 }
 
+// reQueryError cattura il codice della pagina d'errore del portale.
+//
+// Quando il motore non riesce a eseguire una ricerca, `default.jsp` non torna
+// una lista vuota: torna una pagina diversa, con il blocco
+// `<div class="message ko"> (QR997)` al posto del contenuto, e senza il blocco
+// `Lista Documenti (N)` che c'è sia sui risultati sia sul vuoto vero.
+//
+// La distinzione è misurata (2026-08-29, archivio ddl, stessa sessione):
+//
+//	230101/240228.DATPRE E 18.LEGISL  ->  "Lista Documenti (460)", QRY1
+//	300101/301231.DATPRE E 18.LEGISL  ->  "Lista Documenti (0)", "Non esistono
+//	                                      documenti corrispondenti", QRY777
+//	230101/240229.DATPRE E 18.LEGISL  ->  "message ko" (QR997), QRY0
+//
+// Un giorno di differenza sull'estremo destro separa le ultime due: il motore
+// cede sull'ampiezza del range, ma lo DICHIARA. Leggere quella pagina come
+// "nessun risultato" trasformava un errore del portale in un'affermazione
+// falsa sull'archivio — ed è il difetto che questa funzione esiste per chiudere.
+var reQueryError = regexp.MustCompile(`(?s)<div class="message ko">\s*\(?\s*([A-Za-z]{2}\d+)?`)
+
+// DetectQueryError riconosce la pagina d'errore del portale e ne estrae il
+// codice (es. "QR997"), che può mancare: il secondo valore dice se la pagina è
+// una pagina d'errore, non se il codice c'era.
+func DetectQueryError(body string) (string, bool) {
+	m := reQueryError.FindStringSubmatch(body)
+	if m == nil {
+		return "", false
+	}
+	return m[1], true
+}
+
 // reResultCount cattura il totale dei documenti dal blocco `<ul id="resultsList">`
 // della pagina di apertura sessione, dove il portale scrive
 // `<h3 ...><a>Lista Documenti</a> (302)</h3>`.

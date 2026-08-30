@@ -43,6 +43,28 @@ con le sigle di campo verificate su questa CLI.
 Nota: la **commissione** si cerca per nome ordinale (`PRIMA`…`SESTA`) sul campo `COMMIS`; il
 codice numerico `CODCOM` non è indicizzato. La CLI mappa automaticamente `--codcom 6` → `SESTA`.
 
+### Range di date ampi: il motore li rifiuta, e lo dichiara
+
+Oltre un certo numero di documenti il motore non esegue la ricerca. `default.jsp` non torna una lista vuota: torna una pagina diversa, con il blocco `<div class="message ko"> (QR997)` e `QRY0 ()` al posto del contenuto, e senza il blocco `Lista Documenti (N)` che c'è sia sui risultati sia sul vuoto vero.
+
+I tre corpi a confronto, misurati il 2026-08-29 sull'archivio `ddl` (221), stessa sessione, variando solo l'estremo destro:
+
+| query | esito | come si riconosce |
+|---|---|---|
+| `230101/240228.DATPRE E 18.LEGISL` | 460 documenti | `Lista Documenti (460)`, `QRY1` |
+| `300101/301231.DATPRE E 18.LEGISL` | vuoto vero | `Lista Documenti (0)`, «Non esistono documenti corrispondenti alla ricerca formulata», `QRY777` |
+| `230101/240229.DATPRE E 18.LEGISL` | **rifiutata** | `message ko` `(QR997)`, `QRY0 ()`, nessun blocco del totale |
+
+Un giorno di differenza separa le ultime due. La soglia non è temporale ma quantitativa, e dipende dalla densità dell'archivio: `ddl` cede intorno ai 460 documenti (~14 mesi di legislatura XVIII), `interrogazioni` sul range di legislatura, `mozioni`, `odg`, `interpellanze` e `risoluzioni` reggono i 4 anni pieni. Non è un margine su cui contare: è densità, non garanzia.
+
+Gli archivi `/bd/` (`resoconti`, `sommari`, `convocazioni`) non passano di qui: hanno un backend proprio e non mostrano il difetto.
+
+**`--anno` non è l'alternativa sicura.** Su `ddl` non esiste un campo anno: `--anno 2023` è compilato in `230101/231231.DATPRE`, cioè esattamente lo stesso tipo di range di `--data`. Sta sotto la soglia perché un anno solare di ddl ci sta, non perché sia costruito diversamente. Su un archivio più denso, o su un anno più pieno, cederebbe allo stesso modo.
+
+**Cosa fa la CLI.** Il rifiuto viene riconosciuto (`DetectQueryError`) e non confuso con un risultato vuoto. Quando la ricerca porta un range di date, la CLI la rifà su sottoperiodi - prima per anno solare, e se una fetta cede ancora la taglia a metà una seconda volta - e unisce le risposte, dichiarandolo nell'`hint`. Se non c'è un range da spezzare, o se le fette cedono a ogni livello, l'errore arriva al chiamante: una lista vuota al posto di un rifiuto è un'affermazione falsa sull'archivio, ed è il difetto che questo meccanismo esiste per chiudere.
+
+Chi interroga il portale direttamente, senza passare dalla CLI, deve fare la stessa cosa a mano: cercare `message ko` nella risposta prima di concludere che non ci sono documenti.
+
 ### Locuzioni: `--frase` (operatore `adj`)
 
 `--testo "aree idonee"` genera `(aree E idonee)`: le due parole devono esserci **entrambe nel

@@ -414,7 +414,7 @@
         "--json"
       ],
       "status": "pass",
-      "output_sample": "{\n  \"generated_at\": \"2026-08-29T08:43:48Z\",\n  \"mossi\": [],\n  \"note\": \"Nessuno stato iter nello store: `ddl drift` confronta il campo iter, popolato solo da `ars-sicilia-pp-cli sync --resources ddl --deep`. Esegui due deep-sync a distanza di tempo per rilevare i movimenti.\",\n  \"nuovi\": [],\n  \"window\": \"7d\"\n}\n"
+      "output_sample": "{\n  \"generated_at\": \"2026-08-29T11:21:19Z\",\n  \"mossi\": [],\n  \"note\": \"Nessuno stato iter nello store: `ddl drift` confronta il campo iter, popolato solo da `ars-sicilia-pp-cli sync --resources ddl --deep`. Esegui due deep-sync a distanza di tempo per rilevare i movimenti.\",\n  \"nuovi\": [],\n  \"window\": \"7d\"\n}\n"
     },
     {
       "command": "ddl drift",
@@ -427,7 +427,7 @@
         "--json"
       ],
       "status": "pass",
-      "output_sample": "{\n  \"generated_at\": \"2026-08-29T08:43:48Z\",\n  \"mossi\": [],\n  \"note\": \"Nessuno stato iter nello store: `ddl drift` confronta il campo iter, popolato solo da `ars-sicilia-pp-cli sync --resources ddl --deep`. Esegui due deep-sync a distanza di tempo per rilevare i movimenti.\",\n  \"nuovi\": [],\n  \"window\": \"7d\"\n}\n"
+      "output_sample": "{\n  \"generated_at\": \"2026-08-29T11:21:19Z\",\n  \"mossi\": [],\n  \"note\": \"Nessuno stato iter nello store: `ddl drift` confronta il campo iter, popolato solo da `ars-sicilia-pp-cli sync --resources ddl --deep`. Esegui due deep-sync a distanza di tempo per rilevare i movimenti.\",\n  \"nuovi\": [],\n  \"window\": \"7d\"\n}\n"
     },
     {
       "command": "ddl drift",
@@ -753,7 +753,7 @@
         "--dry-run"
       ],
       "status": "pass",
-      "output_sample": "  OK Config: ok\n  OK Auth: not required\n  OK Verify Mode: normal operation\n  OK API: reachable\n  config_path: /tmp/printing-press-subprocess-4102621851/.config/ars-sicilia-pp-cli/config.toml\n  base_url: https://dati.ars.sicilia.it\n  version: 2026.7.2\n  INFO Cache: unknown\n    db_path: /tmp/printing-press-subprocess-4102621851/.local/share/ars-sicilia-pp-cli/data.db\n    schema_version: 2\n    db_bytes: 274432\n    stale_after: 6h0m0s\n    hint: sync_state is empty; run 'ars-sicilia-pp-cli sync' to hydrate.\nGET https://dati.ars.sicilia.it/home/cerca/help.jsp\n\n(dry run - no request sent)\n"
+      "output_sample": "  OK Config: ok\n  OK Auth: not required\n  OK Verify Mode: normal operation\n  OK API: reachable\n  config_path: /tmp/printing-press-subprocess-2422910118/.config/ars-sicilia-pp-cli/config.toml\n  base_url: https://dati.ars.sicilia.it\n  version: 2026.7.2\n  INFO Cache: unknown\n    db_path: /tmp/printing-press-subprocess-2422910118/.local/share/ars-sicilia-pp-cli/data.db\n    schema_version: 2\n    db_bytes: 274432\n    stale_after: 6h0m0s\n    hint: sync_state is empty; run 'ars-sicilia-pp-cli sync' to hydrate.\nGET https://dati.ars.sicilia.it/home/cerca/help.jsp\n\n(dry run - no request sent)\n"
     },
     {
       "command": "doctor",
@@ -764,7 +764,7 @@
         "--json"
       ],
       "status": "pass",
-      "output_sample": "{\n  \"api\": \"reachable\",\n  \"auth\": \"not required\",\n  \"base_url\": \"https://dati.ars.sicilia.it\",\n  \"cache\": {\n    \"db_bytes\": 274432,\n    \"db_path\": \"/tmp/printing-press-subprocess-4102621851/.local/share/ars-sicilia-pp-cli/data.db\",\n    \"hint\": \"sync_state is empty; run 'ars-sicilia-pp-cli sync' to hydrate.\",\n    \"resources\": null,\n    \"schema_version\": 2,\n    \"stale_after\": \"6h0m0s\",\n    \"status\": \"unknown\"\n  },\n  \"config\": \"ok\",\n  \"config_path\": \"/tmp/printing-press-subprocess-4102621851/.config/ars-sicilia-pp-cli/config.toml\",\n  \"verify_mode\": \"normal operation\",\n  \"version\": \"2026.7.2\"\n}\nGET https://dati.ars.sicilia.it/home/cerca/help.jsp\n\n(dry run - no request sent)\n"
+      "output_sample": "{\n  \"api\": \"reachable\",\n  \"auth\": \"not required\",\n  \"base_url\": \"https://dati.ars.sicilia.it\",\n  \"cache\": {\n    \"db_bytes\": 274432,\n    \"db_path\": \"/tmp/printing-press-subprocess-2422910118/.local/share/ars-sicilia-pp-cli/data.db\",\n    \"hint\": \"sync_state is empty; run 'ars-sicilia-pp-cli sync' to hydrate.\",\n    \"resources\": null,\n    \"schema_version\": 2,\n    \"stale_after\": \"6h0m0s\",\n    \"status\": \"unknown\"\n  },\n  \"config\": \"ok\",\n  \"config_path\": \"/tmp/printing-press-subprocess-2422910118/.config/ars-sicilia-pp-cli/config.toml\",\n  \"verify_mode\": \"normal operation\",\n  \"version\": \"2026.7.2\"\n}\nGET https://dati.ars.sicilia.it/home/cerca/help.jsp\n\n(dry run - no request sent)\n"
     },
     {
       "command": "doctor",
@@ -2087,5 +2087,5 @@
       "reason": "no positional argument"
     }
   ],
-  "ran_at": "2026-08-29T08:42:49.749671568Z"
+  "ran_at": "2026-08-29T11:20:20.756751576Z"
 }

@@ -85,6 +85,7 @@ func runCerca(cmd *cobra.Command, flags *rootFlags, archiveSlug string, p cercaP
 		searchParams = normalizeParams(*arc, p.Params)
 	}
 	var truncated bool
+	var spezzato bool
 	// Con l'aggregazione per legge il limite dell'utente è in leggi, non in
 	// righe: la paginazione si ferma quando le leggi chieste ci sono tutte,
 	// invece di consumare una finestra di righe stimata a priori.
@@ -100,6 +101,7 @@ func runCerca(cmd *cobra.Command, flags *rootFlags, archiveSlug string, p cercaP
 		Limit:     p.Limit,
 		MaxPages:  maxPages,
 		Truncated: &truncated,
+		Spezzato:  &spezzato,
 		StopWhen:  stopWhen,
 	})
 	if err != nil {
@@ -112,7 +114,7 @@ func runCerca(cmd *cobra.Command, flags *rootFlags, archiveSlug string, p cercaP
 		if invalido := new(icaro.InvalidParamError); errors.As(err, &invalido) {
 			return usageErr(err)
 		}
-		if h := restringiHint(err, arc.Slug, searchParams); h != "" {
+		if h := uniscoHint(rifiutoHint(err), restringiHint(err, arc.Slug, searchParams)); h != "" {
 			fmt.Fprintln(os.Stderr, "hint: "+h)
 		}
 		return fmt.Errorf("ricerca %s: %w", arc.Slug, err)
@@ -168,23 +170,50 @@ func runCerca(cmd *cobra.Command, flags *rootFlags, archiveSlug string, p cercaP
 	recs = ordinaPerPertinenza(recs, termini)
 	pertHint := pertinenzaHint(recs, termini, arc.Slug)
 	omonHint := omonimiHint(recs, arc.Slug)
+	spezzHint := spezzatoHint(spezzato)
 
 	if envelopeWanted(cmd.OutOrStdout(), flags) {
 		// L'avviso resta anche su stderr: la busta serve a chi legge il JSON,
 		// non a togliere l'informazione a chi usa la CLI a mano.
 		warnTruncated(truncated, len(recs), arc.Slug)
+		warnPertinenza(spezzHint)
 		warnPertinenza(pertHint)
 		warnPertinenza(omonHint)
 		return emitEnvelope(cmd.OutOrStdout(), flatRecords(recs, firm), truncated,
-			uniscoHint(truncatedHint(truncated, len(recs), arc.Slug), pertHint, omonHint), flags)
+			uniscoHint(truncatedHint(truncated, len(recs), arc.Slug), spezzHint, pertHint, omonHint), flags)
 	}
 	if err := emitRecords(cmd, flags, *arc, recs, firm); err != nil {
 		return err
 	}
 	warnTruncated(truncated, len(recs), arc.Slug)
+	warnPertinenza(spezzHint)
 	warnPertinenza(pertHint)
 	warnPertinenza(omonHint)
 	return nil
+}
+
+// spezzatoHint dichiara che la risposta è stata ricomposta da sottorange.
+//
+// Sull'ordine si dice il vero e nient'altro: le fette escono dalla più recente
+// alla più vecchia, ma `ordinaPerPertinenza` rimescola dopo, quindi promettere
+// un ordine per sottoperiodo sarebbe una seconda affermazione non verificata al
+// posto di quella che questo lavoro ha tolto. Si dichiara che l'ordine può
+// differire, che è ciò che si sa.
+func spezzatoHint(spezzato bool) string {
+	if !spezzato {
+		return ""
+	}
+	return "il portale ha rifiutato il periodo chiesto in un colpo solo: la ricerca è stata rifatta su sottoperiodi e i risultati uniti. Le righe sono complete; l'ordine può differire da quello di una ricerca unica."
+}
+
+// rifiutoHint traduce il rifiuto del portale in una mossa. Senza, l'utente legge
+// un codice del motore e non sa che la strada è restringere il periodo — che è
+// l'unica cosa che qui funziona, perché la soglia è sul numero di documenti.
+func rifiutoHint(err error) string {
+	if rifiutata := new(icaro.QueryFailedError); !errors.As(err, &rifiutata) {
+		return ""
+	}
+	return "il portale ha rifiutato la ricerca: cede oltre un certo numero di documenti, e la soglia cambia da archivio ad archivio. Restringi il periodo (--data su una finestra più corta) o aggiungi un filtro che riduca i documenti."
 }
 
 // uniscoHint concatena gli avvisi non vuoti in un unico campo `hint`: la busta

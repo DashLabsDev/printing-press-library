@@ -2,6 +2,7 @@ package icaroclient
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -19,7 +20,7 @@ const DefaultBaseURL = "https://dati.ars.sicilia.it"
 
 // DefaultUserAgent is sent with every request so the portal team can identify
 // the CLI in their logs.
-const DefaultUserAgent = "github.com/mvanhorn/printing-press-library/library/other/ars-sicilia/0.1.0 (+https://github.com/aborruso/ars-trasparente)"
+const DefaultUserAgent = "ars-sicilia-pp-cli/0.1.0 (+https://github.com/aborruso/ars-trasparente)"
 
 // HTTPRateLimitError is returned by the icaroclient when the portal
 // responds with HTTP 429 Too Many Requests. Callers can check for this
@@ -31,6 +32,28 @@ type HTTPRateLimitError struct {
 
 func (e *HTTPRateLimitError) Error() string {
 	return fmt.Sprintf("rate limited (HTTP 429) from ARS portal: %s", e.URL)
+}
+
+// QueryFailedError dice che il portale ha RIFIUTATO la ricerca, non che
+// l'archivio non ha nulla da rispondere. Le due cose arrivavano indistinguibili
+// al chiamante — una lista vuota — e la seconda è una risposta, la prima no.
+//
+// Si incontra sui range di date ampi (vedi DetectQueryError), dove il motore
+// cede oltre un certo numero di documenti: su `ddl` intorno ai 460, su
+// `interrogazioni` sul range di legislatura. La soglia dipende dalla densità
+// dell'archivio, quindi non è una costante da scrivere qui: si legge l'errore.
+type QueryFailedError struct {
+	Archive string
+	Query   string
+	Code    string
+}
+
+func (e *QueryFailedError) Error() string {
+	code := e.Code
+	if code == "" {
+		code = "senza codice"
+	}
+	return fmt.Sprintf("il portale ha rifiutato la ricerca sull'archivio %s (%s): %s", e.Archive, code, e.Query)
 }
 
 // DefaultRateLimit is the per-session request rate applied to the Icaro
@@ -104,6 +127,13 @@ type SearchOptions struct {
 	// commissione dossier) use this to flag undercounts instead of silently
 	// presenting a capped count as complete.
 	Truncated *bool
+	// Spezzato dice che il portale ha rifiutato il range chiesto e la risposta
+	// è stata ricomposta interrogando sottorange. Il risultato è quello giusto,
+	// ma l'ordine delle righe è quello delle fette (dalla più recente alla più
+	// vecchia) e non quello che il motore avrebbe dato su una query sola: chi
+	// mostra le righe lo dichiara, invece di lasciar credere a un ordinamento
+	// che non c'è stato.
+	Spezzato *bool
 	// ForceIcaro pins the search to the legacy Icaro engine even for archives
 	// migrated to /bd/. The `get` path needs it: /bd/ rows carry no Icaro DocID
 	// and the /bd/ per-document detail is not implemented, so GetDoc must run on
@@ -162,9 +192,128 @@ func (c *Client) Search(ctx context.Context, arc Archive, opts SearchOptions) ([
 	if IsBDArchive(arc.Slug) && !opts.ForceIcaro {
 		return c.searchBD(ctx, arc, opts)
 	}
-	expr := BuildQuery(arc, opts.Params, opts.ISISRaw)
-	if err := c.bootstrapSession(ctx, arc.ID, expr); err != nil {
+	recs, err := c.searchIcaro(ctx, arc, opts)
+	var rifiutata *QueryFailedError
+	if !errors.As(err, &rifiutata) {
+		return recs, err
+	}
+	// Il portale ha rifiutato la ricerca. Se a monte c'è un range di date, il
+	// rifiuto dipende da quanti documenti ci stanno dentro: spezzarlo rende la
+	// stessa domanda in pezzi che il motore regge, e le risposte si uniscono.
+	// Se non c'è un range da spezzare non si inventa niente: l'errore passa.
+	sliced, ok, serr := c.searchSpezzato(ctx, arc, opts, profonditaTaglio)
+	if !ok {
 		return nil, err
+	}
+	if serr == nil && opts.Spezzato != nil {
+		*opts.Spezzato = true
+	}
+	return sliced, serr
+}
+
+// profonditaTaglio limita quanto si insiste a spezzare un range rifiutato: un
+// taglio per anno solare, e un secondo a metà sulla fetta che cede ancora. Il
+// caso peggiore su un range di 4 anni resta una dozzina di richieste. Senza
+// questo limite un range legittimamente vuoto che il motore rifiuta si
+// tradurrebbe in una discesa fino al singolo giorno.
+const profonditaTaglio = 2
+
+// searchSpezzato riesegue la ricerca su sottorange e ne unisce i risultati.
+// Il secondo valore dice se c'era davvero un range da spezzare: quando è false
+// il chiamante deve propagare il rifiuto originale, non un risultato vuoto.
+func (c *Client) searchSpezzato(ctx context.Context, arc Archive, opts SearchOptions, profondita int) ([]Record, bool, error) {
+	// Con ISISRaw i parametri non entrano nella query (vedi BuildQuery): non c'è
+	// niente da spezzare senza riscrivere l'espressione dell'utente.
+	if profondita <= 0 || strings.TrimSpace(opts.ISISRaw) != "" {
+		return nil, false, nil
+	}
+	chiave, lo, hi, ok := chiaveRange(opts.Params)
+	if !ok {
+		return nil, false, nil
+	}
+	fette := spezzaPerAnno(lo, hi)
+	if fette == nil {
+		fette = spezzaAMeta(lo, hi)
+	}
+	if len(fette) == 0 {
+		return nil, false, nil
+	}
+
+	var uniti []Record
+	troncato := false
+	for _, fetta := range fette {
+		if opts.Limit > 0 && len(uniti) >= opts.Limit {
+			// Restano fette non interrogate: il taglio è per Limit, e va
+			// dichiarato come tale.
+			troncato = true
+			break
+		}
+		sub := opts
+		sub.Params = conRange(opts.Params, chiave, fetta)
+		if opts.Limit > 0 {
+			sub.Limit = opts.Limit - len(uniti)
+		}
+		var fettaTroncata bool
+		sub.Truncated = &fettaTroncata
+
+		recs, err := c.searchIcaro(ctx, arc, sub)
+		var rifiutata *QueryFailedError
+		if errors.As(err, &rifiutata) {
+			// Un anno solare non basta sempre: la soglia è sul numero di
+			// documenti, non sul calendario.
+			piuFini, ok, ferr := c.searchSpezzato(ctx, arc, sub, profondita-1)
+			if !ok {
+				return nil, false, nil
+			}
+			if ferr != nil {
+				return nil, true, ferr
+			}
+			recs = piuFini
+		} else if err != nil {
+			return nil, true, err
+		}
+		if fettaTroncata {
+			troncato = true
+		}
+		uniti = append(uniti, recs...)
+		if opts.StopWhen != nil && opts.StopWhen(uniti) {
+			break
+		}
+	}
+	if opts.Limit > 0 && len(uniti) > opts.Limit {
+		troncato = true
+		uniti = uniti[:opts.Limit]
+	}
+	if opts.Truncated != nil {
+		*opts.Truncated = troncato
+	}
+	return uniti, true, nil
+}
+
+// conRange copia i parametri sostituendo il range: la mappa del chiamante non
+// va mutata, la stessa SearchOptions viene riusata per ogni fetta.
+func conRange(params map[string]string, chiave, valore string) map[string]string {
+	out := make(map[string]string, len(params))
+	for k, v := range params {
+		out[k] = v
+	}
+	out[chiave] = valore
+	return out
+}
+
+// searchIcaro è la ricerca su una sola espressione, senza tentativi di
+// recupero: ritorna *QueryFailedError se il portale rifiuta.
+func (c *Client) searchIcaro(ctx context.Context, arc Archive, opts SearchOptions) ([]Record, error) {
+	expr := BuildQuery(arc, opts.Params, opts.ISISRaw)
+	// Il corpo della pagina di apertura sessione veniva scartato. Dentro c'è la
+	// differenza fra «non ho trovato nulla» e «non ho potuto cercare»: senza
+	// leggerlo, la seconda usciva da qui come una lista vuota.
+	body, err := c.bootstrapSessionBody(ctx, arc.ID, expr)
+	if err != nil {
+		return nil, err
+	}
+	if code, failed := DetectQueryError(body); failed {
+		return nil, &QueryFailedError{Archive: arc.Slug, Query: expr, Code: code}
 	}
 	maxPages := opts.MaxPages
 	if maxPages <= 0 {
@@ -241,6 +390,9 @@ func (c *Client) Count(ctx context.Context, arc Archive, opts SearchOptions) (in
 	if err != nil {
 		return 0, err
 	}
+	if code, failed := DetectQueryError(body); failed {
+		return 0, &QueryFailedError{Archive: arc.Slug, Query: expr, Code: code}
+	}
 	if n, ok := ParseResultCount(body); ok {
 		return n, nil
 	}
@@ -296,13 +448,6 @@ func PermalinkURL(baseURL, archiveID string, docNo int) string {
 	q.Set("icaDB", archiveID)
 	q.Set("icaQuery", fmt.Sprintf("docno(%d)", docNo))
 	return baseURL + "/icaro/default.jsp?" + q.Encode()
-}
-
-// bootstrapSession establishes a fresh server-side query state. icaQueryId is
-// always 1 after this call.
-func (c *Client) bootstrapSession(ctx context.Context, archiveID, queryExpr string) error {
-	_, err := c.bootstrapSessionBody(ctx, archiveID, queryExpr)
-	return err
 }
 
 // bootstrapSessionBody apre la sessione e RITORNA il corpo della pagina. Quel
