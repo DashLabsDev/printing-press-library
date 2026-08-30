@@ -7,7 +7,7 @@
 | Nearby store lookup | Sniffed `GET /api/stores/near` | Return stores with `extref`; waitlist paths use extref, not internal id. |
 | Quote by party size | Sniffed `GET /waitlist/{extref}/quote` | Expose `MinQuote` / `MaxQuote` buckets 1–6 so submit can send `WaitMinutes`. |
 | Join waitlist | Sniffed `POST /waitlist/{extref}/submit` | Require email, party size ≤ 6, `WaitMinutes` from quote MinQuote. Live POST only with `--yes`. |
-| Check-in (HERE) | Sniffed `POST /waitlist/{extref}/checkin` | Mark the party HERE at the host stand. Live POST only with `--yes`. |
+| Check-in (HERE) | Sniffed `POST /waitlist/{extref}/checkin` | Mark the party HERE after the guest texts HERE once everyone has arrived (REMOVE to leave). Not a host-stand visit. Live POST only with `--yes`. |
 | Cancel request | Sniffed `POST /waitlist/cancel` | Body `waitlistRequestId` is a JSON number; `siteId` is extref. Live POST only with `--yes`. |
 
 ## Transcendence

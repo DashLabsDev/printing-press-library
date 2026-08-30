@@ -216,11 +216,17 @@ func isCobraUsageError(err error) bool {
 func newRootCmd(flags *rootFlags) *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "texas-roadhouse-pp-cli",
-		Short: "Manage texas-roadhouse resources via the texas-roadhouse API",
-		Long: `Manage texas-roadhouse resources via the texas-roadhouse API.
+		Short: "Unofficial Texas Roadhouse waitlist CLI (not affiliated)",
+		Long: `Unofficial Texas Roadhouse waitlist CLI. Not affiliated with or endorsed by Texas Roadhouse, Inc.
+
+This talks to sniffed unofficial endpoints (no public API). Endpoints can change or break without notice. Use is subject to Texas Roadhouse website terms.
+
+Guest first name, last name, email, and phone must not be passed as argv flags. Default is stdin JSON or an interactive prompt. Live submit, check-in (guest texts HERE once everyone has arrived; REMOVE to leave), and cancel require --yes. --dry-run redacts PII.
+
+Last verified late Aug 2026: naked HTTP gets Cloudflare 403; this CLI uses Chrome-compatible transport.
 
 Add --agent to any command for JSON output + non-interactive mode.
-Run 'texas-roadhouse-pp-cli doctor' to verify auth and connectivity.`,
+Run 'texas-roadhouse-pp-cli doctor' to verify connectivity.`,
 		SilenceUsage: true,
 		Version:      version,
 	}

@@ -6,7 +6,7 @@ generated_at: 2026-08-29
 
 # Texas Roadhouse CLI Brief
 
-Waitlist CLI for Texas Roadhouse call-ahead seating. Find a nearby store, read the quote, join the list, check in at the host stand, or cancel.
+Waitlist CLI for Texas Roadhouse call-ahead seating. Find a nearby store, read the quote, join the list, check in when the guest texts HERE, or cancel.
 
 ## API Identity
 
@@ -36,7 +36,7 @@ Internal spec derived from a sanitized browser sniff of `www.texasroadhouse.com`
 1. Geocode a named place (`mapbox`), list nearby stores (`stores --lat --long`), quote each extref.
 2. Present stores. Stop. Wait for the human to name one store and a party size (1–6).
 3. Dry-run submit. Live join only with `--yes`.
-4. Status while waiting. Check-in (HERE) at the host stand only with `--yes`.
+4. Status while waiting. Check-in (guest texts HERE once everyone has arrived; REMOVE to leave) only with `--yes`. Not a host-stand visit.
 5. Cancel only with `--yes`. `waitlistRequestId` stays a JSON number.
 
 ## Safety

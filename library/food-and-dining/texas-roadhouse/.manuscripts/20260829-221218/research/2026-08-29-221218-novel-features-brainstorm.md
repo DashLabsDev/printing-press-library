@@ -25,7 +25,7 @@ Sanitized sniffed-waitlist facts that a reprint must keep. No customer PII, toke
 
 `texasroadhouse checkin <extref>` posts to `/api/texasroadhouse/waitlist/{extref}/checkin`.
 
-- Marks the party HERE at the host stand.
+- Marks the party HERE after the guest texts HERE once everyone has arrived (REMOVE to leave). Not a host-stand visit.
 - Live check-in requires `--yes`.
 
 ## Quote MinQuote lookup

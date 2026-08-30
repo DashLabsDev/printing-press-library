@@ -127,7 +127,7 @@
     },
     {
       "name": "texasroadhouse_checkin",
-      "description": "Check in once the party is at the host stand (destructive). Live check-in requires yes=true; dry-run=true previews without POSTing. Required: waitlist_id. Optional: yes, dry-run. Returns the new WaitlistCheckinResult.",
+      "description": "Mark the party HERE after the guest texts HERE once everyone has arrived (text REMOVE to leave). Not a host-stand visit (destructive). Live check-in requires yes=true; dry-run=true previews without POSTing. Required: waitlist_id. Optional: yes, dry-run. Returns the new WaitlistCheckinResult.",
       "method": "POST",
       "path": "/api/texasroadhouse/waitlist/{waitlist_id}/checkin",
       "no_auth": true,
@@ -232,7 +232,7 @@
     },
     {
       "name": "texasroadhouse_submit",
-      "description": "Join a store waitlist (destructive). Live join requires yes=true; dry-run=true previews without POSTing. Required: waitlist_id, EmailAddress, FirstName, LastName, PrimaryPhoneAreaCode, PrimaryPhoneNumber, PartySize, WaitMinutes. Optional: IsSmoking, PrimaryPhoneExtension, PrimaryPhoneType, Platform, yes, dry-run. Returns the new WaitlistSubmitResult.",
+      "description": "Join a store waitlist (destructive). Unofficial sniffed endpoint; get guest consent before sending name/email/phone. Live join requires yes=true; dry-run=true previews a redacted body without POSTing. Required: waitlist_id, EmailAddress, FirstName, LastName, PrimaryPhoneAreaCode, PrimaryPhoneNumber, PartySize, WaitMinutes. Optional: IsSmoking, PrimaryPhoneExtension, PrimaryPhoneType, Platform, yes, dry-run. Returns the new WaitlistSubmitResult.",
       "method": "POST",
       "path": "/api/texasroadhouse/waitlist/{waitlist_id}/submit",
       "no_auth": true,
