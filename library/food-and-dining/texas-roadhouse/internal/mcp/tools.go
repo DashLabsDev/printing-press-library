@@ -69,20 +69,24 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("texasroadhouse_cancel",
-			mcplib.WithDescription("Cancel a waitlist request. Do not fire without a yes. Required: waitlistRequestId, siteId. Optional: clientid. Returns the new WaitlistCancelResult."),
+			mcplib.WithDescription("Cancel a waitlist request (destructive). Live cancel requires yes=true; dry-run=true previews without POSTing. Required: waitlistRequestId, siteId. Optional: clientid, yes, dry-run. Returns the new WaitlistCancelResult."),
 			mcplib.WithString("clientid", mcplib.Description("Must be texasroadhouse")),
 			mcplib.WithNumber("waitlistRequestId", mcplib.Required(), mcplib.Description("Numeric request id from submit (JSON number)")),
 			mcplib.WithString("siteId", mcplib.Required(), mcplib.Description("Store extref")),
-			mcplib.WithDestructiveHintAnnotation(false),
+			mcplib.WithBoolean("yes", mcplib.Description("Required for a live cancel. Same meaning as CLI --yes.")),
+			mcplib.WithBoolean("dry-run", mcplib.Description("Preview the request body without POSTing. Same meaning as CLI --dry-run.")),
+			mcplib.WithDestructiveHintAnnotation(true),
 			mcplib.WithOpenWorldHintAnnotation(true),
 		),
 		makeAPIHandler("POST", "/api/texasroadhouse/waitlist/cancel", false, false, nil, mcpPageConfig{}, []mcpParamBinding{{PublicName: "clientid", WireName: "clientid", Location: "query"}, {PublicName: "waitlistRequestId", WireName: "waitlistRequestId", Location: "body"}, {PublicName: "siteId", WireName: "siteId", Location: "body"}}, []string{}),
 	)
 	s.AddTool(
 		mcplib.NewTool("texasroadhouse_checkin",
-			mcplib.WithDescription("Check in once the party is at the host stand. Do not fire without a yes. Required: waitlist_id. Returns the new WaitlistCheckinResult."),
+			mcplib.WithDescription("Check in once the party is at the host stand (destructive). Live check-in requires yes=true; dry-run=true previews without POSTing. Required: waitlist_id. Optional: yes, dry-run. Returns the new WaitlistCheckinResult."),
 			mcplib.WithString("waitlist_id", mcplib.Required(), mcplib.Description("Store extref (not internal store id). Springfield MO is 218.")),
-			mcplib.WithDestructiveHintAnnotation(false),
+			mcplib.WithBoolean("yes", mcplib.Description("Required for a live check-in. Same meaning as CLI --yes.")),
+			mcplib.WithBoolean("dry-run", mcplib.Description("Preview the request body without POSTing. Same meaning as CLI --dry-run.")),
+			mcplib.WithDestructiveHintAnnotation(true),
 			mcplib.WithOpenWorldHintAnnotation(true),
 		),
 		makeAPIHandler("POST", "/api/texasroadhouse/waitlist/{waitlist_id}/checkin", false, false, nil, mcpPageConfig{}, []mcpParamBinding{{PublicName: "waitlist_id", WireName: "waitlist_id", Location: "path"}}, []string{"waitlist_id"}),
@@ -131,7 +135,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("texasroadhouse_submit",
-			mcplib.WithDescription("Join a store waitlist. Always pass --dry-run unless the user named a store, party size, and said yes. Required: waitlist_id, EmailAddress, FirstName, LastName, PrimaryPhoneAreaCode, PrimaryPhoneNumber, PartySize, WaitMinutes. Optional: IsSmoking, PrimaryPhoneExtension, PrimaryPhoneType (plus 1 more). Returns the new WaitlistSubmitResult."),
+			mcplib.WithDescription("Join a store waitlist (destructive). Live join requires yes=true; dry-run=true previews without POSTing. Required: waitlist_id, EmailAddress, FirstName, LastName, PrimaryPhoneAreaCode, PrimaryPhoneNumber, PartySize, WaitMinutes. Optional: IsSmoking, PrimaryPhoneExtension, PrimaryPhoneType, Platform, yes, dry-run. Returns the new WaitlistSubmitResult."),
 			mcplib.WithString("waitlist_id", mcplib.Required(), mcplib.Description("Store extref (not internal store id). Springfield MO is 218.")),
 			mcplib.WithString("EmailAddress", mcplib.Required(), mcplib.Description("Guest email")),
 			mcplib.WithString("FirstName", mcplib.Required(), mcplib.Description("Guest first name")),
@@ -144,7 +148,9 @@ func RegisterTools(s *server.MCPServer) {
 			mcplib.WithNumber("PartySize", mcplib.Required(), mcplib.Description("Party size, max 6")),
 			mcplib.WithNumber("WaitMinutes", mcplib.Required(), mcplib.Description("From quote MinQuote for this party size")),
 			mcplib.WithString("Platform", mcplib.Description("Web app sends web")),
-			mcplib.WithDestructiveHintAnnotation(false),
+			mcplib.WithBoolean("yes", mcplib.Description("Required for a live join. Same meaning as CLI --yes.")),
+			mcplib.WithBoolean("dry-run", mcplib.Description("Preview the request body without POSTing. Same meaning as CLI --dry-run.")),
+			mcplib.WithDestructiveHintAnnotation(true),
 			mcplib.WithOpenWorldHintAnnotation(true),
 		),
 		makeAPIHandler("POST", "/api/texasroadhouse/waitlist/{waitlist_id}/submit", false, false, nil, mcpPageConfig{}, []mcpParamBinding{{PublicName: "waitlist_id", WireName: "waitlist_id", Location: "path"}, {PublicName: "EmailAddress", WireName: "EmailAddress", Location: "body"}, {PublicName: "FirstName", WireName: "FirstName", Location: "body"}, {PublicName: "LastName", WireName: "LastName", Location: "body"}, {PublicName: "IsSmoking", WireName: "IsSmoking", Location: "body"}, {PublicName: "PrimaryPhoneAreaCode", WireName: "PrimaryPhoneAreaCode", Location: "body"}, {PublicName: "PrimaryPhoneExtension", WireName: "PrimaryPhoneExtension", Location: "body"}, {PublicName: "PrimaryPhoneNumber", WireName: "PrimaryPhoneNumber", Location: "body"}, {PublicName: "PrimaryPhoneType", WireName: "PrimaryPhoneType", Location: "body"}, {PublicName: "PartySize", WireName: "PartySize", Location: "body"}, {PublicName: "WaitMinutes", WireName: "WaitMinutes", Location: "body"}, {PublicName: "Platform", WireName: "Platform", Location: "body"}}, []string{"waitlist_id"}),
@@ -238,12 +244,53 @@ func mcpPathValue(v any) string {
 	return cliutil.EscapePathParam(formatMCPParamValue(v))
 }
 
+func mcpBoolArg(args map[string]any, key string) bool {
+	if args == nil {
+		return false
+	}
+	v, ok := args[key]
+	if !ok {
+		return false
+	}
+	switch t := v.(type) {
+	case bool:
+		return t
+	case string:
+		b, err := strconv.ParseBool(t)
+		return err == nil && b
+	default:
+		return false
+	}
+}
+
+func mcpMutationDryRun(args map[string]any) bool {
+	return mcpBoolArg(args, "dry-run") || mcpBoolArg(args, "dry_run")
+}
+
+// gateMCPMutation requires the same confirmation as CLI --yes, or a dry-run
+// preview. Default (neither) refuses so typed waitlist POSTs cannot mutate.
+func gateMCPMutation(args map[string]any) error {
+	if mcpMutationDryRun(args) || mcpBoolArg(args, "yes") {
+		return nil
+	}
+	return fmt.Errorf("destructive operation requires yes=true (or dry-run=true to preview the request)")
+}
+
 // makeAPIHandler creates a generic MCP tool handler for an API endpoint.
 func makeAPIHandler(method, pathTemplate string, readOnly bool, binaryResponse bool, headerOverrides map[string]string, pageConfig mcpPageConfig, bindings []mcpParamBinding, positionalParams []string) server.ToolHandlerFunc {
 	return func(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.CallToolResult, error) {
+		args := req.GetArguments()
+		if !readOnly {
+			if err := gateMCPMutation(args); err != nil {
+				return mcpToolError(err.Error()), nil
+			}
+		}
 		c, platformSession, err := newMCPClient(ctx)
 		if err != nil {
 			return mcpToolError(err.Error()), nil
+		}
+		if !readOnly && mcpMutationDryRun(args) {
+			c.DryRun = true
 		}
 		if platformSession != nil {
 			defer platformSession.ZeroCredentials()
@@ -252,7 +299,6 @@ func makeAPIHandler(method, pathTemplate string, readOnly bool, binaryResponse b
 		// mcp-go v0.47+ made CallToolParams.Arguments an `any` to support
 		// non-map payloads; GetArguments() returns the map[string]any shape
 		// we rely on here (or an empty map when the payload is something else).
-		args := req.GetArguments()
 		if err := cli.AdoptMCPOutputSemantics(platformSession, args); err != nil {
 			return mcpToolError(err.Error()), nil
 		}
@@ -261,7 +307,11 @@ func makeAPIHandler(method, pathTemplate string, readOnly bool, binaryResponse b
 		// args that map to query params (e.g. `search <query>` -> ?query=);
 		// the placeholder check below disambiguates them at runtime.
 		path := pathTemplate
-		knownArgs := make(map[string]bool, len(bindings))
+		knownArgs := make(map[string]bool, len(bindings)+3)
+		// Approval flags are MCP-only; never copy them into the upstream body.
+		knownArgs["yes"] = true
+		knownArgs["dry-run"] = true
+		knownArgs["dry_run"] = true
 		pathParams := make(map[string]bool, len(positionalParams))
 		params := make(map[string]string)
 		bodyArgs := make(map[string]any)

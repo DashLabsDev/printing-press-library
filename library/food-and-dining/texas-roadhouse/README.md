@@ -197,13 +197,13 @@ Operations on near
 
 Operations on test
 
-- **`texas-roadhouse-pp-cli texasroadhouse cancel`** - Cancel a waitlist request. Do not fire without a yes.
-- **`texas-roadhouse-pp-cli texasroadhouse checkin`** - Check in once the party is at the host stand. Do not fire without a yes.
+- **`texas-roadhouse-pp-cli texasroadhouse cancel`** - Cancel a waitlist request. Live cancel requires `--yes`; `--dry-run` previews without POSTing.
+- **`texas-roadhouse-pp-cli texasroadhouse checkin`** - Check in once the party is at the host stand. Live check-in requires `--yes`; `--dry-run` previews without POSTing.
 - **`texas-roadhouse-pp-cli texasroadhouse get-quote`** - GET /api/texasroadhouse/waitlist/{waitlist_id}/quote
 - **`texas-roadhouse-pp-cli texasroadhouse get-settings`** - GET /api/texasroadhouse/waitlist/{waitlist_id}/settings
 - **`texas-roadhouse-pp-cli texasroadhouse get-status`** - GET waitlist request status. Query clientid=texasroadhouse.
 - **`texas-roadhouse-pp-cli texasroadhouse get-test`** - GET /api/texasroadhouse/waitlist/{waitlist_id}/test
-- **`texas-roadhouse-pp-cli texasroadhouse submit`** - Join a store waitlist. Always pass --dry-run unless the user named a store, party size, and said yes.
+- **`texas-roadhouse-pp-cli texasroadhouse submit`** - Join a store waitlist. Live join requires `--yes`; `--dry-run` previews without POSTing.
 
 
 ### Self-learning loop

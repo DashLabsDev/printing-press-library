@@ -20,7 +20,7 @@ func newTexasroadhouseCancelCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:         "cancel",
-		Short:       "Cancel a waitlist request. Do not fire without a yes.",
+		Short:       "Cancel a waitlist request. Live cancel requires --yes; --dry-run previews without POSTing.",
 		Example:     "  texas-roadhouse-pp-cli --dry-run texasroadhouse cancel --waitlist-request-id 890199098 --site-id 901 --clientid texasroadhouse",
 		Annotations: map[string]string{"pp:endpoint": "texasroadhouse.cancel", "pp:method": "POST", "pp:path": "/api/texasroadhouse/waitlist/cancel"},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -51,6 +51,9 @@ func newTexasroadhouseCancelCmd(flags *rootFlags) *cobra.Command {
 				}
 			}
 			path := "/api/texasroadhouse/waitlist/cancel"
+			if err := confirmWaitlistMutation(flags); err != nil {
+				return err
+			}
 			c, err := flags.newClient()
 			if err != nil {
 				return err

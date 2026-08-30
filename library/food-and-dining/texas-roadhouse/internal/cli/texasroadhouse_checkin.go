@@ -17,7 +17,7 @@ func newTexasroadhouseCheckinCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:         "checkin <waitlist_id>",
-		Short:       "Check in once the party is at the host stand. Do not fire without a yes.",
+		Short:       "Check in once the party is at the host stand. Live check-in requires --yes; --dry-run previews without POSTing.",
 		Example:     "  texas-roadhouse-pp-cli texasroadhouse checkin 550e8400-e29b-41d4-a716-446655440000",
 		Annotations: map[string]string{"pp:endpoint": "texasroadhouse.checkin", "pp:method": "POST", "pp:path": "/api/texasroadhouse/waitlist/{waitlist_id}/checkin"},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -43,6 +43,9 @@ func newTexasroadhouseCheckinCmd(flags *rootFlags) *cobra.Command {
 				return usageErr(fmt.Errorf("waitlist_id is required\nUsage: %s <%s>", cmd.CommandPath(), "waitlist_id"))
 			}
 			path = replacePathParam(path, "waitlist_id", args[0])
+			if err := confirmWaitlistMutation(flags); err != nil {
+				return err
+			}
 			c, err := flags.newClient()
 			if err != nil {
 				return err

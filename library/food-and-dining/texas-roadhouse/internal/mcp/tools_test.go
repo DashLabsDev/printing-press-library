@@ -610,6 +610,70 @@ func TestMCPToolErrorBoundsEndpointErrors(t *testing.T) {
 	}
 }
 
+func TestWaitlistMutationToolsAreDestructiveAndGated(t *testing.T) {
+	s := server.NewMCPServer("texas-roadhouse", "test")
+	RegisterTools(s)
+	tools := s.ListTools()
+
+	for _, name := range []string{"texasroadhouse_submit", "texasroadhouse_checkin", "texasroadhouse_cancel"} {
+		tool, ok := tools[name]
+		if !ok {
+			t.Fatalf("missing tool %s", name)
+		}
+		if tool.Tool.Annotations.DestructiveHint == nil || !*tool.Tool.Annotations.DestructiveHint {
+			t.Fatalf("%s DestructiveHint = %v, want true", name, tool.Tool.Annotations.DestructiveHint)
+		}
+		if tool.Tool.Annotations.ReadOnlyHint != nil && *tool.Tool.Annotations.ReadOnlyHint {
+			t.Fatalf("%s must not be marked read-only", name)
+		}
+	}
+
+	for _, name := range []string{"texasroadhouse_get_quote", "texasroadhouse_get_status", "texasroadhouse_get_settings", "stores_list_near"} {
+		tool, ok := tools[name]
+		if !ok {
+			t.Fatalf("missing read-only tool %s", name)
+		}
+		if tool.Tool.Annotations.DestructiveHint != nil && *tool.Tool.Annotations.DestructiveHint {
+			t.Fatalf("%s must stay non-destructive", name)
+		}
+	}
+}
+
+func TestGateMCPMutationRequiresYesOrDryRun(t *testing.T) {
+	if err := gateMCPMutation(nil); err == nil || !strings.Contains(err.Error(), "yes=true") {
+		t.Fatalf("nil args should refuse: %v", err)
+	}
+	if err := gateMCPMutation(map[string]any{}); err == nil || !strings.Contains(err.Error(), "yes=true") {
+		t.Fatalf("empty args should refuse: %v", err)
+	}
+	if err := gateMCPMutation(map[string]any{"yes": false, "dry-run": false}); err == nil {
+		t.Fatal("yes=false and dry-run=false should refuse")
+	}
+	if err := gateMCPMutation(map[string]any{"yes": true}); err != nil {
+		t.Fatalf("yes=true should allow: %v", err)
+	}
+	if err := gateMCPMutation(map[string]any{"dry-run": true}); err != nil {
+		t.Fatalf("dry-run=true should allow: %v", err)
+	}
+}
+
+func TestWaitlistMutationHandlerRefusesWithoutYes(t *testing.T) {
+	handler := makeAPIHandler("POST", "/api/texasroadhouse/waitlist/cancel", false, false, nil, mcpPageConfig{}, nil, nil)
+	result, err := handler(context.Background(), mcplib.CallToolRequest{Params: mcplib.CallToolParams{
+		Arguments: map[string]any{"waitlistRequestId": 1.0, "siteId": "218"},
+	}})
+	if err != nil {
+		t.Fatalf("handler transport error: %v", err)
+	}
+	text := mcpTextContent(t, result)
+	if !result.IsError {
+		t.Fatalf("unconfirmed mutation should be an error result, got %q", text)
+	}
+	if !strings.Contains(text, "yes=true") {
+		t.Fatalf("error text = %q, want yes=true", text)
+	}
+}
+
 func mcpTextContent(t *testing.T, result *mcplib.CallToolResult) string {
 	t.Helper()
 	if result == nil {

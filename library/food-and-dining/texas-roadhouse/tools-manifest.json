@@ -86,7 +86,7 @@
     },
     {
       "name": "texasroadhouse_cancel",
-      "description": "Cancel a waitlist request. Do not fire without a yes. Required: waitlistRequestId, siteId. Optional: clientid. Returns the new WaitlistCancelResult.",
+      "description": "Cancel a waitlist request (destructive). Live cancel requires yes=true; dry-run=true previews without POSTing. Required: waitlistRequestId, siteId. Optional: clientid, yes, dry-run. Returns the new WaitlistCancelResult.",
       "method": "POST",
       "path": "/api/texasroadhouse/waitlist/cancel",
       "no_auth": true,
@@ -110,12 +110,24 @@
           "location": "body",
           "description": "Store extref",
           "required": true
+        },
+        {
+          "name": "yes",
+          "type": "boolean",
+          "location": "query",
+          "description": "Required for a live cancel. Same meaning as CLI --yes."
+        },
+        {
+          "name": "dry-run",
+          "type": "boolean",
+          "location": "query",
+          "description": "Preview the request body without POSTing. Same meaning as CLI --dry-run."
         }
       ]
     },
     {
       "name": "texasroadhouse_checkin",
-      "description": "Check in once the party is at the host stand. Do not fire without a yes. Required: waitlist_id. Returns the new WaitlistCheckinResult.",
+      "description": "Check in once the party is at the host stand (destructive). Live check-in requires yes=true; dry-run=true previews without POSTing. Required: waitlist_id. Optional: yes, dry-run. Returns the new WaitlistCheckinResult.",
       "method": "POST",
       "path": "/api/texasroadhouse/waitlist/{waitlist_id}/checkin",
       "no_auth": true,
@@ -126,6 +138,18 @@
           "location": "path",
           "description": "Store extref (not internal store id). Springfield MO is 218.",
           "required": true
+        },
+        {
+          "name": "yes",
+          "type": "boolean",
+          "location": "query",
+          "description": "Required for a live check-in. Same meaning as CLI --yes."
+        },
+        {
+          "name": "dry-run",
+          "type": "boolean",
+          "location": "query",
+          "description": "Preview the request body without POSTing. Same meaning as CLI --dry-run."
         }
       ]
     },
@@ -208,7 +232,7 @@
     },
     {
       "name": "texasroadhouse_submit",
-      "description": "Join a store waitlist. Always pass --dry-run unless the user named a store, party size, and said yes. Required: waitlist_id, EmailAddress, FirstName, LastName, PrimaryPhoneAreaCode, PrimaryPhoneNumber, PartySize, WaitMinutes. Optional: IsSmoking, PrimaryPhoneExtension, PrimaryPhoneType (plus 1 more). Returns the new WaitlistSubmitResult.",
+      "description": "Join a store waitlist (destructive). Live join requires yes=true; dry-run=true previews without POSTing. Required: waitlist_id, EmailAddress, FirstName, LastName, PrimaryPhoneAreaCode, PrimaryPhoneNumber, PartySize, WaitMinutes. Optional: IsSmoking, PrimaryPhoneExtension, PrimaryPhoneType, Platform, yes, dry-run. Returns the new WaitlistSubmitResult.",
       "method": "POST",
       "path": "/api/texasroadhouse/waitlist/{waitlist_id}/submit",
       "no_auth": true,
@@ -292,6 +316,18 @@
           "type": "string",
           "location": "body",
           "description": "Web app sends web"
+        },
+        {
+          "name": "yes",
+          "type": "boolean",
+          "location": "query",
+          "description": "Required for a live join. Same meaning as CLI --yes."
+        },
+        {
+          "name": "dry-run",
+          "type": "boolean",
+          "location": "query",
+          "description": "Preview the request body without POSTing. Same meaning as CLI --dry-run."
         }
       ]
     }
