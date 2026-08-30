@@ -1637,9 +1637,9 @@
       "path": "library/other/aol-puglia",
       "release": {
         "cli_name": "aol-puglia-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-17T09:20:00Z",
-        "source_commit": "74481218e937b287f820083d970333e956d6bbcd"
+        "version": "2026.8.2",
+        "released_at": "2026-08-30T09:06:47Z",
+        "source_commit": "7401d37ebf8cf6dcc71831adae3d7b1b4edffe49"
       },
       "printer": "aborruso",
       "printer_name": "aborruso",
@@ -1947,9 +1947,9 @@
       "path": "library/other/ars-sicilia",
       "release": {
         "cli_name": "ars-sicilia-pp-cli",
-        "version": "2026.8.8",
-        "released_at": "2026-08-29T09:19:25Z",
-        "source_commit": "175af0b59471c510f08875cdc406846bb6d90b18"
+        "version": "2026.8.9",
+        "released_at": "2026-08-30T09:06:47Z",
+        "source_commit": "c09f7f6e0bd8986356730fe3f015931a1367c484"
       },
       "printer": "aborruso",
       "printer_name": "aborruso",
@@ -8385,6 +8385,58 @@
         ],
         "mcp_ready": "full",
         "spec_format": "graphql"
+      }
+    },
+    {
+      "name": "fish-audio",
+      "category": "ai",
+      "api": "Fish Audio",
+      "description": "Fish Audio API: text-to-speech, speech-to-text, voice design, voice models (clones), and account credit.",
+      "search_terms": [
+        "fish-audio",
+        "Fish Audio",
+        "fish-audio-pp-cli",
+        "Fish Audio API: text-to-speech, speech-to-text, voice design, voice models (clones), and account credit.",
+        "Local render history",
+        "render log",
+        "See every past TTS render with its text, model, voice, byte count, and cost.",
+        "Grouped spend report",
+        "render spend",
+        "Total Fish Audio spend grouped by voice, model, or day for a side-by-side with your ElevenLabs invoice.",
+        "Skip identical re-renders",
+        "tts render",
+        "Hash the request and reuse a prior identical render instead of paying for it again.",
+        "Clone fidelity check",
+        "voice verify",
+        "Render a reference phrase with a cloned voice, transcribe it back, and report word-error-rate.",
+        "Pre-batch budget guard",
+        "tts batch",
+        "Estimate a batch's cost against your live API credit and refuse to start if it would overdraw.",
+        "Compare two renders",
+        "render diff",
+        "Show the cost, model, and byte deltas between two past renders."
+      ],
+      "path": "library/ai/fish-audio",
+      "printer": "jongouveia",
+      "printer_name": "Jon Gouveia",
+      "creator": {
+        "handle": "jongouveia",
+        "name": "Jon Gouveia"
+      },
+      "mcp": {
+        "binary": "fish-audio-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 11,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
       }
     },
     {
@@ -20345,9 +20397,9 @@
       "path": "library/other/scientific-consensus",
       "release": {
         "cli_name": "scientific-consensus-pp-cli",
-        "version": "2026.8.9",
-        "released_at": "2026-08-28T09:31:02Z",
-        "source_commit": "64a9473fa380f4dd76efefaaeee36572feeb4858"
+        "version": "2026.8.10",
+        "released_at": "2026-08-30T09:06:47Z",
+        "source_commit": "9f9b634537912a9e1bfdb16f3b1a865f841bfe4a"
       },
       "printer": "laci141",
       "printer_name": "laci141",
@@ -24017,6 +24069,55 @@
         "auth_type": "bearer_token",
         "env_vars": [
           "TESSIE_API_TOKEN"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
+      "name": "texas-roadhouse",
+      "category": "food-and-dining",
+      "api": "Texas Roadhouse - call ahead seating",
+      "description": "Waitlist CLI for Texas Roadhouse. Find a nearby store, read the quote, join and leave the list.",
+      "search_terms": [
+        "texas-roadhouse",
+        "Texas Roadhouse - call ahead seating",
+        "texas-roadhouse-pp-cli",
+        "Waitlist CLI for Texas Roadhouse. Find a nearby store, read the quote, join and leave the list.",
+        "Sniffed waitlist join",
+        "texasroadhouse submit",
+        "Join a store waitlist through the sniffed POST /waitlist/{extref}/submit surface (no public API). Store path uses extref not internal id; email is required; party size max 6; WaitMinutes comes from quote MinQuote.",
+        "Numeric waitlist cancel",
+        "texasroadhouse cancel",
+        "Cancel a waitlist request. The upstream body requires waitlistRequestId as a JSON number (string flags 400); siteId is the store extref.",
+        "Sniffed waitlist check-in",
+        "texasroadhouse checkin",
+        "Check in at the host stand via sniffed POST /waitlist/{extref}/checkin (no public API).",
+        "Quote MinQuote lookup",
+        "texasroadhouse get-quote",
+        "Read per-party-size MinQuote/MaxQuote for a store extref so submit can send the required WaitMinutes.",
+        "Store extref lookup",
+        "stores",
+        "List nearby restaurants; waitlist paths use store extref, not the internal store id."
+      ],
+      "path": "library/food-and-dining/texas-roadhouse",
+      "printer": "DashLabsDev",
+      "printer_name": "Thomas McCormick",
+      "creator": {
+        "handle": "DashLabsDev",
+        "name": "Thomas McCormick"
+      },
+      "mcp": {
+        "binary": "texas-roadhouse-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 9,
+        "public_tool_count": 9,
+        "auth_type": "none",
+        "env_vars": [
+          "PRINTING_PRESS_CLIENT_PROFILE"
         ],
         "mcp_ready": "full",
         "spec_format": "internal"
