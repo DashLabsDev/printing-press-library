@@ -90,6 +90,7 @@ These capabilities aren't available in any other tool for this API.
 
   Nell'output, `base_dichiarata: false` con `di: []` significa che il documento **è** uno stralcio ma il portale non dice di quale ddl (succede su parte della XVII legislatura, dove al posto del numero base è scritto l'id interno). Non dedurre la base dalla numerazione. Uno stralcio può inoltre nascere da più ddl abbinati: `di` ha allora più voci. Su `ddl iter` la cronologia di uno stralcio può cominciare **prima** della sua presentazione (il ddl 6030 è assegnato alla QUARTA il 13 gennaio 2026 ed è presentato il 27): sono i lavori che lo hanno ritagliato dal ddl base, non un dato sballato, e il report lo dice in `note`. Non è marcato `anomalia`, che resta riservato a ciò che non può essere vero.
 - **`deputato profilo`** — Aggrega in un'unica vista tutti gli atti firmati o pronunciati da un deputato: DDL, interrogazioni, interpellanze, mozioni, ordini del giorno, risoluzioni e interventi in resoconti d'aula. `--data` (range `YYYY-MM-DD:YYYY-MM-DD`) filtra per data su tutti i sotto-archivi.
+  Un archivio che non risponde finisce in **`non_raggiunti`**, ed e' da leggere prima dei conteggi: i conteggi non lo comprendono. Prima quell'archivio spariva in silenzio e il profilo si presentava completo - su un periodo lungo mancavano ddl e interrogazioni, e il profilo del deputato usciva senza i suoi disegni di legge.
 
   _Sostituisce un workflow di 7 click manuali con un'unica chiamata strutturata: pensata per agenti che rispondono a 'che ha fatto il deputato X?'._
 
@@ -353,6 +354,8 @@ ars-sicilia-pp-cli deputato profilo "Chinnici Valentina" --legisl 18 --agent --s
 ```
 
 **In ingresso i flag temporali non sono gli stessi su tutti gli archivi**:
+
+**Periodi lunghi**: oltre un certo numero di documenti il motore rifiuta la ricerca, e il portale lo dichiara con una pagina d'errore. La CLI la riconosce e rifà la ricerca su sottoperiodi, unendo le risposte e dicendolo nell'`hint`; prima quel rifiuto usciva come `[]`, cioe' come un'affermazione falsa sull'archivio. La soglia e' sul numero di documenti e cambia da archivio ad archivio, quindi non c'e' una durata sicura da ricordare: se un periodo lungo torna un errore, restringilo. **`--anno` non e' l'alternativa sicura**: su `ddl` non esiste un campo anno, `--anno 2023` e' compilato nello stesso tipo di range di `--data`.
 
 - **`--data`** (giorno singolo o range `YYYY-MM-DD:YYYY-MM-DD`): `ddl`, `interrogazioni`, `interpellanze`, `mozioni`, `odg`, `risoluzioni`, `resoconti`, `commissioni sommari`, `commissioni convocazioni`, e `deputato profilo` (che lo applica a tutti i sotto-archivi).
 - **`--anno`**: `ddl`, `leggi`, `resoconti`, `commissioni sommari`, `commissioni convocazioni`.
