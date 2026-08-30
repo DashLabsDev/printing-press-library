@@ -28,6 +28,7 @@ const corpusDir = "testdata/corpora"
 var allCorpora = []string{
 	"cellphones",
 	"coffee",
+	"fasting",
 	"meditation",
 	"melatonin",
 	"omega3",
@@ -37,6 +38,7 @@ var allCorpora = []string{
 	"saffron",
 	"sweeteners",
 	"vaccines",
+	"vitaminc",
 	"vitamind",
 }
 
@@ -245,6 +247,14 @@ func TestVerbGateCorrelation(t *testing.T) {
 		// like the five above and belongs with them; it is listed separately
 		// only to flag that the earlier hand-count got this one wrong.
 		"probiotics": false,
+		// fasting ("intermittent fasting improves insulin sensitivity") splits
+		// cleanly under polarityVerbCues, but every work it drops sits on a
+		// truncated abstract, so no PICO exclusion reaches the note.
+		"fasting": false,
+		// vitaminc ("vitamin C prevents the common cold") splits into the glued
+		// phrase [vitamin c], which claimStemLen never truncates, so this corpus
+		// is the control: its leakage figure is stem-length independent.
+		"vitaminc": false,
 	}
 
 	for _, name := range allCorpora {
@@ -380,6 +390,7 @@ func TestTokenLeakage(t *testing.T) {
 	recorded := map[string]int{
 		"cellphones":   8,
 		"coffee":       0,
+		"fasting":      25,
 		"meditation":   0,
 		"melatonin":    10,
 		"omega3":       26,
@@ -389,6 +400,7 @@ func TestTokenLeakage(t *testing.T) {
 		"saffron":      2,
 		"sweeteners":   3,
 		"vaccines":     1,
+		"vitaminc":     0,
 		"vitamind":     0,
 	}
 
@@ -408,11 +420,17 @@ func TestTokenLeakage(t *testing.T) {
 			}
 		}
 
-		line := ""
+		t.Logf("%-13s token=%-7q missing %d/%d", name, tok, missing, len(res.AllStudies))
+		// The recorded numbers are a baseline, not a target: a drift means the
+		// tokenizer now reaches a different share of each corpus, which is
+		// exactly the change this file exists to surface. It is reported as a
+		// failure rather than logged because a t.Logf line is invisible without
+		// -v, and the drift went unseen for that reason.
 		if want, ok := recorded[name]; ok && want != missing {
-			line = "  <-- DRIFT from recorded " + itoa(want)
+			t.Errorf("%s: leakage moved from %d to %d of %d works (token %q) — "+
+				"update the recorded figure in the same commit as the change that moved it",
+				name, want, missing, len(res.AllStudies), tok)
 		}
-		t.Logf("%-13s token=%-7q missing %d/%d%s", name, tok, missing, len(res.AllStudies), line)
 	}
 }
 
