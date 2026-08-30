@@ -3,7 +3,7 @@ module github.com/mvanhorn/printing-press-library/library/commerce/woolworths
 go 1.26.6
 
 require (
-	github.com/enetx/http v1.0.28
+	github.com/enetx/http v1.0.29
 	github.com/enetx/surf v1.0.199
 	github.com/gorilla/websocket v1.5.3
 	github.com/mark3labs/mcp-go v0.57.0

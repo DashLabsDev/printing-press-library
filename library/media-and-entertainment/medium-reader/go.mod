@@ -1,10 +1,10 @@
 module github.com/mvanhorn/printing-press-library/library/media-and-entertainment/medium-reader
 
-go 1.26.5
+go 1.26.6
 
 require (
 	github.com/browserutils/kooky v0.2.10
-	github.com/enetx/http v1.0.28
+	github.com/enetx/http v1.0.29
 	github.com/enetx/surf v1.0.199
 	github.com/mark3labs/mcp-go v0.47.0
 	github.com/spf13/cobra v1.9.1
