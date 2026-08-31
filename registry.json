@@ -1947,9 +1947,9 @@
       "path": "library/other/ars-sicilia",
       "release": {
         "cli_name": "ars-sicilia-pp-cli",
-        "version": "2026.8.9",
-        "released_at": "2026-08-30T09:06:47Z",
-        "source_commit": "c09f7f6e0bd8986356730fe3f015931a1367c484"
+        "version": "2026.8.10",
+        "released_at": "2026-08-31T09:13:34Z",
+        "source_commit": "4846aeac70bdfc669ef2f2ecfd23187ec590adc8"
       },
       "printer": "aborruso",
       "printer_name": "aborruso",
@@ -3776,9 +3776,9 @@
       "path": "library/health/carol-bike",
       "release": {
         "cli_name": "carol-bike-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-26T09:29:35Z",
-        "source_commit": "922dc411079fb5600136cbeddffe8a9f202c87d1"
+        "version": "2026.8.2",
+        "released_at": "2026-08-31T09:19:27Z",
+        "source_commit": "4f02e0fe52d431c2f60b82945f03666ee6e834a4"
       },
       "printer": "bricenice17",
       "printer_name": "bricenice17",
@@ -3792,7 +3792,7 @@
           "stdio",
           "http"
         ],
-        "tool_count": 7,
+        "tool_count": 10,
         "public_tool_count": 0,
         "auth_type": "bearer_token",
         "env_vars": [
@@ -8474,9 +8474,9 @@
       "path": "library/travel/flight-goat",
       "release": {
         "cli_name": "flight-goat-pp-cli",
-        "version": "2026.8.4",
-        "released_at": "2026-08-27T18:01:13Z",
-        "source_commit": "2a3d45a2b1ab809e861c18060e4a01fdb759c3b6"
+        "version": "2026.8.5",
+        "released_at": "2026-08-31T09:18:27Z",
+        "source_commit": "8e2e95ef4ff79a8412653a2e621c852cf3bd54dc"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -22236,6 +22236,12 @@
         "Roll up counts and distributions across your corpus — snips per show, top tags, favorites, episode density, and timeline."
       ],
       "path": "library/media-and-entertainment/snipd",
+      "release": {
+        "cli_name": "snipd-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-31T09:19:27Z",
+        "source_commit": "71b2f63f5b8ce6b498f64393d74a527f42415343"
+      },
       "printer": "maxswinguy",
       "printer_name": "Maxime Delavergne",
       "creator": {
@@ -24171,9 +24177,9 @@
       "path": "library/food-and-dining/texas-roadhouse",
       "release": {
         "cli_name": "texas-roadhouse-pp-cli",
-        "version": "2026.8.1",
-        "released_at": "2026-08-30T09:08:18Z",
-        "source_commit": "14285394309fe23641659dcdacdb84fd59437c45"
+        "version": "2026.8.2",
+        "released_at": "2026-08-31T09:12:40Z",
+        "source_commit": "6695fc0c66c9f1a5670c049428bd79752e231751"
       },
       "printer": "DashLabsDev",
       "printer_name": "Thomas McCormick",
