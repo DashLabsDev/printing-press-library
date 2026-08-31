@@ -19,6 +19,7 @@ func newAuthCmd(flags *rootFlags) *cobra.Command {
 		RunE:  parentNoSubcommandRunE(flags),
 	}
 
+	cmd.AddCommand(newAuthLoginCmd(flags))
 	cmd.AddCommand(newAuthSetupCmd(flags))
 	cmd.AddCommand(newAuthStatusCmd(flags))
 	cmd.AddCommand(newAuthSetTokenCmd(flags))
@@ -38,7 +39,9 @@ func newAuthSetupCmd(_ *rootFlags) *cobra.Command {
 		Example: "  snipd-pp-cli auth setup\n  snipd-pp-cli auth setup --launch",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			w := cmd.OutOrStdout()
-			fmt.Fprintln(w, "Get your Snipd token with a one-time browser sign-in (no Obsidian, plugin, or mobile app needed):")
+			fmt.Fprintln(w, "Fastest: snipd-pp-cli auth login   — opens the browser, waits for sign-in, saves the token for you.")
+			fmt.Fprintln(w, "")
+			fmt.Fprintln(w, "Or do it by hand with a one-time browser sign-in (no Obsidian, plugin, or mobile app needed):")
 			fmt.Fprintln(w, "  1. Generate a random UUID (e.g. uuidgen); call it X.")
 			fmt.Fprintln(w, "  2. Open https://app.snipd.com/obsidian/auth?uuid=X and sign in with your Snipd account.")
 			fmt.Fprintln(w, "  3. Open https://api.snipd.com/v1/public/api/obsidian/auth?uuid=X and copy the \"token\" value.")
@@ -91,7 +94,10 @@ func newAuthStatusCmd(flags *rootFlags) *cobra.Command {
 			if !authed {
 				fmt.Fprintln(w, red("Not authenticated"))
 				fmt.Fprintln(w, "")
-				fmt.Fprintln(w, "Set your token:")
+				fmt.Fprintln(w, "Sign in:")
+				fmt.Fprintln(w, "  snipd-pp-cli auth login")
+				fmt.Fprintln(w, "")
+				fmt.Fprintln(w, "Or set a token you already have:")
 				fmt.Fprintln(w, "  export SNIPD_TOKEN=\"your-token-here\"")
 				fmt.Fprintf(w, "  snipd-pp-cli auth set-token <token>\n")
 				return authErr(fmt.Errorf("no credentials configured"))

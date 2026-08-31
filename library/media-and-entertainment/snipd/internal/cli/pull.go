@@ -120,17 +120,17 @@ func newNovelPullCmd(flags *rootFlags) *cobra.Command {
 			// --dry-run and PRINTING_PRESS_VERIFY. Live dogfood (real API) still
 			// runs, curtailed below.
 			if dryRunOK(flags) || cliutil.IsVerifyEnv() {
-				fmt.Fprintln(cmd.OutOrStdout(), "would pull episodes and snips into the local mirror")
-				return nil
+				return writeDryRunShim(cmd.OutOrStdout(), flags, "pull")
 			}
 
 			cfg, err := config.Load(flags.configPath)
 			if err != nil {
 				return err
 			}
-			if cfg.SnipdToken == "" {
-				return usageErr(fmt.Errorf("no SNIPD_TOKEN set — the export API requires your Snipd account token.\n" +
-					"Get your token from Snipd's browser sign-in (no Obsidian needed; see README -> Authentication), then: snipd-pp-cli auth set-token <token>  (or export SNIPD_TOKEN=<token>)"))
+			token := resolveSnipdToken(cfg)
+			if token == "" {
+				return usageErr(fmt.Errorf("no Snipd token configured — the export API requires your Snipd account token.\n" +
+					"Get your token from Snipd's browser sign-in (no Obsidian needed; see README -> Authentication), then: snipd-pp-cli auth login  (or auth set-token <token>, or export SNIPD_TOKEN=<token>)"))
 			}
 
 			// Generous timeout floor for a bulk pull; a larger explicit --timeout wins.
@@ -141,7 +141,7 @@ func newNovelPullCmd(flags *rootFlags) *cobra.Command {
 			ctx, cancel := context.WithTimeout(cmd.Context(), timeout)
 			defer cancel()
 
-			c := snipd.NewClient(cfg.BaseURL, cfg.SnipdToken)
+			c := snipd.NewClient(cfg.BaseURL, token)
 			meta, err := c.FetchMetadata(ctx, updatedAfter)
 			if err != nil {
 				return err
@@ -280,4 +280,29 @@ func newNovelPullCmd(flags *rootFlags) *cobra.Command {
 	cmd.Flags().StringVar(&updatedAfter, "updated-after", "", "Only pull episodes updated after this ISO-8601 time (incremental sync)")
 	cmd.Flags().IntVar(&limit, "limit", 0, "Max episodes to pull this run (0 = all)")
 	return cmd
+}
+
+// resolveSnipdToken returns the raw Snipd bearer token, mirroring the precedence
+// config.AuthHeader() applies everywhere else in the CLI: the SNIPD_TOKEN env var
+// wins, then whatever was persisted to the credentials file.
+//
+// The fallback is load-bearing, not defensive. `auth set-token` routes through the
+// generated config.SaveTokens, whose OAuth-shaped signature files the value under
+// AccessToken. cfg.SnipdToken maps to the `token` key and CAN be loaded from the
+// credentials file, but no command ever writes that key — so in practice the env var
+// is its only populated source. Reading it alone meant `doctor` reported "Auth:
+// configured" from the saved credential while every pull rejected it: the generated
+// half of the CLI honoured the token and this hand-built half did not.
+//
+// AuthHeaderVal is deliberately NOT consulted: it holds a complete header value
+// ("Bearer x"), while snipd.NewClient wants the bare token. `auth set-token`
+// clears it for exactly this reason.
+func resolveSnipdToken(cfg *config.Config) string {
+	if cfg == nil {
+		return ""
+	}
+	if cfg.SnipdToken != "" {
+		return cfg.SnipdToken
+	}
+	return cfg.AccessToken
 }

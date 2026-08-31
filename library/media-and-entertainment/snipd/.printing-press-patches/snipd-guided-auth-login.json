@@ -1,0 +1,22 @@
+{
+  "schema_version": 2,
+  "applied_at": "2026-08-30",
+  "base_run_id": "20260713-190747-d8d38c3e",
+  "base_printing_press_version": "4.28.0",
+  "id": "snipd-guided-auth-login",
+  "summary": "Guided `auth login` automating Snipd's UUID device-pairing flow (generate UUID, open browser, long-poll, save).",
+  "reason": "The only way to mint a Snipd token is a browser device-pairing flow whose final step is reading a secret out of a raw JSON endpoint and pasting it back -- the step no non-technical user discovers unaided. Snipd's own open-source Obsidian plugin is the reference implementation; step 3 is a server-held LONG-POLL, not a client retry loop. DEPENDS ON snipd-auth-token-read-path: this command persists through the same SaveTokens path, so without that fix it reports success and every subsequent pull still fails.",
+  "files": [
+    "internal/snipd/auth.go",
+    "internal/snipd/auth_test.go",
+    "internal/cli/auth_login.go",
+    "internal/cli/auth.go",
+    "go.mod"
+  ],
+  "validated_outcome": "Against a stub withholding the token on the first call, `auth login --no-browser` retries transparently, saves, and reports only a masked length. Browser launch short-circuits on --dry-run, PRINTING_PRESS_VERIFY and PRINTING_PRESS_DOGFOOD (the dogfood guard is load-bearing: pairing needs a human, so a live attempt would hang past the runner timeout and report a false failure). 6 tests, including one asserting an HTTP-error message never echoes the response body -- on a success-shaped response that body is the token. go.mod promotes google/uuid indirect -> direct and bumps the go directive to the repo-wide 1.26.6 floor.",
+  "known_followups": [
+    "No MCP-side change is required by this patch, and the tool surface is unchanged: tools-manifest.json is byte-identical to base, and no auth command CAN register because walk() does not recurse into a commandFramework subtree. `auth` is a top-level entry in cobratree's frameworkCommands, so isTopLevelFrameworkCommand skips the whole subtree and no auth command is ever registered as an MCP tool -- correct, since an MCP server cannot drive a browser sign-in on behalf of its host. The credential fix still reaches MCP users, because the MCP does not execute in-process: cobratree.RunCLICommand shells out via exec.CommandContext to the sibling snipd-pp-cli, so updating the CLI binary alone fixes the MCP's pull tool. `go install` of the MCP binary and a .mcpb rebuild are only needed when the TOOL SURFACE changes.",
+    "Generated auth hints in helpers.go, doctor.go, client.go and mcp/tools.go still name set-token. Correct and functional, but they do not advertise the faster path.",
+    "Deployment gotcha when the MCP does need updating: SiblingCLIPath resolves the CLI next to the MCP executable FIRST, then SNIPD_CLI_PATH, then PATH. If a stale snipd-pp-cli sits beside the MCP binary (e.g. ~/go/bin/ from a `go install`), the MCP keeps using it while the npx installer updates a different copy on PATH (~/.local/bin/) -- a silent version skew with no error. Check for a sibling CLI before assuming an installer refresh reached the MCP."
+  ]
+}

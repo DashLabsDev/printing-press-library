@@ -51,10 +51,13 @@
   },
   "wiring_check": {
     "command_tree": {
-      "defined": 47,
-      "registered": 47
+      "defined": 48,
+      "registered": 48
     },
     "config_consistency": {
+      "write_fields": [
+        ", token, "
+      ],
       "consistent": true
     },
     "workflow_completeness": {
@@ -65,9 +68,8 @@
     }
   },
   "novel_features_check": {
-    "planned": 0,
-    "found": 0,
-    "skipped": true
+    "planned": 5,
+    "found": 5
   },
   "mcp_surface_parity": {
     "state": "runtime_walking",
@@ -75,21 +77,23 @@
     "detail": "MCP surface mirrors the Cobra tree at runtime"
   },
   "reimplementation_check": {
-    "checked": 0,
-    "exempted_via_store": 0,
-    "skipped": true
+    "checked": 5,
+    "exempted_via_store": 5
+  },
+  "description_drift_check": {
+    "expected": "Turn your Snipd snips into a local, ranked, full-text-searchable corpus \u2014 search a concept across every note, quote, and transcript, pull the exact quote, and synthesize across shows from the command line, plus an MCP for agents."
   },
   "source_client_check": {
-    "checked": 2
+    "checked": 3
   },
   "print_json_filtered_check": {
-    "checked": 31
+    "checked": 33
   },
   "test_presence": {
     "checked": 2
   },
   "naming_check": {
-    "checked": 31
+    "checked": 33
   },
   "sync_param_drop_check": {
     "checked": 0,

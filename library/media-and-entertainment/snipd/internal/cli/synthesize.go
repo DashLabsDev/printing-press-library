@@ -30,7 +30,7 @@ func newNovelSynthesizeCmd(flags *rootFlags) *cobra.Command {
 			"synthesize a cross-show answer without dragging whole transcripts through\n" +
 			"context. Plain stemmed terms work best; the index is porter-stemmed.",
 		Example:     "  snipd-pp-cli synthesize \"AI and jobs\" --limit 20 --agent\n  snipd-pp-cli synthesize \"personas\" --show \"UX Research Geeks\"",
-		Annotations: map[string]string{"mcp:read-only": "true"},
+		Annotations: map[string]string{"mcp:read-only": "true", "pp:happy-args": "query=AI and jobs"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 && cmd.Flags().NFlag() == 0 {
 				return cmd.Help()

@@ -1,0 +1,24 @@
+{
+  "schema_version": 2,
+  "applied_at": "2026-08-30",
+  "base_run_id": "20260713-190747-d8d38c3e",
+  "base_printing_press_version": "4.28.0",
+  "id": "snipd-live-matrix-coverage",
+  "summary": "pp:happy-args on the three positional-arg novel commands, plus a dry-run JSON shim; hollow_features 4 -> 1.",
+  "reason": "dogfood's live matrix skips happy_path and json_fidelity for any command taking a non-id positional unless it carries pp:happy-args, and then counts the skip against the CLI as hollow coverage. Any novel command with a positional needs the annotation, with a value that returns real output. Separately, a --dry-run branch that prints prose or returns nil emits non-JSON under --dry-run --json and fails json_fidelity; the 4.31.x chassis ships writeDryRun for this and 4.28.0 does not, so dryrun_shim.go stands in. Its dryRunResult carries 4.31.x's three fields (dry_run/action/would) plus an OPTIONAL url that only auth login emits; on upgrade, pull switches to the framework helper directly, while auth login keeps a local writer if that url is to be retained.",
+  "files": [
+    "internal/cli/quote.go",
+    "internal/cli/synthesize.go",
+    "internal/cli/aggregate.go",
+    "internal/cli/dryrun_shim.go",
+    "internal/cli/pull.go",
+    "dogfood-results.json"
+  ],
+  "validated_outcome": "Full live matrix before -> after: hollow_features [aggregate, pull, quote, synthesize] -> [pull], probes 81 -> 87, failed 5 -> 4. The same matrix run against pristine merged v1 reports the identical pre-change hollow set, so this reduces an existing condition rather than introducing one.",
+  "known_followups": [
+    "pull stays hollow and cannot be annotated out: the harness classifies it as mutating, forces --dry-run onto its probe and discards the result, and pull genuinely writes the corpus. Blocks publish validate. Track cli-printing-press 4046 / 4259 / 4263.",
+    "A reprint on 4.31.2 would ACTIVATE that gate rather than clear it -- the 4.28 artifacts do not carry the fields it reads. Resolve the local-write question upstream before reprinting.",
+    "Four generated framework commands still fail json_fidelity (learnings purge, playbook amend, teach, teach-pattern). The 4.31.x upgrade resolves them via the framework helper.",
+    "dogfood on 4.31.2 DOES consume pp:happy-args, which cli-printing-press#4046 reports as ignored."
+  ]
+}

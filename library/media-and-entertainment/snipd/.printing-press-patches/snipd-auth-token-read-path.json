@@ -1,0 +1,17 @@
+{
+  "schema_version": 2,
+  "applied_at": "2026-08-30",
+  "base_run_id": "20260713-190747-d8d38c3e",
+  "base_printing_press_version": "4.28.0",
+  "id": "snipd-auth-token-read-path",
+  "summary": "pull read cfg.SnipdToken directly, so credentials saved by `auth set-token` were invisible to every command that fetches snips.",
+  "reason": "`auth set-token` persists through the generated config.SaveTokens, which files the value under AccessToken. The hand-built export layer read cfg.SnipdToken. That field maps to the `token` key and can be loaded from the credentials file, but no command ever writes that key, so the env var is its only populated source in practice. Result: doctor reported \"Auth: configured\" while every pull failed with \"no SNIPD_TOKEN set\". Any future hand layer must resolve credentials through the same precedence config.AuthHeader() uses (env var, then persisted) rather than reading one field.",
+  "files": [
+    "internal/cli/pull.go",
+    "internal/cli/pull_token_test.go"
+  ],
+  "validated_outcome": "Reproduced on the merged v1 tree checked out untouched from main. With SNIPD_TOKEN unset and only the set-token credential on disk, v1's pull fails and this branch's pull returns 3 episodes / 52 snips against the real API. 5 unit tests cover the resolver including the regression case.",
+  "known_followups": [
+    "Not fixed at the write site: config.go and auth.go's set-token body carry the generator DO-NOT-EDIT header, and changing the persisted field would alter on-disk credential shape for anyone who already ran set-token."
+  ]
+}

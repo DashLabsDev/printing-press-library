@@ -39,7 +39,7 @@ func newNovelQuoteCmd(flags *rootFlags) *cobra.Command {
 			"for a specific snip via --snip. Use this when you need a citable line, not a\n" +
 			"paraphrase or the whole transcript. Only snips that carry a quote are returned.",
 		Example:     "  snipd-pp-cli quote \"thought partner\" --agent\n  snipd-pp-cli quote --snip 79b70845-023e-40f3-a68f-6e03ae9c0bd6",
-		Annotations: map[string]string{"mcp:read-only": "true"},
+		Annotations: map[string]string{"mcp:read-only": "true", "pp:happy-args": "query=orchestration"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 && cmd.Flags().NFlag() == 0 {
 				return cmd.Help()

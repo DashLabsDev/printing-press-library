@@ -107,7 +107,7 @@
     "display_name": "Snipd",
     "headline": "Turn your Snipd snips into a local, ranked, full-text-searchable corpus — search a concept across every note, quote, and transcript, pull the exact quote, and synthesize across shows from the command line, plus an MCP for agents.",
     "value_prop": "Your snips are trapped in a mobile app. This CLI pulls them into a local SQLite mirror with a full-text index, then lets you search, quote, filter, and aggregate them in kilobytes instead of scrolling an app. The same commands are exposed as MCP tools so an agent can reason over your own listening.",
-    "auth_narrative": "Snipd's export API uses your account Bearer token, obtained by pairing the CLI from the Snipd mobile app. Set it once as SNIPD_TOKEN (or in the config file). It is read-only and never leaves your machine.",
+    "auth_narrative": "Snipd's export API authenticates with **your own Snipd account Bearer token**. Get it with a one-time browser sign-in — **you don't need Obsidian, the Snipd Obsidian plugin, or the mobile app** (the page is titled \"Obsidian integration\" only because the CLI reuses Snipd's export API).\n\n**Recommended — one command:** `snipd-pp-cli auth login` opens your browser to Snipd's sign-in page, waits while you sign in with Google, Apple, or email, then saves the token for you. Add `--no-browser` on a headless or SSH box to print the URL instead. Confirm with `snipd-pp-cli auth status`.\n\n**Manual, if you prefer:** generate any random UUID (e.g. `uuidgen`) and call it `X`; open `https://app.snipd.com/obsidian/auth?uuid=X` and sign in; open `https://api.snipd.com/v1/public/api/obsidian/auth?uuid=X` and copy the `token` value; save it with `snipd-pp-cli auth set-token \u003ctoken\u003e` (or `export SNIPD_TOKEN=\u003ctoken\u003e` for one session). `snipd-pp-cli auth setup` reprints these steps any time.\n\nThe token is personal and account-scoped — read-only, stored locally, and it never leaves your machine. If it stops working, run `snipd-pp-cli auth login` again; re-pairing takes about a minute.",
     "quickstart": [
       {
         "command": "snipd-pp-cli doctor --dry-run",
@@ -133,7 +133,7 @@
       },
       {
         "symptom": "401 / auth error on pull",
-        "fix": "Your token expired. Re-pair the CLI from the Snipd app and set the new value as SNIPD_TOKEN."
+        "fix": "Your token expired or was revoked. Run `snipd-pp-cli auth login` to re-pair (about a minute), or follow the manual browser steps in Authentication."
       },
       {
         "symptom": "a search term returns fewer hits than expected",

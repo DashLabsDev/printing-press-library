@@ -44,7 +44,7 @@ func newNovelAggregateCmd(flags *rootFlags) *cobra.Command {
 		Long: "Group the corpus and count. Dimensions: " + strings.Join(dims, ", ") + ".\n" +
 			"Defaults to by-show. Read-only over the local mirror.",
 		Example:     "  snipd-pp-cli aggregate by-show\n  snipd-pp-cli aggregate by-tag --limit 15 --agent",
-		Annotations: map[string]string{"mcp:read-only": "true"},
+		Annotations: map[string]string{"mcp:read-only": "true", "pp:happy-args": "dimension=by-show"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if dryRunOK(flags) {
 				return nil

@@ -1,0 +1,18 @@
+{
+  "schema_version": 2,
+  "applied_at": "2026-08-30",
+  "base_run_id": "20260713-190747-d8d38c3e",
+  "base_printing_press_version": "4.28.0",
+  "id": "snipd-doc-narrative-source",
+  "summary": "README and SKILL auth prose corrected at its generator source (research.json), not in the output files.",
+  "reason": "dogfood re-syncs README.md and SKILL.md from .manuscripts/<run>/research.json (narrative.auth_narrative, narrative.troubleshoots). The 2026-07-14 snipd-auth-token-docs-fix patch hand-edited the two output files and explicitly left research.json lagging, so that fix was never durable -- the next dogfood run silently reverted both to v1.0's inaccurate 'obtained by pairing the CLI from the Snipd mobile app'. Any prose change to these files must be made in research.json and re-synced, or it will be reverted.",
+  "files": [
+    ".manuscripts/20260713-190747-d8d38c3e/research.json",
+    "README.md",
+    "SKILL.md"
+  ],
+  "validated_outcome": "The revert was observed live during this work: doc edits were made, a dogfood run reverted them, and the regression reached the PR before being caught in review rather than by any local check. After correcting the source and re-syncing, a second dogfood run leaves README.md and SKILL.md byte-identical (md5 unchanged for both), the stale mobile-app pairing strings are gone from both, and the README diff against base main is additive rather than a revert.",
+  "known_followups": [
+    "This supersedes the docs half of snipd-auth-token-docs-fix (2026-07-14), whose known_followups anticipated re-pointing these surfaces at a guided login."
+  ]
+}
