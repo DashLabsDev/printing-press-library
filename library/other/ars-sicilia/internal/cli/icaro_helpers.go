@@ -171,6 +171,7 @@ func runCerca(cmd *cobra.Command, flags *rootFlags, archiveSlug string, p cercaP
 	pertHint := pertinenzaHint(recs, termini, arc.Slug)
 	omonHint := omonimiHint(recs, arc.Slug)
 	spezzHint := spezzatoHint(spezzato)
+	sommHint := sommariHint(truncated, arc.Slug, p.Params, termini)
 
 	if envelopeWanted(cmd.OutOrStdout(), flags) {
 		// L'avviso resta anche su stderr: la busta serve a chi legge il JSON,
@@ -179,8 +180,9 @@ func runCerca(cmd *cobra.Command, flags *rootFlags, archiveSlug string, p cercaP
 		warnPertinenza(spezzHint)
 		warnPertinenza(pertHint)
 		warnPertinenza(omonHint)
+		warnPertinenza(sommHint)
 		return emitEnvelope(cmd.OutOrStdout(), flatRecords(recs, firm), truncated,
-			uniscoHint(truncatedHint(truncated, len(recs), arc.Slug), spezzHint, pertHint, omonHint), flags)
+			uniscoHint(truncatedHint(truncated, len(recs), arc.Slug), spezzHint, pertHint, omonHint, sommHint), flags)
 	}
 	if err := emitRecords(cmd, flags, *arc, recs, firm); err != nil {
 		return err
@@ -189,6 +191,7 @@ func runCerca(cmd *cobra.Command, flags *rootFlags, archiveSlug string, p cercaP
 	warnPertinenza(spezzHint)
 	warnPertinenza(pertHint)
 	warnPertinenza(omonHint)
+	warnPertinenza(sommHint)
 	return nil
 }
 
@@ -579,6 +582,41 @@ func hintLeggiCorte(truncated, mancanti bool, righe, leggi, limite int) string {
 			"mostrate %d leggi, il massimo chiesto: l'archivio ne ha altre e la ricerca si è fermata qui. Alza --limit (es. --limit 50) prima di leggere questo elenco come completo.",
 			leggi)
 	}
+}
+
+// sommariHint nomina la strada che arriva all'atto quando la ricerca testuale
+// sui ddl non ci arriva.
+//
+// Il caso è quello di una notizia che racconta una seduta senza dare il numero
+// del disegno di legge: `ddl cerca --frase "enti locali" --anno 2024` esce
+// troncato e ordinato per data, e il ddl 780 — quello della maratona di
+// emendamenti del 17 settembre 2024 — non entra nella finestra. Il sommario
+// della commissione di quel giorno lo nomina per esteso, e da lì `ddl iter`
+// chiude la storia.
+//
+// L'avviso di troncamento già dice che l'ordinamento non è per pertinenza, cioè
+// che l'atto può stare oltre la finestra; qui si aggiunge l'unica cosa che
+// mancava, dove andarlo a prendere. Esce solo sui ddl (è l'archivio che i
+// sommari di commissione citano per numero) e solo su una ricerca a testo
+// libero: chi cerca per numero l'atto ce l'ha già.
+//
+// `--commissione` non si chiede, si offre: chi parte da una notizia la data ce
+// l'ha e la commissione quasi mai, e mandarlo a compilare proprio il valore che
+// gli manca rimanda al punto di partenza. La sola data risponde — `commissioni
+// sommari --legisl 18 --data 2024-09-17` dà le 7 sedute di quel giorno,
+// `troncato: false` — perché la troncatura del backend /bd/ dipende dalla
+// dimensione della risposta e una giornata sola è piccola.
+func sommariHint(truncated bool, slug string, params map[string]string, termini []string) string {
+	if !truncated || slug != "ddl" || len(termini) == 0 {
+		return ""
+	}
+	legisl := strings.TrimSpace(params["legisl"])
+	if legisl == "" {
+		legisl = "<legisl>"
+	}
+	return fmt.Sprintf(
+		"hint: se parti da una notizia che dà la data di una seduta ma non il numero dell'atto, la ricerca testuale sui ddl non è la strada più corta: `commissioni sommari --legisl %s --data AAAA-MM-GG` nomina i disegni di legge esaminati quel giorno (aggiungi `--commissione <nome>` solo se la sai), e `ddl iter %s <numero>` ne chiude l'iter.",
+		legisl, legisl)
 }
 
 func truncatedHint(truncated bool, shown int, slug string) string {

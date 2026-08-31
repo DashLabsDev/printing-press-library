@@ -625,3 +625,32 @@ func TestRestringiHint(t *testing.T) {
 		}
 	})
 }
+
+// Quando la notizia dà la data di una seduta e non il numero dell'atto, la
+// ricerca testuale sui ddl esce troncata e ordinata per data: l'hint nomina la
+// strada che ci arriva davvero, i sommari di commissione.
+func TestSommariHint(t *testing.T) {
+	params := map[string]string{"legisl": "18", "anno": "2024", "frase": "enti locali"}
+	got := sommariHint(true, "ddl", params, []string{"enti", "locali"})
+	for _, atteso := range []string{"commissioni sommari --legisl 18", "ddl iter 18"} {
+		if !strings.Contains(got, atteso) {
+			t.Errorf("sommariHint non nomina %q: %q", atteso, got)
+		}
+	}
+	// Non troncato: la finestra è tutto ciò che c'è, non manca nulla da cercare.
+	if h := sommariHint(false, "ddl", params, []string{"enti"}); h != "" {
+		t.Errorf("sommariHint su risultato completo = %q, want \"\"", h)
+	}
+	// Ricerca per numero: l'atto è già in mano.
+	if h := sommariHint(true, "ddl", map[string]string{"legisl": "18", "numero": "780"}, nil); h != "" {
+		t.Errorf("sommariHint senza termini = %q, want \"\"", h)
+	}
+	// Gli altri archivi non sono citati per numero dai sommari di commissione.
+	if h := sommariHint(true, "interrogazioni", params, []string{"enti"}); h != "" {
+		t.Errorf("sommariHint su %q = %q, want \"\"", "interrogazioni", h)
+	}
+	// Senza legislatura l'hint resta utile, col segnaposto al posto del numero.
+	if h := sommariHint(true, "ddl", map[string]string{"frase": "enti locali"}, []string{"enti"}); !strings.Contains(h, "--legisl <legisl>") {
+		t.Errorf("sommariHint senza legisl = %q", h)
+	}
+}

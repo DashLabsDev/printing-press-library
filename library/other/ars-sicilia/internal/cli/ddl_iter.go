@@ -390,7 +390,7 @@ func parseIterFromBody(body string) []iterEvent {
 			dopoLr = ""
 		}
 		events = append(events, iterEvent{
-			Fase:       classifyIterFase(action),
+			Fase:       faseIterConSeduta(action, sedeSuffisso),
 			Data:       data,
 			Sede:       iterSedeRisolta(sedeSuffisso, action),
 			Titolo:     action,
@@ -835,6 +835,40 @@ func cleanFirmatarioName(s string) string {
 	return strings.Join(toks, " ")
 }
 
+// faseIterConSeduta corregge la fase quando il verbo e la seduta dichiarata
+// dicono due cose diverse, e la seduta ha ragione.
+//
+// «Esitato per Aula» è l'esito del lavoro di commissione: la commissione chiude
+// l'esame e manda il testo all'Aula. Il verbo nomina l'Aula come destinazione,
+// non come luogo, e classifyIterFase — che legge solo il verbo — ne faceva un
+// evento d'Aula: sul ddl 5030 la riga usciva con `fase: aula` e `sede:
+// Commissione TERZA`, cioè un evento d'Aula tenuto in commissione. Chi filtra
+// `fase == "aula"` per trovare il passaggio in Aula si porta dentro un evento di
+// commissione, e la data del voto d'Aula la sbaglia di settimane (sul 5030 il
+// 16 giugno invece dell'8 luglio).
+//
+// Il criterio non è una lista di verbi da correggere ma la dichiarazione del
+// portale: dove la riga dichiara una seduta di commissione, l'evento è avvenuto
+// lì. Le righe d'Aula portano il marcatore AULA al posto del nome della
+// commissione, quindi il suffisso è vuoto e la fase resta quella del verbo.
+//
+// La regola vale in un verso solo, e non per prudenza. Il caso speculare esiste
+// — «Rinviato Commissione 0400 Seduta n. 255 AULA», l'Aula che rimanda il testo
+// in commissione — ma lì non c'è contraddizione da sciogliere: il verbo nomina
+// una destinazione vera e il luogo è davvero l'Aula, quindi la riga resta come
+// la classifica il verbo. Solo il verbo d'Aula su una seduta di commissione
+// afferma due luoghi insieme. Sul
+// corpus di controllo (13 iter fra XVII e XVIII, 268 eventi) le sole righe
+// toccate sono le 13 «Esitato per Aula»; «Esaminato in Aula» e «Approvato
+// dall'Assemblea» non dichiarano mai una commissione.
+func faseIterConSeduta(action, sedeSuffisso string) string {
+	fase := classifyIterFase(action)
+	if fase == "aula" && sedeSuffisso != "" {
+		return "commissione"
+	}
+	return fase
+}
+
 func classifyIterFase(action string) string {
 	a := strings.ToLower(action)
 	switch {
@@ -914,9 +948,34 @@ func sedeDaSuffissoSeduta(action string) string {
 // back to the one the verb names, with its raw code resolved.
 func iterSedeRisolta(sedeSuffisso, action string) string {
 	if sedeSuffisso != "" {
-		return sedeSuffisso
+		return ricomponiTrattinoACapo(sedeSuffisso)
 	}
-	return risolviCodiceCommissione(iterSede(action))
+	return risolviCodiceCommissione(ricomponiTrattinoACapo(iterSede(action)))
+}
+
+// reTrattinoACapo trova il trattino con cui la fonte spezza una parola a fine
+// riga, con la coda che riprende dopo lo spazio.
+var reTrattinoACapo = regexp.MustCompile(`(\p{L})-\s+(\p{L})`)
+
+// ricomponiTrattinoACapo rimette insieme quella parola.
+//
+// Il dato sporco è a monte e non è un artefatto di questa CLI: l'HTML della
+// scheda 221 del ddl 5030 scrive davvero `Commissione</a> T-<br> ERZA`
+// (verificato sul corpo grezzo), e la stessa cosa tocca alla «Commissione sp-
+// eciale per lo Statuto» della XVII citata qui sopra.
+//
+// Propagarlo però non è neutrale, perché la sede è un campo a vocabolario
+// chiuso: l'iter del ddl 5030 usciva con «Commissione TERZA» quattro volte e
+// «Commissione T- ERZA» una, cioè due sedi dove ce n'è una, e chiunque
+// raggruppi per sede conta due gruppi. Il codice della commissione (0300) sta
+// accanto nella stessa riga e conferma quale sia.
+//
+// Si tocca solo la sede, non il `titolo` dell'evento, che resta la fonte
+// verbatim; e solo il trattino attaccato alla lettera che lo precede, perché un
+// trattino con lo spazio da entrambi i lati separa due parole invece di
+// spezzarne una.
+func ricomponiTrattinoACapo(s string) string {
+	return reTrattinoACapo.ReplaceAllString(s, "$1$2")
 }
 
 // reSedeCodice matches a sede left as the portal's internal committee code

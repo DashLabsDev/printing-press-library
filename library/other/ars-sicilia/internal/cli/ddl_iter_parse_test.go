@@ -323,6 +323,8 @@ func TestSedeDaSuffissoSeduta(t *testing.T) {
 		// Le commissioni speciali hanno nomi veri, non ordinali: una cattura di
 		// una sola parola li taglierebbe a metà (leg. XVII, ddl 66).
 		{"Esaminato in commissione Seduta n. 3 1200 Commissione riforma statuto", "Commissione riforma statuto"},
+		// Il suffisso esce come lo scrive la fonte, trattino di a-capo compreso:
+		// a ricomporlo è iterSedeRisolta, sul valore che finisce nel campo `sede`.
 		{"Esitato per Aula (epa) Seduta n. 29 1200 Commissione sp- eciale per lo Statuto della Regione", "Commissione sp- eciale per lo Statuto della Regione"},
 		// La parentesi annota l'evento, non la commissione: la sede finisce lì.
 		{"Esaminato in commissione Seduta n. 12 0100 Commissione PRIMA (Articolo 3 stralciato)", "Commissione PRIMA"},
@@ -554,6 +556,67 @@ func TestMarcaEventiIncoerentiIterSano(t *testing.T) {
 	for i, ev := range evs {
 		if ev.Anomalia {
 			t.Errorf("evento %d marcato in un iter coerente: %+v", i, ev)
+		}
+	}
+}
+
+// La fonte spezza il nome della commissione con un trattino e un a-capo
+// (`Commissione</a> T-<br> ERZA` nell'HTML della scheda 221 del ddl 5030), e la
+// sede è un campo a vocabolario chiuso: propagata così com'è, lo stesso iter
+// dichiara due sedi dove ce n'è una.
+func TestIterSedeRisolta_RicomponeTrattinoACapo(t *testing.T) {
+	cases := []struct{ suffisso, action, want string }{
+		{"Commissione T- ERZA", "", "Commissione TERZA"},
+		{"Commissione sp- eciale per lo Statuto della Regione", "", "Commissione speciale per lo Statuto della Regione"},
+		// Le righe sane dello stesso iter non si muovono.
+		{"Commissione TERZA", "", "Commissione TERZA"},
+		{"Commissione Bilancio", "", "Commissione Bilancio"},
+		// Il codice grezzo continua a risolversi quando il suffisso manca.
+		{"", "Rinviato Commissione 0400", "Commissione QUARTA"},
+		{"", "Assegnato per esame Commissione T- ERZA", "Commissione TERZA"},
+	}
+	for _, c := range cases {
+		if got := iterSedeRisolta(c.suffisso, c.action); got != c.want {
+			t.Errorf("iterSedeRisolta(%q, %q) = %q, want %q", c.suffisso, c.action, got, c.want)
+		}
+	}
+}
+
+// Il trattino con lo spazio da entrambi i lati separa due parole invece di
+// spezzarne una: non si tocca.
+func TestRicomponiTrattinoACapo_LasciaISeparatori(t *testing.T) {
+	cases := []struct{ in, want string }{
+		{"Commissione T- ERZA", "Commissione TERZA"},
+		{"Commissione PRIMA - SECONDA", "Commissione PRIMA - SECONDA"},
+		{"Commissione anti-mafia", "Commissione anti-mafia"},
+		{"", ""},
+	}
+	for _, c := range cases {
+		if got := ricomponiTrattinoACapo(c.in); got != c.want {
+			t.Errorf("ricomponiTrattinoACapo(%q) = %q, want %q", c.in, got, c.want)
+		}
+	}
+}
+
+// «Esitato per Aula» è l'esito del lavoro di commissione, non un passaggio in
+// Aula: dove la riga dichiara una seduta di commissione, l'evento è avvenuto lì.
+func TestFaseIterConSeduta(t *testing.T) {
+	cases := []struct{ action, sedeSuffisso, want string }{
+		{"Esitato per Aula (epa)", "Commissione TERZA", "commissione"},
+		{"Esitato per Aula", "Commissione PRIMA", "commissione"},
+		// Le righe d'Aula portano il marcatore AULA al posto della commissione,
+		// quindi il suffisso è vuoto e la fase resta quella del verbo.
+		{"Esaminato in Aula", "", "aula"},
+		{"Approvato dall'Assemblea", "", "aula"},
+		// Le altre fasi non si toccano, nemmeno con una commissione dichiarata.
+		{"Esaminato in commissione", "Commissione SECONDA", "commissione"},
+		{"Parere espresso Commissione *", "Commissione QUINTA", "commissione"},
+		{"Abbinamento con ddl 49", "Commissione QUARTA", "iter"},
+		{"Promulgata legge regionale n. 4/2025", "", "legge"},
+	}
+	for _, c := range cases {
+		if got := faseIterConSeduta(c.action, c.sedeSuffisso); got != c.want {
+			t.Errorf("faseIterConSeduta(%q, %q) = %q, want %q", c.action, c.sedeSuffisso, got, c.want)
 		}
 	}
 }

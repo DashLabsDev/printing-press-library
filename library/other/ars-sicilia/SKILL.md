@@ -58,7 +58,11 @@ These capabilities aren't available in any other tool for this API.
 
   In `--select` tieni sempre **`titolo`**: è il campo che dice *cosa* è successo, mentre `data`, `fase`, `sede` e `seduta` dicono solo quando e dove, e fra due eventi possono coincidere legittimamente. Nella stessa seduta d'Aula un ddl viene esaminato e poi votato («Esaminato in Aula» e «Approvato dall'Assemblea», 29 lug 2026 seduta 268 sul ddl 6030): senza `titolo` le due righe escono identiche e l'approvazione finale sembra un duplicato da scartare.
 
+**`fase` dice dove l'evento è avvenuto, non dove il testo è diretto.** «Esitato per Aula» è l'esito del lavoro di commissione — la commissione chiude l'esame e manda il testo all'Aula — e la riga dichiara una seduta di commissione: la fase è `commissione`. Prima quel verbo bastava a farne un evento d'Aula, e chi filtrava `fase == "aula"` per trovare il voto si portava dentro una riga di commissione, con la data sbagliata di settimane (sul ddl 5030 il 16 giugno invece dell'8 luglio, che è la seduta 263). Il criterio è la seduta dichiarata dal portale, non una lista di verbi: le righe d'Aula portano il marcatore AULA al posto del nome della commissione.
+
   Il campo **`sede`** degli eventi dà la commissione in forma canonica — l'ordinale che gli altri comandi accettano (`commissioni sommari --commissione QUARTA`) — **sulle righe in cui il portale dichiara una seduta**, perché è lì accanto che la scrive, e la si legge da lì anche quando il verbo dell'evento dice altro o non la nomina affatto. Le commissioni speciali tengono il loro nome per esteso, e il nome d'uso resta comunque in `titolo`, che è verbatim: «Parere Commissione Bilancio» ha `sede: Commissione SECONDA`. Sulle righe **senza seduta** — le assegnazioni, gli invii — vale invece la dicitura del verbo, quindi la stessa commissione può comparire con due nomi nella stessa cronologia («Inviato Commissione Bilancio» resta `Commissione Bilancio`, il parere che ne segue è `Commissione SECONDA`). Non raggruppare una timeline per `sede` dandola per canonica.
+
+  Nella sede la CLI ricompone la parola che la fonte spezza con un trattino e un a-capo: l'HTML della scheda del ddl 5030 scrive `Commissione</a> T-<br> ERZA`, e l'iter usciva con «Commissione TERZA» quattro volte e «Commissione T- ERZA» una — due sedi dove ce n'è una. Il testo dell'evento resta invece verbatim in `titolo`, garbled compreso: lì la fonte si legge come la scrive.
 
   L'ultimo evento di una legge è la pubblicazione in Gurs, e porta numero e data come li scrive la fonte: «Pubblicazione Gurs n. 44o1 del 21 agosto 2020». Il suffisso dopo il numero è la notazione del portale per i supplementi (la Gazzetta è la n. 44), non un refuso da correggere, e la data ripete quella dell'evento.
 
@@ -318,6 +322,20 @@ ars-sicilia-pp-cli mozioni cerca --legisl 18 --numero 143 --json
 ```
 
 Un numero però non sempre aggancia **un** documento: il portale ne tiene di distinti sotto lo stesso numero, di norma versioni diverse della stessa pratica. Sul ddl 6030 sono due — uno col testo del ddl e l'iter aggiornato, l'altro la sola scheda ferma a due settimane prima — identici in ogni campo della lista, titolo e data comprese. Quando succede, `cerca` e `get` lo dicono con un hint: `get` apre il primo e ne riporta il `docno`.
+
+### Un atto senza numero, ma con la data di una seduta: passa dai sommari
+
+Quando la notizia racconta una seduta e non dà il numero dell'atto, la ricerca testuale sui ddl è la strada lunga: il portale ordina per data e non per pertinenza, quindi l'atto può stare fuori dalla finestra anche quando la ricerca è giusta. `ddl cerca --legisl 18 --anno 2024 --frase "enti locali"` esce troncato su dieci righe di novembre-dicembre, e il ddl 780 — quello della maratona di emendamenti del 17 settembre 2024 — non c'è.
+
+Il sommario della commissione di quel giorno lo nomina per esteso, e da lì l'iter si chiude. La commissione non serve saperla: la sola data risponde, perché la troncatura del backend `/bd/` dipende dalla dimensione della risposta e una giornata sola è piccola (`--commissione` si aggiunge solo per restringere).
+
+```bash
+ars-sicilia-pp-cli commissioni sommari --legisl 18 --data 2024-09-17 --agent
+# le 7 sedute di quel giorno; la II - Bilancio è la seduta 109, «Esame del disegno di legge ... n. 780»
+ars-sicilia-pp-cli ddl iter 18 780 --agent
+```
+
+Quando `ddl cerca` esce troncato su una ricerca a testo libero, l'hint nomina questa strada.
 
 ### `docno` e `permalink`: l'unico URL che si può conservare
 

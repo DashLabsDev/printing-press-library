@@ -1,0 +1,17 @@
+{
+  "schema_version": 2,
+  "id": "ars-sicilia-iter-sede-trattino-acapo",
+  "applied_at": "2026-08-30",
+  "base_run_id": "20260528-181840",
+  "base_printing_press_version": "4.30.3",
+  "summary": "Recompose the hyphen and line break the portal writes inside a committee name, so `sede` names one committee once.",
+  "reason": "The source itself breaks the word: the raw HTML of the ddl 5030 record in archive 221 (docno 9391) contains `Commissione</a> T-<br> ERZA`, and the same shape was already noted in a code comment for the XVII legislature's `Commissione sp- eciale per lo Statuto`. The garbling is upstream, but propagating it is not neutral, because `sede` is a closed vocabulary: the iter of ddl 5030 came out with `Commissione TERZA` four times and `Commissione T- ERZA` once - two committees where there is one - so any grouping by sede counts two groups. The committee code (0300) sits on the same row and confirms which one it is. Only `sede` is touched, not the event's `titolo`, which stays verbatim; and only a hyphen attached to the letter before it, because a hyphen with a space on both sides separates two words instead of breaking one.",
+  "files": [
+    "internal/cli/ddl_iter.go",
+    "internal/cli/ddl_iter_parse_test.go",
+    "SKILL.md",
+    "README.md"
+  ],
+  "validated_outcome": "`ddl iter 18 5030` goes from two sedi for the same committee to one (`Commissione TERZA` x5). The homologous healthy iters are unchanged: 18/780, 18/551, 17/731, 17/733 (seven sedi, none broken) and `legge cronologia 18 14 --anno 2026`. New cases in TestIterSedeRisolta_RicomponeTrattinoACapo and TestRicomponiTrattinoACapo_LasciaISeparatori, the latter pinning that `Commissione PRIMA - SECONDA` and `anti-mafia` are left alone.",
+  "upstream_issue": null
+}

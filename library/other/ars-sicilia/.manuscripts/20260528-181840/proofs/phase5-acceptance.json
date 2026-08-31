@@ -11,7 +11,7 @@
   "auth_context": {
     "type": "none"
   },
-  "source_fingerprint": "3c825f8e2c429e450be964fa2991123d0cf9d3a2dea9ae6ed5bbcd65a98e80d5",
+  "source_fingerprint": "d3ee1d4847f7e2f73e0b872e2083795372ff367113ad30130b4fb573fcedfec3",
   "source_files": {
     "cmd/ars-sicilia-pp-cli/main.go": "c0dfc303980570f5c430e6eb920798649f3825d25b3691778e19507229430b0c",
     "cmd/ars-sicilia-pp-mcp/main.go": "f181e27a68985fa073ecdaec19a264e69a0af84075b1460c097dc0dc4ea4b5db",
@@ -49,8 +49,8 @@
     "internal/cli/ddl_firmatari_data.go": "760a678122a36bc7b67234881d791e9e117d4f1059b8acd4a195923c7b264cc3",
     "internal/cli/ddl_get.go": "1fa0f3eb5a27bfe8d1d0daedfe002bdaa1d1a5573e3b44a4745f49ac78330b15",
     "internal/cli/ddl_iniziative.go": "95cb242f8f52b01abe3151f69b85f949ec46b38ea79e3026f639fbcef75ea123",
-    "internal/cli/ddl_iter.go": "b6e27b52fd0a78f89601c356f5cf8241aa99182bae8e48e0878e6f4ff905576f",
-    "internal/cli/ddl_iter_parse_test.go": "20b5db04ca9b554b0c7c6b7e26948a3b4103fa5fbee9170fb72dd013d697e887",
+    "internal/cli/ddl_iter.go": "9354fe96b97bc296a54005358df371309dc83e02191e0636561187a46c31da0f",
+    "internal/cli/ddl_iter_parse_test.go": "36262ff018fe5e6dd67d0f256bdc84287bcea4e2571c30e8f88f5d8fdad7016c",
     "internal/cli/ddl_iter_test.go": "7688c0018b72b5bb66b3fc7c8710e62d7bde5fb98895c85b6cbd8f30a46c36a0",
     "internal/cli/ddl_materie.go": "4eb46c0ba00605c5f589211e946b4606e37f0c06bf0e5e05a713119b231f760e",
     "internal/cli/ddl_stralci.go": "f8c4649b62f664d6ec57ed01f45b99de8c38dd991e6174b55045e37101275a8a",
@@ -66,8 +66,8 @@
     "internal/cli/gruppi.go": "d561c302effefdf42ec8c31e62e66fb2b51701b42c4bb693f2a25410e6e9df93",
     "internal/cli/helpers.go": "9a17330ca156263b4eb1652db2d5ee365e105c0c404b2fc9eac97e6480067970",
     "internal/cli/html_extract.go": "7355bbacae707a4112fee80a70d01f84c9327170cf2351c88ac6a3a6e930943b",
-    "internal/cli/icaro_helpers.go": "5a01f70e31799a7b8d27bcd765943447824f39d148a7ea8c2fc1e6a6e1952bfb",
-    "internal/cli/icaro_helpers_test.go": "0093c63922dfbf46038bdff5eef80720a3caccc4807d3c2d9eea99da3145afe1",
+    "internal/cli/icaro_helpers.go": "16fc8cb11084a1a4136dcd52889cc15fb74f8dd9fb104cbef62e82c9a2f5097e",
+    "internal/cli/icaro_helpers_test.go": "c400d8582a0d74d8da2ae0bdc9a70f160b3d95fb1f3a343597459f680ceacc34",
     "internal/cli/import.go": "6e2ccefc32e31cf11ffe7cc5bd98d1d019cd5a81d1f63b976f4eddea77da03fc",
     "internal/cli/interpellanze.go": "6247903bf71e3137909aa93a978a18fef8d888a2e9f6add068e47ee5fff4d6c5",
     "internal/cli/interpellanze_cerca.go": "829cd6b4c99716457dc8def7310e9c8363290ea6fa05188a99eb51d2de581a06",

@@ -1,0 +1,17 @@
+{
+  "schema_version": 2,
+  "id": "ars-sicilia-cerca-rotta-sommari",
+  "applied_at": "2026-08-30",
+  "base_run_id": "20260528-181840",
+  "base_printing_press_version": "4.30.3",
+  "summary": "On a truncated free-text ddl search, name the committee-summary route to an act whose number the story does not give.",
+  "reason": "The portal orders ddl results by date, not by relevance, and ordinaPerPertinenza can only reorder the window already downloaded: an act past `--limit` is unreachable by construction, so this is not fixable by ranking. `ddl cerca --legisl 18 --anno 2024 --frase \"enti locali\"` returns ten rows from November and December and leaves out ddl 780, the bill behind the September 17th amendment marathon. The truncation hint already said the ordering is not by relevance, i.e. that the act may sit past the window; what was missing was where to go instead. The committee summary of that day names the bills by number, and `ddl iter` closes the story from there. `--commissione` is offered rather than required: someone starting from a news story has the date and rarely the committee, and demanding the one value they lack sends them back to the start - a date alone answers, because the /bd/ backend's truncation scales with response size and a single day is small.",
+  "files": [
+    "internal/cli/icaro_helpers.go",
+    "internal/cli/icaro_helpers_test.go",
+    "SKILL.md",
+    "README.md"
+  ],
+  "validated_outcome": "The hint appears on the reported case and nowhere it would be noise: absent on an untruncated search (`--legisl 18 --anno 2023 --frase \"enti di area vasta\"`, 5 rows including ddl 319, `troncato: false`), absent on a `--numero` lookup, and absent on other archives (`interrogazioni cerca --frase \"incendi boschivi\"`, truncated, no sommari hint). The route it names was measured: `commissioni sommari --legisl 18 --data 2024-09-17` returns that day's 7 sittings with `troncato: false`, the II - Bilancio one being sitting 109 which names ddl 780. New cases in TestSommariHint.",
+  "upstream_issue": null
+}

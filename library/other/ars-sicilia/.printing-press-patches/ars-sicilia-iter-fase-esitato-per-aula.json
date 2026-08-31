@@ -1,0 +1,17 @@
+{
+  "schema_version": 2,
+  "id": "ars-sicilia-iter-fase-esitato-per-aula",
+  "applied_at": "2026-08-30",
+  "base_run_id": "20260528-181840",
+  "base_printing_press_version": "4.30.3",
+  "summary": "Let the declared sitting, not the verb, decide where an iter event happened: `Esitato per Aula` is a committee outcome.",
+  "reason": "`Esitato per Aula` is how the committee closes its examination and sends the text to the floor: the verb names the Aula as the destination, not as the venue. classifyIterFase reads the verb alone, so the row came out with `fase: aula` and a committee as `sede` - a floor event held in committee. The cost is concrete: anyone filtering `fase == \"aula\"` to find the final vote picks up a committee row and gets the date wrong by weeks (16 June instead of 8 July on ddl 5030, sitting 263). The criterion is not a blacklist of verbs but the portal's own declaration: where the row declares a committee sitting, that is where the event happened, and floor rows carry the AULA marker in place of a committee name. The rule fires in one direction only: the mirror case (`Rinviato Commissione 0400 Seduta n. 255 AULA`, the floor sending a bill back to committee) states no contradiction - there the verb names a real destination and the venue really is the Aula.",
+  "files": [
+    "internal/cli/ddl_iter.go",
+    "internal/cli/ddl_iter_parse_test.go",
+    "SKILL.md",
+    "README.md"
+  ],
+  "validated_outcome": "Measured over 268 events across 13 iters of the XVII and XVIII legislatures, before and after: only the 14 `Esitato per Aula` rows move, `aula` 56 -> 42 and `commissione` 160 -> 174, with `legge`, `iter` and `presentazione` unchanged and zero residual rows carrying `fase: aula` with a committee `sede`. The real floor vote on ddl 5030 stays at 8 July, sitting 263, and the sitting-date coherence guard still fires on `legge cronologia 17 9 --anno 2020`. New table in TestFaseIterConSeduta.",
+  "upstream_issue": null
+}
