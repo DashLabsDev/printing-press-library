@@ -69,7 +69,9 @@ flight-goat-pp-cli flights \
   --pace 3s --currency EUR --agent
 ```
 
-`--trip` takes `ORIG>DEST@DEPART` or `ORIG>DEST@DEPART@RETURN` (same grammar family as `--segment`) and replaces the positional args; all filter flags (`--currency`, `--stops`, `--class`, `--airlines`, `--time`, `--passengers`) apply to every trip. Per-trip rows land in the envelope's `results[]` with `status` `ok`/`error`/`skipped`.
+`--trip` takes `ORIG>DEST@DEPART` or `ORIG>DEST@DEPART@RETURN` (same grammar family as `--segment`) and replaces the positional args; all filter flags (`--currency`, `--stops`, `--class`, `--airlines`, `--time`, `--return-time`, `--passengers`) apply to every trip. Per-trip rows land in the envelope's `results[]` with `status` `ok`/`error`/`skipped`.
+
+Round trips can constrain each leg's departure window independently: `--time` sets the outbound window, `--return-time` sets the return leg's window (falls back to `--time` when unset). Both take the same `H-H` 24h form, e.g. `flight-goat-pp-cli flights SEA HNL 2026-08-01 --return 2026-08-10 --time 6-12 --return-time 17-23` for a morning outbound and evening return.
 
 Rate-limit semantics:
 
