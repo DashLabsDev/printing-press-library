@@ -2,17 +2,17 @@
   "schema_version": 1,
   "slug": "anylist",
   "cli_name": "anylist-pp-cli",
-  "version": "2026.8.4",
-  "released_at": "2026-08-28T09:32:36Z",
-  "source_commit": "00a18551788f440b6276456889156fba7c41a5d4",
+  "version": "2026.8.5",
+  "released_at": "2026-08-31T09:20:27Z",
+  "source_commit": "bb0fd4ce648317f97e2c9cfb56b31e98d90bc8db",
   "printing_press_version": "4.6.1",
   "run_id": "20260514-120439",
   "changes": [
     {
-      "title": "refactor(anylist): split oversized sources by responsibility (from #1845)",
-      "pr": 1852,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/1852",
-      "commit": "00a18551788f440b6276456889156fba7c41a5d4"
+      "title": "feat(anylist): make recipe imports duplicate-safe",
+      "pr": 1885,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/1885",
+      "commit": "bb0fd4ce648317f97e2c9cfb56b31e98d90bc8db"
     }
   ]
 }

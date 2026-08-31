@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.5 - 2026-08-31
+
+- feat(anylist): make recipe imports duplicate-safe (#1885).
+
 ## 2026.8.4 - 2026-08-28
 
 - refactor(anylist): split oversized sources by responsibility (from #1845) (#1852).
