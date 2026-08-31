@@ -224,7 +224,7 @@ resources:
       list:
         method: POST
         path: /data/user-data/get
-        description: "List items in a shopping list"
+        description: "List items in a shopping list; JSON output includes cached package size, photo IDs, prices, store IDs, category match ID, and category assignments when available"
         body:
           - name: list_name
             flag_name: list
@@ -531,9 +531,24 @@ resources:
             required: false
             default: 0
             description: "Scale to this many servings (0 = no scaling)"
+          - name: on_duplicate
+            flag_name: on-duplicate
+            type: string
+            required: false
+            default: skip
+            description: "Duplicate policy: skip, update, or allow"
         response:
           type: object
           item: Recipe
+
+      duplicates:
+        method: GET
+        path: local-cache
+        description: "Report duplicate recipe names from the local cache without changing anything"
+        body: []
+        response:
+          type: array
+          item: RecipeDuplicateGroup
 
       create:
         method: POST
@@ -1126,6 +1141,65 @@ types:
       - name: list_name
         type: string
       - name: store_names
+        type: string
+      - name: package_size
+        type: string
+      - name: category_match_id
+        type: string
+      - name: photo_ids
+        type: array
+        item: string
+      - name: prices
+        type: array
+        item: ItemPrice
+      - name: store_ids
+        type: array
+        item: string
+      - name: category_assignments
+        type: array
+        item: CategoryAssignment
+
+  ItemPrice:
+    fields:
+      - name: amount
+        type: number
+      - name: details
+        type: string
+      - name: store_id
+        type: string
+      - name: date
+        type: string
+
+  CategoryAssignment:
+    fields:
+      - name: id
+        type: string
+      - name: category_group_id
+        type: string
+      - name: category_id
+        type: string
+
+  RecipeDuplicateGroup:
+    fields:
+      - name: name
+        type: string
+      - name: normalized_name
+        type: string
+      - name: count
+        type: integer
+      - name: recipes
+        type: array
+        item: RecipeDuplicateEntry
+
+  RecipeDuplicateEntry:
+    fields:
+      - name: id
+        type: string
+      - name: name
+        type: string
+      - name: source_name
+        type: string
+      - name: source_url
         type: string
 
   Recipe:
