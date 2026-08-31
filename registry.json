@@ -16315,9 +16315,9 @@
       "path": "library/ai/openrouter-image",
       "release": {
         "cli_name": "openrouter-image-pp-cli",
-        "version": "2026.8.10",
-        "released_at": "2026-08-21T08:29:25Z",
-        "source_commit": "35f6cabd68c76fd1eceb6aa37126126ef7d4d7a6"
+        "version": "2026.8.11",
+        "released_at": "2026-08-31T09:11:07Z",
+        "source_commit": "5163acdb2dd6f46b1a75c0a08aae4f6bbc5fc907"
       },
       "printer": "neal-kyle",
       "printer_name": "Kyle Neal",
@@ -19943,6 +19943,12 @@
         "Rank a task's eval test cases by how often they fail, separating genuine flake from cases that fail consistently."
       ],
       "path": "library/ai/rightbrain",
+      "release": {
+        "cli_name": "rightbrain-pp-cli",
+        "version": "2026.8.1",
+        "released_at": "2026-08-30T10:27:02Z",
+        "source_commit": "06428435030fd2dde5f9a64a42bb26a75d02fe93"
+      },
       "printer": "papaonlegs",
       "printer_name": "Farouk Umar",
       "creator": {
@@ -24154,7 +24160,7 @@
         "Cancel a waitlist request. The upstream body requires waitlistRequestId as a JSON number (string flags 400); siteId is the store extref.",
         "Sniffed waitlist check-in",
         "texasroadhouse checkin",
-        "Check in at the host stand via sniffed POST /waitlist/{extref}/checkin (no public API).",
+        "Confirm arrival after the guest receives the Texas Roadhouse text and replies HERE via sniffed POST /waitlist/{extref}/checkin (no public API).",
         "Quote MinQuote lookup",
         "texasroadhouse get-quote",
         "Read per-party-size MinQuote/MaxQuote for a store extref so submit can send the required WaitMinutes.",
