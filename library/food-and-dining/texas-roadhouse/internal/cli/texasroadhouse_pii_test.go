@@ -69,6 +69,66 @@ func TestRedactWaitlistPII(t *testing.T) {
 	}
 }
 
+func TestRedactWaitlistPIIRecursivelyAndCaseInsensitively(t *testing.T) {
+	body := map[string]any{
+		"emailaddress": "guest@example.test",
+		"Nested": map[string]any{
+			"FiRsTnAmE": "Guest",
+			"items": []any{
+				map[string]any{
+					"primaryphonenumber": "555-0100",
+					"keep":               "safe",
+				},
+			},
+		},
+		"PartySize": 2,
+	}
+
+	got := RedactWaitlistPII(body)
+	if got["emailaddress"] != waitlistPIIRedacted {
+		t.Fatalf("lowercase email = %v, want %s", got["emailaddress"], waitlistPIIRedacted)
+	}
+	nested, ok := got["Nested"].(map[string]any)
+	if !ok {
+		t.Fatalf("nested value = %T, want map[string]any", got["Nested"])
+	}
+	if nested["FiRsTnAmE"] != waitlistPIIRedacted {
+		t.Fatalf("mixed-case nested name = %v, want %s", nested["FiRsTnAmE"], waitlistPIIRedacted)
+	}
+	items, ok := nested["items"].([]any)
+	if !ok || len(items) != 1 {
+		t.Fatalf("nested items = %#v, want one item", nested["items"])
+	}
+	item, ok := items[0].(map[string]any)
+	if !ok {
+		t.Fatalf("nested item = %T, want map[string]any", items[0])
+	}
+	if item["primaryphonenumber"] != waitlistPIIRedacted {
+		t.Fatalf("lowercase nested phone = %v, want %s", item["primaryphonenumber"], waitlistPIIRedacted)
+	}
+	if item["keep"] != "safe" || got["PartySize"] != 2 {
+		t.Fatalf("non-PII fields changed: %#v", got)
+	}
+	if body["emailaddress"] != "guest@example.test" {
+		t.Fatalf("redaction mutated input: %#v", body)
+	}
+}
+
+func TestSubmitDryRunRejectsUnknownStdinFields(t *testing.T) {
+	withTempLearnHome(t)
+	_, _, err := runRootArgsWithStdin(t,
+		`{"EmailAddress":"guest@example.test","FirstName":"Test","LastName":"User","PrimaryPhoneAreaCode":"555","PrimaryPhoneNumber":"555-0100","PartySize":2,"WaitMinutes":10,"unexpected":"must-not-reach-upstream"}`,
+		"texasroadhouse", "submit", "218",
+		"--stdin", "--dry-run", "--agent", "--no-learn",
+	)
+	if err == nil {
+		t.Fatal("expected dry-run stdin with an unknown field to be refused")
+	}
+	if !strings.Contains(err.Error(), "unknown stdin JSON field") || !strings.Contains(err.Error(), "unexpected") {
+		t.Fatalf("error = %v, want unknown stdin field refusal", err)
+	}
+}
+
 func TestSubmitDryRunRedactsPII(t *testing.T) {
 	withTempLearnHome(t)
 	stderr := captureOSStderr(t, func() {

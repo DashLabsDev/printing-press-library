@@ -615,7 +615,7 @@ func TestWaitlistMutationToolsAreDestructiveAndGated(t *testing.T) {
 	RegisterTools(s)
 	tools := s.ListTools()
 
-	for _, name := range []string{"texasroadhouse_submit", "texasroadhouse_checkin", "texasroadhouse_cancel"} {
+	for _, name := range []string{"texasroadhouse_checkin", "texasroadhouse_cancel"} {
 		tool, ok := tools[name]
 		if !ok {
 			t.Fatalf("missing tool %s", name)
@@ -636,6 +636,15 @@ func TestWaitlistMutationToolsAreDestructiveAndGated(t *testing.T) {
 		if tool.Tool.Annotations.DestructiveHint != nil && *tool.Tool.Annotations.DestructiveHint {
 			t.Fatalf("%s must stay non-destructive", name)
 		}
+	}
+}
+
+func TestMCPDoesNotExposeWaitlistSubmitGuestPII(t *testing.T) {
+	s := server.NewMCPServer("texas-roadhouse", "test")
+	RegisterTools(s)
+
+	if _, ok := s.ListTools()["texasroadhouse_submit"]; ok {
+		t.Fatal("MCP must not expose waitlist submit because tool-call arguments can retain guest PII; use the CLI stdin/prompt flow")
 	}
 }
 

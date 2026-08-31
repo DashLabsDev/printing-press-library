@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -25,13 +26,44 @@ var waitlistPIIFlagNames = []string{
 	"primary-phone-extension",
 }
 
-var waitlistPIIBodyKeys = []string{
+var waitlistPIIBodyKeySet = map[string]bool{
+	"emailaddress":          true,
+	"firstname":             true,
+	"lastname":              true,
+	"primaryphoneareacode":  true,
+	"primaryphonenumber":    true,
+	"primaryphoneextension": true,
+}
+
+// waitlistSubmitBodyKeys is intentionally a closed list. The upstream
+// endpoint does not provide a safe extension mechanism, so unknown stdin
+// fields must not silently become a POST body during a preview or live join.
+var waitlistSubmitBodyKeys = []string{
 	"EmailAddress",
 	"FirstName",
 	"LastName",
+	"IsSmoking",
 	"PrimaryPhoneAreaCode",
-	"PrimaryPhoneNumber",
 	"PrimaryPhoneExtension",
+	"PrimaryPhoneNumber",
+	"PrimaryPhoneType",
+	"PartySize",
+	"WaitMinutes",
+	"Platform",
+}
+
+var waitlistSubmitBodyKeySet = map[string]bool{
+	"EmailAddress":          true,
+	"FirstName":             true,
+	"LastName":              true,
+	"IsSmoking":             true,
+	"PrimaryPhoneAreaCode":  true,
+	"PrimaryPhoneExtension": true,
+	"PrimaryPhoneNumber":    true,
+	"PrimaryPhoneType":      true,
+	"PartySize":             true,
+	"WaitMinutes":           true,
+	"Platform":              true,
 }
 
 const waitlistPIIRedacted = "<redacted>"
@@ -52,19 +84,56 @@ func rejectWaitlistPIIFlags(cmd *cobra.Command) error {
 	return nil
 }
 
-// RedactWaitlistPII copies body and replaces guest identity fields. Used for
-// --dry-run display and logs so a preview cannot leak name/email/phone.
+// RedactWaitlistPII deep-copies body and replaces guest identity fields at
+// every map depth. It is deliberately case-insensitive because input from
+// generic JSON callers can vary field casing; dry-run display and logs must
+// never expose guest name/email/phone merely because an unexpected nesting or
+// lowercase key bypassed the canonical request shape.
 func RedactWaitlistPII(body map[string]any) map[string]any {
-	out := make(map[string]any, len(body))
-	for k, v := range body {
-		out[k] = v
+	redacted, ok := redactWaitlistPIIValue(body).(map[string]any)
+	if !ok {
+		return map[string]any{}
 	}
-	for _, key := range waitlistPIIBodyKeys {
-		if _, ok := out[key]; ok {
-			out[key] = waitlistPIIRedacted
+	return redacted
+}
+
+func redactWaitlistPIIValue(value any) any {
+	switch typed := value.(type) {
+	case map[string]any:
+		out := make(map[string]any, len(typed))
+		for key, nested := range typed {
+			if waitlistPIIBodyKeySet[strings.ToLower(key)] {
+				out[key] = waitlistPIIRedacted
+				continue
+			}
+			out[key] = redactWaitlistPIIValue(nested)
 		}
+		return out
+	case []any:
+		out := make([]any, len(typed))
+		for i, nested := range typed {
+			out[i] = redactWaitlistPIIValue(nested)
+		}
+		return out
+	case map[string]string:
+		out := make(map[string]string, len(typed))
+		for key, nested := range typed {
+			if waitlistPIIBodyKeySet[strings.ToLower(key)] {
+				out[key] = waitlistPIIRedacted
+				continue
+			}
+			out[key] = nested
+		}
+		return out
+	case []map[string]any:
+		out := make([]map[string]any, len(typed))
+		for i, nested := range typed {
+			out[i] = RedactWaitlistPII(nested)
+		}
+		return out
+	default:
+		return value
 	}
-	return out
 }
 
 func waitlistPIIPlaceholderBody() map[string]any {
@@ -112,7 +181,32 @@ func readWaitlistStdinJSON(r io.Reader) (map[string]any, error) {
 	if err := json.Unmarshal(data, &jsonBody); err != nil {
 		return nil, fmt.Errorf("parsing stdin JSON: %w", err)
 	}
+	if err := validateWaitlistSubmitBodyFields(jsonBody); err != nil {
+		return nil, err
+	}
 	return jsonBody, nil
+}
+
+func validateWaitlistSubmitBodyFields(body map[string]any) error {
+	var unknown []string
+	for key := range body {
+		if !waitlistSubmitBodyKeySet[key] {
+			unknown = append(unknown, key)
+		}
+	}
+	if len(unknown) == 0 {
+		return nil
+	}
+	sort.Strings(unknown)
+	quoted := make([]string, len(unknown))
+	for i, key := range unknown {
+		quoted[i] = fmt.Sprintf("%q", key)
+	}
+	fieldLabel := "field"
+	if len(quoted) > 1 {
+		fieldLabel = "fields"
+	}
+	return usageErr(fmt.Errorf("unknown stdin JSON %s %s; accepted fields: %s", fieldLabel, strings.Join(quoted, ", "), strings.Join(waitlistSubmitBodyKeys, ", ")))
 }
 
 func isTerminalReader(r io.Reader) bool {

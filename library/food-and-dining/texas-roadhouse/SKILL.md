@@ -18,6 +18,8 @@ This is an **unofficial** skill. It is **not affiliated with or endorsed by** Te
 
 **PII / consent:** joining a waitlist sends the guest's first name, last name, email, and phone. Get consent first. Never put that identity on argv flags. Agents pass stdin JSON. `--dry-run` redacts PII. Live `submit` / `checkin` / `cancel` require `--yes`.
 
+**MCP privacy boundary:** MCP intentionally omits waitlist `submit`; hosts can retain tool-call arguments in transcripts or logs. Use the CLI's stdin JSON or interactive-prompt flow when joining a guest.
+
 **Local retention:** successful waitlist responses may be written to the local SQLite store.
 
 **Check-in:** the guest texts HERE once everyone has arrived (text REMOVE to leave). This is not a host-stand visit.

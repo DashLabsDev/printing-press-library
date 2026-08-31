@@ -6,6 +6,8 @@ This is an **unofficial** tool. It is **not affiliated with or endorsed by** Tex
 
 **PII / consent:** joining a waitlist sends the guest's first name, last name, email, and phone to Texas Roadhouse. Get the guest's consent first. Do not put that identity on argv flags (shell history / `ps` leak). Pass stdin JSON, or use the interactive prompt.
 
+**MCP privacy boundary:** the MCP server intentionally does not expose waitlist `submit`, because MCP hosts can retain tool-call arguments in transcripts or logs. Use the CLI's stdin JSON or interactive-prompt flow for a guest join.
+
 **Local retention:** successful waitlist responses may be written to the local SQLite store under the resolved data dir.
 
 **Last verified:** live-tested late Aug 2026. Naked HTTP gets Cloudflare 403; this CLI uses Chrome-compatible transport. A Cloudflare-challenge error means the origin returned `cf-mitigated` / "Just a moment" instead of the waitlist API — run `texas-roadhouse-pp-cli doctor`.

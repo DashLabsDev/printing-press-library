@@ -133,28 +133,10 @@ func RegisterTools(s *server.MCPServer) {
 		),
 		makeAPIHandler("GET", "/api/texasroadhouse/waitlist/{waitlist_id}/test", true, false, nil, mcpPageConfig{}, []mcpParamBinding{{PublicName: "waitlist_id", WireName: "waitlist_id", Location: "path"}}, []string{"waitlist_id"}),
 	)
-	s.AddTool(
-		mcplib.NewTool("texasroadhouse_submit",
-			mcplib.WithDescription("Join a store waitlist (destructive). Unofficial sniffed endpoint; get guest consent before sending name/email/phone. Live join requires yes=true; dry-run=true previews a redacted body without POSTing. Required: waitlist_id, EmailAddress, FirstName, LastName, PrimaryPhoneAreaCode, PrimaryPhoneNumber, PartySize, WaitMinutes. Optional: IsSmoking, PrimaryPhoneExtension, PrimaryPhoneType, Platform, yes, dry-run. Returns the new WaitlistSubmitResult."),
-			mcplib.WithString("waitlist_id", mcplib.Required(), mcplib.Description("Store extref (not internal store id). Springfield MO is 218.")),
-			mcplib.WithString("EmailAddress", mcplib.Required(), mcplib.Description("Guest email")),
-			mcplib.WithString("FirstName", mcplib.Required(), mcplib.Description("Guest first name")),
-			mcplib.WithString("LastName", mcplib.Required(), mcplib.Description("Guest last name")),
-			mcplib.WithBoolean("IsSmoking", mcplib.Description("Always false in the web app")),
-			mcplib.WithString("PrimaryPhoneAreaCode", mcplib.Required(), mcplib.Description("3-digit area code")),
-			mcplib.WithString("PrimaryPhoneExtension", mcplib.Description("Usually empty")),
-			mcplib.WithString("PrimaryPhoneNumber", mcplib.Required(), mcplib.Description("Local number as xxx-xxxx")),
-			mcplib.WithNumber("PrimaryPhoneType", mcplib.Description("Web app sends 1")),
-			mcplib.WithNumber("PartySize", mcplib.Required(), mcplib.Description("Party size, max 6")),
-			mcplib.WithNumber("WaitMinutes", mcplib.Required(), mcplib.Description("From quote MinQuote for this party size")),
-			mcplib.WithString("Platform", mcplib.Description("Web app sends web")),
-			mcplib.WithBoolean("yes", mcplib.Description("Required for a live join. Same meaning as CLI --yes.")),
-			mcplib.WithBoolean("dry-run", mcplib.Description("Preview the request body without POSTing. Same meaning as CLI --dry-run.")),
-			mcplib.WithDestructiveHintAnnotation(true),
-			mcplib.WithOpenWorldHintAnnotation(true),
-		),
-		makeAPIHandler("POST", "/api/texasroadhouse/waitlist/{waitlist_id}/submit", false, false, nil, mcpPageConfig{}, []mcpParamBinding{{PublicName: "waitlist_id", WireName: "waitlist_id", Location: "path"}, {PublicName: "EmailAddress", WireName: "EmailAddress", Location: "body"}, {PublicName: "FirstName", WireName: "FirstName", Location: "body"}, {PublicName: "LastName", WireName: "LastName", Location: "body"}, {PublicName: "IsSmoking", WireName: "IsSmoking", Location: "body"}, {PublicName: "PrimaryPhoneAreaCode", WireName: "PrimaryPhoneAreaCode", Location: "body"}, {PublicName: "PrimaryPhoneExtension", WireName: "PrimaryPhoneExtension", Location: "body"}, {PublicName: "PrimaryPhoneNumber", WireName: "PrimaryPhoneNumber", Location: "body"}, {PublicName: "PrimaryPhoneType", WireName: "PrimaryPhoneType", Location: "body"}, {PublicName: "PartySize", WireName: "PartySize", Location: "body"}, {PublicName: "WaitMinutes", WireName: "WaitMinutes", Location: "body"}, {PublicName: "Platform", WireName: "Platform", Location: "body"}}, []string{"waitlist_id"}),
-	)
+	// PATCH(mcp-submit-keeps-guest-pii-out-of-tool-calls): waitlist submit is
+	// intentionally CLI-only. MCP hosts may retain tool-call arguments in
+	// transcripts or logs, while the CLI can receive guest identity from stdin
+	// or an interactive prompt without making it part of a tool schema.
 	// Search tool — faster than iterating list endpoints for finding specific items
 	s.AddTool(
 		mcplib.NewTool("search",
@@ -959,10 +941,10 @@ func handleContext(_ context.Context, _ mcplib.CallToolRequest) (*mcplib.CallToo
 		"api":         "texas-roadhouse",
 		"description": "Waitlist CLI for Texas Roadhouse. Find a nearby store, read the quote, join and leave the list.",
 		"archetype":   "generic",
-		"tool_count":  9,
+		"tool_count":  8,
 		"paths":       paths,
 		// tool_surface tells agents which surface a capability lives on.
-		"tool_surface": "MCP exposes typed endpoint tools plus a runtime mirror of user-facing CLI commands. Endpoint tools keep typed schemas; command-mirror tools shell out to the companion texas-roadhouse-pp-cli binary.",
+		"tool_surface": "MCP exposes typed endpoint tools plus a runtime mirror of user-facing CLI commands. Endpoint tools keep typed schemas; command-mirror tools shell out to the companion texas-roadhouse-pp-cli binary. Waitlist submit is intentionally CLI-only because MCP tool-call arguments can retain guest PII.",
 		// learn_protocol is generated from the single shared source of
 		// truth (the exported constant internal/learn.RecallFirstProtocol)
 		// also consumed by the CLI agent-context command, so the MCP and
@@ -985,7 +967,7 @@ func handleContext(_ context.Context, _ mcplib.CallToolRequest) (*mcplib.CallToo
 			{
 				"name":        "texasroadhouse",
 				"description": "Operations on test",
-				"endpoints":   []string{"cancel", "checkin", "get_quote", "get_settings", "get_status", "get_test", "submit"},
+				"endpoints":   []string{"cancel", "checkin", "get_quote", "get_settings", "get_status", "get_test"},
 				"searchable":  true,
 				"writable":    true,
 			},
