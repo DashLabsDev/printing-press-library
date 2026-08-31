@@ -554,6 +554,14 @@ def _iter_bool_flag_names(text: str) -> Iterable[str]:
         if method in ("BoolVar", "BoolSliceVar"):
             yield name
 
+    # Non-Var Cobra boolean declarations have a different argument shape:
+    # Flags().Bool("json", false, ...) / BoolP("json", "j", false, ...).
+    for m in re.finditer(
+        r'(?:Persistent)?Flags\(\)\.BoolP?\(\s*"([a-z][a-z0-9-]*)"',
+        text,
+    ):
+        yield m.group(1)
+
     aliases = {
         m.group(1): m.group(2) == "Persistent"
         for m in FLAG_ALIAS_RE.finditer(text)
@@ -579,8 +587,8 @@ def _boolean_flag_names(cli_dir: Path) -> frozenset[str]:
     would silently drop a real positional. A CLI-wide scan (rather than
     per-command) deliberately includes persistent/root booleans like --json or
     --verbose, which are the common case a recipe writes before a positional."""
-    cli_pkg = cli_dir / "internal" / "cli"
-    if not cli_pkg.is_dir():
+    cli_pkg = cli_source_dir(cli_dir)
+    if cli_pkg is None:
         return frozenset()
     names: set[str] = set()
     for path in sorted(cli_pkg.glob("*.go")):
