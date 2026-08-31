@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.10 - 2026-08-31
+
+- fix(ars-sicilia): iter events say where they happened, and a cut ddl search names the way in (#1879).
+
 ## 2026.8.9 - 2026-08-30
 
 - fix(ars-sicilia): the portal's refusal page was read as zero results (#1858).
