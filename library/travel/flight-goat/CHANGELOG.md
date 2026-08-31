@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.5 - 2026-08-31
+
+- feat(flight-goat): add independent return-leg time window (#1880).
+
 ## 2026.8.4 - 2026-08-27
 
 - feat(flight-goat): rebase SeatWifi wifi commands from #1797 (#1824).
