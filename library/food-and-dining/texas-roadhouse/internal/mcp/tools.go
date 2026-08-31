@@ -69,7 +69,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("texasroadhouse_cancel",
-			mcplib.WithDescription("Cancel a waitlist request (destructive). Live cancel requires yes=true; dry-run=true previews without POSTing. Required: waitlistRequestId, siteId. Optional: clientid, yes, dry-run. Returns the new WaitlistCancelResult."),
+			mcplib.WithDescription("Cancel a waitlist request (destructive). Guests can also text REMOVE to leave; CLI leave is texasroadhouse cancel. Live cancel requires yes=true; dry-run=true previews without POSTing. Required: waitlistRequestId, siteId. Optional: clientid, yes, dry-run. Returns the new WaitlistCancelResult."),
 			mcplib.WithString("clientid", mcplib.Description("Must be texasroadhouse")),
 			mcplib.WithNumber("waitlistRequestId", mcplib.Required(), mcplib.Description("Numeric request id from submit (JSON number)")),
 			mcplib.WithString("siteId", mcplib.Required(), mcplib.Description("Store extref")),
@@ -82,7 +82,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("texasroadhouse_checkin",
-			mcplib.WithDescription("Confirm arrival after the guest receives the Texas Roadhouse text and replies HERE (destructive). Live check-in requires yes=true; dry-run=true previews without POSTing. Required: waitlist_id. Optional: yes, dry-run. Returns the new WaitlistCheckinResult."),
+			mcplib.WithDescription("Mark the party HERE after the guest texts HERE once everyone has arrived (text REMOVE to leave). Not a host-stand visit (destructive). Live check-in requires yes=true; dry-run=true previews without POSTing. Required: waitlist_id. Optional: yes, dry-run. Returns the new WaitlistCheckinResult."),
 			mcplib.WithString("waitlist_id", mcplib.Required(), mcplib.Description("Store extref (not internal store id). Springfield MO is 218.")),
 			mcplib.WithBoolean("yes", mcplib.Description("Required for a live check-in. Same meaning as CLI --yes.")),
 			mcplib.WithBoolean("dry-run", mcplib.Description("Preview the request body without POSTing. Same meaning as CLI --dry-run.")),
@@ -135,7 +135,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("texasroadhouse_submit",
-			mcplib.WithDescription("Join a store waitlist (destructive). Live join requires yes=true; dry-run=true previews without POSTing. Required: waitlist_id, EmailAddress, FirstName, LastName, PrimaryPhoneAreaCode, PrimaryPhoneNumber, PartySize, WaitMinutes. Optional: IsSmoking, PrimaryPhoneExtension, PrimaryPhoneType, Platform, yes, dry-run. Returns the new WaitlistSubmitResult."),
+			mcplib.WithDescription("Join a store waitlist (destructive). Unofficial sniffed endpoint; get guest consent before sending name/email/phone. Live join requires yes=true; dry-run=true previews a redacted body without POSTing. Required: waitlist_id, EmailAddress, FirstName, LastName, PrimaryPhoneAreaCode, PrimaryPhoneNumber, PartySize, WaitMinutes. Optional: IsSmoking, PrimaryPhoneExtension, PrimaryPhoneType, Platform, yes, dry-run. Returns the new WaitlistSubmitResult."),
 			mcplib.WithString("waitlist_id", mcplib.Required(), mcplib.Description("Store extref (not internal store id). Springfield MO is 218.")),
 			mcplib.WithString("EmailAddress", mcplib.Required(), mcplib.Description("Guest email")),
 			mcplib.WithString("FirstName", mcplib.Required(), mcplib.Description("Guest first name")),
