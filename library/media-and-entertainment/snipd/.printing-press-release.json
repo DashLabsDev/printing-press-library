@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "slug": "snipd",
+  "cli_name": "snipd-pp-cli",
+  "version": "2026.8.1",
+  "released_at": "2026-08-31T09:19:27Z",
+  "source_commit": "71b2f63f5b8ce6b498f64393d74a527f42415343",
+  "printing_press_version": "4.28.0",
+  "run_id": "20260713-190747-d8d38c3e",
+  "changes": [
+    {
+      "title": "snipd: guided `auth login` + fix `auth set-token` never reaching the fetch commands",
+      "pr": 1882,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/1882",
+      "commit": "71b2f63f5b8ce6b498f64393d74a527f42415343"
+    }
+  ]
+}
