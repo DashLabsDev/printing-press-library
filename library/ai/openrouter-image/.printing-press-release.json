@@ -2,17 +2,17 @@
   "schema_version": 1,
   "slug": "openrouter-image",
   "cli_name": "openrouter-image-pp-cli",
-  "version": "2026.8.10",
-  "released_at": "2026-08-21T08:29:25Z",
-  "source_commit": "35f6cabd68c76fd1eceb6aa37126126ef7d4d7a6",
+  "version": "2026.8.11",
+  "released_at": "2026-08-31T09:11:07Z",
+  "source_commit": "5163acdb2dd6f46b1a75c0a08aae4f6bbc5fc907",
   "printing_press_version": "4.29.0",
   "run_id": "20260803-205427-851f4b39",
   "changes": [
     {
-      "title": "feat(openrouter-image): add openrouter-image",
-      "pr": 1654,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/1654",
-      "commit": "35f6cabd68c76fd1eceb6aa37126126ef7d4d7a6"
+      "title": "docs(openrouter-image): document prerequisites and uninstall steps",
+      "pr": 1874,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/1874",
+      "commit": "5163acdb2dd6f46b1a75c0a08aae4f6bbc5fc907"
     }
   ]
 }

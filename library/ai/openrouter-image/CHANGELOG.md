@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.8.11 - 2026-08-31
+
+- docs(openrouter-image): document prerequisites and uninstall steps (#1874).
+
 ## 2026.8.10 - 2026-08-21
 
 - feat(openrouter-image): add openrouter-image (#1654).
