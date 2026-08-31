@@ -87,6 +87,98 @@ func TestFlightsCmdRejectsMalformedTripWithExit2(t *testing.T) {
 	}
 }
 
+// PATCH(greptile review): a malformed --return-time must fail before any
+// network call (usage exit 2) whenever the batch contains at least one
+// round-trip trip — otherwise earlier one-way trips in the same batch would
+// run their network requests first, and the round-trip trip's failure would
+// surface deep in segment construction as an API error (exit 5) instead.
+func TestFlightsCmdRejectsMalformedReturnTimeInMixedBatchWithExit2(t *testing.T) {
+	cmd := newGfFlightsCmd(&rootFlags{})
+	cmd.SetArgs([]string{
+		"--trip", "SEA>DEN@2026-09-14", // one-way
+		"--trip", "PDX>DEN@2026-09-15@2026-09-17", // round-trip
+		"--return-time", "not-a-window",
+	})
+	cmd.SetOut(&bytes.Buffer{})
+	cmd.SetErr(&bytes.Buffer{})
+	err := cmd.Execute()
+	if err == nil {
+		t.Fatal("expected error for malformed --return-time in a batch containing a round-trip trip")
+	}
+	if ExitCode(err) != 2 {
+		t.Fatalf("ExitCode = %d, want 2 (usage error, before any network call); err = %v", ExitCode(err), err)
+	}
+}
+
+// A batch of pure one-way trips must NOT reject a malformed --return-time —
+// the flag is never read for one-way trips (documented as ignored), so
+// validating it eagerly here would incorrectly block a batch that would
+// otherwise run fine.
+func TestFlightsCmdIgnoresMalformedReturnTimeInOneWayOnlyBatch(t *testing.T) {
+	// dry-run is a persistent root flag, not available on the standalone
+	// command under test — set it directly on rootFlags instead (matches
+	// how flags.dryRun is read in newGfFlightsCmd's RunE).
+	flags := &rootFlags{dryRun: true}
+	cmd := newGfFlightsCmd(flags)
+	cmd.SetArgs([]string{
+		"--trip", "SEA>DEN@2026-09-14",
+		"--trip", "PDX>DEN@2026-09-15",
+		"--return-time", "not-a-window",
+	})
+	out := &bytes.Buffer{}
+	cmd.SetOut(out)
+	cmd.SetErr(&bytes.Buffer{})
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("one-way-only batch with malformed --return-time should not fail: %v", err)
+	}
+}
+
+// PATCH(greptile review): the single (non-batch) round-trip search form must
+// reject a malformed --return-time with a usage error too, both on a real
+// run and on --dry-run — mirrors the batch-path fix above.
+func TestFlightsCmdRejectsMalformedReturnTimeInSingleRoundTripWithExit2(t *testing.T) {
+	cmd := newGfFlightsCmd(&rootFlags{})
+	cmd.SetArgs([]string{"SEA", "HNL", "2026-08-01", "--return", "2026-08-10", "--return-time", "not-a-window"})
+	cmd.SetOut(&bytes.Buffer{})
+	cmd.SetErr(&bytes.Buffer{})
+	err := cmd.Execute()
+	if err == nil {
+		t.Fatal("expected error for malformed --return-time on a round-trip single search")
+	}
+	if ExitCode(err) != 2 {
+		t.Fatalf("ExitCode = %d, want 2 (usage error); err = %v", ExitCode(err), err)
+	}
+}
+
+// dry-run must not report success for the same malformed input.
+func TestFlightsCmdDryRunRejectsMalformedReturnTimeInSingleRoundTrip(t *testing.T) {
+	flags := &rootFlags{dryRun: true}
+	cmd := newGfFlightsCmd(flags)
+	cmd.SetArgs([]string{"SEA", "HNL", "2026-08-01", "--return", "2026-08-10", "--return-time", "not-a-window"})
+	cmd.SetOut(&bytes.Buffer{})
+	cmd.SetErr(&bytes.Buffer{})
+	err := cmd.Execute()
+	if err == nil {
+		t.Fatal("dry-run should still reject malformed --return-time, not report success")
+	}
+	if ExitCode(err) != 2 {
+		t.Fatalf("ExitCode = %d, want 2 (usage error); err = %v", ExitCode(err), err)
+	}
+}
+
+// A malformed --return-time on a one-way single search (no --return) must
+// NOT be rejected — the flag is documented as ignored for one-way.
+func TestFlightsCmdIgnoresMalformedReturnTimeInSingleOneWay(t *testing.T) {
+	flags := &rootFlags{dryRun: true}
+	cmd := newGfFlightsCmd(flags)
+	cmd.SetArgs([]string{"SEA", "HNL", "2026-08-01", "--return-time", "not-a-window"})
+	cmd.SetOut(&bytes.Buffer{})
+	cmd.SetErr(&bytes.Buffer{})
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("one-way search with malformed --return-time should not fail: %v", err)
+	}
+}
+
 func TestRunFlightsBatchStopsOnRateLimitAndEmitsPartialEnvelope(t *testing.T) {
 	origSearch, origSleep := batchSearch, batchSleep
 	defer func() { batchSearch, batchSleep = origSearch, origSleep }()

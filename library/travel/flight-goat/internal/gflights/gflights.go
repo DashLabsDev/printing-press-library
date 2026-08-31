@@ -130,22 +130,27 @@ type Segment struct {
 // LimitedResults — Google Flights' API supports all of these but krisukox
 // did not expose them. fli matches this same surface.
 type SearchOptions struct {
-	Origin         string
-	Destination    string
-	DepartureDate  string
-	ReturnDate     string
-	TimeWindow     string
-	Airlines       []string
-	CabinClass     string
-	MaxStops       string
-	SortBy         string
-	Passengers     int
-	ExcludeBasic   bool
-	Currency       string
-	Bags           *BagsFilter          // PATCH: include checked-bag + carry-on fees in returned prices
-	Emissions      string               // PATCH: "ALL" (default) or "LESS" to filter low-emission itineraries
-	Layover        *LayoverRestrictions // PATCH: restrict connections to specific airports
-	LimitedResults bool                 // PATCH: when true, request the ~30 Google-curated set
+	Origin        string
+	Destination   string
+	DepartureDate string
+	ReturnDate    string
+	TimeWindow    string
+	// ReturnTimeWindow constrains the inbound leg's departure time
+	// independently of TimeWindow, which otherwise applies to both legs of a
+	// round trip. Same "H-H" 24h format as TimeWindow (e.g. "14-22"). Ignored
+	// for one-way searches and multi-city (Segments) searches.
+	ReturnTimeWindow string
+	Airlines         []string
+	CabinClass       string
+	MaxStops         string
+	SortBy           string
+	Passengers       int
+	ExcludeBasic     bool
+	Currency         string
+	Bags             *BagsFilter          // PATCH: include checked-bag + carry-on fees in returned prices
+	Emissions        string               // PATCH: "ALL" (default) or "LESS" to filter low-emission itineraries
+	Layover          *LayoverRestrictions // PATCH: restrict connections to specific airports
+	LimitedResults   bool                 // PATCH: when true, request the ~30 Google-curated set
 	// Segments triggers a multi-city search (Google Flights trip_type=3).
 	// Provide >= 2 entries; the existing Origin / Destination / DepartureDate
 	// / ReturnDate fields are bypassed when this is set. For Google Flights

@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 // Verifies that the multi-passenger price normalization divides the group
@@ -265,4 +266,83 @@ func TestParseOffersResponseNoFabricatedMidnight(t *testing.T) {
 	if wholeHourDeps == 0 {
 		t.Error("expected at least one whole-hour departure in fixture; regression not exercised")
 	}
+}
+
+// TestBuildOfferSegments_ReturnTimeWindowAppliesToInboundOnly verifies that
+// ReturnTimeWindow constrains only the return leg's time field, leaving the
+// outbound leg governed by TimeWindow (or unconstrained if TimeWindow is
+// unset) — the core of the --return-time flag.
+func TestBuildOfferSegments_ReturnTimeWindowAppliesToInboundOnly(t *testing.T) {
+	opts := SearchOptions{
+		Origin:           "SEA",
+		Destination:      "HNL",
+		DepartureDate:    "2026-08-01",
+		ReturnDate:       "2026-08-10",
+		TimeWindow:       "6-12",
+		ReturnTimeWindow: "17-23",
+	}
+	depDate, _ := time.Parse("2006-01-02", opts.DepartureDate)
+	retDate, _ := time.Parse("2006-01-02", opts.ReturnDate)
+
+	segments, err := buildOfferSegments(opts, depDate, retDate, tripTypeRoundTrip, maxStopsAny)
+	if err != nil {
+		t.Fatalf("buildOfferSegments: %v", err)
+	}
+	if len(segments) != 2 {
+		t.Fatalf("got %d segments, want 2 (outbound + inbound)", len(segments))
+	}
+
+	outboundTime := segmentTimeField(t, segments[0])
+	if outboundTime[0] != 6 || outboundTime[1] != 12 {
+		t.Errorf("outbound time field = %v, want [6 12 ...] from TimeWindow", outboundTime)
+	}
+
+	inboundTime := segmentTimeField(t, segments[1])
+	if inboundTime[0] != 17 || inboundTime[1] != 23 {
+		t.Errorf("inbound time field = %v, want [17 23 ...] from ReturnTimeWindow, not TimeWindow", inboundTime)
+	}
+}
+
+// TestBuildOfferSegments_ReturnTimeWindowFallsBackToTimeWindow verifies the
+// prior, still-supported behavior: when ReturnTimeWindow is unset, a single
+// --time value continues to constrain both legs identically.
+func TestBuildOfferSegments_ReturnTimeWindowFallsBackToTimeWindow(t *testing.T) {
+	opts := SearchOptions{
+		Origin:        "SEA",
+		Destination:   "HNL",
+		DepartureDate: "2026-08-01",
+		ReturnDate:    "2026-08-10",
+		TimeWindow:    "6-12",
+	}
+	depDate, _ := time.Parse("2006-01-02", opts.DepartureDate)
+	retDate, _ := time.Parse("2006-01-02", opts.ReturnDate)
+
+	segments, err := buildOfferSegments(opts, depDate, retDate, tripTypeRoundTrip, maxStopsAny)
+	if err != nil {
+		t.Fatalf("buildOfferSegments: %v", err)
+	}
+	inboundTime := segmentTimeField(t, segments[1])
+	if inboundTime[0] != 6 || inboundTime[1] != 12 {
+		t.Errorf("inbound time field = %v, want [6 12 ...] (fallback to TimeWindow)", inboundTime)
+	}
+}
+
+// segmentTimeField extracts the [earliest, latest] pair from a segment's
+// index-2 time-restriction field, built by buildOneSegment.
+func segmentTimeField(t *testing.T, segment any) [2]int {
+	t.Helper()
+	seg, ok := segment.([]any)
+	if !ok || len(seg) < 3 {
+		t.Fatalf("segment has unexpected shape: %#v", segment)
+	}
+	tf, ok := seg[2].([]any)
+	if !ok || len(tf) < 2 {
+		t.Fatalf("segment time field has unexpected shape: %#v", seg[2])
+	}
+	earliest, ok1 := tf[0].(int)
+	latest, ok2 := tf[1].(int)
+	if !ok1 || !ok2 {
+		t.Fatalf("segment time field values not int: %#v", tf)
+	}
+	return [2]int{earliest, latest}
 }

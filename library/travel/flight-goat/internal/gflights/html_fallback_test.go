@@ -136,7 +136,7 @@ func TestFlightsFromHTMLParsesEmbeddedPayload(t *testing.T) {
 		t.Fatalf("extractInitDataBlobs found %d blobs, want 3", len(blobs))
 	}
 
-	flights := flightsFromHTML(html, "USD")
+	flights, _ := flightsFromHTML(html, "USD")
 	if len(flights) == 0 {
 		t.Fatal("flightsFromHTML parsed 0 flights from live-captured page payload")
 	}
@@ -177,7 +177,7 @@ func TestFlightsFromHTMLParsesStandaloneDS1ScriptPayload(t *testing.T) {
 <script class="ds:1">window._unused = {data:` + string(loadFixture(t, "aus_lax_embedded_ds1.json")) + `, sideChannel:{}};</script>
 </body></html>`
 
-	flights := flightsFromHTML(html, "USD")
+	flights, _ := flightsFromHTML(html, "USD")
 	if len(flights) == 0 {
 		t.Fatal("flightsFromHTML parsed 0 flights from standalone script.ds:1 payload")
 	}
@@ -192,7 +192,7 @@ func TestFlightsFromHTMLSkipsUnclosedScriptBeforeDS1Payload(t *testing.T) {
 <script class="ds:1">window._unused = {data:` + string(loadFixture(t, "aus_lax_embedded_ds1.json")) + `, sideChannel:{}};</script>
 </body></html>`
 
-	flights := flightsFromHTML(html, "USD")
+	flights, _ := flightsFromHTML(html, "USD")
 	if len(flights) == 0 {
 		t.Fatal("flightsFromHTML parsed 0 flights after unclosed decoy script")
 	}
@@ -394,5 +394,63 @@ func TestDatesViaHTMLAllRateLimitedReturnsErrRateLimited(t *testing.T) {
 	_, _, err := datesViaHTML(context.Background(), DatesOptions{Origin: "SEA", Destination: "DEN"}, from, to, "EUR")
 	if !errors.Is(err, ErrRateLimited) {
 		t.Fatalf("err = %v, want ErrRateLimited", err)
+	}
+}
+
+// TestFlightsFromEmbeddedPayload_OutboundReturnSplit verifies that the
+// outbound bucket (inner[2]) and return bucket (inner[3]) are counted
+// separately via outboundCount, which searchViaHTML relies on to apply
+// ReturnTimeWindow only to the return leg.
+func TestFlightsFromEmbeddedPayload_OutboundReturnSplit(t *testing.T) {
+	mkHead := func(duration float64) []any {
+		head := make([]any, 10)
+		head[2] = []any{} // no legs — irrelevant to this test
+		head[9] = duration
+		return head
+	}
+	mkRow := func(duration float64) []any {
+		return []any{mkHead(duration)}
+	}
+
+	inner := make([]any, 4)
+	inner[2] = []any{[]any{mkRow(100), mkRow(200)}} // 2 outbound offers
+	inner[3] = []any{[]any{mkRow(300)}}             // 1 return offer
+
+	flights, outboundCount := flightsFromEmbeddedPayload(inner, "USD")
+	if len(flights) != 3 {
+		t.Fatalf("got %d flights, want 3", len(flights))
+	}
+	if outboundCount != 2 {
+		t.Fatalf("outboundCount = %d, want 2", outboundCount)
+	}
+	if flights[0].DurationMinutes != 100 || flights[1].DurationMinutes != 200 {
+		t.Errorf("outbound flights out of order: %+v", flights[:2])
+	}
+	if flights[2].DurationMinutes != 300 {
+		t.Errorf("return flight wrong: %+v", flights[2])
+	}
+}
+
+// TestFilterFlightsClientSide_ReturnTimeWindowAppliesOnlyToReturnBucket
+// exercises the searchViaHTML split: outbound flights are filtered against
+// TimeWindow, return flights against ReturnTimeWindow, independently.
+func TestFilterFlightsClientSide_ReturnTimeWindowAppliesOnlyToReturnBucket(t *testing.T) {
+	mk := func(dep string) Flight {
+		return Flight{Price: 100, Legs: []Leg{{DepartureTime: dep}}}
+	}
+	outbound := []Flight{mk("2026-07-15T06:10:00"), mk("2026-07-15T20:00:00")}
+	inbound := []Flight{mk("2026-07-20T18:00:00"), mk("2026-07-20T06:00:00")}
+
+	outboundOpts := SearchOptions{TimeWindow: "6-12"}
+	returnOpts := SearchOptions{TimeWindow: "17-23"} // simulates ReturnTimeWindow substitution
+
+	filteredOutbound := filterFlightsClientSide(append([]Flight(nil), outbound...), outboundOpts)
+	filteredInbound := filterFlightsClientSide(append([]Flight(nil), inbound...), returnOpts)
+
+	if len(filteredOutbound) != 1 || filteredOutbound[0].Legs[0].DepartureTime != "2026-07-15T06:10:00" {
+		t.Fatalf("outbound filter = %+v, want only the 06:10 departure", filteredOutbound)
+	}
+	if len(filteredInbound) != 1 || filteredInbound[0].Legs[0].DepartureTime != "2026-07-20T18:00:00" {
+		t.Fatalf("inbound filter = %+v, want only the 18:00 departure", filteredInbound)
 	}
 }

@@ -266,7 +266,7 @@ Existing installs keep working because the platform-default rung matches the leg
 
 The headline commands query consumer fare sources directly — no `FLIGHT_GOAT_API_KEY` needed. FlightAware AeroAPI (the resources below) is secondary and optional.
 
-- **`flight-goat-pp-cli flights <origin> <destination> <date>`** - Google Flights fare search with real prices, durations, airlines, and leg details. Round trip with `--return`, multi-city with repeated `--segment`, batch probes with repeated `--trip`.
+- **`flight-goat-pp-cli flights <origin> <destination> <date>`** - Google Flights fare search with real prices, durations, airlines, and leg details. Round trip with `--return`, multi-city with repeated `--segment`, batch probes with repeated `--trip`. Departure time window with `--time` (outbound) and `--return-time` (return leg, independent of `--time`; falls back to it when unset).
 - **`flight-goat-pp-cli dates <origin> <destination>`** - Cheapest-date scan for a route across a travel window.
 - **`flight-goat-pp-cli explore <airport>`** / **`flight-goat-pp-cli longhaul <airport>`** - Kayak nonstop and long-haul route discovery.
 - **`flight-goat-pp-cli soar <origin> <destination> <date>`** - FlySoar (Duffel NDC/GDS) second price opinion with a booking handoff.

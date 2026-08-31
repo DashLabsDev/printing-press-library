@@ -74,7 +74,31 @@ func ValidateSearchBase(opts SearchOptions) error {
 	if _, err := mapSortBy(opts.SortBy); err != nil {
 		return err
 	}
+	if opts.TimeWindow != "" {
+		if _, _, err := parseTimeWindow(opts.TimeWindow); err != nil {
+			return err
+		}
+	}
+	// PATCH(greptile review): ReturnTimeWindow is deliberately not validated
+	// here. Unlike TimeWindow (which applies to every trip regardless of
+	// shape) it's a round-trip-only knob, and this function validates the
+	// shared base options once for an entire --trip batch before any trip's
+	// shape is known — eagerly rejecting it here would reject a batch of
+	// pure one-way trips over a flag that would never be read for them.
+	// Callers that DO know a batch contains at least one round-trip trip
+	// should additionally call ValidateTimeWindow(opts.ReturnTimeWindow) —
+	// see primary.go's batch mode — so a malformed value still fails before
+	// any network call rather than mid-batch during segment construction.
 	return nil
+}
+
+// ValidateTimeWindow checks a "--time"/"--return-time" style "H-H" 24h
+// window string without requiring a full SearchOptions. Batch callers use
+// this to validate ReturnTimeWindow only when the batch actually contains a
+// round-trip trip (see ValidateSearchBase).
+func ValidateTimeWindow(tw string) error {
+	_, _, err := parseTimeWindow(tw)
+	return err
 }
 
 // searchNativeDirect is the post-krisukox native backend.
@@ -346,7 +370,7 @@ func buildOfferSegments(opts SearchOptions, depDate, retDate time.Time, tripType
 			if err != nil {
 				return nil, fmt.Errorf("segment %d date %q: %w", i+1, s.DepartureDate, err)
 			}
-			seg, err := buildOneSegment(opts, d, s.Origin, s.Destination, stops)
+			seg, err := buildOneSegment(opts, d, s.Origin, s.Destination, stops, opts.TimeWindow)
 			if err != nil {
 				return nil, fmt.Errorf("segment %d: %w", i+1, err)
 			}
@@ -355,13 +379,21 @@ func buildOfferSegments(opts SearchOptions, depDate, retDate time.Time, tripType
 		return segs, nil
 	}
 	var segments []any
-	outbound, err := buildOneSegment(opts, depDate, opts.Origin, opts.Destination, stops)
+	outbound, err := buildOneSegment(opts, depDate, opts.Origin, opts.Destination, stops, opts.TimeWindow)
 	if err != nil {
 		return nil, err
 	}
 	segments = append(segments, outbound)
 	if tripType == tripTypeRoundTrip {
-		inbound, err := buildOneSegment(opts, retDate, opts.Destination, opts.Origin, stops)
+		// PATCH(library): the return leg gets its own time window
+		// (ReturnTimeWindow) when set; otherwise it falls back to the shared
+		// TimeWindow, matching the prior behavior where one --time value
+		// applied to both legs.
+		returnWindow := opts.ReturnTimeWindow
+		if returnWindow == "" {
+			returnWindow = opts.TimeWindow
+		}
+		inbound, err := buildOneSegment(opts, retDate, opts.Destination, opts.Origin, stops, returnWindow)
 		if err != nil {
 			return nil, err
 		}
@@ -370,10 +402,10 @@ func buildOfferSegments(opts SearchOptions, depDate, retDate time.Time, tripType
 	return segments, nil
 }
 
-func buildOneSegment(opts SearchOptions, date time.Time, origin, dest string, stops int) ([]any, error) {
+func buildOneSegment(opts SearchOptions, date time.Time, origin, dest string, stops int, timeWindow string) ([]any, error) {
 	var timeField any
-	if opts.TimeWindow != "" {
-		earliest, latest, err := parseTimeWindow(opts.TimeWindow)
+	if timeWindow != "" {
+		earliest, latest, err := parseTimeWindow(timeWindow)
 		if err != nil {
 			return nil, err
 		}
@@ -508,7 +540,8 @@ func parseOffersResponse(body []byte, currency string) ([]Flight, error) {
 		return nil, fmt.Errorf("decoding inner payload: %w", err)
 	}
 
-	return flightsFromEmbeddedPayload(inner, currency), nil
+	flights, _ := flightsFromEmbeddedPayload(inner, currency)
+	return flights, nil
 }
 
 func parseOfferRow(row any, currency string) (Flight, bool) {

@@ -328,10 +328,12 @@ func scanBalancedArray(s string) (int, bool) {
 
 // flightsFromEmbeddedPayload walks one decoded blob with the same bucket
 // layout parseOffersResponse uses on the RPC payload (offers at inner[2] and
-// inner[3], rows at bucket[0]) and returns the parsed flights.
-func flightsFromEmbeddedPayload(inner []any, currency string) []Flight {
-	var flights []Flight
-	for _, idx := range []int{2, 3} {
+// inner[3], rows at bucket[0]) and returns the parsed flights, plus the
+// count of leading entries that belong to the outbound bucket (inner[2]) so
+// callers that need to apply a different filter to the return leg (see
+// ReturnTimeWindow) can split flights[:outboundCount] / flights[outboundCount:].
+func flightsFromEmbeddedPayload(inner []any, currency string) (flights []Flight, outboundCount int) {
+	for i, idx := range []int{2, 3} {
 		if idx >= len(inner) {
 			continue
 		}
@@ -350,27 +352,33 @@ func flightsFromEmbeddedPayload(inner []any, currency string) []Flight {
 			}
 			flights = append(flights, f)
 		}
+		if i == 0 {
+			outboundCount = len(flights)
+		}
 	}
-	return flights
+	return flights, outboundCount
 }
 
 // flightsFromHTML extracts every AF_initDataCallback blob and returns the
 // flights from the blob that yields the most itineraries (the page carries
-// several unrelated blobs; only one embeds the shopping results).
-func flightsFromHTML(html, currency string) []Flight {
+// several unrelated blobs; only one embeds the shopping results), plus the
+// outbound/return split (see flightsFromEmbeddedPayload).
+func flightsFromHTML(html, currency string) ([]Flight, int) {
 	var best []Flight
+	var bestOutboundCount int
 	blobs := append(extractInitDataBlobs(html), extractDS1ScriptBlobs(html)...)
 	for _, blob := range blobs {
 		var inner []any
 		if err := json.Unmarshal([]byte(blob), &inner); err != nil {
 			continue
 		}
-		flights := flightsFromEmbeddedPayload(inner, currency)
+		flights, outboundCount := flightsFromEmbeddedPayload(inner, currency)
 		if len(flights) > len(best) {
 			best = flights
+			bestOutboundCount = outboundCount
 		}
 	}
-	return best
+	return best, bestOutboundCount
 }
 
 // searchViaHTML is the fallback search path. Filters Google's RPC accepted
@@ -387,12 +395,23 @@ func searchViaHTML(ctx context.Context, opts SearchOptions, currencyCode string)
 	if err != nil {
 		return nil, "", err
 	}
-	flights := flightsFromHTML(html, currencyCode)
+	flights, outboundCount := flightsFromHTML(html, currencyCode)
 	if len(flights) == 0 && pageMissingFlightData(html) {
 		return nil, "", errors.New("fallback page did not embed flight data — Google likely served a consent " +
 			"interstitial (the built-in SOCS consent cookie may have gone stale) or redesigned the page")
 	}
-	flights = filterFlightsClientSide(flights, opts)
+	// PATCH(library): the return leg gets its own time window when
+	// ReturnTimeWindow is set — filter the outbound and return buckets
+	// separately rather than applying one window to the flat list (which
+	// used to filter both legs identically). Falls back to TimeWindow for
+	// the return leg when ReturnTimeWindow is unset, matching prior behavior.
+	outboundOpts, returnOpts := opts, opts
+	if opts.ReturnTimeWindow != "" {
+		returnOpts.TimeWindow = opts.ReturnTimeWindow
+	}
+	outbound := filterFlightsClientSide(append([]Flight(nil), flights[:outboundCount]...), outboundOpts)
+	inbound := filterFlightsClientSide(append([]Flight(nil), flights[outboundCount:]...), returnOpts)
+	flights = append(outbound, inbound...)
 	note := htmlFallbackNote
 	if !sortFlightsClientSide(flights, opts.SortBy) {
 		note += fmt.Sprintf(htmlFallbackSortNote, opts.SortBy)

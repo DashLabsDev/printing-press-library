@@ -1,0 +1,20 @@
+{
+  "schema_version": 2,
+  "id": "return-leg-independent-time-window",
+  "applied_at": "2026-08-30",
+  "base_run_id": "20260712-220852",
+  "base_printing_press_version": "4.28.0",
+  "upstream_issue": "",
+  "files": [
+    "internal/gflights/gflights.go",
+    "internal/gflights/flights_native.go",
+    "internal/gflights/flights_native_test.go",
+    "internal/gflights/html_fallback.go",
+    "internal/gflights/html_fallback_test.go",
+    "internal/cli/primary.go",
+    "SKILL.md"
+  ],
+  "summary": "A round-trip search must support independent outbound and return departure-time windows across every search path, while preserving the outbound window as the return fallback when no independent window is set.",
+  "reason": "Google Flights' own RPC and fallback page both support per-leg time restrictions, but flight-goat's request builder (buildOneSegment) and the HTML-fallback bucket parser (flightsFromEmbeddedPayload, outbound at inner[2] / inbound at inner[3]) only ever forwarded one shared TimeWindow to both legs. Round-trip users commonly want different windows per direction (e.g. don't leave before noon outbound, don't return before evening) and had no way to express that.",
+  "validated_outcome": "go build ./... ; go vet ./... ; go test ./... all pass, including new tests TestBuildOfferSegments_ReturnTimeWindowAppliesToInboundOnly, TestBuildOfferSegments_ReturnTimeWindowFallsBackToTimeWindow, TestFlightsFromEmbeddedPayload_OutboundReturnSplit, and TestFilterFlightsClientSide_ReturnTimeWindowAppliesOnlyToReturnBucket. python3 .github/scripts/verify-skill/verify_skill.py --dir library/travel/flight-goat/ passes. govulncheck ./... reports 0 reachable vulnerabilities."
+}
