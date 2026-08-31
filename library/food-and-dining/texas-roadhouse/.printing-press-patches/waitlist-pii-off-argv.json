@@ -9,6 +9,8 @@
   "files": [
     "internal/cli/texasroadhouse_pii.go",
     "internal/cli/texasroadhouse_pii_test.go",
+    "internal/client/client.go",
+    "internal/client/client_test.go",
     "internal/cli/texasroadhouse_submit.go",
     "internal/cli/texasroadhouse_checkin.go",
     "internal/cli/texasroadhouse_cancel.go",
@@ -20,5 +22,5 @@
     "tools-manifest.json",
     "spec.yaml"
   ],
-  "validated_outcome": "Submit PII flags without --yes refuse; --stdin --dry-run redacts guest fields; hidden flags + --yes still POST in httptest; help examples drop the UUID mock and street-as-email."
+  "validated_outcome": "Submit PII flags without --yes refuse; --stdin --dry-run redacts guest fields; client dry-run logger redacts MCP/CLI stderr; --guest-file wins over env and does not drain stdin; hidden flags + --yes still POST in httptest; help examples drop the UUID mock and street-as-email."
 }

@@ -5,8 +5,11 @@ package cli
 import (
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/spf13/cobra"
 )
 
 const submitGuestStdinJSON = `{"EmailAddress":"guest@example.test","FirstName":"Test","LastName":"User","PrimaryPhoneAreaCode":"555","PrimaryPhoneNumber":"555-0100","PartySize":2,"WaitMinutes":10}`
@@ -176,4 +179,103 @@ func TestMapboxHelpUsesZip(t *testing.T) {
 	if !strings.Contains(stdout, "65804") {
 		t.Fatalf("mapbox help should use zip 65804: %q", stdout)
 	}
+}
+
+func writeGuestFile(t *testing.T, contents string) string {
+	t.Helper()
+	path := filepath.Join(t.TempDir(), "guest.json")
+	if err := os.WriteFile(path, []byte(contents), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	return path
+}
+
+func clearWaitlistGuestEnv(t *testing.T) {
+	t.Helper()
+	t.Setenv(waitlistGuestEmailEnv, "")
+	t.Setenv(waitlistGuestFirstEnv, "")
+	t.Setenv(waitlistGuestLastEnv, "")
+	t.Setenv(waitlistGuestPhoneAreaEnv, "")
+	t.Setenv(waitlistGuestPhoneNumEnv, "")
+}
+
+type failOnRead struct {
+	t *testing.T
+}
+
+func (r failOnRead) Read([]byte) (int, error) {
+	r.t.Fatal("stdin was read; --guest-file must not drain stdin")
+	return 0, io.EOF
+}
+
+func TestGuestFileWinsOverEnv(t *testing.T) {
+	clearWaitlistGuestEnv(t)
+	t.Setenv(waitlistGuestEmailEnv, "env@example.test")
+	t.Setenv(waitlistGuestFirstEnv, "EnvFirst")
+	t.Setenv(waitlistGuestLastEnv, "EnvLast")
+	t.Setenv(waitlistGuestPhoneAreaEnv, "999")
+	t.Setenv(waitlistGuestPhoneNumEnv, "555-0199")
+
+	path := writeGuestFile(t, `{"EmailAddress":"guest@example.test","FirstName":"Test","LastName":"User","PrimaryPhoneAreaCode":"555","PrimaryPhoneNumber":"555-0100"}`)
+	cmd := &cobra.Command{Use: "submit"}
+	cmd.SetIn(failOnRead{t: t})
+
+	body, err := collectWaitlistGuestPII(cmd, &rootFlags{agent: true}, false, path, waitlistPIIFlagValues{})
+	if err != nil {
+		t.Fatalf("collectWaitlistGuestPII: %v", err)
+	}
+	if got, want := guestString(body["EmailAddress"]), "guest@example.test"; got != want {
+		t.Fatalf("EmailAddress = %q, want file value %q (env must not override explicit --guest-file)", got, want)
+	}
+	if got, want := guestString(body["FirstName"]), "Test"; got != want {
+		t.Fatalf("FirstName = %q, want file value %q", got, want)
+	}
+	if got, want := guestString(body["PrimaryPhoneNumber"]), "555-0100"; got != want {
+		t.Fatalf("PrimaryPhoneNumber = %q, want file value %q", got, want)
+	}
+}
+
+func TestEnvFillsEmptyGuestFileFields(t *testing.T) {
+	clearWaitlistGuestEnv(t)
+	t.Setenv(waitlistGuestEmailEnv, "guest@example.test")
+	t.Setenv(waitlistGuestPhoneAreaEnv, "555")
+	t.Setenv(waitlistGuestPhoneNumEnv, "555-0100")
+
+	path := writeGuestFile(t, `{"FirstName":"Test","LastName":"User"}`)
+	cmd := &cobra.Command{Use: "submit"}
+	cmd.SetIn(failOnRead{t: t})
+
+	body, err := collectWaitlistGuestPII(cmd, &rootFlags{agent: true}, false, path, waitlistPIIFlagValues{})
+	if err != nil {
+		t.Fatalf("collectWaitlistGuestPII: %v", err)
+	}
+	if got, want := guestString(body["FirstName"]), "Test"; got != want {
+		t.Fatalf("FirstName = %q, want file value %q", got, want)
+	}
+	if got, want := guestString(body["EmailAddress"]), "guest@example.test"; got != want {
+		t.Fatalf("EmailAddress = %q, want env fill %q", got, want)
+	}
+	if got, want := guestString(body["PrimaryPhoneNumber"]), "555-0100"; got != want {
+		t.Fatalf("PrimaryPhoneNumber = %q, want env fill %q", got, want)
+	}
+}
+
+func TestGuestFileDoesNotReadStdin(t *testing.T) {
+	clearWaitlistGuestEnv(t)
+	path := writeGuestFile(t, `{"EmailAddress":"guest@example.test","FirstName":"Test","LastName":"User","PrimaryPhoneAreaCode":"555","PrimaryPhoneNumber":"555-0100"}`)
+	cmd := &cobra.Command{Use: "submit"}
+	cmd.SetIn(failOnRead{t: t})
+
+	body, err := collectWaitlistGuestPII(cmd, &rootFlags{agent: true}, false, path, waitlistPIIFlagValues{})
+	if err != nil {
+		t.Fatalf("collectWaitlistGuestPII: %v", err)
+	}
+	if got, want := guestString(body["EmailAddress"]), "guest@example.test"; got != want {
+		t.Fatalf("EmailAddress = %q, want %q", got, want)
+	}
+}
+
+func guestString(v any) string {
+	s, _ := v.(string)
+	return s
 }

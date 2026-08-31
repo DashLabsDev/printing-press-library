@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -228,5 +229,51 @@ func TestStreamingHTTPClientDropsWholeCallTimeout(t *testing.T) {
 	}
 	if base.Timeout != 60*time.Second {
 		t.Fatalf("StreamingHTTPClient mutated the JSON client's Timeout to %s", base.Timeout)
+	}
+}
+
+func TestDryRunRedactsWaitlistPII(t *testing.T) {
+	c := &Client{BaseURL: "https://api.example.test"}
+	body, err := json.Marshal(map[string]any{
+		"EmailAddress":         "guest@example.test",
+		"FirstName":            "Test",
+		"LastName":             "User",
+		"PrimaryPhoneAreaCode": "555",
+		"PrimaryPhoneNumber":   "555-0100",
+		"PartySize":            2,
+		"WaitMinutes":          10,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	orig := os.Stderr
+	os.Stderr = w
+	_, _, dryErr := c.dryRun("POST", "https://api.example.test/api/texasroadhouse/waitlist/218/submit", "/api/texasroadhouse/waitlist/218/submit", nil, body, nil, "")
+	_ = w.Close()
+	os.Stderr = orig
+	out, readErr := io.ReadAll(r)
+	_ = r.Close()
+	if dryErr != nil {
+		t.Fatalf("dryRun: %v", dryErr)
+	}
+	if readErr != nil {
+		t.Fatal(readErr)
+	}
+	stderr := string(out)
+	for _, leak := range []string{"guest@example.test", "555-0100"} {
+		if strings.Contains(stderr, leak) {
+			t.Fatalf("dry-run stderr leaked %q: %s", leak, stderr)
+		}
+	}
+	if !strings.Contains(stderr, "redacted") {
+		t.Fatalf("dry-run stderr should redact PII, got %q", stderr)
+	}
+	if !strings.Contains(stderr, `"PartySize": 2`) && !strings.Contains(stderr, `"PartySize":2`) {
+		t.Fatalf("dry-run should still print non-PII fields, got %q", stderr)
 	}
 }

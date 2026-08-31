@@ -121,6 +121,24 @@ func mergeWaitlistJSON(dst map[string]any, src map[string]any) {
 	}
 }
 
+func fillEmptyWaitlistJSON(dst map[string]any, src map[string]any) {
+	for k, v := range src {
+		if waitlistNonEmpty(v) && !waitlistNonEmpty(dst[k]) {
+			dst[k] = v
+		}
+	}
+}
+
+func waitlistHasNonStdinSource(cmd *cobra.Command, flags *rootFlags, guestFile string) bool {
+	if strings.TrimSpace(guestFile) != "" {
+		return true
+	}
+	if waitlistHasGuestPII(waitlistGuestEnvBody()) {
+		return true
+	}
+	return flags != nil && flags.yes && waitlistPIIFlagsChanged(cmd)
+}
+
 func readWaitlistJSON(r io.Reader) (map[string]any, error) {
 	data, err := io.ReadAll(r)
 	if err != nil {
@@ -268,7 +286,10 @@ func collectWaitlistGuestPII(cmd *cobra.Command, flags *rootFlags, stdinBody boo
 		mergeWaitlistJSON(body, parsed)
 	}
 
-	if stdinBody || !isTerminalReader(in) {
+	// Only drain stdin when --stdin is set, or when stdin is a non-tty pipe
+	// and no other source (guest-file / env / confirmed flags) is already set.
+	// Implicit ReadAll on a long-lived pipe would hang --guest-file and env.
+	if stdinBody || (!isTerminalReader(in) && !waitlistHasNonStdinSource(cmd, flags, guestFile)) {
 		parsed, err := readWaitlistJSON(in)
 		if err != nil {
 			return nil, err
@@ -278,7 +299,7 @@ func collectWaitlistGuestPII(cmd *cobra.Command, flags *rootFlags, stdinBody boo
 		}
 	}
 
-	mergeWaitlistJSON(body, waitlistGuestEnvBody())
+	fillEmptyWaitlistJSON(body, waitlistGuestEnvBody())
 
 	if flags != nil && flags.yes && waitlistPIIFlagsChanged(cmd) {
 		mergeWaitlistJSON(body, waitlistFlagPIIBody(flagVals))
