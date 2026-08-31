@@ -5,6 +5,8 @@ package cli
 import (
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -58,6 +60,34 @@ func TestWaitlistMutationsRefuseWithoutYes(t *testing.T) {
 				t.Fatalf("error = %v, want requires --yes (stderr=%q)", err, stderr)
 			}
 		})
+	}
+}
+
+func TestCheckinHelpDescribesHERETextFlow(t *testing.T) {
+	stdout, stderr, err := runRootArgs(t, "texasroadhouse", "checkin", "--help")
+	if err != nil {
+		t.Fatalf("checkin --help: %v (stderr=%q)", err, stderr)
+	}
+	if strings.Contains(strings.ToLower(stdout), "host stand") {
+		t.Fatalf("checkin help must not direct guests to the host stand: %q", stdout)
+	}
+	if !strings.Contains(stdout, "HERE") {
+		t.Fatalf("checkin help must describe the guest HERE text flow: %q", stdout)
+	}
+}
+
+func TestREADMEStoreTroubleshootingUsesActualFlags(t *testing.T) {
+	readmePath := filepath.Join("..", "..", "README.md")
+	readme, err := os.ReadFile(readmePath)
+	if err != nil {
+		t.Fatalf("read %s: %v", readmePath, err)
+	}
+	text := string(readme)
+	if strings.Contains(text, "stores --latitude") || strings.Contains(text, "--longitude <lon>") {
+		t.Fatalf("README store troubleshooting uses unsupported coordinate flags")
+	}
+	if !strings.Contains(text, "stores --lat <lat> --long <lon>") {
+		t.Fatalf("README store troubleshooting must use the command's --lat/--long flags")
 	}
 }
 

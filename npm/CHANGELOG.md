@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.21
+
+- Pin released Go CLI builds to the full `release.source_commit` selected by the live catalog instead of resolving mutable `@latest`. This reduces accidental branch drift but does not authenticate the mutable catalog or separate skill installer. Entries without release metadata retain the existing `@latest` fallback for compatibility.
+- Include the installed source commit in human and JSON results so users and agents can audit exactly what was selected.
+
 ## 0.1.19
 
 - Multi-name installs run up to 6 CLIs concurrently (same cap and buffered-output pattern as `update`); per-CLI output is replayed in input order and `[k/N]` progress lines on stderr keep long runs live.

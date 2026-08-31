@@ -82,7 +82,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("texasroadhouse_checkin",
-			mcplib.WithDescription("Check in once the party is at the host stand (destructive). Live check-in requires yes=true; dry-run=true previews without POSTing. Required: waitlist_id. Optional: yes, dry-run. Returns the new WaitlistCheckinResult."),
+			mcplib.WithDescription("Confirm arrival after the guest receives the Texas Roadhouse text and replies HERE (destructive). Live check-in requires yes=true; dry-run=true previews without POSTing. Required: waitlist_id. Optional: yes, dry-run. Returns the new WaitlistCheckinResult."),
 			mcplib.WithString("waitlist_id", mcplib.Required(), mcplib.Description("Store extref (not internal store id). Springfield MO is 218.")),
 			mcplib.WithBoolean("yes", mcplib.Description("Required for a live check-in. Same meaning as CLI --yes.")),
 			mcplib.WithBoolean("dry-run", mcplib.Description("Preview the request body without POSTing. Same meaning as CLI --dry-run.")),

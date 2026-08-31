@@ -96,7 +96,9 @@ npx -y @mvanhorn/printing-press-library install --category travel
 npx -y @mvanhorn/printing-press-library install --all
 ```
 
-Under the hood: the installer reads the live catalog at [`registry.json`](https://github.com/mvanhorn/printing-press-library/blob/main/registry.json), resolves the CLI's Go module path, runs `go install`, and installs the matching focused skill from `cli-skills/pp-<name>` via `npx skills@latest`.
+Under the hood: the installer reads the live catalog at [`registry.json`](https://github.com/mvanhorn/printing-press-library/blob/main/registry.json), resolves the CLI's Go module path, and pins `go install` to the full `release.source_commit` selected by that catalog entry. Older entries without release metadata retain an `@latest` fallback. This prevents accidental drift from a later `main` update; it does not authenticate the mutable live catalog. The installer then installs the matching focused skill from `cli-skills/pp-<name>` via the separately versioned `npx skills@latest` path.
+
+Successful output includes the selected source commit, and `--json` returns it as `sourceCommit`. Treat that value as an audit trail for what the live catalog selected, not proof that the catalog itself was authentic. The npm package publishes with npm provenance. CLI release archives publish `checksums.txt`; verify a downloaded pre-built archive against that file before running it. The separate upstream `skills` installer remains versioned independently and is not covered by the Go source-commit pin.
 
 Names are forgiving: use the catalog slug (`airbnb`), generated binary name (`airbnb-pp-cli`), or API-ish name (`Airbnb Vrbo`) and the installer normalizes it to the right catalog entry.
 
@@ -114,7 +116,7 @@ npx -y @mvanhorn/printing-press-library uninstall espn --yes
 
 `list` shows the public catalog by default. Use `list --installed` when you only want CLIs already present on your machine.
 
-`reinstall` is an alias for `update`: `reinstall <name>` rebuilds one CLI from the latest catalog code and re-adds its skill, while `reinstall` with no name refreshes every Printing Press CLI already on your `PATH`. Reach for it when a binary or skill needs a clean refresh — `install <name>` overwrites in place too, so either works.
+`reinstall` is an alias for `update`: `reinstall <name>` rebuilds one CLI from the release commit recorded in the current catalog and re-adds its skill, while `reinstall` with no name refreshes every Printing Press CLI already on your `PATH`. Reach for it when a binary or skill needs a clean refresh — `install <name>` overwrites in place too, so either works.
 
 ## Options
 
@@ -161,7 +163,8 @@ More bundles will be added over time. To suggest one, open an issue at the [prin
 ## Requirements
 
 - Node.js 20+
-- Go 1.26.5 or newer (for `go install`)
+- Go 1.26.6 or newer (for `go install`; use a pre-built release when that toolchain is unavailable)
+- Pre-built CLI/MCP archives are published for macOS, Linux, and Windows on `amd64` and `arm64`. Claude Desktop MCPB support varies by individual CLI; check the CLI's README and release assets.
 - The installer writes CLI binaries to a per-user binary directory by default: `$HOME/.local/bin` on macOS/Linux and `%LOCALAPPDATA%\Programs\PrintingPress\bin` on Windows. That directory must be on the runtime `PATH` for installed CLIs to be runnable by name. If it is missing, `install` still installs the focused skill, then prints the exact, copy-pasteable line to add for your platform and shell (zsh/bash/fish, PowerShell, cmd, or Git Bash).
 
 Use `--bin-dir <dir>` only when you want to override the default user bin directory. The installer creates the directory first, sets `GOBIN=<dir>` for the install, and reports the resulting binary path:

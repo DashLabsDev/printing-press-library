@@ -18,6 +18,12 @@ const registry: Registry = {
       api: "ESPN",
       description: "Sports scores",
       path: "library/sports/espn",
+      release: {
+        cli_name: "espn-pp-cli",
+        version: "2026.8.1",
+        released_at: "2026-08-17T00:00:00Z",
+        source_commit: "0123456789abcdef0123456789abcdef01234567",
+      },
       mcp: {
         binary: "espn-pp-mcp",
         transports: ["stdio"],
@@ -71,7 +77,7 @@ test("install command installs binary and skill", async () => {
     goCalls[0]!.modulePath,
     "github.com/mvanhorn/printing-press-library/library/sports/espn/cmd/espn-pp-cli",
   );
-  assert.equal(goCalls[0]!.ref, "latest");
+  assert.equal(goCalls[0]!.ref, "0123456789abcdef0123456789abcdef01234567");
   assert.equal(goCalls[0]!.env?.GOBIN, "/Users/example/.local/bin");
   assert.deepEqual(skillCalls, [{ skillName: "pp-espn", agents: ["claude-code"] }]);
   assert.match(stdout.join("\n"), /Installed espn/);
@@ -109,7 +115,7 @@ test("install command stops when Go is missing", async () => {
   assert.match(stderr.join("\n"), /brew install go/);
 });
 
-test("install command surfaces go install failure when @latest fails", async () => {
+test("install command surfaces go install failure at the immutable source commit", async () => {
   const refs: string[] = [];
   const stderr: string[] = [];
   const command = createInstallCommand({
@@ -128,8 +134,33 @@ test("install command surfaces go install failure when @latest fails", async () 
   });
 
   assert.equal(await command(["espn"]), 1);
-  assert.deepEqual(refs, ["latest"]);
+  assert.deepEqual(refs, ["0123456789abcdef0123456789abcdef01234567"]);
   assert.match(stderr.join("\n"), /go install failed/);
+});
+
+test("install command falls back to latest for a legacy entry without release metadata", async () => {
+  const refs: string[] = [];
+  const legacyRegistry: Registry = {
+    schema_version: 2,
+    entries: [{ ...registry.entries[0]!, release: undefined }],
+  };
+  const command = createInstallCommand({
+    fetchRegistry: async () => legacyRegistry,
+    resolveModulePath: async () => null,
+    detectGo: async () => ({ installed: true }),
+    goInstall: async (_modulePath, ref) => {
+      refs.push(ref);
+      return ok();
+    },
+    goInstallDir: async () => goBinDir("/Users/example/go/bin"),
+    commandOnPath: async () => "/Users/example/go/bin/espn-pp-cli",
+    installSkill: async () => ok(),
+    stdout: () => {},
+    stderr: () => {},
+  });
+
+  assert.equal(await command(["espn"]), 0);
+  assert.deepEqual(refs, ["latest"]);
 });
 
 test("install command warns but still installs skill when binary is not on PATH", async () => {
@@ -245,7 +276,9 @@ test("install command emits JSON when requested", async () => {
   });
 
   assert.equal(await command(["espn", "--json"]), 0);
-  assert.equal(JSON.parse(stdout[0]!).skill, "pp-espn");
+  const result = JSON.parse(stdout[0]!);
+  assert.equal(result.skill, "pp-espn");
+  assert.equal(result.sourceCommit, "0123456789abcdef0123456789abcdef01234567");
 });
 
 test("install command installs multiple CLIs in one call", async () => {
