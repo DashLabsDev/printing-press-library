@@ -129,11 +129,8 @@ func fillEmptyWaitlistJSON(dst map[string]any, src map[string]any) {
 	}
 }
 
-func waitlistHasNonStdinSource(cmd *cobra.Command, flags *rootFlags, guestFile string) bool {
+func waitlistHasExplicitNonStdinSource(cmd *cobra.Command, flags *rootFlags, guestFile string) bool {
 	if strings.TrimSpace(guestFile) != "" {
-		return true
-	}
-	if waitlistHasGuestPII(waitlistGuestEnvBody()) {
 		return true
 	}
 	return flags != nil && flags.yes && waitlistPIIFlagsChanged(cmd)
@@ -287,9 +284,10 @@ func collectWaitlistGuestPII(cmd *cobra.Command, flags *rootFlags, stdinBody boo
 	}
 
 	// Only drain stdin when --stdin is set, or when stdin is a non-tty pipe
-	// and no other source (guest-file / env / confirmed flags) is already set.
-	// Implicit ReadAll on a long-lived pipe would hang --guest-file and env.
-	if stdinBody || (!isTerminalReader(in) && !waitlistHasNonStdinSource(cmd, flags, guestFile)) {
+	// and no explicit non-stdin source (--guest-file / confirmed flags) is set.
+	// Ambient guest env is a fallback, so it must not suppress piped guest JSON.
+	// Implicit ReadAll on a long-lived pipe would hang explicit sources.
+	if stdinBody || (!isTerminalReader(in) && !waitlistHasExplicitNonStdinSource(cmd, flags, guestFile)) {
 		parsed, err := readWaitlistJSON(in)
 		if err != nil {
 			return nil, err

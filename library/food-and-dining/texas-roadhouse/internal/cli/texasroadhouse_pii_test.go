@@ -275,6 +275,32 @@ func TestGuestFileDoesNotReadStdin(t *testing.T) {
 	}
 }
 
+func TestImplicitStdinWinsOverAmbientGuestEnv(t *testing.T) {
+	clearWaitlistGuestEnv(t)
+	t.Setenv(waitlistGuestEmailEnv, "stale@example.test")
+	t.Setenv(waitlistGuestFirstEnv, "Stale")
+	t.Setenv(waitlistGuestLastEnv, "Guest")
+	t.Setenv(waitlistGuestPhoneAreaEnv, "999")
+	t.Setenv(waitlistGuestPhoneNumEnv, "555-0199")
+
+	cmd := &cobra.Command{Use: "submit"}
+	cmd.SetIn(strings.NewReader(`{"EmailAddress":"pipe@example.test","FirstName":"Piped","LastName":"Guest","PrimaryPhoneAreaCode":"555","PrimaryPhoneNumber":"555-0100"}`))
+
+	body, err := collectWaitlistGuestPII(cmd, &rootFlags{agent: true}, false, "", waitlistPIIFlagValues{})
+	if err != nil {
+		t.Fatalf("collectWaitlistGuestPII: %v", err)
+	}
+	if got, want := guestString(body["EmailAddress"]), "pipe@example.test"; got != want {
+		t.Fatalf("EmailAddress = %q, want piped value %q (ambient env must not suppress implicit stdin)", got, want)
+	}
+	if got, want := guestString(body["FirstName"]), "Piped"; got != want {
+		t.Fatalf("FirstName = %q, want piped value %q", got, want)
+	}
+	if got, want := guestString(body["PrimaryPhoneNumber"]), "555-0100"; got != want {
+		t.Fatalf("PrimaryPhoneNumber = %q, want piped value %q", got, want)
+	}
+}
+
 func guestString(v any) string {
 	s, _ := v.(string)
 	return s
