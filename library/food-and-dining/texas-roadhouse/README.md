@@ -4,6 +4,8 @@ Waitlist CLI for Texas Roadhouse. Find a nearby store, read the quote, join and 
 
 > **Unofficial integration.** This project is not affiliated with or endorsed by Texas Roadhouse. It uses browser-observed, undocumented endpoints that can change without notice. Joining the waitlist sends guest name, email address, phone number, and party details to Texas Roadhouse. Do not put that identity on argv flags (shell history / `ps`). Pass stdin JSON, `--guest-file`, or `TEXAS_ROADHOUSE_GUEST_*` env vars. `--dry-run` redacts guest fields. Hidden name/email/phone flags are a private `--yes` path only. Never paste `--dry-run` output containing real PII into shared logs.
 
+**MCP privacy boundary:** the MCP server intentionally does not expose waitlist `submit`, because MCP hosts can retain tool-call arguments in transcripts or logs. Use the CLI's stdin JSON, `--guest-file`, environment, or interactive-prompt flow for a guest join.
+
 **Last endpoint verification:** 2026-08-29. A Cloudflare challenge or HTTP 403 can mean the browser-facing endpoint changed or rejected the Chrome-compatible transport; retrying a mutation is unsafe until `--dry-run` and a fresh read request succeed.
 
 Learn more at [Texas Roadhouse](https://www.texasroadhouse.com).

@@ -8,7 +8,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -24,13 +26,52 @@ var waitlistPIIFlagNames = []string{
 	"primary-phone-extension",
 }
 
-var waitlistPIIBodyKeys = []string{
+var waitlistPIIBodyKeySet = map[string]struct{}{
+	"emailaddress":          {},
+	"firstname":             {},
+	"lastname":              {},
+	"primaryphoneareacode":  {},
+	"primaryphonenumber":    {},
+	"primaryphoneextension": {},
+}
+
+// waitlistSubmitBodyKeys is intentionally a closed schema. Unknown or
+// structured values must never reach either a dry-run preview or live POST.
+var waitlistSubmitBodyKeys = []string{
 	"EmailAddress",
 	"FirstName",
 	"LastName",
+	"IsSmoking",
 	"PrimaryPhoneAreaCode",
-	"PrimaryPhoneNumber",
 	"PrimaryPhoneExtension",
+	"PrimaryPhoneNumber",
+	"PrimaryPhoneType",
+	"PartySize",
+	"WaitMinutes",
+	"Platform",
+}
+
+type waitlistSubmitValueType string
+
+const (
+	waitlistSubmitString  waitlistSubmitValueType = "string"
+	waitlistSubmitBoolean waitlistSubmitValueType = "boolean"
+	waitlistSubmitNumber  waitlistSubmitValueType = "number"
+	waitlistSubmitInteger waitlistSubmitValueType = "integer"
+)
+
+var waitlistSubmitBodyTypes = map[string]waitlistSubmitValueType{
+	"EmailAddress":          waitlistSubmitString,
+	"FirstName":             waitlistSubmitString,
+	"LastName":              waitlistSubmitString,
+	"IsSmoking":             waitlistSubmitBoolean,
+	"PrimaryPhoneAreaCode":  waitlistSubmitString,
+	"PrimaryPhoneExtension": waitlistSubmitString,
+	"PrimaryPhoneNumber":    waitlistSubmitString,
+	"PrimaryPhoneType":      waitlistSubmitInteger,
+	"PartySize":             waitlistSubmitNumber,
+	"WaitMinutes":           waitlistSubmitInteger,
+	"Platform":              waitlistSubmitString,
 }
 
 const waitlistPIIRedacted = "<redacted>"
@@ -74,16 +115,50 @@ func rejectWaitlistPIIFlagsUnlessYes(cmd *cobra.Command, flags *rootFlags) error
 }
 
 func redactWaitlistPII(body map[string]any) map[string]any {
-	out := make(map[string]any, len(body))
-	for k, v := range body {
-		out[k] = v
+	redacted, ok := redactWaitlistPIIValue(body).(map[string]any)
+	if !ok {
+		return map[string]any{}
 	}
-	for _, key := range waitlistPIIBodyKeys {
-		if _, ok := out[key]; ok {
-			out[key] = waitlistPIIRedacted
+	return redacted
+}
+
+func redactWaitlistPIIValue(value any) any {
+	switch typed := value.(type) {
+	case map[string]any:
+		out := make(map[string]any, len(typed))
+		for key, nested := range typed {
+			if _, pii := waitlistPIIBodyKeySet[strings.ToLower(key)]; pii {
+				out[key] = waitlistPIIRedacted
+				continue
+			}
+			out[key] = redactWaitlistPIIValue(nested)
 		}
+		return out
+	case []any:
+		out := make([]any, len(typed))
+		for i, nested := range typed {
+			out[i] = redactWaitlistPIIValue(nested)
+		}
+		return out
+	case map[string]string:
+		out := make(map[string]string, len(typed))
+		for key, nested := range typed {
+			if _, pii := waitlistPIIBodyKeySet[strings.ToLower(key)]; pii {
+				out[key] = waitlistPIIRedacted
+				continue
+			}
+			out[key] = nested
+		}
+		return out
+	case []map[string]any:
+		out := make([]map[string]any, len(typed))
+		for i, nested := range typed {
+			out[i] = redactWaitlistPII(nested)
+		}
+		return out
+	default:
+		return value
 	}
-	return out
 }
 
 func waitlistPIIPlaceholderBody() map[string]any {
@@ -144,11 +219,7 @@ func readWaitlistJSON(r io.Reader) (map[string]any, error) {
 	if len(strings.TrimSpace(string(data))) == 0 {
 		return nil, nil
 	}
-	var jsonBody map[string]any
-	if err := json.Unmarshal(data, &jsonBody); err != nil {
-		return nil, fmt.Errorf("parsing guest JSON: %w", err)
-	}
-	return jsonBody, nil
+	return decodeWaitlistGuestJSON(data, "guest")
 }
 
 func readWaitlistGuestFile(path string) (map[string]any, error) {
@@ -156,11 +227,122 @@ func readWaitlistGuestFile(path string) (map[string]any, error) {
 	if err != nil {
 		return nil, fmt.Errorf("reading --guest-file: %w", err)
 	}
+	return decodeWaitlistGuestJSON(data, "--guest-file")
+}
+
+func decodeWaitlistGuestJSON(data []byte, source string) (map[string]any, error) {
 	var jsonBody map[string]any
 	if err := json.Unmarshal(data, &jsonBody); err != nil {
-		return nil, fmt.Errorf("parsing --guest-file JSON: %w", err)
+		return nil, fmt.Errorf("parsing %s JSON: %w", source, err)
+	}
+	if jsonBody == nil {
+		return nil, usageErr(fmt.Errorf("%s JSON must be an object", source))
+	}
+	if err := validateWaitlistSubmitBodyFields(jsonBody); err != nil {
+		return nil, err
 	}
 	return jsonBody, nil
+}
+
+func validateWaitlistSubmitBodyFields(body map[string]any) error {
+	unknown := make([]string, 0)
+	for key := range body {
+		if _, ok := waitlistSubmitBodyTypes[key]; !ok {
+			unknown = append(unknown, key)
+		}
+	}
+	if len(unknown) > 0 {
+		sort.Strings(unknown)
+		quoted := make([]string, len(unknown))
+		for i, key := range unknown {
+			quoted[i] = fmt.Sprintf("%q", key)
+		}
+		fieldLabel := "field"
+		if len(quoted) > 1 {
+			fieldLabel = "fields"
+		}
+		return usageErr(fmt.Errorf("unknown guest JSON %s %s; accepted fields: %s", fieldLabel, strings.Join(quoted, ", "), strings.Join(waitlistSubmitBodyKeys, ", ")))
+	}
+	for _, key := range waitlistSubmitBodyKeys {
+		value, ok := body[key]
+		if !ok {
+			continue
+		}
+		expected := waitlistSubmitBodyTypes[key]
+		if !waitlistSubmitValueMatches(expected, value) {
+			return usageErr(fmt.Errorf("guest JSON field %q must be a %s, not %s", key, expected, waitlistJSONValueType(value)))
+		}
+	}
+	return nil
+}
+
+func waitlistSubmitValueMatches(expected waitlistSubmitValueType, value any) bool {
+	switch expected {
+	case waitlistSubmitString:
+		_, ok := value.(string)
+		return ok
+	case waitlistSubmitBoolean:
+		_, ok := value.(bool)
+		return ok
+	case waitlistSubmitNumber:
+		return waitlistJSONNumber(value)
+	case waitlistSubmitInteger:
+		return waitlistJSONInteger(value)
+	default:
+		return false
+	}
+}
+
+func waitlistJSONNumber(value any) bool {
+	switch n := value.(type) {
+	case float64:
+		return !math.IsNaN(n) && !math.IsInf(n, 0)
+	case float32:
+		return !math.IsNaN(float64(n)) && !math.IsInf(float64(n), 0)
+	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+		return true
+	case json.Number:
+		parsed, err := n.Float64()
+		return err == nil && !math.IsNaN(parsed) && !math.IsInf(parsed, 0)
+	default:
+		return false
+	}
+}
+
+func waitlistJSONInteger(value any) bool {
+	switch n := value.(type) {
+	case float64:
+		return !math.IsNaN(n) && !math.IsInf(n, 0) && math.Trunc(n) == n
+	case float32:
+		f := float64(n)
+		return !math.IsNaN(f) && !math.IsInf(f, 0) && math.Trunc(f) == f
+	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+		return true
+	case json.Number:
+		parsed, err := n.Float64()
+		return err == nil && !math.IsNaN(parsed) && !math.IsInf(parsed, 0) && math.Trunc(parsed) == parsed
+	default:
+		return false
+	}
+}
+
+func waitlistJSONValueType(value any) string {
+	switch value.(type) {
+	case nil:
+		return "null"
+	case string:
+		return "string"
+	case bool:
+		return "boolean"
+	case float64, float32, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, json.Number:
+		return "number"
+	case map[string]any, map[string]string:
+		return "object"
+	case []any, []string, []map[string]any:
+		return "array"
+	default:
+		return fmt.Sprintf("%T", value)
+	}
 }
 
 func waitlistGuestEnvBody() map[string]any {
@@ -337,18 +519,22 @@ func applyWaitlistNonPIIFlags(cmd *cobra.Command, body map[string]any, isSmoking
 }
 
 func requireWaitlistSubmitFields(body map[string]any, dryRun bool) error {
+	if err := validateWaitlistSubmitBodyFields(body); err != nil {
+		return err
+	}
 	if dryRun {
 		return nil
 	}
 	for _, key := range []string{"EmailAddress", "FirstName", "LastName", "PrimaryPhoneAreaCode", "PrimaryPhoneNumber"} {
-		if !waitlistNonEmpty(body[key]) || fmt.Sprint(body[key]) == waitlistPIIRedacted {
+		value, ok := body[key].(string)
+		if !ok || strings.TrimSpace(value) == "" || value == waitlistPIIRedacted {
 			return usageErr(fmt.Errorf("%s", waitlistPIIStdinErr))
 		}
 	}
-	if !waitlistNonEmpty(body["PartySize"]) {
+	if _, ok := body["PartySize"]; !ok {
 		return usageErr(fmt.Errorf("required flag %q not set (or include PartySize in stdin JSON)", "party-size"))
 	}
-	if !waitlistNonEmpty(body["WaitMinutes"]) {
+	if _, ok := body["WaitMinutes"]; !ok {
 		return usageErr(fmt.Errorf("required flag %q not set (or include WaitMinutes in stdin JSON)", "wait-minutes"))
 	}
 	return nil

@@ -277,3 +277,36 @@ func TestDryRunRedactsWaitlistPII(t *testing.T) {
 		t.Fatalf("dry-run should still print non-PII fields, got %q", stderr)
 	}
 }
+
+func TestRedactDryRunJSONBodyRecursivelyAndCaseInsensitively(t *testing.T) {
+	body := []byte(`{"emailaddress":"email-value","nested":{"FiRsTnAmE":"first-value","items":[{"primaryphonenumber":"phone-value","keep":"safe-value"}]},"PartySize":2}`)
+	got := redactDryRunJSONBody(body)
+	gotText := string(got)
+	for _, leak := range []string{"email-value", "first-value", "phone-value"} {
+		if strings.Contains(gotText, leak) {
+			t.Fatalf("dry-run redaction leaked nested or mixed-case guest data")
+		}
+	}
+	var parsed map[string]any
+	if err := json.Unmarshal(got, &parsed); err != nil {
+		t.Fatalf("redacted body is not JSON: %v", err)
+	}
+	if parsed["emailaddress"] != dryRunPIIRedacted {
+		t.Fatal("dry-run redaction did not redact the top-level guest field")
+	}
+	nested, ok := parsed["nested"].(map[string]any)
+	if !ok || nested["FiRsTnAmE"] != dryRunPIIRedacted {
+		t.Fatal("dry-run redaction did not redact the nested guest field")
+	}
+	items, ok := nested["items"].([]any)
+	if !ok || len(items) != 1 {
+		t.Fatal("dry-run redaction did not preserve nested list content")
+	}
+	item, ok := items[0].(map[string]any)
+	if !ok || item["primaryphonenumber"] != dryRunPIIRedacted {
+		t.Fatal("dry-run redaction did not redact the nested phone field")
+	}
+	if item["keep"] != "safe-value" || parsed["PartySize"] != float64(2) {
+		t.Fatal("dry-run redaction changed non-PII body content")
+	}
+}

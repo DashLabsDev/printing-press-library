@@ -86,6 +86,93 @@ func TestRedactWaitlistPII(t *testing.T) {
 	}
 }
 
+func TestRedactWaitlistPIIRecursivelyAndCaseInsensitively(t *testing.T) {
+	body := map[string]any{
+		"emailaddress": "email-value",
+		"Nested": map[string]any{
+			"FiRsTnAmE": "first-value",
+			"items": []any{map[string]any{
+				"primaryphonenumber": "phone-value",
+				"keep":               "safe-value",
+			}},
+		},
+		"PartySize": 2,
+	}
+
+	got := redactWaitlistPII(body)
+	if got["emailaddress"] != waitlistPIIRedacted {
+		t.Fatal("lowercase guest email was not redacted")
+	}
+	nested, ok := got["Nested"].(map[string]any)
+	if !ok || nested["FiRsTnAmE"] != waitlistPIIRedacted {
+		t.Fatal("mixed-case nested guest name was not redacted")
+	}
+	items, ok := nested["items"].([]any)
+	if !ok || len(items) != 1 {
+		t.Fatal("nested list was not preserved")
+	}
+	item, ok := items[0].(map[string]any)
+	if !ok || item["primaryphonenumber"] != waitlistPIIRedacted {
+		t.Fatal("nested guest phone was not redacted")
+	}
+	if item["keep"] != "safe-value" || got["PartySize"] != 2 {
+		t.Fatal("non-PII fields changed during redaction")
+	}
+	if body["emailaddress"] != "email-value" {
+		t.Fatal("redaction mutated the input body")
+	}
+}
+
+func TestSubmitDryRunRejectsInvalidGuestJSONSchema(t *testing.T) {
+	withTempLearnHome(t)
+	tests := []struct {
+		name  string
+		stdin string
+	}{
+		{name: "unknown field", stdin: `{"EmailAddress":"email-value","FirstName":"first-value","LastName":"last-value","PrimaryPhoneAreaCode":"area-value","PrimaryPhoneNumber":"phone-value","PartySize":2,"WaitMinutes":10,"unexpected":"value"}`},
+		{name: "object field", stdin: `{"EmailAddress":"email-value","FirstName":"first-value","LastName":"last-value","PrimaryPhoneAreaCode":"area-value","PrimaryPhoneNumber":"phone-value","PartySize":{"nested":"value"},"WaitMinutes":10}`},
+		{name: "array field", stdin: `{"EmailAddress":"email-value","FirstName":"first-value","LastName":"last-value","PrimaryPhoneAreaCode":"area-value","PrimaryPhoneNumber":"phone-value","PartySize":[2],"WaitMinutes":10}`},
+		{name: "null field", stdin: `{"EmailAddress":"email-value","FirstName":"first-value","LastName":"last-value","PrimaryPhoneAreaCode":"area-value","PrimaryPhoneNumber":"phone-value","PartySize":null,"WaitMinutes":10}`},
+		{name: "wrong scalar type", stdin: `{"EmailAddress":"email-value","FirstName":"first-value","LastName":"last-value","PrimaryPhoneAreaCode":"area-value","PrimaryPhoneNumber":"phone-value","PartySize":2,"WaitMinutes":"10"}`},
+		{name: "fractional integer", stdin: `{"EmailAddress":"email-value","FirstName":"first-value","LastName":"last-value","PrimaryPhoneAreaCode":"area-value","PrimaryPhoneNumber":"phone-value","PartySize":2,"WaitMinutes":10.5}`},
+		{name: "top-level null", stdin: `null`},
+		{name: "top-level array", stdin: `[]`},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			_, _, err := runRootArgsWithStdin(t, tc.stdin,
+				"texasroadhouse", "submit", "218",
+				"--stdin", "--dry-run", "--agent", "--no-learn",
+			)
+			if err == nil {
+				t.Fatal("invalid guest JSON schema was accepted for dry-run")
+			}
+		})
+	}
+}
+
+func TestGuestFileRejectsInvalidGuestJSONSchema(t *testing.T) {
+	path := writeGuestFile(t, `{"EmailAddress":"email-value","FirstName":"first-value","LastName":"last-value","PrimaryPhoneAreaCode":"area-value","PrimaryPhoneNumber":"phone-value","PartySize":{"nested":"value"},"WaitMinutes":10}`)
+	if _, err := readWaitlistGuestFile(path); err == nil {
+		t.Fatal("guest file with structured PartySize was accepted")
+	}
+}
+
+func TestRequireWaitlistSubmitFieldsRejectsInvalidFinalBody(t *testing.T) {
+	body := validWaitlistSubmitBody()
+	body["WaitMinutes"] = 10.5
+	if err := requireWaitlistSubmitFields(body, false); err == nil {
+		t.Fatal("final submit guard accepted fractional integer WaitMinutes")
+	}
+}
+
+func TestRequireWaitlistSubmitFieldsAcceptsDocumentedScalarTypes(t *testing.T) {
+	if err := requireWaitlistSubmitFields(validWaitlistSubmitBody(), false); err != nil {
+		t.Fatalf("documented scalar types rejected: %v", err)
+	}
+}
+
 func TestSubmitDryRunRedactsPII(t *testing.T) {
 	withTempLearnHome(t)
 	stderr := captureOSStderr(t, func() {
@@ -298,6 +385,64 @@ func TestImplicitStdinWinsOverAmbientGuestEnv(t *testing.T) {
 	}
 	if got, want := guestString(body["PrimaryPhoneNumber"]), "555-0100"; got != want {
 		t.Fatalf("PrimaryPhoneNumber = %q, want piped value %q", got, want)
+	}
+}
+
+func TestImplicitStdinFillsMissingGuestFieldsFromEnv(t *testing.T) {
+	clearWaitlistGuestEnv(t)
+	t.Setenv(waitlistGuestEmailEnv, "env-email")
+	t.Setenv(waitlistGuestPhoneAreaEnv, "env-area")
+	t.Setenv(waitlistGuestPhoneNumEnv, "env-phone")
+
+	cmd := &cobra.Command{Use: "submit"}
+	cmd.SetIn(strings.NewReader(`{"FirstName":"pipe-first","LastName":"pipe-last"}`))
+
+	body, err := collectWaitlistGuestPII(cmd, &rootFlags{agent: true}, false, "", waitlistPIIFlagValues{})
+	if err != nil {
+		t.Fatalf("collectWaitlistGuestPII: %v", err)
+	}
+	if got := guestString(body["FirstName"]); got != "pipe-first" {
+		t.Fatalf("FirstName = %q, want piped value", got)
+	}
+	if got := guestString(body["EmailAddress"]); got != "env-email" {
+		t.Fatalf("EmailAddress = %q, want environment fallback", got)
+	}
+	if got := guestString(body["PrimaryPhoneNumber"]); got != "env-phone" {
+		t.Fatalf("PrimaryPhoneNumber = %q, want environment fallback", got)
+	}
+}
+
+func TestConfirmedPIIFlagsDoNotDrainImplicitStdin(t *testing.T) {
+	clearWaitlistGuestEnv(t)
+	cmd := &cobra.Command{Use: "submit"}
+	cmd.Flags().String("email-address", "", "")
+	if err := cmd.Flags().Set("email-address", "flag-email"); err != nil {
+		t.Fatal(err)
+	}
+	cmd.SetIn(failOnRead{t: t})
+
+	body, err := collectWaitlistGuestPII(cmd, &rootFlags{agent: true, yes: true}, false, "", waitlistPIIFlagValues{email: "flag-email"})
+	if err != nil {
+		t.Fatalf("collectWaitlistGuestPII: %v", err)
+	}
+	if got := guestString(body["EmailAddress"]); got != "flag-email" {
+		t.Fatalf("EmailAddress = %q, want confirmed flag value", got)
+	}
+}
+
+func validWaitlistSubmitBody() map[string]any {
+	return map[string]any{
+		"EmailAddress":          "email-value",
+		"FirstName":             "first-value",
+		"LastName":              "last-value",
+		"IsSmoking":             false,
+		"PrimaryPhoneAreaCode":  "area-value",
+		"PrimaryPhoneExtension": "",
+		"PrimaryPhoneNumber":    "phone-value",
+		"PrimaryPhoneType":      1,
+		"PartySize":             2.5,
+		"WaitMinutes":           10,
+		"Platform":              "web",
 	}
 }
 

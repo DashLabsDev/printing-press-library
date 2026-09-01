@@ -1187,13 +1187,13 @@ func safeEndpointClass(method, path string) string {
 
 const dryRunPIIRedacted = "<redacted>"
 
-var dryRunPIIBodyKeys = []string{
-	"EmailAddress",
-	"FirstName",
-	"LastName",
-	"PrimaryPhoneAreaCode",
-	"PrimaryPhoneNumber",
-	"PrimaryPhoneExtension",
+var dryRunPIIBodyKeySet = map[string]struct{}{
+	"emailaddress":          {},
+	"firstname":             {},
+	"lastname":              {},
+	"primaryphoneareacode":  {},
+	"primaryphonenumber":    {},
+	"primaryphoneextension": {},
 }
 
 // redactDryRunJSONBody replaces waitlist guest identity fields before dry-run
@@ -1203,25 +1203,51 @@ func redactDryRunJSONBody(body []byte) []byte {
 	if len(body) == 0 {
 		return body
 	}
-	var obj map[string]any
-	if err := json.Unmarshal(body, &obj); err != nil {
-		return body
+	var value any
+	if err := json.Unmarshal(body, &value); err != nil {
+		// The dry-run logger must fail closed: an unparseable body cannot be
+		// safely inspected for guest fields, so never emit it verbatim.
+		return []byte(`"` + dryRunPIIRedacted + `"`)
 	}
-	changed := false
-	for _, key := range dryRunPIIBodyKeys {
-		if _, ok := obj[key]; ok {
-			obj[key] = dryRunPIIRedacted
-			changed = true
-		}
-	}
+	redacted, changed := redactDryRunPIIValue(value)
 	if !changed {
 		return body
 	}
-	out, err := json.Marshal(obj)
+	out, err := json.Marshal(redacted)
 	if err != nil {
-		return body
+		return []byte(`"` + dryRunPIIRedacted + `"`)
 	}
 	return out
+}
+
+func redactDryRunPIIValue(value any) (any, bool) {
+	switch typed := value.(type) {
+	case map[string]any:
+		out := make(map[string]any, len(typed))
+		changed := false
+		for key, nested := range typed {
+			if _, pii := dryRunPIIBodyKeySet[strings.ToLower(key)]; pii {
+				out[key] = dryRunPIIRedacted
+				changed = true
+				continue
+			}
+			redacted, nestedChanged := redactDryRunPIIValue(nested)
+			out[key] = redacted
+			changed = changed || nestedChanged
+		}
+		return out, changed
+	case []any:
+		out := make([]any, len(typed))
+		changed := false
+		for i, nested := range typed {
+			redacted, nestedChanged := redactDryRunPIIValue(nested)
+			out[i] = redacted
+			changed = changed || nestedChanged
+		}
+		return out, changed
+	default:
+		return value, false
+	}
 }
 
 // dryRun prints the outgoing request exactly as the live path would send it,
