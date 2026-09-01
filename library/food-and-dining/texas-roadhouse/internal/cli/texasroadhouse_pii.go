@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"sort"
 	"strings"
@@ -35,9 +36,10 @@ var waitlistPIIBodyKeySet = map[string]bool{
 	"primaryphoneextension": true,
 }
 
-// waitlistSubmitBodyKeys is intentionally a closed list. The upstream
-// endpoint does not provide a safe extension mechanism, so unknown stdin
-// fields must not silently become a POST body during a preview or live join.
+// waitlistSubmitBodyKeys is intentionally a closed field-and-type schema. The
+// upstream endpoint does not provide a safe extension mechanism, so unknown
+// or structured stdin values must not silently become a POST body during a
+// preview or live join.
 var waitlistSubmitBodyKeys = []string{
 	"EmailAddress",
 	"FirstName",
@@ -64,6 +66,29 @@ var waitlistSubmitBodyKeySet = map[string]bool{
 	"PartySize":             true,
 	"WaitMinutes":           true,
 	"Platform":              true,
+}
+
+type waitlistSubmitValueType string
+
+const (
+	waitlistSubmitString  waitlistSubmitValueType = "string"
+	waitlistSubmitBoolean waitlistSubmitValueType = "boolean"
+	waitlistSubmitNumber  waitlistSubmitValueType = "number"
+	waitlistSubmitInteger waitlistSubmitValueType = "integer"
+)
+
+var waitlistSubmitBodyTypes = map[string]waitlistSubmitValueType{
+	"EmailAddress":          waitlistSubmitString,
+	"FirstName":             waitlistSubmitString,
+	"LastName":              waitlistSubmitString,
+	"IsSmoking":             waitlistSubmitBoolean,
+	"PrimaryPhoneAreaCode":  waitlistSubmitString,
+	"PrimaryPhoneExtension": waitlistSubmitString,
+	"PrimaryPhoneNumber":    waitlistSubmitString,
+	"PrimaryPhoneType":      waitlistSubmitInteger,
+	"PartySize":             waitlistSubmitNumber,
+	"WaitMinutes":           waitlistSubmitInteger,
+	"Platform":              waitlistSubmitString,
 }
 
 const waitlistPIIRedacted = "<redacted>"
@@ -194,19 +219,98 @@ func validateWaitlistSubmitBodyFields(body map[string]any) error {
 			unknown = append(unknown, key)
 		}
 	}
-	if len(unknown) == 0 {
-		return nil
+	if len(unknown) > 0 {
+		sort.Strings(unknown)
+		quoted := make([]string, len(unknown))
+		for i, key := range unknown {
+			quoted[i] = fmt.Sprintf("%q", key)
+		}
+		fieldLabel := "field"
+		if len(quoted) > 1 {
+			fieldLabel = "fields"
+		}
+		return usageErr(fmt.Errorf("unknown stdin JSON %s %s; accepted fields: %s", fieldLabel, strings.Join(quoted, ", "), strings.Join(waitlistSubmitBodyKeys, ", ")))
 	}
-	sort.Strings(unknown)
-	quoted := make([]string, len(unknown))
-	for i, key := range unknown {
-		quoted[i] = fmt.Sprintf("%q", key)
+	for _, key := range waitlistSubmitBodyKeys {
+		value, ok := body[key]
+		if !ok {
+			continue
+		}
+		expected := waitlistSubmitBodyTypes[key]
+		if !waitlistSubmitValueMatches(expected, value) {
+			return usageErr(fmt.Errorf("stdin JSON field %q must be a %s, not %s", key, expected, waitlistJSONValueType(value)))
+		}
 	}
-	fieldLabel := "field"
-	if len(quoted) > 1 {
-		fieldLabel = "fields"
+	return nil
+}
+
+func waitlistSubmitValueMatches(expected waitlistSubmitValueType, value any) bool {
+	switch expected {
+	case waitlistSubmitString:
+		_, ok := value.(string)
+		return ok
+	case waitlistSubmitBoolean:
+		_, ok := value.(bool)
+		return ok
+	case waitlistSubmitNumber:
+		return waitlistJSONNumber(value)
+	case waitlistSubmitInteger:
+		return waitlistJSONInteger(value)
+	default:
+		return false
 	}
-	return usageErr(fmt.Errorf("unknown stdin JSON %s %s; accepted fields: %s", fieldLabel, strings.Join(quoted, ", "), strings.Join(waitlistSubmitBodyKeys, ", ")))
+}
+
+func waitlistJSONNumber(value any) bool {
+	switch n := value.(type) {
+	case float64:
+		return !math.IsNaN(n) && !math.IsInf(n, 0)
+	case float32:
+		return !math.IsNaN(float64(n)) && !math.IsInf(float64(n), 0)
+	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+		return true
+	case json.Number:
+		parsed, err := n.Float64()
+		return err == nil && !math.IsNaN(parsed) && !math.IsInf(parsed, 0)
+	default:
+		return false
+	}
+}
+
+func waitlistJSONInteger(value any) bool {
+	switch n := value.(type) {
+	case float64:
+		return !math.IsNaN(n) && !math.IsInf(n, 0) && math.Trunc(n) == n
+	case float32:
+		f := float64(n)
+		return !math.IsNaN(f) && !math.IsInf(f, 0) && math.Trunc(f) == f
+	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+		return true
+	case json.Number:
+		_, err := n.Int64()
+		return err == nil
+	default:
+		return false
+	}
+}
+
+func waitlistJSONValueType(value any) string {
+	switch value.(type) {
+	case nil:
+		return "null"
+	case string:
+		return "string"
+	case bool:
+		return "boolean"
+	case float64, float32, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, json.Number:
+		return "number"
+	case map[string]any, map[string]string:
+		return "object"
+	case []any, []string, []map[string]any:
+		return "array"
+	default:
+		return fmt.Sprintf("%T", value)
+	}
 }
 
 func isTerminalReader(r io.Reader) bool {
@@ -319,18 +423,22 @@ func applyWaitlistNonPIIFlags(cmd *cobra.Command, body map[string]any, isSmoking
 }
 
 func requireWaitlistSubmitFields(body map[string]any, dryRun bool) error {
+	if err := validateWaitlistSubmitBodyFields(body); err != nil {
+		return err
+	}
 	if dryRun {
 		return nil
 	}
 	for _, key := range []string{"EmailAddress", "FirstName", "LastName", "PrimaryPhoneAreaCode", "PrimaryPhoneNumber"} {
-		if !waitlistNonEmpty(body[key]) || fmt.Sprint(body[key]) == waitlistPIIRedacted {
+		value, ok := body[key].(string)
+		if !ok || strings.TrimSpace(value) == "" || value == waitlistPIIRedacted {
 			return usageErr(fmt.Errorf("%s", waitlistPIIStdinErr))
 		}
 	}
-	if !waitlistNonEmpty(body["PartySize"]) {
+	if _, ok := body["PartySize"]; !ok {
 		return usageErr(fmt.Errorf("required flag %q not set (or include PartySize in stdin JSON)", "party-size"))
 	}
-	if !waitlistNonEmpty(body["WaitMinutes"]) {
+	if _, ok := body["WaitMinutes"]; !ok {
 		return usageErr(fmt.Errorf("required flag %q not set (or include WaitMinutes in stdin JSON)", "wait-minutes"))
 	}
 	return nil

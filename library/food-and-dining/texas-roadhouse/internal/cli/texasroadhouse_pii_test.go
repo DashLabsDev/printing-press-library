@@ -129,6 +129,102 @@ func TestSubmitDryRunRejectsUnknownStdinFields(t *testing.T) {
 	}
 }
 
+func TestValidateWaitlistSubmitBodyFieldsRejectsWrongTypes(t *testing.T) {
+	tests := []struct {
+		name  string
+		field string
+		value any
+		want  string
+	}{
+		{name: "email object", field: "EmailAddress", value: map[string]any{"unexpected": "must-not-reach-upstream"}, want: "string"},
+		{name: "first name array", field: "FirstName", value: []any{"Test"}, want: "string"},
+		{name: "last name null", field: "LastName", value: nil, want: "string"},
+		{name: "smoking string", field: "IsSmoking", value: "false", want: "boolean"},
+		{name: "area code boolean", field: "PrimaryPhoneAreaCode", value: false, want: "string"},
+		{name: "extension object", field: "PrimaryPhoneExtension", value: map[string]any{}, want: "string"},
+		{name: "phone array", field: "PrimaryPhoneNumber", value: []any{"555-0100"}, want: "string"},
+		{name: "phone type boolean", field: "PrimaryPhoneType", value: true, want: "integer"},
+		{name: "party size object", field: "PartySize", value: map[string]any{"unexpected": "must-not-reach-upstream"}, want: "number"},
+		{name: "wait minutes fraction", field: "WaitMinutes", value: 10.5, want: "integer"},
+		{name: "platform null", field: "Platform", value: nil, want: "string"},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			body := validWaitlistSubmitBody()
+			body[tc.field] = tc.value
+			err := validateWaitlistSubmitBodyFields(body)
+			if err == nil {
+				t.Fatalf("%s accepted %T", tc.field, tc.value)
+			}
+			if !strings.Contains(err.Error(), tc.field) || !strings.Contains(err.Error(), tc.want) {
+				t.Fatalf("error = %v, want field %q and type %q", err, tc.field, tc.want)
+			}
+		})
+	}
+}
+
+func TestValidateWaitlistSubmitBodyFieldsAcceptsDocumentedScalarTypes(t *testing.T) {
+	if err := validateWaitlistSubmitBodyFields(validWaitlistSubmitBody()); err != nil {
+		t.Fatalf("documented scalar types rejected: %v", err)
+	}
+
+	// JSON decoding produces float64 values, while the non-PII CLI flags add
+	// native ints after stdin is decoded. Both forms are documented numeric
+	// values and must remain valid at the final submit guard.
+	body := validWaitlistSubmitBody()
+	body["PrimaryPhoneType"] = 1
+	body["PartySize"] = 2
+	body["WaitMinutes"] = 10
+	if err := requireWaitlistSubmitFields(body, false); err != nil {
+		t.Fatalf("CLI numeric scalar types rejected after merge: %v", err)
+	}
+}
+
+func TestRequireWaitlistSubmitFieldsRejectsStructuredValueAfterMerge(t *testing.T) {
+	body := validWaitlistSubmitBody()
+	body["PartySize"] = map[string]any{"unexpected": "must-not-reach-upstream"}
+
+	err := requireWaitlistSubmitFields(body, false)
+	if err == nil {
+		t.Fatal("expected final submit guard to reject structured PartySize")
+	}
+	if !strings.Contains(err.Error(), "PartySize") || !strings.Contains(err.Error(), "number") {
+		t.Fatalf("error = %v, want PartySize number refusal", err)
+	}
+}
+
+func TestSubmitDryRunRejectsStructuredScalarStdin(t *testing.T) {
+	withTempLearnHome(t)
+	_, _, err := runRootArgsWithStdin(t,
+		`{"EmailAddress":"guest@example.test","FirstName":"Test","LastName":"User","PrimaryPhoneAreaCode":"555","PrimaryPhoneNumber":"555-0100","PartySize":{"unexpected":"must-not-reach-upstream"},"WaitMinutes":10}`,
+		"texasroadhouse", "submit", "218",
+		"--stdin", "--dry-run", "--agent", "--no-learn",
+	)
+	if err == nil {
+		t.Fatal("expected dry-run stdin with an object-valued PartySize to be refused")
+	}
+	if !strings.Contains(err.Error(), "PartySize") || !strings.Contains(err.Error(), "number") {
+		t.Fatalf("error = %v, want PartySize number refusal", err)
+	}
+}
+
+func validWaitlistSubmitBody() map[string]any {
+	return map[string]any{
+		"EmailAddress":          "guest@example.test",
+		"FirstName":             "Test",
+		"LastName":              "User",
+		"IsSmoking":             false,
+		"PrimaryPhoneAreaCode":  "555",
+		"PrimaryPhoneExtension": "",
+		"PrimaryPhoneNumber":    "555-0100",
+		"PrimaryPhoneType":      1.0,
+		"PartySize":             2.5,
+		"WaitMinutes":           10.0,
+		"Platform":              "web",
+	}
+}
+
 func TestSubmitDryRunRedactsPII(t *testing.T) {
 	withTempLearnHome(t)
 	stderr := captureOSStderr(t, func() {
