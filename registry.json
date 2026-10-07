@@ -8364,9 +8364,9 @@
       "path": "library/sales-and-crm/eu-tenders",
       "release": {
         "cli_name": "eu-tenders-pp-cli",
-        "version": "2026.9.1",
-        "released_at": "2026-09-11T09:22:21Z",
-        "source_commit": "81f5764eda401077520268afe74913c0f21f5b7e"
+        "version": "2026.10.1",
+        "released_at": "2026-10-06T08:55:58Z",
+        "source_commit": "a41b512d9224e0573d0c6c58ecf0cfd477205852"
       },
       "printer": "m91michel",
       "printer_name": "Mathias Michel",
@@ -29086,7 +29086,7 @@
         "Compare how a journal's topic distribution shifts between two time windows; spot emerging and fading specialties.",
         "Reading List Curation",
         "curate",
-        "Auto-generate ranked reading lists for a topic, sorted by citations, date or per-year (average citations per year since publication; age = years since pub_date, or July 1 of the year if unknown, at least 0.25; local store only), exportable as Markdown or BibTeX.",
+        "Auto-generate ranked reading lists for a topic, sorted by citations, date, per-year (average citations per year since publication; age = years since pub_date, or July 1 of the year if unknown, at least 0.25) or velocity (recency-weighted mean of citations in the last up to 3 complete calendar years, weights 0.5/0.3/0.2; needs a refreshed store); per-year and velocity use the local store only, exportable as Markdown or BibTeX.",
         "Citation Visibility Gap",
         "visibility-gap",
         "Find authors whose citation impact is out of step with the prestige of the Lancet journals they publish in."
