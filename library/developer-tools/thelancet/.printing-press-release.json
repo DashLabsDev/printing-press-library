@@ -2,17 +2,17 @@
   "schema_version": 1,
   "slug": "thelancet",
   "cli_name": "thelancet-pp-cli",
-  "version": "2026.10.2",
-  "released_at": "2026-10-04T08:54:26Z",
-  "source_commit": "7376d5fc0da12663c1234a0e72e19912516c76d2",
+  "version": "2026.10.3",
+  "released_at": "2026-10-07T08:57:14Z",
+  "source_commit": "e528b1131f07785707827a4741abc0b57d3a24bd",
   "printing_press_version": "4.24.0",
   "run_id": "20260617-072858-2f9fe13e",
   "changes": [
     {
-      "title": "feat(thelancet): curate outputs pub_date and citations_per_year and sorts by per-year",
-      "pr": 2266,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/2266",
-      "commit": "7376d5fc0da12663c1234a0e72e19912516c76d2"
+      "title": "feat(thelancet): curate --sort velocity (recent-window citation velocity)",
+      "pr": 2274,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/2274",
+      "commit": "e528b1131f07785707827a4741abc0b57d3a24bd"
     }
   ]
 }

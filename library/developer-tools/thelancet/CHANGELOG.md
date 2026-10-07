@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.10.3 - 2026-10-07
+
+- feat(thelancet): curate --sort velocity (recent-window citation velocity) (#2274).
+
 ## 2026.10.2 - 2026-10-04
 
 - feat(thelancet): curate outputs pub_date and citations_per_year and sorts by per-year (#2266).
