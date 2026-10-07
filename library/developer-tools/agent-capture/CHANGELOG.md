@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.10.1 - 2026-10-07
+
+- fix(nvd,agent-capture): correct MCP install path, dangling section re… (#2275).
+
 ## 2026.8.3 - 2026-08-17
 
 - fix(cli): repair agent-capture doctor probe and capture docs (#1736).

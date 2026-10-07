@@ -2,16 +2,16 @@
   "schema_version": 1,
   "slug": "nvd",
   "cli_name": "nvd-pp-cli",
-  "version": "2026.9.1",
-  "released_at": "2026-09-11T09:22:21Z",
-  "source_commit": "81f5764eda401077520268afe74913c0f21f5b7e",
+  "version": "2026.10.1",
+  "released_at": "2026-10-07T08:58:29Z",
+  "source_commit": "b631967bfaeae6f1c2deca9d07668df771cc532e",
   "printing_press_version": "3.6.0",
   "changes": [
     {
-      "title": "fix: fail closed on ambiguous fleet write retries",
-      "pr": 1978,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/1978",
-      "commit": "81f5764eda401077520268afe74913c0f21f5b7e"
+      "title": "fix(nvd,agent-capture): correct MCP install path, dangling section re…",
+      "pr": 2275,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/2275",
+      "commit": "b631967bfaeae6f1c2deca9d07668df771cc532e"
     }
   ]
 }

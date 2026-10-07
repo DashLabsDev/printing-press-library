@@ -2,17 +2,17 @@
   "schema_version": 1,
   "slug": "scrape-do",
   "cli_name": "scrape-do-pp-cli",
-  "version": "2026.9.1",
-  "released_at": "2026-09-11T09:22:21Z",
-  "source_commit": "81f5764eda401077520268afe74913c0f21f5b7e",
+  "version": "2026.10.1",
+  "released_at": "2026-10-07T08:58:29Z",
+  "source_commit": "f9f034d71565567546954940e8a57749d7712920",
   "printing_press_version": "4.20.0",
   "run_id": "20260601-111749",
   "changes": [
     {
-      "title": "fix: fail closed on ambiguous fleet write retries",
-      "pr": 1978,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/1978",
-      "commit": "81f5764eda401077520268afe74913c0f21f5b7e"
+      "title": "fix(scrape-do): correct PATH step in Prerequisites — npx install does…",
+      "pr": 2277,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/2277",
+      "commit": "f9f034d71565567546954940e8a57749d7712920"
     }
   ]
 }
