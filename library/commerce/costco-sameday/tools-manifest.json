@@ -1,0 +1,38 @@
+{
+  "api_name": "costco-sameday",
+  "base_url": "https://sameday.costco.com",
+  "description": "Costco Same-Day (sameday.costco.com) GraphQL CLI. Cookie auth after Costco Azure B2C SSO.",
+  "mcp_ready": "partial",
+  "http_transport": "browser-http",
+  "mcp": {
+    "endpoint_tools": "hidden",
+    "orchestration": "code"
+  },
+  "auth": {
+    "type": "cookie",
+    "cookie_domain": "sameday.costco.com",
+    "cookies": [
+      "__Host-instacart_sid",
+      "_instacart_session_id",
+      "X-IC-bcx",
+      "ahoy_visitor",
+      "ahoy_visit",
+      "build_sha"
+    ]
+  },
+  "required_headers": [
+    {
+      "name": "Accept",
+      "value": "application/json"
+    },
+    {
+      "name": "Origin",
+      "value": "https://sameday.costco.com"
+    },
+    {
+      "name": "Referer",
+      "value": "https://sameday.costco.com/"
+    }
+  ],
+  "tools": []
+}

@@ -1,0 +1,2159 @@
+name: costco-sameday
+description: Costco Same-Day (sameday.costco.com) GraphQL CLI. Cookie auth after Costco
+  Azure B2C SSO. Place-order mutation is FinalizeCheckout — exposed only via gated
+  `order place` (--yes + --confirm-charge; --dry-run never charges). Tip updates via
+  UpdateCheckout tipsUpdate. Cancel mutation not captured.
+version: 0.1.0
+base_url: https://sameday.costco.com
+spec_source: sniffed
+auth:
+  type: cookie
+  cookie_domain: sameday.costco.com
+  cookies:
+  - __Host-instacart_sid
+  - _instacart_session_id
+  - X-IC-bcx
+  - ahoy_visitor
+  - ahoy_visit
+  - build_sha
+  login_url: https://sameday.costco.com/rest/sso/auth/costco/init
+  verify_path: /graphql?operationName=GlobalMainMenuLayout&variables=%7B%22zoneId%22%3A%222801%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%221ad8b3952d5868ab9903e6e41d0a7b233a004906d2b61de49fee2d394f5f3fea%22%7D%7D
+auth_warnings:
+- 'SSO flow: sameday /rest/sso/auth/costco/init → www.costco.com/logon-instacart →
+  signin.costco.com Azure B2C (B2C_1A_SSO_WCS_signup_signin_214) → www.costco.com/OAuthLogonCmd
+  → sameday /rest/sso/auth/costco/callback (sets __Host-instacart_sid) → /store.'
+- This SSO capture completed Costco sign-in WITHOUT an OTP prompt; OTP path still
+  uncaptured.
+- Azure B2C cookies (x-ms-cpim-*) are for signin.costco.com only; API session uses
+  Instacart cookies on sameday.costco.com.
+- Never commit HAR or cookie values. Import via auth login --chrome / cookie jar.
+- 'Place-order HAR (2026-10-06): FinalizeCheckout is the charge mutation; UpdateCheckout.tipsUpdate
+  changes tip; CustomerCancelSelections is read-only (no cancel mutation in HAR).'
+config:
+  format: toml
+  path: ~/.config/costco-sameday-pp-cli/config.toml
+resources:
+  cart:
+    description: Costco Same-Day cart GraphQL operations
+    endpoints:
+      cartsignaledeta:
+        method: GET
+        path: /graphql
+        description: GraphQL query CartSignaledEta (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: CartSignaledEta
+          description: GraphQL operationName
+          fields: []
+        - name: cartId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.cartId
+          fields: []
+        - name: subtotal
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.subtotal
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        - name: addressId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.addressId
+          fields: []
+        - name: postalCode
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.postalCode
+          fields: []
+        - name: pageType
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.pageType
+          fields: []
+        body: []
+        response:
+          type: object
+          item: CartSignaledEtaResponse
+        pagination: null
+      cartcheckoutvalidation:
+        method: GET
+        path: /graphql
+        description: GraphQL query CartCheckoutValidation (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: CartCheckoutValidation
+          description: GraphQL operationName
+          fields: []
+        - name: cartId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.cartId
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        - name: total
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.total
+          fields: []
+        body: []
+        response:
+          type: object
+          item: CartCheckoutValidationResponse
+        pagination: null
+      cartcouponremovalpopupquery:
+        method: GET
+        path: /graphql
+        description: GraphQL query CartCouponRemovalPopupQuery (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: CartCouponRemovalPopupQuery
+          description: GraphQL operationName
+          fields: []
+        - name: retailerId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.retailerId
+          fields: []
+        body: []
+        response:
+          type: object
+          item: CartCouponRemovalPopupQueryResponse
+        pagination: null
+      familyexpeditedonboardingcart:
+        method: GET
+        path: /graphql
+        description: GraphQL query FamilyExpeditedOnboardingCart (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: FamilyExpeditedOnboardingCart
+          description: GraphQL operationName
+          fields: []
+        body: []
+        response:
+          type: object
+          item: FamilyExpeditedOnboardingCartResponse
+        pagination: null
+      treatmentcartmessages:
+        method: GET
+        path: /graphql
+        description: GraphQL query TreatmentCartMessages (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: TreatmentCartMessages
+          description: GraphQL operationName
+          fields: []
+        - name: cartId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.cartId
+          fields: []
+        - name: postalCode
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.postalCode
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        - name: total
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.total
+          fields: []
+        - name: itemSavings
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.itemSavings
+          fields: []
+        - name: utmTreatmentOfferId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.utmTreatmentOfferId
+          fields: []
+        - name: isUserClick
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.isUserClick
+          fields: []
+        body: []
+        response:
+          type: object
+          item: TreatmentCartMessagesResponse
+        pagination: null
+      activecartid:
+        method: GET
+        path: /graphql
+        description: GraphQL query ActiveCartId (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: ActiveCartId
+          description: GraphQL operationName
+          fields: []
+        - name: addressId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.addressId
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        body: []
+        response:
+          type: object
+          item: ActiveCartIdResponse
+        pagination: null
+      cartbottombannerquery:
+        method: GET
+        path: /graphql
+        description: GraphQL query CartBottomBannerQuery (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: CartBottomBannerQuery
+          description: GraphQL operationName
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        - name: postalCode
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.postalCode
+          fields: []
+        - name: debugPlacementId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.debugPlacementId
+          fields: []
+        body: []
+        response:
+          type: object
+          item: CartBottomBannerQueryResponse
+        pagination: null
+      cartonloadplacementquery:
+        method: GET
+        path: /graphql
+        description: GraphQL query CartOnloadPlacementQuery (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: CartOnloadPlacementQuery
+          description: GraphQL operationName
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        - name: cartId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.cartId
+          fields: []
+        - name: postalCode
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.postalCode
+          fields: []
+        body: []
+        response:
+          type: object
+          item: CartOnloadPlacementQueryResponse
+        pagination: null
+      cartproductsrecomendation:
+        method: GET
+        path: /graphql
+        description: GraphQL query CartProductsRecomendation (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: CartProductsRecomendation
+          description: GraphQL operationName
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        - name: pageSource
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.pageSource
+          fields: []
+        - name: pageViewId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.pageViewId
+          fields: []
+        - name: first
+          type: integer
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.first
+          fields: []
+        - name: postalCode
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.postalCode
+          fields: []
+        - name: zoneId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.zoneId
+          fields: []
+        - name: cartId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.cartId
+          fields: []
+        body: []
+        response:
+          type: object
+          item: CartProductsRecomendationResponse
+        pagination: null
+      cartrecommendationsplacements:
+        method: GET
+        path: /graphql
+        description: GraphQL query CartRecommendationsPlacements (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: CartRecommendationsPlacements
+          description: GraphQL operationName
+          fields: []
+        - name: postalCode
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.postalCode
+          fields: []
+        - name: zoneId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.zoneId
+          fields: []
+        - name: first
+          type: integer
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.first
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        body: []
+        response:
+          type: object
+          item: CartRecommendationsPlacementsResponse
+        pagination: null
+      cartswitchervariant:
+        method: GET
+        path: /graphql
+        description: GraphQL query CartSwitcherVariant (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: CartSwitcherVariant
+          description: GraphQL operationName
+          fields: []
+        body: []
+        response:
+          type: object
+          item: CartSwitcherVariantResponse
+        pagination: null
+      carttotals:
+        method: GET
+        path: /graphql
+        description: GraphQL query CartTotals (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: CartTotals
+          description: GraphQL operationName
+          fields: []
+        - name: cartId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.cartId
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        body: []
+        response:
+          type: object
+          item: CartTotalsResponse
+        pagination: null
+      cartviewlayout:
+        method: GET
+        path: /graphql
+        description: GraphQL query CartViewLayout (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: CartViewLayout
+          description: GraphQL operationName
+          fields: []
+        body: []
+        response:
+          type: object
+          item: CartViewLayoutResponse
+        pagination: null
+      finishmycartviewlayout:
+        method: GET
+        path: /graphql
+        description: GraphQL query FinishMyCartViewLayout (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: FinishMyCartViewLayout
+          description: GraphQL operationName
+          fields: []
+        - name: retailerId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.retailerId
+          fields: []
+        body: []
+        response:
+          type: object
+          item: FinishMyCartViewLayoutResponse
+        pagination: null
+      finishmycartviewuilayout:
+        method: GET
+        path: /graphql
+        description: GraphQL query FinishMyCartViewUILayout (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: FinishMyCartViewUILayout
+          description: GraphQL operationName
+          fields: []
+        - name: retailerId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.retailerId
+          fields: []
+        body: []
+        response:
+          type: object
+          item: FinishMyCartViewUILayoutResponse
+        pagination: null
+      fixcartbasketforcheckout:
+        method: POST
+        path: /graphql
+        description: GraphQL query FixCartBasketForCheckout (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: FixCartBasketForCheckout
+          description: GraphQL operationName
+          fields: []
+        - name: cartId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.cartId
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        body: []
+        response:
+          type: object
+          item: FixCartBasketForCheckoutResponse
+        pagination: null
+      floatingcartmessages:
+        method: GET
+        path: /graphql
+        description: GraphQL query FloatingCartMessages (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: FloatingCartMessages
+          description: GraphQL operationName
+          fields: []
+        - name: cartId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.cartId
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        - name: postalCode
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.postalCode
+          fields: []
+        - name: fetchMode
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.fetchMode
+          fields: []
+        - name: utmTreatmentOfferId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.utmTreatmentOfferId
+          fields: []
+        - name: isUserClick
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.isUserClick
+          fields: []
+        body: []
+        response:
+          type: object
+          item: FloatingCartMessagesResponse
+        pagination: null
+      getexpresscartplacementsquery:
+        method: GET
+        path: /graphql
+        description: GraphQL query GetExpressCartPlacementsQuery (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: GetExpressCartPlacementsQuery
+          description: GraphQL operationName
+          fields: []
+        - name: cartId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.cartId
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        - name: postalCode
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.postalCode
+          fields: []
+        - name: coordinates
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.coordinates
+          fields: []
+        body: []
+        response:
+          type: object
+          item: GetExpressCartPlacementsQueryResponse
+        pagination: null
+      inlinecarteppvariant:
+        method: GET
+        path: /graphql
+        description: GraphQL query InlineCartEppVariant (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: InlineCartEppVariant
+          description: GraphQL operationName
+          fields: []
+        body: []
+        response:
+          type: object
+          item: InlineCartEppVariantResponse
+        pagination: null
+      othersingleretailercarts:
+        method: GET
+        path: /graphql
+        description: GraphQL query OtherSingleRetailerCarts (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: OtherSingleRetailerCarts
+          description: GraphQL operationName
+          fields: []
+        - name: excludeIds
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.excludeIds
+          fields: []
+        body: []
+        response:
+          type: object
+          item: OtherSingleRetailerCartsResponse
+        pagination: null
+      personalactivecarts:
+        method: GET
+        path: /graphql
+        description: GraphQL query PersonalActiveCarts (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: PersonalActiveCarts
+          description: GraphQL operationName
+          fields: []
+        body: []
+        response:
+          type: object
+          item: PersonalActiveCartsResponse
+        pagination: null
+      updatecartitemsmutation:
+        method: POST
+        path: /graphql
+        description: GraphQL mutation UpdateCartItemsMutation (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: UpdateCartItemsMutation
+          description: GraphQL operationName
+          fields: []
+        - name: cartItemUpdates
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.cartItemUpdates
+          fields: []
+        - name: cartType
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.cartType
+          fields: []
+        - name: requestTimestamp
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.requestTimestamp
+          fields: []
+        - name: cartId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.cartId
+          fields: []
+        body: []
+        response:
+          type: object
+          item: UpdateCartItemsMutationResponse
+        pagination: null
+      usercart:
+        method: GET
+        path: /graphql
+        description: GraphQL query UserCart (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: UserCart
+          description: GraphQL operationName
+          fields: []
+        - name: id
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.id
+          fields: []
+        body: []
+        response:
+          type: object
+          item: UserCartResponse
+        pagination: null
+      usercartenriched:
+        method: GET
+        path: /graphql
+        description: GraphQL query UserCartEnriched (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: UserCartEnriched
+          description: GraphQL operationName
+          fields: []
+        - name: id
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.id
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        - name: postalCode
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.postalCode
+          fields: []
+        body: []
+        response:
+          type: object
+          item: UserCartEnrichedResponse
+        pagination: null
+  checkout:
+    description: Costco Same-Day checkout GraphQL operations
+    endpoints:
+      checkoutcmd:
+        method: GET
+        path: /graphql
+        description: GraphQL query CheckoutCmd (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: CheckoutCmd
+          description: GraphQL operationName
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        body: []
+        response:
+          type: object
+          item: CheckoutCmdResponse
+        pagination: null
+      checkoutaisleitemmin:
+        method: GET
+        path: /graphql
+        description: GraphQL query CheckoutAisleItemMin (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: CheckoutAisleItemMin
+          description: GraphQL operationName
+          fields: []
+        - name: retailerId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.retailerId
+          fields: []
+        body: []
+        response:
+          type: object
+          item: CheckoutAisleItemMinResponse
+        pagination: null
+      checkoutdraftorderinvoicev2:
+        method: GET
+        path: /graphql
+        description: GraphQL query CheckoutDraftOrderInvoiceV2 (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: CheckoutDraftOrderInvoiceV2
+          description: GraphQL operationName
+          fields: []
+        - name: checkoutSessionId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.checkoutSessionId
+          fields: []
+        - name: checkoutCreationTrackingParams
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.checkoutCreationTrackingParams
+          fields: []
+        body: []
+        response:
+          type: object
+          item: CheckoutDraftOrderInvoiceV2Response
+        pagination: null
+      checkoutheaderview:
+        method: GET
+        path: /graphql
+        description: GraphQL query CheckoutHeaderView (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: CheckoutHeaderView
+          description: GraphQL operationName
+          fields: []
+        body: []
+        response:
+          type: object
+          item: CheckoutHeaderViewResponse
+        pagination: null
+      checkoutpagemeta:
+        method: GET
+        path: /graphql
+        description: GraphQL query CheckoutPageMeta (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: CheckoutPageMeta
+          description: GraphQL operationName
+          fields: []
+        body: []
+        response:
+          type: object
+          item: CheckoutPageMetaResponse
+        pagination: null
+      checkoutv4disclaimeronetrusttoggle:
+        method: GET
+        path: /graphql
+        description: GraphQL query CheckoutV4DisclaimerOneTrustToggle (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: CheckoutV4DisclaimerOneTrustToggle
+          description: GraphQL operationName
+          fields: []
+        body: []
+        response:
+          type: object
+          item: CheckoutV4DisclaimerOneTrustToggleResponse
+        pagination: null
+      getexpresscheckouttoggleplacements:
+        method: GET
+        path: /graphql
+        description: GraphQL query GetExpressCheckoutTogglePlacements (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: GetExpressCheckoutTogglePlacements
+          description: GraphQL operationName
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        - name: checkoutSessionId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.checkoutSessionId
+          fields: []
+        body: []
+        response:
+          type: object
+          item: GetExpressCheckoutTogglePlacementsResponse
+        pagination: null
+      giftingexpandedcheckoutdetails:
+        method: GET
+        path: /graphql
+        description: GraphQL query GiftingExpandedCheckoutDetails (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: GiftingExpandedCheckoutDetails
+          description: GraphQL operationName
+          fields: []
+        body: []
+        response:
+          type: object
+          item: GiftingExpandedCheckoutDetailsResponse
+        pagination: null
+      initializecheckout:
+        method: POST
+        path: /graphql
+        description: GraphQL query InitializeCheckout (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: InitializeCheckout
+          description: GraphQL operationName
+          fields: []
+        - name: cartId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.cartId
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        - name: userLocation
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.userLocation
+          fields: []
+        - name: serviceType
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.serviceType
+          fields: []
+        - name: checkoutCreationTrackingParams
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.checkoutCreationTrackingParams
+          fields: []
+        - name: clientInfo
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.clientInfo
+          fields: []
+        body: []
+        response:
+          type: object
+          item: InitializeCheckoutResponse
+        pagination: null
+      updatecheckout:
+        method: POST
+        path: /graphql
+        description: GraphQL mutation UpdateCheckout (persistedQuery). Tip changes
+          use checkoutUpdates.tipsUpdate.tippingFields.tipInputToken. Not the charge
+          mutation.
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: UpdateCheckout
+          description: GraphQL operationName
+          fields: []
+        - name: checkoutSessionId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.checkoutSessionId
+          fields: []
+        - name: checkoutUpdates
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.checkoutUpdates
+          fields: []
+        - name: checkoutCreationTrackingParams
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.checkoutCreationTrackingParams
+          fields: []
+        body: []
+        response:
+          type: object
+          item: UpdateCheckoutResponse
+        pagination: null
+      updatebuyflowpaymentinstructionsv2:
+        method: POST
+        path: /graphql
+        description: GraphQL mutation UpdateBuyflowPaymentInstructionsV2 — attach/select
+          payment instrument on checkout session (not FinalizeCheckout).
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: UpdateBuyflowPaymentInstructionsV2
+          description: GraphQL operationName
+          fields: []
+        - name: checkoutSessionId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.checkoutSessionId
+          fields: []
+        - name: updatePaymentInstructions
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.updatePaymentInstructions
+          fields: []
+        body: []
+        response:
+          type: object
+          item: UpdateBuyflowPaymentInstructionsV2Response
+        pagination: null
+  session:
+    description: Costco Same-Day session GraphQL operations
+    endpoints:
+      complementaryproductitems:
+        method: GET
+        path: /graphql
+        description: GraphQL query ComplementaryProductItems (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: ComplementaryProductItems
+          description: GraphQL operationName
+          fields: []
+        - name: retailerId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.retailerId
+          fields: []
+        - name: retailerLocationId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.retailerLocationId
+          fields: []
+        - name: productIds
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.productIds
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        - name: cmdEnabled
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.cmdEnabled
+          fields: []
+        - name: postalCode
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.postalCode
+          fields: []
+        - name: zoneId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.zoneId
+          fields: []
+        body: []
+        response:
+          type: object
+          item: ComplementaryProductItemsResponse
+        pagination: null
+      getcobrandcreditcardoffermutation:
+        method: POST
+        path: /graphql
+        description: GraphQL mutation GetCobrandCreditCardOfferMutation (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: GetCobrandCreditCardOfferMutation
+          description: GraphQL operationName
+          fields: []
+        - name: placement
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.placement
+          fields: []
+        body: []
+        response:
+          type: object
+          item: GetCobrandCreditCardOfferMutationResponse
+        pagination: null
+  orders:
+    description: Costco Same-Day orders GraphQL operations
+    endpoints:
+      orderuptimer:
+        method: GET
+        path: /graphql
+        description: GraphQL query OrderUpTimer (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: OrderUpTimer
+          description: GraphQL operationName
+          fields: []
+        body: []
+        response:
+          type: object
+          item: OrderUpTimerResponse
+        pagination: null
+      customercancelselections:
+        method: GET
+        path: /graphql
+        description: GraphQL query CustomerCancelSelections — cancel-reason options
+          UI. Cancel MUTATION not in place-order HAR (cancel may have happened after
+          capture).
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: CustomerCancelSelections
+          description: GraphQL operationName
+          fields: []
+        - name: orderDeliveryId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.orderDeliveryId
+          fields: []
+        - name: orderUuid
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.orderUuid
+          fields: []
+        - name: serviceType
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.serviceType
+          fields: []
+        body: []
+        response:
+          type: object
+          item: CustomerCancelSelectionsResponse
+        pagination: null
+  retailer:
+    description: Costco Same-Day retailer GraphQL operations
+    endpoints:
+      landingretailermetas:
+        method: GET
+        path: /graphql
+        description: GraphQL query LandingRetailerMetas (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: LandingRetailerMetas
+          description: GraphQL operationName
+          fields: []
+        - name: retailerSlug
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.retailerSlug
+          fields: []
+        - name: retailerId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.retailerId
+          fields: []
+        - name: zoneId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.zoneId
+          fields: []
+        - name: pageType
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.pageType
+          fields: []
+        body: []
+        response:
+          type: object
+          item: LandingRetailerMetasResponse
+        pagination: null
+      currentretailer:
+        method: GET
+        path: /graphql
+        description: GraphQL query CurrentRetailer (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: CurrentRetailer
+          description: GraphQL operationName
+          fields: []
+        - name: cartId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.cartId
+          fields: []
+        body: []
+        response:
+          type: object
+          item: CurrentRetailerResponse
+        pagination: null
+  products:
+    description: Costco Same-Day products GraphQL operations
+    endpoints:
+      items:
+        method: GET
+        path: /graphql
+        description: GraphQL query Items (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: Items
+          description: GraphQL operationName
+          fields: []
+        - name: ids
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.ids
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        - name: zoneId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.zoneId
+          fields: []
+        - name: postalCode
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.postalCode
+          fields: []
+        body: []
+        response:
+          type: object
+          item: ItemsResponse
+        pagination: null
+      autosuggestions:
+        method: GET
+        path: /graphql
+        description: GraphQL query Autosuggestions (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: Autosuggestions
+          description: GraphQL operationName
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        - name: query
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.query
+          fields: []
+        - name: autosuggestionSessionId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.autosuggestionSessionId
+          fields: []
+        body: []
+        response:
+          type: object
+          item: AutosuggestionsResponse
+        pagination: null
+      searchresultsplacements:
+        method: GET
+        path: /graphql
+        description: GraphQL query SearchResultsPlacements (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: SearchResultsPlacements
+          description: GraphQL operationName
+          fields: []
+        - name: action
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.action
+          fields: []
+        - name: query
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.query
+          fields: []
+        - name: pageViewId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.pageViewId
+          fields: []
+        - name: elevatedProductId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.elevatedProductId
+          fields: []
+        - name: searchSource
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.searchSource
+          fields: []
+        - name: filters
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.filters
+          fields: []
+        - name: disableReformulation
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.disableReformulation
+          fields: []
+        - name: disableLlm
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.disableLlm
+          fields: []
+        - name: forceInspiration
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.forceInspiration
+          fields: []
+        - name: orderBy
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.orderBy
+          fields: []
+        - name: clusterId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.clusterId
+          fields: []
+        - name: includeDebugInfo
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.includeDebugInfo
+          fields: []
+        body: []
+        response:
+          type: object
+          item: SearchResultsPlacementsResponse
+        pagination: null
+      itemcardsizesearchvariant:
+        method: GET
+        path: /graphql
+        description: GraphQL query ItemCardSizeSearchVariant (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: ItemCardSizeSearchVariant
+          description: GraphQL operationName
+          fields: []
+        body: []
+        response:
+          type: object
+          item: ItemCardSizeSearchVariantResponse
+        pagination: null
+      itemdetaildata:
+        method: GET
+        path: /graphql
+        description: GraphQL query ItemDetailData (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: ItemDetailData
+          description: GraphQL operationName
+          fields: []
+        - name: id
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.id
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        - name: isFeatured
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.isFeatured
+          fields: []
+        body: []
+        response:
+          type: object
+          item: ItemDetailDataResponse
+        pagination: null
+      itemdetailfeaturedproductlist:
+        method: GET
+        path: /graphql
+        description: GraphQL query ItemDetailFeaturedProductList (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: ItemDetailFeaturedProductList
+          description: GraphQL operationName
+          fields: []
+        - name: itemProductId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.itemProductId
+          fields: []
+        - name: pageViewId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.pageViewId
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        - name: zoneId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.zoneId
+          fields: []
+        - name: postalCode
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.postalCode
+          fields: []
+        body: []
+        response:
+          type: object
+          item: ItemDetailFeaturedProductListResponse
+        pagination: null
+      itemdetailsupplementalfields:
+        method: GET
+        path: /graphql
+        description: GraphQL query ItemDetailSupplementalFields (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: ItemDetailSupplementalFields
+          description: GraphQL operationName
+          fields: []
+        - name: ids
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.ids
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        body: []
+        response:
+          type: object
+          item: ItemDetailSupplementalFieldsResponse
+        pagination: null
+      itemdetailviewlayout:
+        method: GET
+        path: /graphql
+        description: GraphQL query ItemDetailViewLayout (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: ItemDetailViewLayout
+          description: GraphQL operationName
+          fields: []
+        body: []
+        response:
+          type: object
+          item: ItemDetailViewLayoutResponse
+        pagination: null
+      itemdetailsrecommendationsplacements:
+        method: GET
+        path: /graphql
+        description: GraphQL query ItemDetailsRecommendationsPlacements (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: ItemDetailsRecommendationsPlacements
+          description: GraphQL operationName
+          fields: []
+        - name: postalCode
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.postalCode
+          fields: []
+        - name: zoneId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.zoneId
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        - name: pageSource
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.pageSource
+          fields: []
+        - name: productId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.productId
+          fields: []
+        - name: first
+          type: integer
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.first
+          fields: []
+        body: []
+        response:
+          type: object
+          item: ItemDetailsRecommendationsPlacementsResponse
+        pagination: null
+      itemdetailsretailerproduct:
+        method: GET
+        path: /graphql
+        description: GraphQL query ItemDetailsRetailerProduct (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: ItemDetailsRetailerProduct
+          description: GraphQL operationName
+          fields: []
+        - name: ids
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.ids
+          fields: []
+        - name: zoneId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.zoneId
+          fields: []
+        body: []
+        response:
+          type: object
+          item: ItemDetailsRetailerProductResponse
+        pagination: null
+      itemdetailsv2flags:
+        method: GET
+        path: /graphql
+        description: GraphQL query ItemDetailsV2Flags (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: ItemDetailsV2Flags
+          description: GraphQL operationName
+          fields: []
+        body: []
+        response:
+          type: object
+          item: ItemDetailsV2FlagsResponse
+        pagination: null
+      itemdetailsv4:
+        method: GET
+        path: /graphql
+        description: GraphQL query ItemDetailsV4 (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: ItemDetailsV4
+          description: GraphQL operationName
+          fields: []
+        body: []
+        response:
+          type: object
+          item: ItemDetailsV4Response
+        pagination: null
+      klarnaosmitemdetails:
+        method: GET
+        path: /graphql
+        description: GraphQL query KlarnaOSMItemDetails (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: KlarnaOSMItemDetails
+          description: GraphQL operationName
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        - name: itemIds
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.itemIds
+          fields: []
+        - name: postalCode
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.postalCode
+          fields: []
+        - name: zoneId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.zoneId
+          fields: []
+        body: []
+        response:
+          type: object
+          item: KlarnaOSMItemDetailsResponse
+        pagination: null
+      postaddtocartsearchlayoutquery:
+        method: GET
+        path: /graphql
+        description: GraphQL query PostAddToCartSearchLayoutQuery (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: PostAddToCartSearchLayoutQuery
+          description: GraphQL operationName
+          fields: []
+        body: []
+        response:
+          type: object
+          item: PostAddToCartSearchLayoutQueryResponse
+        pagination: null
+      searchfacets:
+        method: GET
+        path: /graphql
+        description: GraphQL query SearchFacets (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: SearchFacets
+          description: GraphQL operationName
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        - name: postalCode
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.postalCode
+          fields: []
+        - name: query
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.query
+          fields: []
+        body: []
+        response:
+          type: object
+          item: SearchFacetsResponse
+        pagination: null
+      viewlayoutsearchresults:
+        method: GET
+        path: /graphql
+        description: GraphQL query ViewLayoutSearchResults (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: ViewLayoutSearchResults
+          description: GraphQL operationName
+          fields: []
+        body: []
+        response:
+          type: object
+          item: ViewLayoutSearchResultsResponse
+        pagination: null
+  slots:
+    description: Costco Same-Day slots GraphQL operations
+    endpoints:
+      slotcampaignplacement:
+        method: GET
+        path: /graphql
+        description: GraphQL query SlotCampaignPlacement (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: SlotCampaignPlacement
+          description: GraphQL operationName
+          fields: []
+        - name: slotId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.slotId
+          fields: []
+        - name: adsEnabled
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.adsEnabled
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        - name: postalCode
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.postalCode
+          fields: []
+        - name: zoneId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.zoneId
+          fields: []
+        - name: query
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.query
+          fields: []
+        - name: first
+          type: integer
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.first
+          fields: []
+        - name: slotPlacementLimit
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.slotPlacementLimit
+          fields: []
+        body: []
+        response:
+          type: object
+          item: SlotCampaignPlacementResponse
+        pagination: null
+      availableservices:
+        method: GET
+        path: /graphql
+        description: GraphQL query AvailableServices (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: AvailableServices
+          description: GraphQL operationName
+          fields: []
+        - name: shopId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.shopId
+          fields: []
+        - name: cartId
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.cartId
+          fields: []
+        - name: userLocation
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.userLocation
+          fields: []
+        - name: checkoutCreationTrackingParams
+          type: string
+          required: false
+          positional: false
+          default: null
+          description: GraphQL variables.checkoutCreationTrackingParams
+          fields: []
+        body: []
+        response:
+          type: object
+          item: AvailableServicesResponse
+        pagination: null
+  account:
+    description: Costco Same-Day account GraphQL operations
+    endpoints:
+      gethouseholdbyuser:
+        method: GET
+        path: /graphql
+        description: GraphQL query GetHouseholdByUser (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: GetHouseholdByUser
+          description: GraphQL operationName
+          fields: []
+        body: []
+        response:
+          type: object
+          item: GetHouseholdByUserResponse
+        pagination: null
+      householdbyuser:
+        method: GET
+        path: /graphql
+        description: GraphQL query HouseholdByUser (persistedQuery)
+        params:
+        - name: operationName
+          type: string
+          required: true
+          positional: false
+          default: HouseholdByUser
+          description: GraphQL operationName
+          fields: []
+        body: []
+        response:
+          type: object
+          item: HouseholdByUserResponse
+        pagination: null
+http_transport: browser-http
+required_headers:
+- name: Accept
+  value: application/json
+- name: Origin
+  value: https://sameday.costco.com
+- name: Referer
+  value: https://sameday.costco.com/

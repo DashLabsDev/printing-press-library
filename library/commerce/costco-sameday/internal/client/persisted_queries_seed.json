@@ -1,0 +1,2422 @@
+[
+  {
+    "operation_name": "ActiveCartId",
+    "hash": "6803f97683d706ab6faa3c658a0d6766299dbe1ff55f78b720ca2ef77de7c5c7"
+  },
+  {
+    "operation_name": "ActiveCarts",
+    "hash": "839c3658a57f86c543ba367a16d0eaa648f167a1eaf20f6d80aa14165f1ee10d"
+  },
+  {
+    "operation_name": "ActiveInStoreOrders",
+    "hash": "dd60b670bf967967a785a97946b48ad4bd7fff9f1aed771495915c0e459d1e9c"
+  },
+  {
+    "operation_name": "AutosuggestViewLayout",
+    "hash": "6fc295145119a81dbfa2f4d624fe638b52c504fae548a1b6bcc1243be3a5655e"
+  },
+  {
+    "operation_name": "Autosuggestions",
+    "hash": "ab7f2b2553af705f1969ef5f4512b2e53967e57a2f54e208cea093c308ac713a"
+  },
+  {
+    "operation_name": "AvailableCreditsBalances",
+    "hash": "94760ea4b09b76074ddffb72810d418e64ac2320c90faa6e1bb92cf36dbe4ef0"
+  },
+  {
+    "operation_name": "AvailableEducationalRetailers",
+    "hash": "6c5005d2139293ce2864bb70f6acccd2fcfc2d967a2a895ce2ef85c2f9c36059"
+  },
+  {
+    "operation_name": "AvailableInStoreRetailerServices",
+    "hash": "44105036e7fbffa98cf4ac2cf41cb1c0c47dfa9b3e19b8e56154f543637a7699"
+  },
+  {
+    "operation_name": "AvailableLoyaltyCards",
+    "hash": "17d992b9f4ff1ad74d088ee3c9b2ff935f23aa53039c98646ab752526ee98119"
+  },
+  {
+    "operation_name": "AvailablePickupRetailerServices",
+    "hash": "86abeba18e28405b9950facd1d13c7b7796dda35a7e1617a61733ca45cb18300"
+  },
+  {
+    "operation_name": "AvailablePromotionsService",
+    "hash": "cba37b9d37c3666ea73885775dceb69220941b936fece82a4ed22ffd6e728aac"
+  },
+  {
+    "operation_name": "AvailableRetailerLocationsServices",
+    "hash": "bea786dfccd6e730e72f43616dd2f23ec3bb008659becb18a026129f06e8d543"
+  },
+  {
+    "operation_name": "AvailableRetailerServices",
+    "hash": "4520049dcd07cf94194ab992612fd4bfd40a3fee5dada86593fb4eb3fc495b01"
+  },
+  {
+    "operation_name": "AvailableServices",
+    "hash": "e6f85c30d9057d44fdcd0b424a0833a35d8c4338adefd112c3c00b756663f53f"
+  },
+  {
+    "operation_name": "CartAddDebounceVariant",
+    "hash": "e0b2b89d3d9e00347b2c9fe18dc7e5cb2343d2ddb3f8f9b5735159b6b29f0348"
+  },
+  {
+    "operation_name": "CartAddRetriesVariant",
+    "hash": "230eb6e055a85bdeb48646b490e97845e76fe00ad71e1df19a9d36304b7d095e"
+  },
+  {
+    "operation_name": "CartBottomBannerQuery",
+    "hash": "cc7000e9d2443ac6e5ecc06b151a0328eb4cc25f8e42ed62cf042dd56c5400be"
+  },
+  {
+    "operation_name": "CartCashCreditHomeMessage",
+    "hash": "1b03b73e42b9f484dc30a0140813b660b127b3a1711bdfd586d44c8bdb3fe71d"
+  },
+  {
+    "operation_name": "CartCheckoutValidation",
+    "hash": "a6714f0d4001a95a6860088a47af9774621d5b7a6e69362c0ed903e5dc2cd523"
+  },
+  {
+    "operation_name": "CartCoachmark",
+    "hash": "81c41614bd29b73620ad24070733349fe31556a01073553a80c274abd399b074"
+  },
+  {
+    "operation_name": "CartCouponRemovalPopupQuery",
+    "hash": "04170d373f23cafbecae9f21dc90dd2b27594fd86cf3db60104d0a548f9f68ba"
+  },
+  {
+    "operation_name": "CartCreateInspirationListGenericItem",
+    "hash": "d38b65cf584b9d34837945fda6a922dabede1a682ebe5b61df5cca45da4709b2"
+  },
+  {
+    "operation_name": "CartData",
+    "hash": "05e3d7448576ff7d464c9244fb6687fabd1bdeee85fdf817e85487003cdb6d44"
+  },
+  {
+    "operation_name": "CartDataReadVariant",
+    "hash": "1ef3b2c54979198f5ca738a85bdaae2a6fd6aa32920b4a365eff551e288e6dc1"
+  },
+  {
+    "operation_name": "CartDeleteInspirationListGenericItem",
+    "hash": "c8d1d051b0442fd4b064d90e6d44ac236342fd647b9efbe1767777c39f0f5e91"
+  },
+  {
+    "operation_name": "CartDeleteInspirationListGenericItems",
+    "hash": "11f7993e134ff41ebece4fd2cdc7bc8c83c4d90d6f996eb1aeaf061cc0ec4759"
+  },
+  {
+    "operation_name": "CartFeatureFlags",
+    "hash": "4d5843cb6038a3c4a8807efd5d03c11d7fef2bc8df38d32ae9bedb229827a3bd"
+  },
+  {
+    "operation_name": "CartIncentiveTrackerQuery",
+    "hash": "12c0523c603f3a2bd53b38a47c6ace797e1615b72cbe51c7fcf84eeb949b0103"
+  },
+  {
+    "operation_name": "CartItemCount",
+    "hash": "2a89f7495cfb8c1ffcb61158b561ee503fed5d0ad40e076720763c2eb806b8f6"
+  },
+  {
+    "operation_name": "CartItemReplaceSuggestions",
+    "hash": "12dc8d264507b33f51b476ee4f222200e1d07d886dde0c7eced07b3e1a13fe4c"
+  },
+  {
+    "operation_name": "CartItems",
+    "hash": "4f6d65f62cdccc9d66d34ba752cfa2fc6536ca7c5adf2e1a9170fb3dbc50e7a7"
+  },
+  {
+    "operation_name": "CartMessaging",
+    "hash": "12d49980055204e6d29c4a52115ab63c8804a634a52cf417a2a4c1358d978440"
+  },
+  {
+    "operation_name": "CartOnloadPlacementQuery",
+    "hash": "5939e199c8c76c7bfb904eee547587a7b81e09a3232e5ff0a022bd4c7c2df1e3"
+  },
+  {
+    "operation_name": "CartOrderDeliveryCartSection",
+    "hash": "1ac98bc37d9c8d68adc665b46443f6e3dd3d7ad4725a63e47b0fb3d6e1316eea"
+  },
+  {
+    "operation_name": "CartOrderDeliveryInfo",
+    "hash": "21f72e442c5a7b7dcf24a358780ca5cbeb959545c930e4637f38501d5238058d"
+  },
+  {
+    "operation_name": "CartOrderDeliveryItems",
+    "hash": "7d22c2aebd275bf3f46ade3a727df54dda668547c3a75b3054fdfc53505dedc7"
+  },
+  {
+    "operation_name": "CartOrderDeliveryOrderItems",
+    "hash": "a78090aca93e0f4f1078a4f5a2664d713862746d0f53c7705827555dbf65e82b"
+  },
+  {
+    "operation_name": "CartOrderDeliveryV4Variant",
+    "hash": "eae2a3b53c0a9239fe155b0a8310727d4df90cd25bb0ee0a6fe33f3414833187"
+  },
+  {
+    "operation_name": "CartProductsRecomendation",
+    "hash": "c1cecd87e70882a6f99c7f42bb6e74bd294049f047cdd89c780fb214ee3e683c"
+  },
+  {
+    "operation_name": "CartRecommendationsPlacements",
+    "hash": "e615b29f43077d7d1bdf317669c7c0c715f957480fa56f3d6d0abc8a88ad2b69"
+  },
+  {
+    "operation_name": "CartSharedOrderDeliveryInfo",
+    "hash": "823ae917d072992e82f0dd1c3196abc5828eb0bb67d006726895e099269d92d5"
+  },
+  {
+    "operation_name": "CartSharedOrderDeliveryOrderItems",
+    "hash": "7bf71cf90488007b9ae45998bc4cbe0a3bcbd4034366f0863dd07195b97b9511"
+  },
+  {
+    "operation_name": "CartSharedOrderDeliveryV4Variant",
+    "hash": "ee75bb28e7f4b0bd70e234b7bdff8d62739f721dd538ce6d93c4c2d75a81b5c0"
+  },
+  {
+    "operation_name": "CartSignaledEta",
+    "hash": "d971c4e0e239d95f0127a07c4ebe59d0c6ba62b6779c12b286c1a0fc5220898e"
+  },
+  {
+    "operation_name": "CartSwitcherServerOrderingVariant",
+    "hash": "815d884c8cbfd86bdce72869f6f16dbcae5693782cc18220186e74e6ffeeff1a"
+  },
+  {
+    "operation_name": "CartSwitcherSingleRetailerCartIds",
+    "hash": "5915621492913130fa5840efd7298d57f99aa5fd28ad964cb4b3ec4e34f7eab2"
+  },
+  {
+    "operation_name": "CartSwitcherSingleRetailerCarts",
+    "hash": "c330a205df7dbfe8e18f21651b5abf7abe61b87f409628cd4b9ddbc0317f5b71"
+  },
+  {
+    "operation_name": "CartSwitcherVariant",
+    "hash": "342d9ec71690f458888efcda1af89feb7759bfcb6209d52b757844ba6ec28cbc"
+  },
+  {
+    "operation_name": "CartToggleInspirationListGenericItemChecked",
+    "hash": "e3bdc4d6b7c662f52d55f31cc643f36573a2457d9c42c64ed1a822ba2400b1b3"
+  },
+  {
+    "operation_name": "CartTotals",
+    "hash": "7550ad273ec50fde6dc1ed80fb288c911cf32591e1983593cc27117365e96794"
+  },
+  {
+    "operation_name": "CartTransferModal",
+    "hash": "a47885e27363cbe9cdf194ab6ac041c990d5fde90f5bd3fa335ae8be2a4f8699"
+  },
+  {
+    "operation_name": "CartViewLayout",
+    "hash": "f276f207f531043c23b8b0afefc61c1deb9f79458fabd9da387bfe95e712a262"
+  },
+  {
+    "operation_name": "CheckoutAddressDeliverability",
+    "hash": "72eee32f588d859174cfb4456c8b7972d5dcc00b7cdd8b8d13a9fb1db451439f"
+  },
+  {
+    "operation_name": "CheckoutAisleItemMin",
+    "hash": "40dc22475964ff1ffc69a799ccb43f2c432af9f27bdb43e27eb00773ef7d40b7"
+  },
+  {
+    "operation_name": "CheckoutCalendarAvailability",
+    "hash": "37f76f4a6f9f2c9f33b137b1c21b33223af1b1fe1457cad9b4b00e6fa56c8d94"
+  },
+  {
+    "operation_name": "CheckoutCmd",
+    "hash": "b3c4d24690c382c872f8514991d13ded455a9dc45e83554c9027f9f38e10bb9b"
+  },
+  {
+    "operation_name": "CheckoutDraftOrderInvoiceV2",
+    "hash": "2b5be837e3ee80944d70736061b4b1b1c7c488f3a6015e83e68444419b20f29f"
+  },
+  {
+    "operation_name": "CheckoutHeaderView",
+    "hash": "a3a52e93bdebc5b6b8f87524596a7016c313f9e7af0fd75c8581ee682b4c667c"
+  },
+  {
+    "operation_name": "CheckoutHomeCache",
+    "hash": "1bf4ec300207294b682170f02559ee72857c744231cf70ff7524798259f2ad4f"
+  },
+  {
+    "operation_name": "CheckoutPageMeta",
+    "hash": "731524524deaaba6ddbacd61792bd687fcb6dd31dfc6961a81a97c1fa4113655"
+  },
+  {
+    "operation_name": "CheckoutPostOrderConfirmationAnalytics",
+    "hash": "10b71b224a191ea93599d81160d5dc95fe275a7449c683c8d2924544a2d20c7e"
+  },
+  {
+    "operation_name": "CheckoutPricedServiceOptionsForDateRange",
+    "hash": "e22a8233532158026fbacf072e0a5b13e441cb850ad30b8471d13c43ed4da048"
+  },
+  {
+    "operation_name": "CheckoutPromoViewLayoutQuery",
+    "hash": "94de4f74ff7aa3a76ad48b2023b0f05c9148d82d6009c7b4f34bc7b89dbaaaec"
+  },
+  {
+    "operation_name": "CheckoutRecommendationItemsQuery",
+    "hash": "3f8b346fec1c28559d086fdd33a851d3f4d10f975f083e2827e508d29a0384f9"
+  },
+  {
+    "operation_name": "CheckoutRecommendationsPlacements",
+    "hash": "cd7d87aa97299cdd61e7c1a542bb31c7e04211000068ca76e6f1c92cc9d22b4b"
+  },
+  {
+    "operation_name": "CheckoutSyncAddressQuery",
+    "hash": "67b38bc89ff66533757d100a786f94755a850a9d462d8b98cb570a44246f0a19"
+  },
+  {
+    "operation_name": "CheckoutV4DisclaimerOneTrustToggle",
+    "hash": "c011e5900bc2b3f93846b89d2354372e147a465e8d51d8248ede38b00d37cbc8"
+  },
+  {
+    "operation_name": "ComplementaryProductItems",
+    "hash": "ffe5487b28f2dd6a0953a6b16729d09c120e1988f3116eaa3c14737bb1b2c64e"
+  },
+  {
+    "operation_name": "ComplementaryProductItemsQuery",
+    "hash": "1cca3feae6f68b2044031c09ffccfb4abb833eac6d21b4e08a3fd3d10a31cd5e"
+  },
+  {
+    "operation_name": "CreateAddress",
+    "hash": "c748be3a0a731e83b6e16868de6f87b8284924cbd36a2582039fb2dee88e960b"
+  },
+  {
+    "operation_name": "CreateAddressLocationPhoto",
+    "hash": "62c6610c87bd8d14d9a3f02386edee911131e06dd043b96f01c9750268ed986b"
+  },
+  {
+    "operation_name": "CreateAddressLocationPhotoUrl",
+    "hash": "fe23843b87b45f0e8f1fb0612360666331c9cb789dad50e6222da4cd8c79a33c"
+  },
+  {
+    "operation_name": "CreateAddressV2",
+    "hash": "4627b492eca5e79c652646ae0038f41dfd9c042d5b217f8143511bcace58b87d"
+  },
+  {
+    "operation_name": "CreateAffiliateTransaction",
+    "hash": "319892de4f3979e8294f40b701d2ffcd8407a5b4f49b99c883521d32f0f9db2a"
+  },
+  {
+    "operation_name": "CreateAuthorization",
+    "hash": "1903cc3016bcec8c1d377996d38d994bf5ca316b8d7f40eb0de05cf1c6de50ca"
+  },
+  {
+    "operation_name": "CreateAutoLoginTokenMutation",
+    "hash": "b8562852660f2b4e02d0239e6982e1164ffd765336b0b23b13297c8eb34ef5c3"
+  },
+  {
+    "operation_name": "CreateBraintreePaypalInstrument",
+    "hash": "d7508a9bdf58fc5319b75e70024af5c54cfde91c8c2253ad66c0cd650e611e2e"
+  },
+  {
+    "operation_name": "CreateBraintreePaypalSingleUseInstrument",
+    "hash": "0eb8b8feefe5b2ce1725db5c55269fdd7fc7a66a41e8c07f36d884a054c4e545"
+  },
+  {
+    "operation_name": "CreateBraintreeVenmoInstrument",
+    "hash": "1c5fc41f4ea7374f84046c140fe77a4c4ba28f9ea8056b68b0b2cb26a8af6c37"
+  },
+  {
+    "operation_name": "CreateBusinessClientAddress",
+    "hash": "c33b0389aabccd183e0f439a685209920ee3b207c4505739c6032a2cf26d9185"
+  },
+  {
+    "operation_name": "CreateBusinessGroup",
+    "hash": "f454d4fd7c90823acbdfb74dc9811f6e4e1a4f06a38b688a3dea8f36415a3bff"
+  },
+  {
+    "operation_name": "CreateBusinessNetTermsApplication",
+    "hash": "4424f550f5241e44f7b9aceec1f999ed074c0e5a2dcfe0a38355e4ac16afc50b"
+  },
+  {
+    "operation_name": "CreateBusinessOrganization",
+    "hash": "f241c78bc336b34e2d074163178e22d083caf2b7786e53d488a77b55de8bde12"
+  },
+  {
+    "operation_name": "CreateCRTicketTicket",
+    "hash": "ac6a5c60bfdad82a767016b7228304b0acbe1e753329a16533e36d38a9467f70"
+  },
+  {
+    "operation_name": "CreateCertifiedDeliveryConfirmation",
+    "hash": "6a663f217afc5357839d79b7419d3082ddfb9d70e2cb445d1e530b0352cd76e6"
+  },
+  {
+    "operation_name": "CreateChaseCreditCard",
+    "hash": "16255917669e0a7e7d043efc9713907ae6965e4968caa495af18da5429094d90"
+  },
+  {
+    "operation_name": "CreateChatbotFeedback",
+    "hash": "38157f78fd2dd6372e5510993a3c114b399f88c55856a79223b9ba3d3d732495"
+  },
+  {
+    "operation_name": "CreateChatbotMessage",
+    "hash": "fc29b0530445399c69af4bd0daaedc9df726599e680befd03a29509930e45f55"
+  },
+  {
+    "operation_name": "CreateChatbotMessageFeedback",
+    "hash": "3a16023bafaca43ea9544d132f5efb94925a6a396a07619d46fcc50ad1f66988"
+  },
+  {
+    "operation_name": "CreateChatbotMessageInteraction",
+    "hash": "c813e500257458179d0c4e958d5471c629b8a8d5d7e3221b869884540fed9b9c"
+  },
+  {
+    "operation_name": "CreateChatbotMessagePayload",
+    "hash": "08ef4a58adb63dc0c8d37a81d6ba6ecf0d74016d66e212bcf7e8a8a5de9f9d78"
+  },
+  {
+    "operation_name": "CreateChatbotThreadOnHelpCenter",
+    "hash": "afe94636e4ded9d1aedb43054f4fac668e0fed5e26383cca0e793d70570729b5"
+  },
+  {
+    "operation_name": "CreateChatbotThreadStateMachine",
+    "hash": "95d0adaf7bf96165e3eb37bc121f377a001e8e67c5be0a6b83794eb531a37137"
+  },
+  {
+    "operation_name": "CreateCommerceFundingCard",
+    "hash": "e643a2e787e921049d360561a67cdfed441cc7440e05b05c71674baf7f8fec87"
+  },
+  {
+    "operation_name": "CreateCustomerRequest",
+    "hash": "efe43eaa4644462c5e60a0512e243cae66bcc5fb8e755546ae7e7116e3ab2d47"
+  },
+  {
+    "operation_name": "CreateCustomerRequestV2",
+    "hash": "46d8357d8989645b81d04b08d6e7bfc12ed41352486c4aa8773d0bd4fcaa88c5"
+  },
+  {
+    "operation_name": "CreateEcmSubmissionMutation",
+    "hash": "13e7de70dacf9472b08484c2de679a6d665db266cb9719e6ce7bc745afa8c31a"
+  },
+  {
+    "operation_name": "CreateGuestUserWithPostalCodeMutation",
+    "hash": "30f806779a3051ec1a0a66c44516478d3ce3e4b750a7485e1b33706eae80769d"
+  },
+  {
+    "operation_name": "CreateHelpArticleFeedback",
+    "hash": "583f83bf40a332c345d798603100cd06fe2e87f9abc2b2c0fdf6baa3e84dfd3c"
+  },
+  {
+    "operation_name": "CreateHouseholdAndShareInviteWithDetail",
+    "hash": "d1f2ba9f763f279dd7696957d8cce775f47dcb6e42c2c925cdbe61dad9546f3a"
+  },
+  {
+    "operation_name": "CreateHouseholdWithSharableInviteWeb",
+    "hash": "afb5d6e86ab4138f7bda110831c82b0b512759152ea11557a80dff96ad3bb7e2"
+  },
+  {
+    "operation_name": "CreateImplicitGuestUser",
+    "hash": "ef47cbbf97c8f094cb7d493531704ee26747923a2e770ba9b2ea61493fb53401"
+  },
+  {
+    "operation_name": "CreateIncidentReport",
+    "hash": "0e9cb7310af0760cb1d6ced10f5e8ce7bb5374e449800dfa2fb4e95747d10f1f"
+  },
+  {
+    "operation_name": "CreateInspirationListGenericItem",
+    "hash": "a9016a22b1f60114b340e3cf85bf82e1f572523e9e359e8a307af58f457d31ec"
+  },
+  {
+    "operation_name": "CreateListAffiliateTransaction",
+    "hash": "48ddefaf4993be5ef7ca6f67d16db678263e3c99323b7e0f72a5a7c7f772b27d"
+  },
+  {
+    "operation_name": "CreateListFavorite",
+    "hash": "2fb811b058a8f31feb3f6105fd189b9b5499d2541a97664eccd459f112c1d6b4"
+  },
+  {
+    "operation_name": "CreateLoginLink",
+    "hash": "5dd919bf2c4bc86cf254c2c7b166ee13999d13f6c49a82b483ce11acab5175a6"
+  },
+  {
+    "operation_name": "CreateLoyaltyCardMutation",
+    "hash": "830b8efcd90b8cc04107a0cd1ff54fbdc325726409a036ad318c141040c1e747"
+  },
+  {
+    "operation_name": "CreateOrUpdateBusinessCustomFormV2",
+    "hash": "c6e6344c94c764a7c1066d1b038e7d8fa2ca37aab4c990b74dbbdeb3941acd0c"
+  },
+  {
+    "operation_name": "CreateOrUpdateRating",
+    "hash": "b64ac1bcdd94120caf4ec6b52b8b310992482da5bad9d1bd3eb1b1590185bd7f"
+  },
+  {
+    "operation_name": "CreateOrUpdateRetailerFlyerSubscription",
+    "hash": "d107991ec3bba7f074b574295cd6afdda7684e2f52b84be60ee763834b4d87ce"
+  },
+  {
+    "operation_name": "CreateOrUpdateRetailerFlyerSubscriptions",
+    "hash": "5b47cd3a676f208478f1bccdc4776b8afc26771e7e17d2183334db5d978aa24c"
+  },
+  {
+    "operation_name": "CreateOrUpdateRetailerMarketingOptIn",
+    "hash": "eb607d4307e4285129ce13f14ee1f644318cf715ad9c2125a0770efe5d2a6b9d"
+  },
+  {
+    "operation_name": "CreateOrUpdateReturn",
+    "hash": "b56da5da4f9b4576433a9ad6e6dd9e5b9ed411cabbaeb96cb0eec559a1ca577c"
+  },
+  {
+    "operation_name": "CreateOrUpdateUserProductRating",
+    "hash": "6efdf849967455fd906da7a57c76924e6eff1a9ed135bc18b547250a74331faa"
+  },
+  {
+    "operation_name": "CreateOrUpdateUserRecipeRating",
+    "hash": "8661b405dc3f283706ec4d12942300235aef78d091750919f8932024942c2fbd"
+  },
+  {
+    "operation_name": "CreateOrderGuide",
+    "hash": "0546b6b4bcb9f09d504605df49998f083238dfa9887a8de6c319c061db4d7d19"
+  },
+  {
+    "operation_name": "CreateOrderGuideLayout",
+    "hash": "6991cee180691f6ae3ebb48ee466d3ff95e169732cb648a69eef4fca2e5d6da7"
+  },
+  {
+    "operation_name": "CreateOrgBulkInvitations",
+    "hash": "f6e19d50c6d78562da7ff80596d2099d8b9947a39c8f7bf97bd6910877da6f93"
+  },
+  {
+    "operation_name": "CreateOrganizationV1Layout",
+    "hash": "55beda5e22e1b15153ca9a434206429923b457780c704a47edf5770b1746a086"
+  },
+  {
+    "operation_name": "CreateOrganizationV2Layout",
+    "hash": "8708899fe241285f10248fcdb18dd5389051d6cb8d45a2b2d036c2f951181a4d"
+  },
+  {
+    "operation_name": "CreatePartnerLoyaltyCardMutation",
+    "hash": "d2a386f52f7324595429f6dce9d78352763baa5fed75c3188c8b5c3ed2d2b058"
+  },
+  {
+    "operation_name": "CreatePrivacyRequest",
+    "hash": "1c181fd7d0e00a7c03160ffecd7220ac883b4a7603bd531655665a59c4451164"
+  },
+  {
+    "operation_name": "CreateProductReviewMutation",
+    "hash": "833d904080a31942d546dab5676efceb1e3be85bf4ed55764da3bc22aebf3bbd"
+  },
+  {
+    "operation_name": "CreateProfilingRecord",
+    "hash": "202150ce735e6072a9261c98542cd3bb7a975986e538765d6480479e8539fa33"
+  },
+  {
+    "operation_name": "CreateRecipeReviewMutation",
+    "hash": "04e42b52a7aba10f5d6d7bcebbcab00c742e30d012ae3e07acba403c3d3a5022"
+  },
+  {
+    "operation_name": "CreateRedeemToken",
+    "hash": "a719475f7b41578e730daedd7ae11790d5f4ff280dae14c7278b3a5576d05753"
+  },
+  {
+    "operation_name": "CreateResetPasswordToken",
+    "hash": "8d5bbac1f49663f9d50d0154f128c3b7ed4fe7f2ff6781cd436a123c3ed3a49a"
+  },
+  {
+    "operation_name": "CreateRetailerGiftCardInstrument",
+    "hash": "fb49689f532764a74dd17ee63a3999f8aed758c6ef067c6dbebbbaedde42eef7"
+  },
+  {
+    "operation_name": "CreateScanAndPayGuestUser",
+    "hash": "3ec9c18646efd609330fa9fa31c8ab441d091e1e7c1bc80941af17ff8fb5e52a"
+  },
+  {
+    "operation_name": "CreateScheduledExport",
+    "hash": "37e240d90e431b66c2302f18d355739e3af058cdad8a573419d9dfc9f70fa5f3"
+  },
+  {
+    "operation_name": "CreateUser",
+    "hash": "67581a081712c3561d022f863e14648adeaf78aba9c45dc2807d72e85358f723"
+  },
+  {
+    "operation_name": "CreateUserAccount",
+    "hash": "38101e183f7e5be1ce0390cf2a65d4393ffbd88b7f7aa9ef67c24b1707787341"
+  },
+  {
+    "operation_name": "CreateUserCaperCartSession",
+    "hash": "7c1d793a4965b12ae700be2ce4799268b510c34dc80ca5cdfdda31974a0371c5"
+  },
+  {
+    "operation_name": "CreateUserFromAuthenticationCredential",
+    "hash": "49f276408fc823ca33e7bdec17f7b345790c03b8eaf27972f7f8bb1b3026c136"
+  },
+  {
+    "operation_name": "CreateUserFromVerificationCode",
+    "hash": "21633bf33406f1f417b30b07e2373e65563baabda7ac67ff3e6abb7eadbdf9e7"
+  },
+  {
+    "operation_name": "CreateUserList",
+    "hash": "02eac90861e9ffc90725f579d7492b03bcc5af29f31c9af4e21469cdfb6b5c51"
+  },
+  {
+    "operation_name": "CreateUserProductFavorite",
+    "hash": "17f59a477f476a48b263fe9c2d3aeff5a3dcff4eb599905e888531ba49c7e066"
+  },
+  {
+    "operation_name": "CreateUserRecipeFavorite",
+    "hash": "64c706ed85e57716ed68ce950e9b73fa69d77190e1b275e5cbfbbf43e6cc8c39"
+  },
+  {
+    "operation_name": "CreateUserSession",
+    "hash": "c0cb40dcaa6acc8c5a9ce2ffd102aa329568b595849525f9ac85a725a89b5844"
+  },
+  {
+    "operation_name": "CreateUserSessionFromLinkedUserAccounts",
+    "hash": "b42d9f5c76b2481195490a2bafad65215bb963486ffb9ec8482d089e0234215d"
+  },
+  {
+    "operation_name": "CreateUserSessionFromVerificationCode",
+    "hash": "294f540baedcf8885783abaf5e6ccebca355bb9d459da9080b85abb3331262b0"
+  },
+  {
+    "operation_name": "CreateUserToAffiliateMapping",
+    "hash": "49ed5b33157df67cdd0b512d53e2e05f7b44365f9ded0dd3297690cbd121cd11"
+  },
+  {
+    "operation_name": "CreateZendeskEmailTicket",
+    "hash": "ea33c0d1eb3be51dc6408f2985d5a23aed2b5a6262974d3412de6192db7cc6c4"
+  },
+  {
+    "operation_name": "CurrentRetailer",
+    "hash": "a03a3fb87f46ffca8d0875a8ee7db6af209ce67ab386f9fea45e17266d6c1ccf"
+  },
+  {
+    "operation_name": "CustomerCancelSelections",
+    "hash": "e24e05b3b9d5d33d5d5a739f7b7e42175493f4b5a22a34055dd0cb927744a9b6"
+  },
+  {
+    "operation_name": "FamilyAccountMenuLink",
+    "hash": "2ca1055d3b6268f10340ba09ee387bbf0cfe614d60fecf4cc13dfdeb99d681db"
+  },
+  {
+    "operation_name": "FamilyCartViewLayout",
+    "hash": "d8099b3abee49dd36597f0ee181a2e5ca078ed8307490ff6f39a99df943591ca"
+  },
+  {
+    "operation_name": "FamilyExpandHouseholdSeatsVariant",
+    "hash": "b8acce77a055b6c1d2e6b1cdad3f3290a53187a8dc215d198a99e399a34d8990"
+  },
+  {
+    "operation_name": "FamilyExpeditedOnboarding",
+    "hash": "0bf8d07bf9b7d8b4adaee6d967ea16a6aeba9837f4e62ce9855b12d64fb697dd"
+  },
+  {
+    "operation_name": "FamilyExpeditedOnboardingCart",
+    "hash": "d369977c904c9740bf545cf9a58cb65b3f226cc454411c38224ec39b5d3201c4"
+  },
+  {
+    "operation_name": "FamilyExpeditedOnboardingInvite",
+    "hash": "00c6770b43855a2f6ba66f488d54955195b4e789dc94913bd217791be1277cc7"
+  },
+  {
+    "operation_name": "FamilyManagement",
+    "hash": "7e23e95a9ad9b38ce48de526e77eb5876f90b5f685e0634777d204c2d67c2987"
+  },
+  {
+    "operation_name": "FamilyMembers",
+    "hash": "bd704a3e721522f45a1b8fb8f85fd9e2da7c44c8fe18144c5f256d9f1139dae4"
+  },
+  {
+    "operation_name": "FamilyOnboardingPostOrdersFV",
+    "hash": "81dc6b99baf3317c2c8292ad4f964d3d4b8ce31f6e64ca231b78bab4ab51d903"
+  },
+  {
+    "operation_name": "FamilyOneClickOnboardingFlowWebEnabledVariant",
+    "hash": "a1ec0fc1b80d3bb16b35b3c08f0673a1b12724c7d758845daa2d72ff13c82384"
+  },
+  {
+    "operation_name": "FinalizeCheckout",
+    "hash": "b9285c75cc7cef766cd8a8a3b53abb8b3d24faf9d4135f555fba9d0cda1bfaa3"
+  },
+  {
+    "operation_name": "FinishMyCartViewLayout",
+    "hash": "4ed2b393126c2b3e908a5b7254a3643d3d682e5957081d934a850aa7422dc8d8"
+  },
+  {
+    "operation_name": "FinishMyCartViewUILayout",
+    "hash": "3e7c4588a743a1aadeb0b098e213eb97cd2e72cd801902dabe51fee016b19434"
+  },
+  {
+    "operation_name": "FixCartBasketForCheckout",
+    "hash": "186a8d95c36f9b9bcf7ea62663b1aae13e762c45f4dcd5aab8549552a6139ea5"
+  },
+  {
+    "operation_name": "FloatingCartMessages",
+    "hash": "52789dd449025cf5a99caa1ffdf7549e65d30340b1480cc433380761e3e338bd"
+  },
+  {
+    "operation_name": "GetAccurateRetailerEtas",
+    "hash": "382a4e539ffafb2d566b24009cd9bc4b796727b4bb93716a239e349dcc21e864"
+  },
+  {
+    "operation_name": "GetAccurateRetailerPickupEtas",
+    "hash": "1ea4074f38193de62d9dd72cc782772d8362e21cd9817da37bea6b7412034231"
+  },
+  {
+    "operation_name": "GetAccurateVisitorRetailerEtas",
+    "hash": "9881fd027c49446b8b7aee43975267e8dbda7257de5cca4af0b091b5278c751b"
+  },
+  {
+    "operation_name": "GetAccurateVisitorRetailerPickupEtas",
+    "hash": "0e9fb88c7e2e8ba5c4f246cc0caded113199bbaca109a1f563c3b9e3f35df48b"
+  },
+  {
+    "operation_name": "GetAddressById",
+    "hash": "9128b6c5e391c3fb6cd974d18588ee130c950a7e7caa2e0a7be33210963e9c17"
+  },
+  {
+    "operation_name": "GetAddressDeliverability",
+    "hash": "483b179d34bbe269ed1d66b8641995eae5d418a68545f6ffe31fb78391592c38"
+  },
+  {
+    "operation_name": "GetAgaveTripDetails",
+    "hash": "a6b361eb0f071809c4582cecabcef3f0ec30da9dc3ae7b955939750af55f84ad"
+  },
+  {
+    "operation_name": "GetAlcoholTermsLayout",
+    "hash": "7a79988e1b7a7c63494c2dc311743207cc7dffbec8d73f5b6676ce99ee5cb5bf"
+  },
+  {
+    "operation_name": "GetAllLinkedUserAccounts",
+    "hash": "dbed350d6bbee749b0d387b49e4f9fc7cdf2927fb95fa1790ef9e0da1f21ffe7"
+  },
+  {
+    "operation_name": "GetAppPageQuery",
+    "hash": "3cb740d35ffec0e52c58d99ff7b23d4a9e6c9e760ea4134d83825088f370e050"
+  },
+  {
+    "operation_name": "GetAuthenticationCredentialOptions",
+    "hash": "fa4e290c861494ca99e773f0d232a4dc87f8f843ade7e9e761066cc66382bb87"
+  },
+  {
+    "operation_name": "GetAvailableOffer",
+    "hash": "5da751e575440ec9bcaeed1554e17bc376006841fcf4818182b7d813bda47a6d"
+  },
+  {
+    "operation_name": "GetAvailableOfferWithOrk",
+    "hash": "0789cf76f22edb9529a56f94de70c60fcb41c45ceab37cb2951252234cde15cb"
+  },
+  {
+    "operation_name": "GetAvailableRetailerServicesCollection",
+    "hash": "7750b1f70cbb0babafeed0e00e5ae126e92e37504bcd35a03e1abb2c17722f75"
+  },
+  {
+    "operation_name": "GetBannerLegalClaim",
+    "hash": "f1291e4f1298a1a0312bca4431fe008e7bf8aaffc6a7f348679240991ef33429"
+  },
+  {
+    "operation_name": "GetBulkInvitationsModalContext",
+    "hash": "7fcb4bc80e46bcd0ba5d774de4bb00b969d2c85595b0a1a3868b6dacacf64d8f"
+  },
+  {
+    "operation_name": "GetBusinessEcmToken",
+    "hash": "389d07432084d80b4afc1517d3291da844724d2e4dd9642d93d01d682fb83273"
+  },
+  {
+    "operation_name": "GetCartTotal",
+    "hash": "9167e21459b6946012446f5a9e3e686b85648a25843081813b85d89faf8ca932"
+  },
+  {
+    "operation_name": "GetCertifiedDeliveryHandoffInfo",
+    "hash": "eb13caed526d9d71060ef781714cacc6eee393d02016fc0236dcfa16c35120e9"
+  },
+  {
+    "operation_name": "GetCertifiedDeliveryHandoffLayout",
+    "hash": "93a8b570e712d80fb634aad40710d6e6391ad7e576788e2527008fddde3ee3fe"
+  },
+  {
+    "operation_name": "GetCheckoutAddress",
+    "hash": "5e74de8aaa292ac17c8ee0293ac7575a83814530acbdeb736f8f94171633bb79"
+  },
+  {
+    "operation_name": "GetCobrandCreditCardOfferMutation",
+    "hash": "ac9ddbeda8545c03ef3c6da3c61ed0d23629ccdcb8e6487fa4f2111999accc1d"
+  },
+  {
+    "operation_name": "GetCollectionHubAssignment",
+    "hash": "3144a19d595adc07fb0dca2191f9b50481167b0693865bdf9f7433db2b97b389"
+  },
+  {
+    "operation_name": "GetCollectionHubBanner",
+    "hash": "52e054e4798a5b4f71e1f305c09bbfd7cdb547d3fabf6c451f6fa2794ebb007f"
+  },
+  {
+    "operation_name": "GetCollectionHubLayout",
+    "hash": "3b34c2eef8305a33433070fbc7ef882dc7dbc1c49aba9fd47458ca5ef33d56c1"
+  },
+  {
+    "operation_name": "GetCollectionHubPlacements",
+    "hash": "7ae1302c88c6b66adb8664d64fb218c3d9bd09ab09ae0b1f088d85adbe295882"
+  },
+  {
+    "operation_name": "GetCollectionHubSeoHeader",
+    "hash": "30e2fa756decb938d0ad30e35ab4900ead2b0b6c09e06dc7b434044c077906c4"
+  },
+  {
+    "operation_name": "GetCollectionProducts",
+    "hash": "9d8528bb0a13e4dba2203adb9147ac015ad59a3def035748ed794eb5f876b020"
+  },
+  {
+    "operation_name": "GetComplianceTerms",
+    "hash": "ee2ed60081374233f419fa32952b33572cf681cf3529bf72b37220ea981ce270"
+  },
+  {
+    "operation_name": "GetContentPageMeta",
+    "hash": "8da2b3c3826edde22b93403c37103372e4374057915d6fc5bd4215f01b91f2ce"
+  },
+  {
+    "operation_name": "GetCurrentStoreConfiguration",
+    "hash": "119088cfa62e10192bf699bbd8a387c556e3027ba913a203fe757b3f761088bd"
+  },
+  {
+    "operation_name": "GetCurrentUserName",
+    "hash": "c357258d8af661a4d3e46164fda86b631d77318469af555648f15d2230c8f862"
+  },
+  {
+    "operation_name": "GetDefaultShopAddress",
+    "hash": "3319fcc1d3c1059c63bdfb758463a42191efe31425a0e1980051bb6a564fd66b"
+  },
+  {
+    "operation_name": "GetDisplayCreativeCustomerFeedbackOptions",
+    "hash": "96c5065cbc6ab8f07371920c151f112ed63d78a60b4879fa44b5c8fc05e4e138"
+  },
+  {
+    "operation_name": "GetEmailAvailability",
+    "hash": "f2f32834e2e4323c367032dd92b38759ee01f4aaa47cbdea712da23aecace56d"
+  },
+  {
+    "operation_name": "GetEmailAvailabilityForVisistorEmailCapture",
+    "hash": "a7fd00c1c1553ba83871121305e741324add913f4c8bd421ceff93f3d27c1e51"
+  },
+  {
+    "operation_name": "GetEmailAvailabilityWithSignupMethods",
+    "hash": "cc461b4bd4c8e9a824cb0754f003af5aa8aa498c17cccb5dc1be9aa611765495"
+  },
+  {
+    "operation_name": "GetEmailAvailabilityWithSignupMethodsForExpress",
+    "hash": "721d22ca8b0ac1c6efc4a058734392b7984339614ca86eb04eb796ea2245e116"
+  },
+  {
+    "operation_name": "GetEmailCredentialCreationOptions",
+    "hash": "11d00d1106d28a86b6227de360bc16a82e386c006b67c1c1c98917fff267c252"
+  },
+  {
+    "operation_name": "GetExpressCartPlacementsQuery",
+    "hash": "e430c6fd3459ad2f17b47746e5104517039802698835b7216d75aad43639fc4c"
+  },
+  {
+    "operation_name": "GetExpressCheckoutToggleModalPlacements",
+    "hash": "f4130ba2317d929c2eca642667455181f35e38f15f454e135d2bc41d20469400"
+  },
+  {
+    "operation_name": "GetExpressCheckoutTogglePlacements",
+    "hash": "51cb5759ce95b3d6606a8ad7e7ce82ebfc51673e781fe8ee79ced63c03cbdb7d"
+  },
+  {
+    "operation_name": "GetExternalUserId",
+    "hash": "e414de97c30c7885c9d77ea487667d89161e5112b0445c7ff3489ce471d5bb55"
+  },
+  {
+    "operation_name": "GetFullTextRecipeRatings",
+    "hash": "8427cb3368ddf42b4fc0428d47bdd67b3b666a2e2c60c6b886ae4d023ce8dd97"
+  },
+  {
+    "operation_name": "GetFullTextRecipeReviews",
+    "hash": "604c9402fd738d168f12d66f1bd50e6c0fbba3b8e22507d48173dd815fe1e020"
+  },
+  {
+    "operation_name": "GetGiftCardDigitalWalletBalance",
+    "hash": "caf223da7c6eddd7bc279527a2fa09da1202182b07c1335c046be8c8c3036da6"
+  },
+  {
+    "operation_name": "GetHeadingHomeMode",
+    "hash": "1e8e35bad394414f13b006265028d8a031f28ce948dfcbe7b4c140f056dbca87"
+  },
+  {
+    "operation_name": "GetHomeVisiblePromotionV2",
+    "hash": "2c1d19143f054d768de4858afae4a1f7cc6d972dc6a51824c86ea560e4da1935"
+  },
+  {
+    "operation_name": "GetHouseholdByUser",
+    "hash": "202908cf8714ec321f26507cbd51b362e37d5cf246ae43fe0a84857f48c63e27"
+  },
+  {
+    "operation_name": "GetHouseholdCarousel",
+    "hash": "c4c91d1c27a1e10250baf91db1ae54cbe7a467af50ecf42cb403d2efc656d7eb"
+  },
+  {
+    "operation_name": "GetHouseholdInviteValidity",
+    "hash": "32839e5148f10c95246a66aaf869246247c4c6be38027eb1ee7c409d2865b5c4"
+  },
+  {
+    "operation_name": "GetHouseholdLandingVisual",
+    "hash": "b299a3b22f68d0d42424a4a0f2715d601d7a3a4ac9dd1d1065aabadb9b074352"
+  },
+  {
+    "operation_name": "GetHouseholdManagedInviteByInviteId",
+    "hash": "b97631b5d744ed87496da1d43e943f6a040a6599ce2f35291aef5f3772a9fa1c"
+  },
+  {
+    "operation_name": "GetHubExperiment",
+    "hash": "5f40287ee372c070e009a44b82289babc8b2d562c87519b55654803fbf30d1f1"
+  },
+  {
+    "operation_name": "GetHubHeader",
+    "hash": "66445f0d9e2e25be2b8405a5897a2e1238b032402795bf9ac74a716869af7d72"
+  },
+  {
+    "operation_name": "GetHubPlacements",
+    "hash": "ccb4bb4ce2fde5bf5b2881a9703566c329d7ad4e44e9825dce1f471bcbad8747"
+  },
+  {
+    "operation_name": "GetInStorePurchase",
+    "hash": "5c83653c140a7eddd2811215d9bd1fa6eccd571145bb056abb1f3961a60db38d"
+  },
+  {
+    "operation_name": "GetIppPreviewByAuthToken",
+    "hash": "ffff419a26a59c3e2c0ba34abf318e9491e23b238346e4739a24f448041388e2"
+  },
+  {
+    "operation_name": "GetItRightGuaranteeBannerQuery",
+    "hash": "c9f871caf42c52f36038e4edca39cec97edf32fe415818f010bc11736156c3e3"
+  },
+  {
+    "operation_name": "GetItRightGuaranteeModalQuery",
+    "hash": "1f9e79720140063fa7777335a909cad0839c97aa3338b4b59ee5269ea7031f16"
+  },
+  {
+    "operation_name": "GetItemVariantGroup",
+    "hash": "027131fddd11fa4aae28f51d844e27a0e1be23edd02a1dbbc70b42a0dbc77405"
+  },
+  {
+    "operation_name": "GetLandingFooterNavigation",
+    "hash": "3f58d644c46725a38dd7a887ac699324453560950e3cebd87d8ec1370b8a6234"
+  },
+  {
+    "operation_name": "GetLandingProductRatings",
+    "hash": "bdf61cbc9af5ae6d44e56c374ff961f90eb06d1a5ca4eb47719336300d862543"
+  },
+  {
+    "operation_name": "GetLandingProductReviews",
+    "hash": "ee623f15a2d15c389c9668875f179494c63740fbf01925874ed856ddf3f149e2"
+  },
+  {
+    "operation_name": "GetLandingRatingsReviewsLayout",
+    "hash": "68972b56d45dd376be4fb90e25089d529f077230f2f9ab30a1de68ba35223f96"
+  },
+  {
+    "operation_name": "GetLastUserLocation",
+    "hash": "6c76952dbbaf5fe8b79d2ae6dc96af8ccca133285868e7efb9a81ffe624e37e1"
+  },
+  {
+    "operation_name": "GetMobileNavigation",
+    "hash": "78e24b971328f57265fa4226b1a63c384c9406231a29cfd2c248a379aad50323"
+  },
+  {
+    "operation_name": "GetNotes",
+    "hash": "7d51a84052dd2e55244f1f626517a272357867b8d0bab1a4faef717440fdf17a"
+  },
+  {
+    "operation_name": "GetOptOutEnforcementByIp",
+    "hash": "7da6eeb183cca0e00374de353fae4df6fa9c143c7f430d29876c8af7333581db"
+  },
+  {
+    "operation_name": "GetOrderAheadEnabled",
+    "hash": "05e823c82cd54e47e141b774e4601d75612e6169e104d3f461e66be27e5b7d66"
+  },
+  {
+    "operation_name": "GetOrderGuide",
+    "hash": "9311e536ce2a55e992814f859d5e85527fbf90bfeef3cc959965a052d7a70c2b"
+  },
+  {
+    "operation_name": "GetOrderGuidesListLayout",
+    "hash": "be0026fe5a4a5d12f884bbe311d9b135bf003b921ef496f8033b3877ea911aea"
+  },
+  {
+    "operation_name": "GetOrgBulkInvitationsJob",
+    "hash": "454c7a632de9c7007134cca440f6a8038e67fa471a2fc689744e34e4834dc682"
+  },
+  {
+    "operation_name": "GetPartnerLoyaltyCardsAndProgramsQuery",
+    "hash": "8ffab998c9868bc4b76892bb4980c626f2e810e3a13a7d1e473cb66e282ab1ac"
+  },
+  {
+    "operation_name": "GetPlacementsForMultiRetailerPage",
+    "hash": "0a21a22da6f15a51b1e90f6f675cf64fdebb68aa0328a15a1a96533847c31b0e"
+  },
+  {
+    "operation_name": "GetPlusQuery",
+    "hash": "a796f4621503fd5acf3e6831dff614966097aeeed82ae1368eeb42eb5af2e2d0"
+  },
+  {
+    "operation_name": "GetPreviewAuthToken",
+    "hash": "d58a51c903469f81b9a3f13b5930884749a76cbcc301dc31b3e072dab3baa1d3"
+  },
+  {
+    "operation_name": "GetPrivacyConfiguration",
+    "hash": "74f1851e8404f5424b466c4928bdbf31f32f57d0e54adad66e9df18459e47721"
+  },
+  {
+    "operation_name": "GetProductRatings",
+    "hash": "e0ce69452493f19ece52d62a48a60693831b6ded4fd599633d01ab1d4f88f0b6"
+  },
+  {
+    "operation_name": "GetProductReviews",
+    "hash": "2eb2d9d6e5afb4df8affbce611b4e0eb5f2ec93a81412140259e0cffb821f098"
+  },
+  {
+    "operation_name": "GetProfilingStatus",
+    "hash": "4f7c6b66d973ea7446afeceab637118701861ffd7eed9ffeb909a33173e1ad31"
+  },
+  {
+    "operation_name": "GetRankedOrderItems",
+    "hash": "55be258c0c7e4896a7006b97384484c0429ae8e202cda5163a4e3a516833b5fe"
+  },
+  {
+    "operation_name": "GetRatingsReviewsLayout",
+    "hash": "643a34f9f41826094fcf90139e552b86b85901138e9bd9b16fb1858a8f0a292c"
+  },
+  {
+    "operation_name": "GetRecaptchaKey",
+    "hash": "bc069abd7ba3879b092524bf798ddbdc99410be2ea75704425b16b22a1a55713"
+  },
+  {
+    "operation_name": "GetReplacementsVariants",
+    "hash": "147aad01b575766cee82f280a0b6610b5367ee1986769f51bb3fdf2c5343fe7d"
+  },
+  {
+    "operation_name": "GetResetPasswordTokenStatus",
+    "hash": "fec7276bfdaf6ded101ed9a81744fc15c89f7307239205cf5752f9204fca2315"
+  },
+  {
+    "operation_name": "GetRetailerBySlug",
+    "hash": "367659e8274b260e4596e57b7c79fc64087ab55c174bb77158a197675d5fdbb7"
+  },
+  {
+    "operation_name": "GetRetailerGiftCardBalance",
+    "hash": "3e241b9ec23902e4eb60b9eeb352191bcd8ad1a913a1e40ac2ff3d14c816b579"
+  },
+  {
+    "operation_name": "GetRetailerIdBySlug",
+    "hash": "df6ad2cdb35868f2ce81c48e21bc6ec2905ee75c5a1f21c660aed08b816240cb"
+  },
+  {
+    "operation_name": "GetRetailerIntegrationOrderFulfillments",
+    "hash": "8d435d1a0c1769aad8617e0e017cac35ae499debf015da9ddd22423e58ef00a8"
+  },
+  {
+    "operation_name": "GetRetailerInventorySession",
+    "hash": "501730061a41b976b9a69771a07b7744c3b8957e4da8de9524df948f17e39750"
+  },
+  {
+    "operation_name": "GetRetailerInventorySessionTokenByRetailerId",
+    "hash": "098594a85633c1eac7e7123f48349af5a2e9b1e166943f5d0b0e33485bf169f8"
+  },
+  {
+    "operation_name": "GetRetailerLocationAddress",
+    "hash": "b80a5ef08c6fe88df0b9a2e78a099dd6141345b213df0f9f517803674b6eee94"
+  },
+  {
+    "operation_name": "GetRetailerLogos",
+    "hash": "ace6b75262914b9d66608268bd8765723e32d8318a8223ecef148b6c4c2963dd"
+  },
+  {
+    "operation_name": "GetRetailerLoyaltyPageRetailer",
+    "hash": "5fa544daf038631f5525797042c4dcd989564d3f9c6377b9a87dfd119cf3f1a5"
+  },
+  {
+    "operation_name": "GetRetailerNameByID",
+    "hash": "d6e8237844f7b75fbd04422244111aac6625a433ed844d0e63123b8082985557"
+  },
+  {
+    "operation_name": "GetRetailerNameBySlug",
+    "hash": "1d22c0f444a2ec3e436b636c3d83b4e616a68851fd42e58c550312fb5b5d0634"
+  },
+  {
+    "operation_name": "GetRetailerOperatingHours",
+    "hash": "61ccf8998e8185a1489ce1536ba49c9986b6e20da7f329c431b2da98acb834ce"
+  },
+  {
+    "operation_name": "GetReviewsResolver",
+    "hash": "bea791e567781ed061b272bbcd1a94c4fb86e37826fd361c6212f9d7a60ca999"
+  },
+  {
+    "operation_name": "GetSetupStripePaymentMethodStatus",
+    "hash": "a0b9137394c038b1a2f532ec3d1b562add0ec9e9b2a2f73472aeae08fed2c0ef"
+  },
+  {
+    "operation_name": "GetShopByRetailerLocation",
+    "hash": "1f5d73a06306c7db19f2276c73b6a2c9a25a63f011116699ef8e38f9eef6ac2b"
+  },
+  {
+    "operation_name": "GetShopCollectionHubSections",
+    "hash": "a40ee00ecc95ecc37b1848ec94c6e779b08e4f0c9d341014db179ba6eafe0791"
+  },
+  {
+    "operation_name": "GetShopCollectionRetailerOptionsModal",
+    "hash": "c4dfea0845a37eb7788295e32d3f7b5925242a705463fbd2200f820223f84d58"
+  },
+  {
+    "operation_name": "GetShopFooterNavigation",
+    "hash": "5d04425ea6042d20dfd3bf775a4097f16cba04a2254ea62eef3cf91b5d6718fb"
+  },
+  {
+    "operation_name": "GetShopHeaderNavigation",
+    "hash": "40d484589f3da29ee346525653e174118b05e826a987ea6d1f5a9c9ad1e70cd1"
+  },
+  {
+    "operation_name": "GetShopperSourcedImages",
+    "hash": "1ea5679376eeee436954e7fdec78b72fd64aabc9d42067d8188a20220a98f447"
+  },
+  {
+    "operation_name": "GetStandAloneRetailerOptinModal",
+    "hash": "e67a1cd7e1e6c3e87c4e5b81f9120d0e71f5ef19c953e19dd64abeba0c914bae"
+  },
+  {
+    "operation_name": "GetStoreEmbeddedAppMoreMenuNavigation",
+    "hash": "9b8138af3d0938596624d11e1fd38d2fc59de51b0cd69199a63fb34ab0432924"
+  },
+  {
+    "operation_name": "GetStoreLogo",
+    "hash": "05b0f70e5628a7638b6278d2184bf5cb17c0a7c3a4f504c0a653cb0ef9f10f7f"
+  },
+  {
+    "operation_name": "GetStorefrontDoublecartLayout",
+    "hash": "f1119970157856a549a9214fa39e767fe74545d8c8c38cbad12cf0ee9ccf2f98"
+  },
+  {
+    "operation_name": "GetStorefrontSavingsCardContent",
+    "hash": "d59af0fce49bca5db4ee6197411d3e9be567184e23f11acfd30faa3ce76444ae"
+  },
+  {
+    "operation_name": "GetStripePublishableKey",
+    "hash": "fa9df427da7ed222da84818bad1ad48188837856ba0023d7635e3299fec8c808"
+  },
+  {
+    "operation_name": "GetTaskCenterTasks",
+    "hash": "7bf28b2e50fc16c8211b8d70ac0e7c2b49e12ea9b3bbe395887fd54bc7073430"
+  },
+  {
+    "operation_name": "GetUpdatedCouponApplicationStates",
+    "hash": "009d2264d77c6de867dbbc0051c61e9b3505ac6e2a7ca3938c86d09211e648e4"
+  },
+  {
+    "operation_name": "GiftingExpandedCheckoutDetails",
+    "hash": "9ad5c7e7f6ac802961fc9beca253808c9e146ca2ada9f48b1c204b9c3c39b209"
+  },
+  {
+    "operation_name": "GlobalMainMenuLayout",
+    "hash": "1ad8b3952d5868ab9903e6e41d0a7b233a004906d2b61de49fee2d394f5f3fea"
+  },
+  {
+    "operation_name": "HouseholdByUser",
+    "hash": "7262a67a24116b34941398b82752a7854c1c9e7518c640055280c8043c897d00"
+  },
+  {
+    "operation_name": "InitializeCheckout",
+    "hash": "943180d90bba34179213d412efdef58d2b17e3312ed887610efb2626b4d50f62"
+  },
+  {
+    "operation_name": "InlineCartEppVariant",
+    "hash": "8cc0b404878097e5e9cfa0cda85f6174f515d9badaab68c6b3d65ab5aac6020d"
+  },
+  {
+    "operation_name": "ItemAddedToCartStrings",
+    "hash": "57c83e41879ad31161330a7706ed7d12aae59014a25a58b382fce3d86914416a"
+  },
+  {
+    "operation_name": "ItemAttributePreferences",
+    "hash": "927a3d148c6393b86b69e510f3e725d7fd44b19b492b8ed39f21665f76a903ed"
+  },
+  {
+    "operation_name": "ItemCardAttributesVariant",
+    "hash": "061bdd9f6bcedce9534820a583db056fe9cdd341591900313d71234dd730ed03"
+  },
+  {
+    "operation_name": "ItemCardSizeCollectionVariant",
+    "hash": "16bf56b5f1e72eb49ce30bcda8c4daafcfd2e7b3e650652425b1481672a63dbb"
+  },
+  {
+    "operation_name": "ItemCardSizeSearchVariant",
+    "hash": "e710a4fddd71d1a0fbeea27e4d7cc26fccb10917a5fd94b72f58f1ed4e79abb3"
+  },
+  {
+    "operation_name": "ItemCarouselScreenReader",
+    "hash": "cf1e0978b52cc044708788aada24dc5c223ef4a662c2941abd84499d1fe2874b"
+  },
+  {
+    "operation_name": "ItemCarouselViewMoreModal",
+    "hash": "fd053dceb3ec20c09c9200b37c720153127860137b662da59c0d693d4aea70f8"
+  },
+  {
+    "operation_name": "ItemComboCollectionsV4",
+    "hash": "7d5c9dbe834ca65d7b525c6c9559037dc82df4796d50754286b45daa436e4383"
+  },
+  {
+    "operation_name": "ItemComboPromotionsPlacements",
+    "hash": "83ffc73400fd0ec1df0ca04ba2e66713926165e3fa1d3c95043f42a7516391c4"
+  },
+  {
+    "operation_name": "ItemDetailData",
+    "hash": "8d05cc79533c6ae98b02e67c0e3bec76e06a8b7658099801e3aea0f08a5793ce"
+  },
+  {
+    "operation_name": "ItemDetailFeaturedProductList",
+    "hash": "17d17ce8c6f222e8120b8894d5ccb257cd8b1398aa0336b50f2bb25b91a8848b"
+  },
+  {
+    "operation_name": "ItemDetailSupplementalFields",
+    "hash": "b3e79191d1db94a2c24eac6b8016d36239d1387f2fd39fea86d1260da4d03b83"
+  },
+  {
+    "operation_name": "ItemDetailViewLayout",
+    "hash": "0129df643653a4806c31c5afd9e52ee71de4e36e9324037c374fff5c6871ee66"
+  },
+  {
+    "operation_name": "ItemDetailsRecommendationsPlacements",
+    "hash": "4b8fdb0e5addbb7eeb8a0ac44890658a644f410d778c85c82e1d033f46cb67ae"
+  },
+  {
+    "operation_name": "ItemDetailsRetailerProduct",
+    "hash": "5ac2d820f689a151c7dbaccefbbcb4b59d1c84db56a667a6b90d0137d5e72cca"
+  },
+  {
+    "operation_name": "ItemDetailsV2Configurable",
+    "hash": "2acad19439721bbce5148cba25c32efe3e0de7e90a7689f46626f156829bab2b"
+  },
+  {
+    "operation_name": "ItemDetailsV2CreateUserProductFavorite",
+    "hash": "4bb618a0ce4be86515992874cf9694165b1b6bb576bb440dc594c846cbce7f59"
+  },
+  {
+    "operation_name": "ItemDetailsV2DeleteBiaItems",
+    "hash": "4606e0934843af847afdc014c59654f2cde1526aa4e1bcc327083ad22bfcbcf3"
+  },
+  {
+    "operation_name": "ItemDetailsV2DeleteFromBia",
+    "hash": "ca44fd9af345c69fccf647536ff78e7665bff7302c7c8b18f7e2e1537b52f3b7"
+  },
+  {
+    "operation_name": "ItemDetailsV2DeleteUserProductFavorite",
+    "hash": "13f08edbc9534ade8a04e56165e0dbb144e2e0feb81d0785a7be5df069585694"
+  },
+  {
+    "operation_name": "ItemDetailsV2Detail",
+    "hash": "db56dec966dd65a6bc6528da884b8a0b5ba2b8659bdf53d0c81c8579b54e2e3f"
+  },
+  {
+    "operation_name": "ItemDetailsV2Flags",
+    "hash": "f94156c799f1ec0ddaadd4d51471049468494798766d68f2d6200abb2cdfb62d"
+  },
+  {
+    "operation_name": "ItemDetailsV2ItemPrices",
+    "hash": "6980d58818f8afd5ff2b50e638d603e5d2cd14711c66f63963bcf3f60e2ae486"
+  },
+  {
+    "operation_name": "ItemDetailsV2Scores",
+    "hash": "240da294d5d5c5a41668148f9e21e889d03d805e04e0b56ebb453177d2802335"
+  },
+  {
+    "operation_name": "ItemDetailsV2Selections",
+    "hash": "e10dc2bab92e56280330dc81e240b3750c2ee7d2f9a32e119c84bf8818c85218"
+  },
+  {
+    "operation_name": "ItemDetailsV2UserProductFavorites",
+    "hash": "d02e8ee382a9f5a977bc87873a25a5950ca6cfdeacdc93fe4a55798bb69d029d"
+  },
+  {
+    "operation_name": "ItemDetailsV2ValidateTextProfanity",
+    "hash": "1728fbebc697df562211ab2406ffd8492f9c3ab40b2384dea5330cbf1c6bd9dc"
+  },
+  {
+    "operation_name": "ItemDetailsV2VariantGroup",
+    "hash": "2c23ccc46fcee0a33e1c2cb73f86aeb090d606f918b9225eebd5424e72a329c5"
+  },
+  {
+    "operation_name": "ItemDetailsV4",
+    "hash": "f24f5236ab2f5bfe12fe616ce19bfa2bdbab8831fe8075936723ffee5401c612"
+  },
+  {
+    "operation_name": "ItemDetailsV4DensificationExperimentPreview",
+    "hash": "3f1fc12e8526d6f4bb3034c855e74c616401d0a9997a953d6be5883d3540627b"
+  },
+  {
+    "operation_name": "ItemDietaryAttributeMatches",
+    "hash": "b70f5b8cac5efc10c7fe85b8bac09bd5d39098d8ea5889918d91d52307a40c09"
+  },
+  {
+    "operation_name": "ItemDietaryConfirmationContent",
+    "hash": "ce1c9dece10a8599510a5ecc30c040b47646781780fb22854e1e92cd072b679e"
+  },
+  {
+    "operation_name": "ItemGranularFlowVariant",
+    "hash": "782a93965e1f2e1775227e2454a6f1089839f89bc6c601d7ff1e7413c92f884c"
+  },
+  {
+    "operation_name": "ItemGranularIssues",
+    "hash": "7779cd4e9228d199070bc6ddcf1ae49d3c508b15f0068ea94700ca597c5973ea"
+  },
+  {
+    "operation_name": "ItemName",
+    "hash": "eb8ff62cdd3dad6840e0b592360e6929cd32b59d93523ccfdac1b2549a646248"
+  },
+  {
+    "operation_name": "ItemOffersSheetViewLayout",
+    "hash": "4e538ec6d655dae26a836e73a47bd57ca9126647b33ab03f35ae5fb259be435a"
+  },
+  {
+    "operation_name": "ItemPricesQuery",
+    "hash": "b9bcf36721a5f43a2c356d42d16ef002ed24941034a3dad53485b0f627aa2450"
+  },
+  {
+    "operation_name": "ItemSearchModal",
+    "hash": "2159cc4c740f762d2371fa49bbf103b83ed835e32ae59117589087df97110c58"
+  },
+  {
+    "operation_name": "ItemSelectionCTA",
+    "hash": "16b5cb129fd615740a387a6cabdfbed7e51c924be8e3c72b3a4bf4f441f82405"
+  },
+  {
+    "operation_name": "ItemViewLayout",
+    "hash": "dd9c824b6f9b73dd16dbb3979dea831aaec69b2b0ebf5ee288f3a931e529656e"
+  },
+  {
+    "operation_name": "ItemViewLayoutQuery",
+    "hash": "53470eafcdef0c9107ca93cf2947be7ba3ef2149ff50c25a5c68f69c28be8604"
+  },
+  {
+    "operation_name": "Items",
+    "hash": "8fe60a2c4c74b994076e8fc97883141aec582e7f6e2402d82c9902772432f183"
+  },
+  {
+    "operation_name": "ItemsQuery",
+    "hash": "5c93a1c049568ec5724d5e4de684fa9221d5a815028228c19a7d6f8f8f6f4887"
+  },
+  {
+    "operation_name": "ItemsTotalPrice",
+    "hash": "7a51c00612eb31592db87f47116523f90ebbe7a79fd0885262b592a396d31dcb"
+  },
+  {
+    "operation_name": "KlarnaOSMItemDetails",
+    "hash": "d5254a54fb864c6650a0f62271a26646e2f8dc7f5f9a45cb602e6a9704c4897c"
+  },
+  {
+    "operation_name": "LandingRetailerMetas",
+    "hash": "b8ae98edc10398530e845b5458fed2d63b7024cf3cbd7c0312c9873e494f3d56"
+  },
+  {
+    "operation_name": "OrderAhead",
+    "hash": "47cf139836543a26265a87ad7a59c1c3e03bdfff51703819e563a7dab6131671"
+  },
+  {
+    "operation_name": "OrderAheadAvailabilityWithScope",
+    "hash": "a8bd88c85063124fc2512052bd303633083b8417b3b3ee33f4c0b5df4cff7dc7"
+  },
+  {
+    "operation_name": "OrderAheadCartLayout",
+    "hash": "0dc4e32b9e2c15e8350bc15903706a8d0bf396c06fcac160549efce362aba99a"
+  },
+  {
+    "operation_name": "OrderAheadCartMetadata",
+    "hash": "ca9265cd82d9cae1c95d8a43f86996d9c1408f6a049494cd60bdc66732f9c7da"
+  },
+  {
+    "operation_name": "OrderAheadShoppingListGate",
+    "hash": "be713aebb8c2c61f0fb73f5d63811250fd2d02b604f656bef71676f85460506f"
+  },
+  {
+    "operation_name": "OrderAheadViewLayout",
+    "hash": "08f818109f81c7cd0e186ed61cb13d57c87b5c0dc7f2ef389de0afaa6bf0d34e"
+  },
+  {
+    "operation_name": "OrderApprovalDetailsConnection",
+    "hash": "021f3cdadb12776d6b29e443836bc5c9dc0879504da08ce7c17c538e209aecc6"
+  },
+  {
+    "operation_name": "OrderApprovalsLayout",
+    "hash": "22fa4f2a11506d4d6ea97832eef1ab3fb0ea362034e312d544369e553a226b83"
+  },
+  {
+    "operation_name": "OrderDeliveries",
+    "hash": "791f9109ea596a27a05b8b6c6a8833e3a692a0beadd493359d0a16d7a9c9fd3b"
+  },
+  {
+    "operation_name": "OrderDeliveriesConnection",
+    "hash": "e38f6fed5589997f465a4d364ec1dfb5b09ce4db8e0b4a8a3370ea47df6b6ec9"
+  },
+  {
+    "operation_name": "OrderDelivery",
+    "hash": "3ed4c3e0648822a69f64512ff389c068053f32310edb0f790479a83d6c00b663"
+  },
+  {
+    "operation_name": "OrderDeliveryAddToOrderData",
+    "hash": "211312ed51ab29fc39145647ffddae75dc21f2a9b05c89aec7d02b697926e977"
+  },
+  {
+    "operation_name": "OrderDeliveryData",
+    "hash": "fe0247fa9ad9e79e89e08948266a122fed405c846a9438a0b042f2b95f24a9da"
+  },
+  {
+    "operation_name": "OrderDeliveryGiftingOption",
+    "hash": "22d53d368e9a577be42b7803cd59bbb44606434f18f68208822b673490e95921"
+  },
+  {
+    "operation_name": "OrderDeliveryItems",
+    "hash": "860a9fa59deec3ac694e2bfaf7d87abded7ba902ac15ddd96d75f015d7f40f8e"
+  },
+  {
+    "operation_name": "OrderDeliveryReceiptUrl",
+    "hash": "368eed5f1ea412b8f2ad343cbe1c6b289f29b7f124315adbfb78448ac7cbaf0a"
+  },
+  {
+    "operation_name": "OrderDeliveryReturnsData",
+    "hash": "73235991e31d268b7c310ff159b1e5198d24e95cbc54c14f827a41cc10ab043e"
+  },
+  {
+    "operation_name": "OrderDeliveryShoppingContext",
+    "hash": "fe98dd033d9d075e21e8d38e30fafd06bec2f161a4a74e3d59936d73b89ecbe1"
+  },
+  {
+    "operation_name": "OrderFeedbackCreateCustomerRequest",
+    "hash": "b30407329d9dd8e22ff84ad6adf2ff9083f9b4dcda9f134937755a695b42c8c8"
+  },
+  {
+    "operation_name": "OrderFeedbackData",
+    "hash": "8ceb4c150fad55781a6b77e7872ace31e2d43d138e78833a725a0b370c4b8971"
+  },
+  {
+    "operation_name": "OrderFeedbackItemIssuesResolution",
+    "hash": "1c859b2458801ffc56c95130b9b7610bf56e558960661e2164dded8ee09c477e"
+  },
+  {
+    "operation_name": "OrderFeedbackShopperIssuesResolution",
+    "hash": "78337e5a28a7ecd77c666db1d45907982323ba691620dd8b3e78c88bfe9edc7a"
+  },
+  {
+    "operation_name": "OrderFeedbackUpdateTip",
+    "hash": "a4fa4e63f2c4b62916978fb967eafe9e8c9219fc55ae909d6b6f477268dd201f"
+  },
+  {
+    "operation_name": "OrderFeedbackVisible",
+    "hash": "a513ab95b4e19d516f009995894a6428bfeae568f5da164e02a405cc3f7105ec"
+  },
+  {
+    "operation_name": "OrderGuidesBuyItAgain",
+    "hash": "e2abd6f219c75df70a702848cfb35341cc303b4816d6fff7c83ae403dfa08123"
+  },
+  {
+    "operation_name": "OrderGuidesConnection",
+    "hash": "f5a7a4eba3385b99ce8fa832949dee19b11ec05590455c8ddc8b69ff835dcaea"
+  },
+  {
+    "operation_name": "OrderGuidesRetailerQuery",
+    "hash": "590308d0e784d1d202b6735403f7250250874101df9a1a2a7501012a3aa84426"
+  },
+  {
+    "operation_name": "OrderHistoryNavigation",
+    "hash": "492003b9796f653fc6b3ab9e9378bec71f8952a28e2578211c145187ed123611"
+  },
+  {
+    "operation_name": "OrderIssueAppealSendSafelyLayout",
+    "hash": "bd91f4b32e0d8b67269036500b7ed7aa01017c1d426a520ea6d65cf61c1bf852"
+  },
+  {
+    "operation_name": "OrderIssueAppealSuccessLayout",
+    "hash": "f3b011cc01e305615b93f7f1714c49ad0fa77ffb336862f7f26f362036bab6be"
+  },
+  {
+    "operation_name": "OrderIssuesChatWithUs",
+    "hash": "fb85b4ad344fcc23c8d5e30817e422dcc0bea3c00a60ccc930922ee3d8f65760"
+  },
+  {
+    "operation_name": "OrderIssuesConfirmation",
+    "hash": "edf0d0ab8d2a07e228d133664b08ec98d8d30e607de07a4c1e527ce81be1a3db"
+  },
+  {
+    "operation_name": "OrderIssuesElseIssues",
+    "hash": "8779fa6d2a61c7999c60a18f1e703177f4f2010ffce0d9c8ae5d8b7c1ad6e66e"
+  },
+  {
+    "operation_name": "OrderIssuesElseIssuesTopicLayout",
+    "hash": "e5e15a7028a1f425b3562e5bb00a4940a1fb62d1ea5044442b60039ed9259cac"
+  },
+  {
+    "operation_name": "OrderIssuesFeedback",
+    "hash": "5bd2ee9dfd7d1c53b2e83f731e4585f0ee98ac72d9604b58db1ede43bdc2a6bc"
+  },
+  {
+    "operation_name": "OrderIssuesIncidentReportForm",
+    "hash": "ca731c81d9d219bfd97cb702f428517ddbaa261c2f1a02ecee0d973cc27869d7"
+  },
+  {
+    "operation_name": "OrderIssuesItemIssues",
+    "hash": "4f7925173466b78c91309a0577ea7890b5135e791fa1c2067df1611c8bfde03b"
+  },
+  {
+    "operation_name": "OrderIssuesItemResolutionsV3",
+    "hash": "f094d8ee356f0b68142cf929ecab5a91200ee2483630eca938e93c0dd9a1ba6c"
+  },
+  {
+    "operation_name": "OrderIssuesItemSelectionViewLayout",
+    "hash": "30a51afe8dd8734537639ca5041c4c101e446ec2992df0694ae815ca84b46564"
+  },
+  {
+    "operation_name": "OrderIssuesOptionSelection",
+    "hash": "dbb81495bd2682a7e4b4dc487933b17037bbce61229300844347453ab5b18d29"
+  },
+  {
+    "operation_name": "OrderIssuesOrderItems",
+    "hash": "171e0c9c1cc38d03ba70962cf4b4bc5273f5db18b92a13c6bf2838000689d0e4"
+  },
+  {
+    "operation_name": "OrderIssuesOrderMissing",
+    "hash": "4b482b6f398d4c75c71c525bcb455b5202da9e4758f0b7c4551739700afb4aea"
+  },
+  {
+    "operation_name": "OrderIssuesQuantitySelectionViewLayout",
+    "hash": "0edb3b79eb976de0b7e783a34143fb6e554ef470dcfbedd8f4f26d983f1ba8e5"
+  },
+  {
+    "operation_name": "OrderIssuesRefundViewLayout",
+    "hash": "33e31103111cf0c2fa632c1cef1590466cc41c65324a720b1efda68d6ebf298f"
+  },
+  {
+    "operation_name": "OrderIssuesResolutionOptions",
+    "hash": "0091a51fd1084fad82e2f18ec9caedc176531636c6eaf71a8e05c1d78894aaa7"
+  },
+  {
+    "operation_name": "OrderIssuesResolutions",
+    "hash": "d3dc9c1c87e2c359e0ce80b329e79607d9e3899032cbc961b3e0e5834baa24e5"
+  },
+  {
+    "operation_name": "OrderIssuesReturnDetailsViewLayout",
+    "hash": "4c4bc798e2021d21d67401f2a12c8a1ee75599f684cb89d8224a4339e68a67dd"
+  },
+  {
+    "operation_name": "OrderIssuesReturnInfoData",
+    "hash": "f86aba51dc2daedbf35dd17afd2a0e8faeb12e68479ad6c6b629103146331166"
+  },
+  {
+    "operation_name": "OrderIssuesSelectionConfirmation",
+    "hash": "648e3eab0a62fa9b67f57a15aea5de2b36b43bf64a3a11b2852fae685bed3389"
+  },
+  {
+    "operation_name": "OrderIssuesSelectionOptions",
+    "hash": "6ff97135588620e60d688e44dd84993386ffad82ca70efa4c07b525a9597023c"
+  },
+  {
+    "operation_name": "OrderIssuesTopicsData",
+    "hash": "20ce8c9dba1289c1ba4e6e01d04478207e8bb6ea8007f61539c37060743d7985"
+  },
+  {
+    "operation_name": "OrderIssuesTopicsViewLayout",
+    "hash": "52180894e86b9c20338ca1f57ccb3727c79840998111c5cf5d2d069ead801647"
+  },
+  {
+    "operation_name": "OrderIssuesWhatWentWrongIssuesV2",
+    "hash": "b2dd33059ff247e5c87e25062d1cfbb8ea5caa313947fde8671a109379147875"
+  },
+  {
+    "operation_name": "OrderIssuesWhatWentWrongTitle",
+    "hash": "47e236ac064a94931d466d6dee6e682b214a1d07d590b436b9a3586ac6d995f6"
+  },
+  {
+    "operation_name": "OrderManagerOrderDelivery",
+    "hash": "71cadd785ca1e38428bdb01bcafbbdccbf43ef5659fd688954f41239554f39a7"
+  },
+  {
+    "operation_name": "OrderManagerSharedOrderDelivery",
+    "hash": "216c38fa35c79024307ee918f197b7e30cb0763e3e5f1dcef1e4b0591b797781"
+  },
+  {
+    "operation_name": "OrderPlacedAnimation",
+    "hash": "972991a680dee0c74c44f95bab95b9e58f2ecab4d993f81c1c5f45ecc2dec3a9"
+  },
+  {
+    "operation_name": "OrderReturnItemSelectionViewLayout",
+    "hash": "8542138052b0b1aaa356f207ad299d895dd2f5fda20e8e63c6187c863e728359"
+  },
+  {
+    "operation_name": "OrderSatisfactionOrderDelivery",
+    "hash": "c92a16cb35e1fc5475563cf0d828be74e2492812205498ee4ec8d50c8869d80e"
+  },
+  {
+    "operation_name": "OrderSatisfactionOrderItems",
+    "hash": "e1d3e2e336bce2e607eb66a1ddfe30c4cd781c8557d7481692e62fe745c8c7f3"
+  },
+  {
+    "operation_name": "OrderSatisfactionViewLayout",
+    "hash": "0dd435ad4fa5351893efa3495310a54ed56ca221ee7978b4400f8de9ab73617f"
+  },
+  {
+    "operation_name": "OrderStatus",
+    "hash": "e80e4c0e7c4abb33aa71943f2013044672c08e3230d1414b70a770f4efd05320"
+  },
+  {
+    "operation_name": "OrderStatusLayoutQuery",
+    "hash": "1af70ba3064d4cbbd22f3bbdadeae46191f80d3f323834f308035137be6f8b83"
+  },
+  {
+    "operation_name": "OrderStatusRecommendationsPlacements",
+    "hash": "ba13718a050e58271c5db43e95a5ffbb30cb3995207a28c09635f0c602584ba4"
+  },
+  {
+    "operation_name": "OrderTrackingHeader",
+    "hash": "8cbeebe70217c6124afbfc077395b49e8e7c03c67bf0c7d3cbbedfea15c4145b"
+  },
+  {
+    "operation_name": "OrderUpLearnMore",
+    "hash": "ac80e7b04f1fedab32da3b3a868ef8b83175134fb40dfc166d18e21362857438"
+  },
+  {
+    "operation_name": "OrderUpPlacements",
+    "hash": "95a52d4d354751d4eb984babe74da15023a6013203a6cc3419977c5a429cfa7b"
+  },
+  {
+    "operation_name": "OrderUpRetailerItemsQuery",
+    "hash": "fc724d36e8a1963950b7a56b121571d419f503db25477ae9b02edc97c198f6c3"
+  },
+  {
+    "operation_name": "OrderUpTimer",
+    "hash": "35e48b409f1f6601f2eb8ad4979365f19587cd5b909e2e950380d282d6f6b72d"
+  },
+  {
+    "operation_name": "OrderUploadAddress",
+    "hash": "d1a2a863bf6b4403cff2a1f256b8626fee234037dcc0b18710a083fc18b8c650"
+  },
+  {
+    "operation_name": "OrderUploadCreateBusinessClientAddress",
+    "hash": "f5e43c11e89cdddecb51c0eab3f696fa046195bcd4ebbfa0f0fe395097af7247"
+  },
+  {
+    "operation_name": "OrderUploadTrackOrder",
+    "hash": "4afaadbea5a983368e9c998910cd58f5ce6d5953d8fc50db425bd2a884ce93a7"
+  },
+  {
+    "operation_name": "OrderUploadUpdateBusinessClientAddress",
+    "hash": "537735c777b526ad88d2ca9bcba1a887a4faa2203b406136d9675402cfd63b21"
+  },
+  {
+    "operation_name": "OtherSingleRetailerCarts",
+    "hash": "8f680ab09b04fe68b23840a0e9e60689856924106071be9bd241f9a0570c61fe"
+  },
+  {
+    "operation_name": "PersonalActiveCarts",
+    "hash": "f3490f98c3c25bb6ed7614298df8c01e547a989baff638450793de1a4c73932f"
+  },
+  {
+    "operation_name": "PersonalOrderHistory",
+    "hash": "ffde6dab3a502e1cffa3b908b616778300bd9c91b2ff95be1cb90444820e4e66"
+  },
+  {
+    "operation_name": "PostAddToCartBrowseLayoutQuery",
+    "hash": "701033fe405d91a9be820776dfefb71cdfaf7f55a3062342deae301dd68bb406"
+  },
+  {
+    "operation_name": "PostAddToCartComplementaryProductItems",
+    "hash": "d9fb9c28e549dfcbc8702213752d1e5ce04692787214e17bfe04836d1565b566"
+  },
+  {
+    "operation_name": "PostAddToCartLayoutQuery",
+    "hash": "a464c045fed1499e5a96a54d48a596607e9983eb7e15c5f07d401d0aefb064b7"
+  },
+  {
+    "operation_name": "PostAddToCartSearchLayoutQuery",
+    "hash": "034fe387ac7c8ff71904a3a69f77839e8ad5ae073badbfc4d63382147f7727f3"
+  },
+  {
+    "operation_name": "PostAddToCartStorefrontLayoutQuery",
+    "hash": "75cf75bc5e6a74a06f8f3cdb6fe490779a2e3284c3fa6962d0746058a879d0d5"
+  },
+  {
+    "operation_name": "PostAuthPathsQuery",
+    "hash": "e3594db3eed5ded3e0f2f0a6d8f94eef31a62738ce1beed5f8d55898d2aadf8e"
+  },
+  {
+    "operation_name": "PostCheckoutAirbnbGraduationEligibility",
+    "hash": "a6c682016abfcfbdf1fb0c7e408e59590f0bf247a919c59cdbf8e37ff620dc2f"
+  },
+  {
+    "operation_name": "PostCheckoutComplementaryItems",
+    "hash": "a400b84e34f8275caf952bb41a3708dcd1fd9a74f28e0312baa876db591265bd"
+  },
+  {
+    "operation_name": "PostCheckoutCreateChatMessage",
+    "hash": "2003a54251e1c1a78d7eac0e38d498de0902036fffec4eab74dea33728d2a226"
+  },
+  {
+    "operation_name": "PostCheckoutCreateEuWithdrawalRequest",
+    "hash": "1668f5c90b291623892563256320f12b2a80d27c2725e8a04c4cc4048541877a"
+  },
+  {
+    "operation_name": "PostCheckoutCreateOrUpdateVehicleInfo",
+    "hash": "1ff243fa39a82441777347bc3091b4ed88a5ef19a62fae0d36774bc502e5e102"
+  },
+  {
+    "operation_name": "PostCheckoutGetItemNotes",
+    "hash": "e089b9dca76c2d1354a5b4e7162ea4bbee4583bc8aedd14e9f6712048b17600e"
+  },
+  {
+    "operation_name": "PostCheckoutGetOrderItemIdsByRisk",
+    "hash": "5cfe4946989f69d0b47882096eff5e9f68ad05bfb92d7e74a1a1f539f57cab52"
+  },
+  {
+    "operation_name": "PostCheckoutInitiateCallWithShopper",
+    "hash": "dd7c7b4c7e5b7f36b64dabd336e11cba81e74fb5ee87af3078cdadb17fac65de"
+  },
+  {
+    "operation_name": "PostCheckoutOrderDelivery",
+    "hash": "ce9ff3f381c6a33716aa9e0e8ad147415ad58077fed77c31e5ace020023ffab5"
+  },
+  {
+    "operation_name": "PostCheckoutOrderItemChangeRequest",
+    "hash": "73b1ad2cccd7256da85517fe37b10459453063ada9bb200b0d8016f9ab273e53"
+  },
+  {
+    "operation_name": "PostCheckoutOrderStatusLayout",
+    "hash": "ba2eec6575411403b5feb3aa834e9e8131527b1a58968a8f94d813f345ebd580"
+  },
+  {
+    "operation_name": "PostCheckoutRedeemPartnershipOffer",
+    "hash": "b03fa82f50b39a80f7044b9c5139f6ffa0b14cabbc617f7bf77992961809485f"
+  },
+  {
+    "operation_name": "PostCheckoutReferralDetails",
+    "hash": "f05f92186dbc0bb217e9eb80d11b78db2735eb706501f1658c4ca6b0f75194c6"
+  },
+  {
+    "operation_name": "PostCheckoutShareDelegationLink",
+    "hash": "675144c16c7c8387bd37c09ea1bc6d3e30c3a5918e51d4c896b700645c54669a"
+  },
+  {
+    "operation_name": "PostCheckoutSharedOrderDelivery",
+    "hash": "eb06421d5e109e40788a130148c82f7fe80f7bf970237fd29e23d50fea4067fd"
+  },
+  {
+    "operation_name": "PostCheckoutSharedOrderItemChangeRequest",
+    "hash": "07d69f2f1b958fc1b5bfb097fedc80424efd26132190aefcee297d8016420427"
+  },
+  {
+    "operation_name": "PostCheckoutShopperEnhancedProfile",
+    "hash": "07b15b0818d7345de2508578125497a58e8938884cf7a7e3a3fd56c292ebb601"
+  },
+  {
+    "operation_name": "PostCheckoutTrackingOrderDelivery",
+    "hash": "ba416f4f8becdfd79fea76ab902f69928a90494029946444dcbc87db10f9d397"
+  },
+  {
+    "operation_name": "PostCheckoutTrackingRescheduleLayout",
+    "hash": "0cbd1871a2cdd8ef4e9cd91eaedf39c85419f8f81241be838680e5066ff40044"
+  },
+  {
+    "operation_name": "PostCheckoutTrackingServiceOptions",
+    "hash": "bb639353730b99be8763a131a299c225b65036622dfdaed7415c9a66ee3948d6"
+  },
+  {
+    "operation_name": "PostCheckoutUpdateItemNotes",
+    "hash": "1df3f51b4073a52b4dd515ddf3a3ad55c6ad03164b454ed318fc5e11d066abba"
+  },
+  {
+    "operation_name": "PostCheckoutUpdatePickupParkingSpot",
+    "hash": "4e1d7362abef0d663287a7cb0a5b8774adac2803773f713f1ade648dec853b7a"
+  },
+  {
+    "operation_name": "PostCheckoutUpdatePickupStatus",
+    "hash": "dad3868cc5b980ec9fa7aaa065dc1e98088cc3edc8b92bc354d95004dd003a0f"
+  },
+  {
+    "operation_name": "PostCheckoutUserPushNotificationsEnabled",
+    "hash": "4212748b75a30aa0ee5fe41ced496b4254ab65a08fd0daa94512e4824173759e"
+  },
+  {
+    "operation_name": "PostCheckoutVehicleInfo",
+    "hash": "0b57a9c697233dfaaba267e935eb3f5f8f8a88e326ad7eae94b52a6ab955a7e6"
+  },
+  {
+    "operation_name": "Search",
+    "hash": "966d75e3dd85cbdf4f11b6eb8f3d167eab4cdcc67d2852048ed2e065f8f1d495"
+  },
+  {
+    "operation_name": "SearchArticles",
+    "hash": "f0553100911096f5b8208594f038f12e9325f9bfe95cede7c271f92b96d52734"
+  },
+  {
+    "operation_name": "SearchBusinessMemberClientAddresses",
+    "hash": "d1fd45aa1e5605409d4c01ff60e12428fdc954c6a24ca2f80e998c8556ec9217"
+  },
+  {
+    "operation_name": "SearchCollectionProductsBasedSearchResults",
+    "hash": "cc9894ed2408f104e75e40a4eefb8e8f6178f29e465257b5f48722313fad8297"
+  },
+  {
+    "operation_name": "SearchCrossRetailerGroupResults",
+    "hash": "0d677ff45abe538ba6854b38f73a7f6af3d10ccab62306826d72bf465b9323fc"
+  },
+  {
+    "operation_name": "SearchCrossRetailerGroupResultsDebug",
+    "hash": "d6d359024033c60c3ba7d4b034a2d8f3be627c62a71bc1d6e974f77255d594b3"
+  },
+  {
+    "operation_name": "SearchFacets",
+    "hash": "239be7211ba1456b45268b8207a8f3ca87bc28639fd87165b940053062f8f6ae"
+  },
+  {
+    "operation_name": "SearchResultsPlacements",
+    "hash": "fd2103793d8666d699914f81f9f09b0bbe5fdc45559c1a9d252a5a7788979fc6"
+  },
+  {
+    "operation_name": "SearchResultsView",
+    "hash": "455228c99365fcb944c689e4fd9be69c3dbe6c2343546acb3f5458988f88462f"
+  },
+  {
+    "operation_name": "SearchTaxonomyBasedRefinements",
+    "hash": "79fb8fd39dbf0b449e1608e0b8adfc5be0d29af159fdddccb2f171d1baccbe9c"
+  },
+  {
+    "operation_name": "SecondaryCartsConfig",
+    "hash": "7db26b3df72ab680ecca2c066a751140900814c69f9c410877d4d8cc0ddd67e9"
+  },
+  {
+    "operation_name": "Sections",
+    "hash": "ddbec6486efce17782e81bf480e93dc131a048a0bd660d5699a4b623f4baa14e"
+  },
+  {
+    "operation_name": "SlotCampaignPlacement",
+    "hash": "31fd5cec327387134c7d553d9c4afa849bccbddf1f254113a23c96101be34bc4"
+  },
+  {
+    "operation_name": "SlotPlacements",
+    "hash": "5a6404f817aa44d01b27f7cd6f0bf43df79845267503cc77f2337b9a6d3808b1"
+  },
+  {
+    "operation_name": "StoreAppConfigurationUjetKeys",
+    "hash": "402acee7fe75e7fd09a2aa14e03d1884cbb1662942b1a61a807a7a30c2f12517"
+  },
+  {
+    "operation_name": "StoreAppTrackingProperties",
+    "hash": "0d977572cba6d219fcb6f246f2bc05bf13bbf7b5cc592fda26db845eea75714c"
+  },
+  {
+    "operation_name": "StoreAppUserlessPlatformExperiments",
+    "hash": "83814d0f09a54e0d2242f32222f20956dd2515b70dfcd77b1d523e0aba08d5e6"
+  },
+  {
+    "operation_name": "StoreCardItemImageListViewLayout",
+    "hash": "8fbbed75ac19d491d3698e9ac5bb2eb60c1d3cd3fa8a1ba3d337a52ef919997f"
+  },
+  {
+    "operation_name": "StoreDirectory",
+    "hash": "75192b636fc876201e0052aa9b2cc8c04ae5819f6e2318c8dc6d60ae8a4acc10"
+  },
+  {
+    "operation_name": "StoreDirectoryFilters",
+    "hash": "3b1431669d8e2fb820a923b7637497ddb6614623c962773253b8937f5a6f4864"
+  },
+  {
+    "operation_name": "StoreEmbeddedAppLoginText",
+    "hash": "ab4e98c0c4b84d6c6b7bf8e0703baf813236bb3789167d4f3cac19acdf8d6ceb"
+  },
+  {
+    "operation_name": "StoreFulfillmentPrompt",
+    "hash": "b2f3ffc13e4dfd759cc9dd3d32e04dc9c176fde5bd56da67e4a7979ae93a7304"
+  },
+  {
+    "operation_name": "StoreFulfillmentPromptLayout",
+    "hash": "00dd0ec1f10b1f78cb7f49af71b7de69d9fb5ad5df20aaebe7042ab4825d73fc"
+  },
+  {
+    "operation_name": "StoreHeaderLayout",
+    "hash": "798aecacca30aea46c80410742de4e342ab02a232d6d1057844859ffad7dce1e"
+  },
+  {
+    "operation_name": "StoreHeaderNavigationStrings",
+    "hash": "836277e4eb751b949b2f0939b826670a63cbb4bd4ff813bae784b5cf5e248470"
+  },
+  {
+    "operation_name": "StoreHeaderServiceTypeChooserAlwaysShow",
+    "hash": "4f15059c0e466acad7d64a021d09f7672dab0d8105db9ea4ad3906bb29ebce0f"
+  },
+  {
+    "operation_name": "StoreInStoreHeaderCountVariant",
+    "hash": "8941c6bd375cbb03b189cd54c43415f7189ba52a712f903636faf88331ced6e4"
+  },
+  {
+    "operation_name": "StoreInfoModalContentQuery",
+    "hash": "d22b42d094a216695f0fb045c4eb3ad6eb6d4dac16e632b98276163f34546ebf"
+  },
+  {
+    "operation_name": "StoreInfoModalOperationHoursQuery",
+    "hash": "4a9b1b26276225c84b139572e0f24941da7e28e358a5f6e7956a0b46b79f4aca"
+  },
+  {
+    "operation_name": "StoreInfoModalReturnPolicyQuery",
+    "hash": "1bc1cd7afcca5dc649deff158b3acd32d33a4b600001c67a9cd2d8ce6cafb3e2"
+  },
+  {
+    "operation_name": "StoreMenuRetailerLayout",
+    "hash": "9c36a5d2716c56019d444e11b1c20fe15926621ebba0530559baeab5191e6bbb"
+  },
+  {
+    "operation_name": "StoreOperationInfo",
+    "hash": "f4a96c16ec9761095f8690c89e9657d7bc46b2dc4ddc58c6f0a54514e591d541"
+  },
+  {
+    "operation_name": "StoreSearchLayout",
+    "hash": "2823ee8d4c4cf39a7d577ad4a205a8c56524a1b4654d957ef5206d59c4806655"
+  },
+  {
+    "operation_name": "StoreSelectorRetailerServices",
+    "hash": "8d044e9dea5a12a83d0b283b3a768a00fc256cd731e8efdcba56e63210150ed3"
+  },
+  {
+    "operation_name": "StoreSelectorViewLayout",
+    "hash": "92728f71eef5f0052e24e19e475981bcba499dde77a2f575ab2432b691b65c4d"
+  },
+  {
+    "operation_name": "StoreShopLayoutComponentVariantV2",
+    "hash": "da32479be3edfff4dce6764d640d69864ad6a98d3b70643ae2819474b184324f"
+  },
+  {
+    "operation_name": "StorefrontAppDownloadBannerQuery",
+    "hash": "ed390cb769bc2260d472db2468e0255c8199aeedd7b3a2b3c6d850b3fddbfd65"
+  },
+  {
+    "operation_name": "StorefrontBanners",
+    "hash": "800d501fb53e1d0a0f8f25e63027fad2797b54090c174854960e677bcc6eb56d"
+  },
+  {
+    "operation_name": "StorefrontBasedOnYourPurchases",
+    "hash": "14a4b41db941b0b00d2367e587c540e9a2875d815b7e93e2939e13871cd82759"
+  },
+  {
+    "operation_name": "StorefrontBottomBannerQuery",
+    "hash": "c32743b0c2237f69c8821c78c55ed5557d4e10fde2a1bee53ebaabcd1eb819f2"
+  },
+  {
+    "operation_name": "StorefrontCarousel",
+    "hash": "c1ce275e57b0754d219867ac654f822267892ed5e1826c43945fbfc15a72e0a9"
+  },
+  {
+    "operation_name": "StorefrontCategoryHero",
+    "hash": "d127e98b3a8aca8aa674acae8e02e54e65dbdc4a33888ff9f17b54af269cca51"
+  },
+  {
+    "operation_name": "StorefrontCollectionFeaturedProducts",
+    "hash": "7437fe75242457a7d41798da4bf03d8cf1221f05f9cfb49effacd3e44ebc2e40"
+  },
+  {
+    "operation_name": "StorefrontDesktopSidebarLayouts",
+    "hash": "65aebe45e26ad40322ebe3406f7466a111db839155de3b9788440ef1cf604e78"
+  },
+  {
+    "operation_name": "StorefrontEmptyError",
+    "hash": "60357b721aa2ddab614621f4995731ac715d746eb860953205e8c98e09e06284"
+  },
+  {
+    "operation_name": "StorefrontEyebrowPlacementQuery",
+    "hash": "48ec80928244c726575b6b995535299939197a6f0ffec955568f43fd04823750"
+  },
+  {
+    "operation_name": "StorefrontEyebrowPromotion",
+    "hash": "b2a8fd9a5b1d1178bc8ab6fc5a86dc567c9647eb1f2be06c2413e44926d95e2b"
+  },
+  {
+    "operation_name": "StorefrontFeaturedProducts",
+    "hash": "4fa71ed15d6c09a1fd6a201a45f428dfec9bc8118d1c21aca90f47b80df9a6bd"
+  },
+  {
+    "operation_name": "StorefrontFirstCartAddAuthModal",
+    "hash": "9d86895aeeb4e2351d94fdad7853784fbf3d32540bc6f9d026935e9a9d2a0ffe"
+  },
+  {
+    "operation_name": "StorefrontLayoutsData",
+    "hash": "0ddf2a0b9fa1be1f9705600c500245838ff2166e56ecb24ecf161185cc4a5158"
+  },
+  {
+    "operation_name": "StorefrontMasonryFlyerItems",
+    "hash": "57af4e26fec3ab52960ea1599ccd80972c46801a7a0619e16739e40e9667c162"
+  },
+  {
+    "operation_name": "StorefrontMeta",
+    "hash": "a9f7f16f56e7d8082a09618fa156dbd3921cbd55dc753c23281f48e2dc84f269"
+  },
+  {
+    "operation_name": "StorefrontMobileWebHamburgerMenuLayouts",
+    "hash": "e9cfbd2075fe7eb8af5d5757e3f85f423ff8995022d267560bf3de1b1159bb15"
+  },
+  {
+    "operation_name": "StorefrontOfferTagShopTags",
+    "hash": "52a3fcf3ff12a9956362216619b2a518fbd2d24d42378d8e5d6f6b590bf74991"
+  },
+  {
+    "operation_name": "StorefrontOverHeaderPlacement",
+    "hash": "b8da37f79669329cf70f1f027a601d1672f61fb707c2ffe0bfe409857baccfb3"
+  },
+  {
+    "operation_name": "StorefrontPersonalizedCollectionFeaturedProducts",
+    "hash": "fd45904851cba398323257d2200e8df1e670d0cace82e62c24233217a7997804"
+  },
+  {
+    "operation_name": "StorefrontPlacements",
+    "hash": "8d8a918632025a1244a4bbcd5bc2dd9a44cb90a97b8d5784bae6c2b783b8be7f"
+  },
+  {
+    "operation_name": "StorefrontPlacementsLoaderVariants",
+    "hash": "38fbcd26191035714b54332febd3f63405f7e118296be1b5090299dd4fc9c65d"
+  },
+  {
+    "operation_name": "StorefrontPlacementsV2",
+    "hash": "63666b09246fa92f0a0a2d1d689f67bbdae858090bb74201370f5f21a90d9310"
+  },
+  {
+    "operation_name": "StorefrontPlacementsV2Enabled",
+    "hash": "d6813ddacdfe32d40a17c669c5fac9ce4806eb527e616f976ce806d20c267f65"
+  },
+  {
+    "operation_name": "StorefrontPostAtcQuery",
+    "hash": "8c240ec45afdab7bcb32bc1e684e5e17b14fadea73d8ad071676e8bfeb8e3b2d"
+  },
+  {
+    "operation_name": "StorefrontTitleCurrentStoreConfiguration",
+    "hash": "5ae334e6ccd24b56fa050f56cc39e44b5512e48605816e51b86d678de515b4db"
+  },
+  {
+    "operation_name": "StorefrontTitleRetailerName",
+    "hash": "f8f19dd798ee719cb8cea34cee184e1717e2056dc6e0453964630149fc69390d"
+  },
+  {
+    "operation_name": "StorefrontViewLayout",
+    "hash": "aa51d19ae335064861206bd9c7d660f7d49c7bfc7c2176d42a82d9b0e8b4b6f0"
+  },
+  {
+    "operation_name": "TreatmentCardHeader",
+    "hash": "2cb410562f2b6b1abbf447d17c7bf3a0ab1091abd7254f8ac2f09898be4f5fff"
+  },
+  {
+    "operation_name": "TreatmentCartMessages",
+    "hash": "3d6246a2f480a51d0b09966e7708213c6934b030bac3cbf2a302bba9d3c89c10"
+  },
+  {
+    "operation_name": "TreatmentSlimTrackerResponse",
+    "hash": "193b76d18117f36e47a14f3756a3a11c9f0f1d28de68a6bb443974ddac173c75"
+  },
+  {
+    "operation_name": "TreatmentTrackerPlacement",
+    "hash": "0276a82861134deba8c06fd86df2061bcd0f5de83dc2dca1d32dde1654a8e3df"
+  },
+  {
+    "operation_name": "TreatmentTrackerViewLayout",
+    "hash": "3324d1b95139d8ac5da15973bdcb4ca15cfdfd67991fa02a442f5ed0a78db7f1"
+  },
+  {
+    "operation_name": "UpdateAddress",
+    "hash": "607f0d1546f2cea870a5e5f8cd695f5d27b76e524b399a74928274afb790cade"
+  },
+  {
+    "operation_name": "UpdateAddressV2",
+    "hash": "2fca9a9ecfcd21a400672118b4b0022f1ef432307c235122ed25eab756c88361"
+  },
+  {
+    "operation_name": "UpdateBasketItemReplacementSelections",
+    "hash": "8b495ae7c0678c6c8a2d906094f2f91293eb86ad4165f64c80f231487de7d6dd"
+  },
+  {
+    "operation_name": "UpdateBusinessClientAddress",
+    "hash": "05bdb56321241b3b8856660d461acc6adcb50c144001739eee03e24995e15d28"
+  },
+  {
+    "operation_name": "UpdateBusinessDetails",
+    "hash": "a98d4625ba6c2d155f5ac84c99154de140cd9aa7e97b3511ee8b4d1ada731d4d"
+  },
+  {
+    "operation_name": "UpdateBusinessGroup",
+    "hash": "23eae0c12eb6e460cfb92918d3753cbdde55313ed3abf3a3085a8599629d6ce2"
+  },
+  {
+    "operation_name": "UpdateBusinessGroupOrderingRules",
+    "hash": "1ea1a9d19fed375c3b5b4e39f3da503bb2418559e298b2855b8fdc40f6531d26"
+  },
+  {
+    "operation_name": "UpdateBusinessMemberExpressSeatStatus",
+    "hash": "6b708c7afba745a22a09787b2cb6f43364692b507d589a685d4a4af38ad81055"
+  },
+  {
+    "operation_name": "UpdateBusinessMemberOrderingRules",
+    "hash": "e2eb9a9cbae7402e8ab2421e171741255eb8ef740e5c1489522cf085a9edb1ab"
+  },
+  {
+    "operation_name": "UpdateBusinessMemberRole",
+    "hash": "74ea94438ecc1da80fe1fd18c18b2c9ff1206a0fced55e24a55aee5517b1c6a8"
+  },
+  {
+    "operation_name": "UpdateBusinessOrganization",
+    "hash": "d120807a802d7c00143fb45d506ea56289e83cfb42bc1c8ac466cf10c860cf2a"
+  },
+  {
+    "operation_name": "UpdateBusinessProfileOffer",
+    "hash": "c70298fb4d7f95df78aced9928cc7b85af9e7f56217c2f56c9ccc09d5edd1761"
+  },
+  {
+    "operation_name": "UpdateBuyflowPaymentInstructionsV2",
+    "hash": "0b39b41f761825ab707d6a1c61796faa401c6e838510aa3e6a3ba6cdfe0946ba"
+  },
+  {
+    "operation_name": "UpdateBuyflowToggleSplitTenderInstrument",
+    "hash": "65d07b4793da03103ba707661b713d0464220802a9ac8e0f2dcccb08bbed8f24"
+  },
+  {
+    "operation_name": "UpdateCartItemsMutation",
+    "hash": "0227be0f5c58b9e1e5dbf883f0ac48236e72ef4f70c915110480269fc3047ba0"
+  },
+  {
+    "operation_name": "UpdateCheckout",
+    "hash": "ff98f32acdf8f1842064974699990562e867f38c35b0249d7ed190354a089213"
+  },
+  {
+    "operation_name": "UpdateCouponSelection",
+    "hash": "8e96f6bb782855969a625ca3c5d52fcbae55e87f5d827573c4b0fbd57111746e"
+  },
+  {
+    "operation_name": "UpdateExtendedCardDetailsMutation",
+    "hash": "76e120df501956760e833169b3036ee3ca7ada152d54ae550f5b8299a82bf4be"
+  },
+  {
+    "operation_name": "UpdateFamilySharing",
+    "hash": "d261c3a53ccd47300df1c5a4798d98c2495750a2d8abc6ec8b8f109986a29595"
+  },
+  {
+    "operation_name": "UpdateFeedbackHighlights",
+    "hash": "c962bb20473d5e9e3f276e822f37ad67d220319c3db9dfd4a53522a10108573c"
+  },
+  {
+    "operation_name": "UpdateHouseholdInviteAsShared",
+    "hash": "483702603fa9f3acab98259881026bd7eab3ab996c6bab4947858cc0c4f46d4f"
+  },
+  {
+    "operation_name": "UpdateHouseholdUserPermissions",
+    "hash": "7118ed91645b063f72cd75eb8334f07726c2936df68c22e2eafc5fb6d176bd88"
+  },
+  {
+    "operation_name": "UpdateListState",
+    "hash": "cc818f9ddba6c84263ccdf50d03a9918ba668792b7e83a6fe8987d715e388019"
+  },
+  {
+    "operation_name": "UpdateLoyaltyCardMutation",
+    "hash": "8828483124ac693a436d6d7588060367d19b1e0fa71e3b5bb8fe01a057f150ff"
+  },
+  {
+    "operation_name": "UpdateMealBasket",
+    "hash": "2b1f2537a019cb6a9f99341161aedcf4856f8fd98fd0927033340b083d023588"
+  },
+  {
+    "operation_name": "UpdateNetTermsAccountSettings",
+    "hash": "06a114f68f9b281af0ec5e35560cde3316af85415657e4776353c92a872d5904"
+  },
+  {
+    "operation_name": "UpdateNotes",
+    "hash": "92278deeb9ddf16e9d85a45ee07d8054c2a4d05a80556f6c575b6f413d16cc94"
+  },
+  {
+    "operation_name": "UpdateOrderGuide",
+    "hash": "f0ea03f067ad837e141bf649d717cbad4c369c56d08075672eceba33404832d4"
+  },
+  {
+    "operation_name": "UpdateOrderGuideBusinessMembers",
+    "hash": "d06c99aa234d7c1361ff16a41e037e8118442db9244330fe46ae8b7357d67dd0"
+  },
+  {
+    "operation_name": "UpdateOrderGuideGroups",
+    "hash": "95f33bbfc4e006e99204a7b93e6323649974d09285434c129ed00a94ed698e55"
+  },
+  {
+    "operation_name": "UpdateRetailerMarketingOptIns",
+    "hash": "e00f1df1dddf8c969d41dc9d5c0d9fe6ddbd7426aa3791a8dc34c5940351fade"
+  },
+  {
+    "operation_name": "UpdateSelectedItems",
+    "hash": "ab306133f8f6dd0cd8e65d66ee6b8c24ecf2fe3dc1fcfc80fcc4093710acbd1b"
+  },
+  {
+    "operation_name": "UpdateTaskCenterTaskStatus",
+    "hash": "27c9c5e38a7fe89f457b08caa16ab3691353da8397147b01ce8527ddf2c12197"
+  },
+  {
+    "operation_name": "UpdateUserAppealStatus",
+    "hash": "f1f44d29835d719a0584a36a92fdbe185ab4c1f5e566946a9cb83a11b85d7aff"
+  },
+  {
+    "operation_name": "UpdateUserDietaryPreference",
+    "hash": "cdf8ae221c04e8514e1ff4413b3d9773e87959550d3aea6b9335ecfcc93eb173"
+  },
+  {
+    "operation_name": "UpdateUserEbtSettings",
+    "hash": "ec64fb359db6f7b968a627107d87989eb4a560e3347caa8b92aad20af51751ce"
+  },
+  {
+    "operation_name": "UpdateUserEmailWithVerificationCode",
+    "hash": "f479e25404bfc5742cdd26d74e8669dd2c85f1faac67014cecec5430f7033c1b"
+  },
+  {
+    "operation_name": "UpdateUserEmailWithoutVerification",
+    "hash": "d6d8ebfdbbf091d0d40874409bc5f9adbac493cb6ac09c49c9659b880907e88a"
+  },
+  {
+    "operation_name": "UpdateUserItemAttributeModalShown",
+    "hash": "b5c4921137b6a342836b926138214234294513a392aa78566eaf1f88ece20e50"
+  },
+  {
+    "operation_name": "UpdateUserItemAttributePreference",
+    "hash": "b8f5e35e1edea00fdb112145932fd5fb43f54c103ec7746870c3c8ae0d8e1193"
+  },
+  {
+    "operation_name": "UpdateUserList",
+    "hash": "6623c9725c730e8fd59dee157b667adcabda2f89e14a0a88e49d63d2cac89cf3"
+  },
+  {
+    "operation_name": "UpdateUserLocation",
+    "hash": "81bb02547c0f4aafe480a766600e75210e9087516e9891e0105a5ce3a622d845"
+  },
+  {
+    "operation_name": "UpdateUserName",
+    "hash": "018bc232c79c0f51886dfcda8fd37f02614dc5bdbfc689345121ff61bfcb32bd"
+  },
+  {
+    "operation_name": "UpdateUserNotificationsSettings",
+    "hash": "e9f8f946bbd6347f0f8b03d91054fe59f4907b63f519df698a1b494959b64c51"
+  },
+  {
+    "operation_name": "UpdateUserOptOutStatus",
+    "hash": "ea95fa834a2a0720aaa1d5ad848a88a7a2c6b5d41e38ec38e6e503f72a1f33ce"
+  },
+  {
+    "operation_name": "UpdateUserPassword",
+    "hash": "e988f9aee5ed6327636e0b72d660ebe41e13ad17d380b082d1469abae5609621"
+  },
+  {
+    "operation_name": "UpdateUserPasswordWithResetPasswordToken",
+    "hash": "5ddd0a8137c8b3771de5d4185d7bb29b26c49d0f7f6644f93de6d3985d9af90e"
+  },
+  {
+    "operation_name": "UpdateUserPreferredStoreLocationCode",
+    "hash": "c0a9cf926f76ad8090411fcaba09887d5ad62a47b5b8c1b22852aebcbbdc7aff"
+  },
+  {
+    "operation_name": "UpdateVisitorOrGuestOptOutStatus",
+    "hash": "c2470dfb9ab22bfb2d1e55cd3fd32f3933b5587c798b23938a768c501b07e7b1"
+  },
+  {
+    "operation_name": "UserAddressCollection",
+    "hash": "a873e5a889372662322231d7968086d9980e32decaf86e6a8860b2b0bd19e1f0"
+  },
+  {
+    "operation_name": "UserAddressCollectionV2",
+    "hash": "33e0d1f2a96a470842ede0d1b2404d12f85853ea68f4f27e30bc6aa6afed7561"
+  },
+  {
+    "operation_name": "UserAddressManagerAccountAddressesViewLayout",
+    "hash": "469ca0501b6895630a46687ce4786a24aa6485331723b98b5793a386aff26974"
+  },
+  {
+    "operation_name": "UserAddressManagerModalViewLayout",
+    "hash": "153c96d053c8754dfebe6b2c3f5b68d6b1ca958c297237d207d653e35a1a2759"
+  },
+  {
+    "operation_name": "UserAddressManagerViewLayout",
+    "hash": "4f3b137d2e2fcab1e3b09384dc083ffa8192e2fb68e788f04e9fcdf974e11b11"
+  },
+  {
+    "operation_name": "UserAddressSections",
+    "hash": "5566d5a39aef4e42992d670d287ae74dfbffdc70170e9967067487fe24035754"
+  },
+  {
+    "operation_name": "UserAddresses",
+    "hash": "22e6dfa5cb0c9e731bfb696f34f573c1c2e31b8191e96c2b14329c33400a0ddc"
+  },
+  {
+    "operation_name": "UserAppliedOffers",
+    "hash": "3ad946a1912d1f71448f9994d8ab9102698922dd719715e733d32a666c10e7d1"
+  },
+  {
+    "operation_name": "UserBroadPreferencesSurvey",
+    "hash": "7aa66ef3a986fb249dd81e75d0fe4fd34810c6aa2f56fd1920a713627c228de6"
+  },
+  {
+    "operation_name": "UserCart",
+    "hash": "ca22d2fe8fcea2d665ce0eb6b95ba907d440368cdce6cb6de8e7ce5afb5e76be"
+  },
+  {
+    "operation_name": "UserCartEnriched",
+    "hash": "e4c8775681b10fe01e9a1afbb7d8a7bf9cde95a33c4564423522b73e703d6284"
+  },
+  {
+    "operation_name": "UserCartGrouped",
+    "hash": "bfbc84059272b7d3edbbd94020378af2d351608fd7163aeb847b5ba95e95dc52"
+  },
+  {
+    "operation_name": "UserCurrentCountry",
+    "hash": "6474498373291fce01b3f0cb6540842e47eff4b776ec6d2d1663b6cbe4451f67"
+  },
+  {
+    "operation_name": "UserEmailQuery",
+    "hash": "c734139801c4c4710320e8611d178baa4ae1356c6f38715f52e89d896e0dc95b"
+  },
+  {
+    "operation_name": "UserIsolationMigrationCaptureConsent",
+    "hash": "1e241b95436eab813ceed40129cfeed813a1309ccc95e2fc8ba9631a18fea0c1"
+  },
+  {
+    "operation_name": "UserIsolationMigrationConfiguration",
+    "hash": "36561c0515394f8fb0c336e0c0fa3ee4d01fabaffd80a4d8edbcc2977ffff594"
+  },
+  {
+    "operation_name": "UserIsolationMigrationInitiateSession",
+    "hash": "7635e63c513d41c9d1c454aa76ea2389aca8cedb9053b4f0866fb6f8238e3879"
+  },
+  {
+    "operation_name": "UserIsolationMigrationVerifyConfirmationCode",
+    "hash": "300d3c630c724d2baf8f4fe17e63aa6a73e55369198431745c21e8ed7fdd0c39"
+  },
+  {
+    "operation_name": "UserLocale",
+    "hash": "28c7631056230f79746ab100af90ecc1b057a80dea76ecde552ee883cfec2f99"
+  },
+  {
+    "operation_name": "UserOffer",
+    "hash": "36aa6cc34ff62e10c593eab1b21fe2928f86edce38a8c4e8eb528bbf091b7911"
+  },
+  {
+    "operation_name": "UserPreferences",
+    "hash": "7c1a26bf55e511d9380e1738752e286ac50a96b9ac24519aa7f2061d5b522437"
+  },
+  {
+    "operation_name": "UserPrivacyAuthPageMeta",
+    "hash": "0b1ebe4b51b823d36c194cb1d9c377bc1ffeab88e1d589d8f2ef4fe52dc1af8a"
+  },
+  {
+    "operation_name": "UserPrivacyForm",
+    "hash": "daf557cdecc946118e1a7468a6de45ccacff5c79d0b5606e1c967953f388b4ae"
+  },
+  {
+    "operation_name": "UserProductFavorites",
+    "hash": "cbb89e8b2d8abd95d3aa5be17edee2da45bb834fc88ea51b9a502e7a9cf83f33"
+  },
+  {
+    "operation_name": "UserRecipeRatingsById",
+    "hash": "5373ec11d283cc95801acfedf9416771bc337e3151a9c0f3c3dea36166b2e3e6"
+  },
+  {
+    "operation_name": "UserRetailerCartSimple",
+    "hash": "bb1a75c913165d2bb3ba2219ec85ea37e0d7ede6f515ffcfb8aa12950cbbd87a"
+  },
+  {
+    "operation_name": "UserRetailerCarts",
+    "hash": "ab349b4727ac675ac8c483d2575315acaf4289a3d98eb960e0c31d9b8537a546"
+  },
+  {
+    "operation_name": "UserSavings",
+    "hash": "2475f5de86639746511ce2154a5a7c491ee904bc2335fc41b97ecc7e1dbdf24a"
+  },
+  {
+    "operation_name": "UserSelectedConfiguredItemData",
+    "hash": "b5a0ec92621c3ec53369a78f49c091b708ac77a838a5db14924ac305e6225692"
+  },
+  {
+    "operation_name": "UserType",
+    "hash": "a0cc2fe5df96022732ae588f44b0c673588a758c4c7dcc5b2d5fd5ae2c03b76b"
+  },
+  {
+    "operation_name": "UsersImplicitGuestUserResponse",
+    "hash": "f03946b2b145240beb6029a3e2ecb697e32b445503432d355a12145e0f481634"
+  },
+  {
+    "operation_name": "UsersPhoneNumber",
+    "hash": "a5c45b39a642dd47149ad49cf06259136762352ac7498e8adb19b236e8f99e0d"
+  },
+  {
+    "operation_name": "UsersPhoneNumberStatus",
+    "hash": "4da93c56265b50a036d92ae170a343f57b940326668f4b357f824689c4003933"
+  },
+  {
+    "operation_name": "UsersSendVerificationCode",
+    "hash": "0ad2f39ecd42c9595da3f5fb2d87a0598d27f2a435f4aa8ef8c3eb28796b281d"
+  },
+  {
+    "operation_name": "UsersSupportedCountryCodes",
+    "hash": "b2e472a2a44a06c11470367e636a99c5f526e250ac05dc9a2872f4ec4871d8a0"
+  },
+  {
+    "operation_name": "UsersUpdatePhoneNumber",
+    "hash": "554b6814bc57c325eaef1537e9815a5252f1a57885c0338ea7c95102392f6868"
+  },
+  {
+    "operation_name": "ViewLayout",
+    "hash": "b5ef80ff412b1d35729b2753b98738aa8f2fe9f020193abfc878122fdb5f87fd"
+  },
+  {
+    "operation_name": "ViewLayoutGetCMSFV",
+    "hash": "45d36fdbb8ac03877d8f16be1177aa3aa5aa04f69973e1ab9b08fb4578c70b89"
+  },
+  {
+    "operation_name": "ViewLayoutGlobalHomeHeader",
+    "hash": "702fabfe84d2cc559abe2914b940e43f540c1a9e20b0f0c4bd401200f3477d26"
+  },
+  {
+    "operation_name": "ViewLayoutGlobalHomeRetailersAllStoresStringQuery",
+    "hash": "364cb0ce03a449948eb3b74cc81004cbadb87ec461f03b8d65601889a4b38c2c"
+  },
+  {
+    "operation_name": "ViewLayoutHomeOrders",
+    "hash": "b9f1768bacab791fa27e98df9c255ffd2c876a65793ea526056e1de28acc1428"
+  },
+  {
+    "operation_name": "ViewLayoutInstoreChooser",
+    "hash": "ea71e2f250867cf7d57cc7db4d6d69a7818e9881e27fa5af5b9d85a13de0d410"
+  },
+  {
+    "operation_name": "ViewLayoutPickupChooser",
+    "hash": "c2e3938aca82eadcc3921d1f5e3b5797acf674c25fe8dfe3e75d529182b41098"
+  },
+  {
+    "operation_name": "ViewLayoutRetailerLocationChooser",
+    "hash": "e591165998e30d56e979707e095164fd0d391867f76aff7fe0dc9b4b71be43f6"
+  },
+  {
+    "operation_name": "ViewLayoutSearchResults",
+    "hash": "bb6731b3324ad62be0bd9b31386c38e02b8bda9b12ae56d7960a12512c0e07f1"
+  },
+  {
+    "operation_name": "ViewTypeVariantAdsBasedOnYourPurchases",
+    "hash": "016f1159a026870d5009afc296b0ec268fe9ded6f0493e74692b9b5107825d00"
+  },
+  {
+    "operation_name": "ViewTypeVariantAdsImpulse",
+    "hash": "cabe1264fcf9878ea3c7bd4157048b05b2fbecd2cc67bfe59b35d8e1e3f48ae7"
+  },
+  {
+    "operation_name": "ViewTypeVariantCheckoutRecommendations",
+    "hash": "b08cee88eaeb7e6b3015a012d7b1333af0125d0a582084717fea7b5b066f59e0"
+  },
+  {
+    "operation_name": "ViewTypeVariantDynamicCategories",
+    "hash": "087ebea6a42ac9759cfa3affdf33fec05b7906680ac458f9f54bde54c6421d32"
+  },
+  {
+    "operation_name": "ViewTypeVariantDynamicCategoriesProductCategoryItems",
+    "hash": "e65f61edcc68db31aefc640437356564435e2eb1f11e42b77f8561e4d113e2d1"
+  },
+  {
+    "operation_name": "ViewTypeVariantUnfulfilledIntents",
+    "hash": "ce66694684604942cca46139b93e9f1e61a784b0f747116abfe2f1767ca29dda"
+  },
+  {
+    "operation_name": "createVgsCardInstrument",
+    "hash": "9e97e6b1dd9dfd49e502231dae643c922d8c6137d2b0517dd48c0172f639a9cb"
+  },
+  {
+    "operation_name": "updateCartShoppingModePreferenceMutation",
+    "hash": "a98dea9f142292b05f2229796c539575d72d6b01c2601ae22eadc7abb13d5335"
+  },
+  {
+    "operation_name": "updateUserPreferences",
+    "hash": "cf26a70bbbb43ffa5af65a0fea54c2ab43984096ee02fb3838936bb9a734c61c"
+  }
+]
