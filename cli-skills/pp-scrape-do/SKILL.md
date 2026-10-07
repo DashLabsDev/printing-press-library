@@ -32,7 +32,7 @@ This skill drives the `scrape-do-pp-cli` binary. **You must verify the CLI is in
    npx -y @mvanhorn/printing-press-library install scrape-do --cli-only
    ```
 2. Verify: `scrape-do-pp-cli --version`
-3. Ensure `$GOPATH/bin` (or `$HOME/go/bin`) is on `$PATH`.
+3. Ensure the directory the npx installer placed the binary in is on `$PATH`. On Windows this is `%LOCALAPPDATA%\Programs\PrintingPress\bin`; on macOS/Linux it is typically `$HOME/.local/bin` or a platform-specific location printed by the installer. If you used the Go fallback instead, add `$GOPATH/bin` (or `$HOME/go/bin`).
 
 If the `npx` install fails (no Node, offline, etc.), fall back to a direct Go install (requires Go 1.26.6 or newer):
 

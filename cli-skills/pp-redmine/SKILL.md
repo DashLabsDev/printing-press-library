@@ -382,7 +382,7 @@ Open/closed counts, average done_ratio, and hours variance for the version in on
 
 ## Auth Setup
 
-Redmine is self-hosted, so two things are required instead of just a key: REDMINE_URL (your instance's base URL) and REDMINE_API_KEY (from your account's My Account page, or Administration > Settings > API for admins). Both are sent as-is — REDMINE_API_KEY becomes the X-Redmine-API-Key header on every request.
+Redmine is self-hosted, so two things are required instead of just a key: REDMINE_BASE_URL (your instance's base URL) and REDMINE_API_KEY (from your account's My Account page, or Administration > Settings > API for admins). Both are sent as-is — REDMINE_API_KEY becomes the X-Redmine-API-Key header on every request.
 
 Run `redmine-pp-cli doctor` to verify setup.
 
