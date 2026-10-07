@@ -123,12 +123,12 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 
 ## Authentication
 
-Redmine is self-hosted, so two things are required instead of just a key: REDMINE_URL (your instance's base URL) and REDMINE_API_KEY (from your account's My Account page, or Administration > Settings > API for admins). Both are sent as-is — REDMINE_API_KEY becomes the X-Redmine-API-Key header on every request.
+Redmine is self-hosted, so two things are required instead of just a key: REDMINE_BASE_URL (your instance's base URL) and REDMINE_API_KEY (from your account's My Account page, or Administration > Settings > API for admins). Both are sent as-is — REDMINE_API_KEY becomes the X-Redmine-API-Key header on every request.
 
 ## Quick Start
 
 ```bash
-# Verify REDMINE_URL and REDMINE_API_KEY are set and the instance is reachable, without making a real call.
+# Verify REDMINE_BASE_URL and REDMINE_API_KEY are set and the instance is reachable, without making a real call.
 redmine-pp-cli doctor --dry-run
 
 # Pull a full local mirror so search, digest, and every transcendence command have data to work with. The status_id=* override is required to include closed issues — Redmine's default issue list only returns open ones.
@@ -659,7 +659,7 @@ If you use agentcookie to sync secrets across machines, this CLI auto-adopts age
 - Run the `list` command to see available items
 
 ### API-specific
-- **doctor reports 'connection refused' or a timeout** — Confirm REDMINE_URL points at a reachable instance (e.g. http://redmine:3000 inside this devcontainer, http://localhost:3001 from the host browser) and that the Redmine container is healthy.
+- **doctor reports 'connection refused' or a timeout** — Confirm REDMINE_BASE_URL points at a reachable instance (e.g. http://redmine:3000 inside this devcontainer, http://localhost:3001 from the host browser) and that the Redmine container is healthy.
 - **401 Unauthorized on every command** — Confirm REDMINE_API_KEY is set and REST API access is enabled on the instance (Administration > Settings > API > 'Enable REST web service').
 - **issues-json create-issue fails with 'tracker_id is invalid' or similar** — Run redmine-pp-cli trackers-json (or issue-statuses-json / enumerations get-issue-priorities) to get valid IDs for this instance — trackers, statuses, and priorities are configured per-instance and IDs are not portable across Redmine installs.
 - **roadmap burndown, issues cycle-time, or workload undercounts closed issues** — The default 'sync' only pulls open issues (Redmine's own API default). Re-sync with '--resource-param issues-json:status_id=*' to include closed issues in the local mirror before running these commands.

@@ -11,7 +11,7 @@ info:
   version: 6.1.3-r1
 servers:
   - url: http://redmine:3000
-    description: Default dev Redmine instance (override via REDMINE_URL / --base-url for other instances)
+    description: Default dev Redmine instance (override via REDMINE_BASE_URL for other instances)
 security:
   - Basic: []
   - ApiKey: []
