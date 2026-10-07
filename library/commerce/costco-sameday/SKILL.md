@@ -1,7 +1,7 @@
 ---
 name: pp-costco-sameday
 description: "Printing Press CLI for Costco Sameday. Costco Same-Day (sameday.costco.com) GraphQL CLI. Cookie auth after Costco Azure B2C SSO."
-author: "dashlabsdev"
+author: "Dash Labs"
 license: "Apache-2.0"
 argument-hint: "<command> [args] | install cli|mcp"
 allowed-tools: "Read Bash"
@@ -42,16 +42,6 @@ Costco Same-Day (sameday.costco.com) GraphQL CLI. Cookie auth after Costco Azure
 ## HTTP Transport
 
 This CLI uses standard HTTP transport with HTTP/2 disabled for browser-facing endpoints. It does not require a resident browser process for normal API calls.
-
-## Discovery Signals
-
-This CLI was generated with browser-observed traffic context.
-- Capture coverage: 197 API entries from 559 total network entries
-- Protocols: graphql (92% confidence), graphql_persisted_query (90% confidence), rpc_envelope (80% confidence), rest_json (75% confidence), html_scrape (55% confidence)
-- Auth signals: cookie — cookies: __Host-instacart_sid, _instacart_session_id, X-IC-bcx, ahoy_visitor, ahoy_visit, build_sha
-- Generation hints: graphql_persisted_query, has_rpc_envelope, requires_protected_client, weak_schema_confidence, requires_browser_auth
-- Candidate command ideas: create_graphql — Derived from observed POST /graphql traffic.; create_logger — Derived from observed POST /xoplatform/logger/api/logger traffic.; create_prop.json — Derived from observed POST /prop.json traffic.; create_wpt.json — Derived from observed POST /e44177b6b805/{e44177b6b805_id}/wpt.json traffic.; list_.deploy_status_henson.json — Derived from observed GET /v3/.deploy_status_henson.json traffic.; list_graphql — Derived from observed GET /graphql traffic.; options_graphql — Derived from observed OPTIONS /graphql traffic.
-- Caveats: empty_payload: API-looking request returned an empty or null payload; schema confidence is weak.; empty_payload: API-looking request returned an empty or null payload; schema confidence is weak.; empty_payload: API-looking request returned an empty or null payload; schema confidence is weak.; empty_payload: API-looking request returned an empty or null payload; schema confidence is weak.; empty_payload: API-looking request returned an empty or null payload; schema confidence is weak.; empty_payload: API-looking request returned an empty or null payload; schema confidence is weak.; empty_payload: API-looking request returned an empty or null payload; schema confidence is weak.; empty_payload: API-looking request returned an empty or null payload; schema confidence is weak.; empty_payload: API-looking request returned an empty or null payload; schema confidence is weak.; empty_payload: API-looking request returned an empty or null payload; schema confidence is weak.
 
 ## Command Reference
 
@@ -149,7 +139,7 @@ When you know what you want to do but not which command does it, ask the CLI dir
 costco-sameday-pp-cli which "<capability in your own words>"
 ```
 
-`which` resolves a natural-language capability query to the best matching command from this CLI's curated feature index. Exit code `0` means at least one match; exit code `2` means no confident match — fall back to `--help` or use a narrower query.
+`which` resolves a natural-language capability query to the best matching command from this CLI's curated feature index. Exit code `0` means at least one match; exit code `2` means no confident match — fall back to `--help` or use a narrower query. `--json` (and other machine formats) keep that exit-2 contract and write `{"matches":[]}` on stdout so agents can inspect the envelope without treating a miss as success.
 
 ## Auth Setup
 
@@ -172,6 +162,13 @@ Run `costco-sameday-pp-cli doctor` to verify setup.
 ## Agent Mode
 
 Add `--agent` to any command. Expands to: `--json --compact --no-input --no-color`.
+
+Global format flags share one contract on promoted, novel, sync, and `--deliver` paths:
+
+- `--json` — one JSON document on stdout (sync progress events go to stderr)
+- `--compact` — keep identity/status/timestamp fields; does not change the document vs stream shape
+- `--csv` / `--plain` — tabular rows (collection envelopes unwrap to the row array)
+- `--quiet` — one identity value per row, no envelope
 
 - **Pipeable** — JSON on stdout, errors on stderr
 - **Filterable** — `--select` keeps a subset of fields. Dotted paths descend into nested structures; arrays traverse element-wise. Critical for keeping context small on verbose APIs:
@@ -334,7 +331,7 @@ Graceful degradation: if `learnings confirm` is an unknown command, you are driv
 - `similar_shape_different_entity:<canonical>` (top-level): a structurally matching row exists but its canonical entity differs from the live query's. Treated as cold start; the warning carries the conflicting canonical as a hint, but the row is NOT promoted into Results.
 - `ambiguous_alias` (top-level): a single query entity resolved to multiple canonicals (e.g., "Cards" → Arizona Cardinals + St. Louis Cardinals). Surface the ambiguity from context before committing to a resource.
 - `candidates_present` (top-level): the envelope carries a `candidates` section. Handle it via the candidates branch in Step 2 before anything else.
-- `lookup_refresh_available` (top-level): an entity in the query has no lookup row yet, but synced data could provide one. Run `costco-sameday-pp-cli sync` to refresh entity lookups.
+- `lookup_refresh_available` (top-level): an entity in the query has no lookup row yet, but synced data could provide one. Run `costco-sameday-pp-cli sync --resources account,cart,checkout,orders,products,retailer,session,slots` to refresh entity lookups.
 - Top-level `no_learnings_for_query_family`: the table had no rows above the Jaccard floor. Pure cold start.
 
 ### Step 4: `teach &` after finalizing your response - always
@@ -438,8 +435,8 @@ Every command accepts `--deliver <sink>`. The output goes to the named sink in a
 | Sink | Effect |
 |------|--------|
 | `stdout` | Default; write to stdout only |
-| `file:<path>` | Atomically write output to `<path>` (tmp + rename) |
-| `webhook:<url>` | POST the output body to the URL (`application/json` or `application/x-ndjson` when `--compact`) |
+| `file:<path>` | Atomically write output to `<path>` (tmp + rename). Binary-response commands write decoded payload bytes (not the base64 JSON envelope) and print a small JSON receipt on stdout; `--json`/`--csv` do not refuse when this sink is set. |
+| `webhook:<url>` | POST the output body to the URL (`application/json`) |
 
 Unknown schemes are refused with a structured error naming the supported set. Webhook failures return non-zero and log the URL + HTTP status on stderr.
 

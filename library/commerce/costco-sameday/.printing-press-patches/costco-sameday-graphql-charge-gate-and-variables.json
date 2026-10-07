@@ -1,0 +1,26 @@
+{
+  "schema_version": 2,
+  "id": "costco-sameday-graphql-charge-gate-and-variables",
+  "applied_at": "2026-10-07",
+  "base_run_id": "20261007-135457",
+  "base_printing_press_version": "4.31.7",
+  "summary": "Client-level FinalizeCheckout consent gate, declared-operation lock, and GraphQL variables fold from flags; updatecheckout and other stdin mutations locked to declared ops.",
+  "reason": "Greptile P1: checkout updatecheckout --operation-name FinalizeCheckout --stdin bypassed dual gate; flag values never reached GraphQL variables.",
+  "files": [
+    "internal/client/graphql_guard.go",
+    "internal/client/graphql_guard_test.go",
+    "internal/client/client.go",
+    "internal/cli/checkout_updatecheckout.go",
+    "internal/cli/checkout_updatebuyflowpaymentinstructionsv2.go",
+    "internal/cli/checkout_initializecheckout.go",
+    "internal/cli/cart_updatecartitemsmutation.go"
+  ],
+  "markers": [
+    "WithFinalizeCheckoutConsent",
+    "foldGraphQLVariables",
+    "enforceGraphQLOperationSafety",
+    "declaredOp",
+    "refusing FinalizeCheckout without charge consent"
+  ],
+  "validated_outcome": "go test ./internal/client/ -run \"TestFold|TestEnforce|TestGraphQL\"; updatecheckout --operation-name FinalizeCheckout refuses."
+}

@@ -4,7 +4,7 @@ Costco Same-Day (sameday.costco.com) GraphQL CLI. Cookie auth after Costco Azure
 
 Learn more at [Costco Sameday](https://sameday.costco.com).
 
-Created by [@DashLabsDev](https://github.com/DashLabsDev).
+Created by [@DashLabsDev](https://github.com/DashLabsDev) (Dash Labs).
 
 ## Install
 
@@ -397,30 +397,6 @@ Static request headers can be configured under `headers`; per-command header ove
 ## HTTP Transport
 
 This CLI uses standard HTTP transport with HTTP/2 disabled for browser-facing endpoints. It does not require a resident browser process for normal API calls.
-
-## Discovery Signals
-
-This CLI was generated with browser-captured traffic analysis.
-- Target observed: https://transcend-cdn.com/cm/448b3320-9d7c-499a-bc56-f0dae33c8f5c/cm.css
-- Capture coverage: 197 API entries from 559 total network entries
-- Reachability: browser_http (75% confidence)
-- Protocols: graphql (92% confidence), graphql_persisted_query (90% confidence), rpc_envelope (80% confidence), rest_json (75% confidence), html_scrape (55% confidence)
-- Auth signals: cookie — cookies: __Host-instacart_sid, _instacart_session_id, X-IC-bcx, ahoy_visitor, ahoy_visit, build_sha
-- Protection signals: cloudflare (90% confidence), captcha (85% confidence), datadome (85% confidence), perimeterx (80% confidence)
-- Generation hints: graphql_persisted_query, has_rpc_envelope, requires_protected_client, weak_schema_confidence, requires_browser_auth
-- Candidate command ideas: create_graphql — Derived from observed POST /graphql traffic.; create_logger — Derived from observed POST /xoplatform/logger/api/logger traffic.; create_prop.json — Derived from observed POST /prop.json traffic.; create_wpt.json — Derived from observed POST /e44177b6b805/{e44177b6b805_id}/wpt.json traffic.; list_.deploy_status_henson.json — Derived from observed GET /v3/.deploy_status_henson.json traffic.; list_graphql — Derived from observed GET /graphql traffic.; options_graphql — Derived from observed OPTIONS /graphql traffic.
-
-Warnings from discovery:
-- empty_payload: API-looking request returned an empty or null payload; schema confidence is weak.
-- empty_payload: API-looking request returned an empty or null payload; schema confidence is weak.
-- empty_payload: API-looking request returned an empty or null payload; schema confidence is weak.
-- empty_payload: API-looking request returned an empty or null payload; schema confidence is weak.
-- empty_payload: API-looking request returned an empty or null payload; schema confidence is weak.
-- empty_payload: API-looking request returned an empty or null payload; schema confidence is weak.
-- empty_payload: API-looking request returned an empty or null payload; schema confidence is weak.
-- empty_payload: API-looking request returned an empty or null payload; schema confidence is weak.
-- empty_payload: API-looking request returned an empty or null payload; schema confidence is weak.
-- empty_payload: API-looking request returned an empty or null payload; schema confidence is weak.
 
 ---
 

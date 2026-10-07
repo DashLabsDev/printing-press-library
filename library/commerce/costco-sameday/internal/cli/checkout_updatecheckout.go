@@ -9,6 +9,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/mvanhorn/printing-press-library/library/commerce/costco-sameday/internal/client"
 	"github.com/spf13/cobra"
 )
 
@@ -25,17 +26,16 @@ func newCheckoutUpdatecheckoutCmd(flags *rootFlags) *cobra.Command {
 		Example:     "  costco-sameday-pp-cli checkout updatecheckout --operation-name UpdateCheckout",
 		Annotations: map[string]string{"pp:endpoint": "checkout.updatecheckout", "pp:method": "POST", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !stdinBody {
+			const declaredOp = "UpdateCheckout"
+			if cmd.Flags().Changed("operation-name") && flagOperationName != "" && flagOperationName != declaredOp {
+				return fmt.Errorf("refusing operation %q: checkout updatecheckout is locked to %s (use order place for FinalizeCheckout)", flagOperationName, declaredOp)
 			}
 			path := "/graphql"
 			c, err := flags.newClient()
 			if err != nil {
 				return err
 			}
-			params := map[string]string{}
-			if cmd.Flags().Changed("operation-name") || flagOperationName != "" {
-				params["operationName"] = formatCLIParamValue(flagOperationName)
-			}
+			params := map[string]string{"operationName": declaredOp}
 			if cmd.Flags().Changed("checkout-session-id") || flagCheckoutSessionId != "" {
 				params["checkoutSessionId"] = formatCLIParamValue(flagCheckoutSessionId)
 			}
@@ -55,12 +55,17 @@ func newCheckoutUpdatecheckoutCmd(flags *rootFlags) *cobra.Command {
 				if err := json.Unmarshal(stdinData, &jsonBody); err != nil {
 					return fmt.Errorf("parsing stdin JSON: %w", err)
 				}
+				if op, _ := jsonBody["operationName"].(string); op != "" && op != declaredOp {
+					return fmt.Errorf("refusing stdin operation %q: checkout updatecheckout is locked to %s (use order place for FinalizeCheckout)", op, declaredOp)
+				}
+				jsonBody["operationName"] = declaredOp
 				body = jsonBody
 			} else {
-				bodyMap := map[string]any{}
+				bodyMap := map[string]any{"operationName": declaredOp}
 				body = bodyMap
 			}
-			data, statusCode, err := c.PostWithParams(cmd.Context(), path, params, body)
+			ctx := client.WithDeclaredGraphQLOperation(cmd.Context(), declaredOp)
+			data, statusCode, err := c.PostWithParams(ctx, path, params, body)
 			if err != nil {
 				return classifyAPIError(cmd.OutOrStdout(), err, flags)
 			}

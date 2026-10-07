@@ -9,6 +9,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/mvanhorn/printing-press-library/library/commerce/costco-sameday/internal/client"
 	"github.com/spf13/cobra"
 )
 
@@ -28,6 +29,10 @@ func newCheckoutInitializecheckoutCmd(flags *rootFlags) *cobra.Command {
 		Example:     "  costco-sameday-pp-cli checkout initializecheckout --operation-name InitializeCheckout",
 		Annotations: map[string]string{"pp:endpoint": "checkout.initializecheckout", "pp:method": "POST", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			const declaredOp = "InitializeCheckout"
+			if cmd.Flags().Changed("operation-name") && flagOperationName != "" && flagOperationName != declaredOp {
+				return fmt.Errorf("refusing operation %q: this command is locked to %s", flagOperationName, declaredOp)
+			}
 			if !stdinBody {
 			}
 			path := "/graphql"
@@ -36,9 +41,7 @@ func newCheckoutInitializecheckoutCmd(flags *rootFlags) *cobra.Command {
 				return err
 			}
 			params := map[string]string{}
-			if cmd.Flags().Changed("operation-name") || flagOperationName != "" {
-				params["operationName"] = formatCLIParamValue(flagOperationName)
-			}
+			params["operationName"] = declaredOp
 			if cmd.Flags().Changed("cart-id") || flagCartId != "" {
 				params["cartId"] = formatCLIParamValue(flagCartId)
 			}
@@ -67,12 +70,16 @@ func newCheckoutInitializecheckoutCmd(flags *rootFlags) *cobra.Command {
 				if err := json.Unmarshal(stdinData, &jsonBody); err != nil {
 					return fmt.Errorf("parsing stdin JSON: %w", err)
 				}
+				if op, _ := jsonBody["operationName"].(string); op != "" && op != declaredOp {
+					return fmt.Errorf("refusing stdin operation %q: this command is locked to %s", op, declaredOp)
+				}
+				jsonBody["operationName"] = declaredOp
 				body = jsonBody
 			} else {
 				bodyMap := map[string]any{}
 				body = bodyMap
 			}
-			data, statusCode, err := c.PostWithParams(cmd.Context(), path, params, body)
+			data, statusCode, err := c.PostWithParams(client.WithDeclaredGraphQLOperation(cmd.Context(), declaredOp), path, params, body)
 			if err != nil {
 				return classifyAPIError(cmd.OutOrStdout(), err, flags)
 			}

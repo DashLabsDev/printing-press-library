@@ -1,10 +1,10 @@
 {
   "schema_version": 2,
   "id": "costco-sameday-dual-gate-order-narrative",
-  "applied_at": "2026-10-06",
-  "base_run_id": "20261007-005213",
-  "base_printing_press_version": "4.31.2",
-  "summary": "Narrative order preview/tip/place (dual-gate FinalizeCheckout) and REST cancel PUT /api/v2/orders/{orderId}/cancel gated with --yes; cancel-options via CustomerCancelSelections; VGS not exposed.",
+  "applied_at": "2026-10-07",
+  "base_run_id": "20261007-135457",
+  "base_printing_press_version": "4.31.7",
+  "summary": "Narrative order preview/tip/place (dual-gate FinalizeCheckout) and REST cancel; charged/canceled honesty; mcp:read-only on preview/cancel-options.",
   "reason": "Paid-test sniff found FinalizeCheckout; cancel sniff found REST PUT cancel (not GraphQL). Raw generation would expose ungated charge/cancel surfaces.",
   "files": [
     "internal/cli/order_narrative.go",
@@ -15,7 +15,10 @@
     "confirm-charge",
     "FinalizeCheckout",
     "/api/v2/orders/",
-    "refusing to cancel"
+    "refusing to cancel",
+    "WithFinalizeCheckoutConsent",
+    "GraphQLResponseSucceeded",
+    "mcp:read-only"
   ],
-  "validated_outcome": "go test ./internal/cli/ -run TestOrder; order place without flags exits non-zero; place --yes --confirm-charge --dry-run charged false; cancel without --yes refuses; cancel --dry-run canceled false."
+  "validated_outcome": "go test ./internal/cli/ -run TestOrder; go test ./internal/client/ -run TestGraphQL; place without flags refuses; charged false on errors/verify."
 }

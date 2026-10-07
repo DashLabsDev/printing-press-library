@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/mvanhorn/printing-press-library/library/commerce/costco-sameday/internal/client"
 	"github.com/spf13/cobra"
 )
 
@@ -65,8 +66,9 @@ func newOrderPreviewCmd(flags *rootFlags) *cobra.Command {
 		Example: `  costco-sameday-pp-cli order preview --checkout-session-id <id>
   costco-sameday-pp-cli order preview --checkout-session-id <id> --json`,
 		Annotations: map[string]string{
-			"pp:narrative": "order.preview",
-			"pp:charge":    "false",
+			"pp:narrative":  "order.preview",
+			"pp:charge":     "false",
+			"mcp:read-only": "true",
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if checkoutSessionID == "" {
@@ -173,7 +175,8 @@ Requires --yes for a live mutation. --dry-run never sends the mutation.`,
 				return err
 			}
 			params := map[string]string{"operationName": "UpdateCheckout"}
-			data, status, err := c.PostWithParams(cmd.Context(), "/graphql", params, body)
+			ctx := client.WithDeclaredGraphQLOperation(cmd.Context(), "UpdateCheckout")
+			data, status, err := c.PostWithParams(ctx, "/graphql", params, body)
 			if err != nil {
 				return classifyAPIError(cmd.OutOrStdout(), err, flags)
 			}
@@ -215,10 +218,10 @@ Card PANs/CVV are never accepted here; payment must already be attached on the c
 		Example: `  costco-sameday-pp-cli order place --checkout-session-id <id> --dry-run
   costco-sameday-pp-cli order place --checkout-session-id <id> --yes --confirm-charge`,
 		Annotations: map[string]string{
-			"pp:narrative":       "order.place",
-			"pp:charge":          "true",
-			"pp:confirm-charge":  "required",
-			"pp:mutation":        "FinalizeCheckout",
+			"pp:narrative":      "order.place",
+			"pp:charge":         "true",
+			"pp:confirm-charge": "required",
+			"pp:mutation":       "FinalizeCheckout",
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if checkoutSessionID == "" {
@@ -263,7 +266,7 @@ Card PANs/CVV are never accepted here; payment must already be attached on the c
 			variables := map[string]any{
 				"checkoutSessionId": checkoutSessionID,
 				"paymentsClientInfo": map[string]any{
-					"applePayEligible": false,
+					"applePayEligible":  false,
 					"googlePayEligible": false,
 					"venmoAddable":      false,
 				},
@@ -290,18 +293,25 @@ Card PANs/CVV are never accepted here; payment must already be attached on the c
 				return err
 			}
 			params := map[string]string{"operationName": "FinalizeCheckout"}
-			data, status, err := c.PostWithParams(cmd.Context(), "/graphql", params, body)
+			ctx := client.WithFinalizeCheckoutConsent(cmd.Context())
+			ctx = client.WithDeclaredGraphQLOperation(ctx, "FinalizeCheckout")
+			data, status, err := c.PostWithParams(ctx, "/graphql", params, body)
 			if err != nil {
 				return classifyAPIError(cmd.OutOrStdout(), err, flags)
 			}
-			return printNarrativeJSON(cmd, flags, map[string]any{
+			charged := client.GraphQLResponseSucceeded(status, data)
+			out := map[string]any{
 				"would_charge": true,
 				"dry_run":      false,
-				"charged":      status >= 200 && status < 300,
+				"charged":      charged,
 				"http_status":  status,
 				"operation":    "FinalizeCheckout",
 				"response":     json.RawMessage(data),
-			})
+			}
+			if !charged {
+				out["success"] = false
+			}
+			return printNarrativeJSON(cmd, flags, out)
 		},
 	}
 	cmd.Flags().StringVar(&checkoutSessionID, "checkout-session-id", "", "Checkout session id from InitializeCheckout")
@@ -314,13 +324,14 @@ Card PANs/CVV are never accepted here; payment must already be attached on the c
 func newOrderCancelOptionsCmd(flags *rootFlags) *cobra.Command {
 	var orderDeliveryID, orderUUID, serviceType string
 	cmd := &cobra.Command{
-		Use:   "cancel-options",
-		Short: "List cancel-reason options (CustomerCancelSelections) — read-only",
-		Long:  "Does not cancel an order. Lists CustomerCancelSelections reasons; use order cancel to PUT /api/v2/orders/{orderId}/cancel.",
+		Use:     "cancel-options",
+		Short:   "List cancel-reason options (CustomerCancelSelections) — read-only",
+		Long:    "Does not cancel an order. Lists CustomerCancelSelections reasons; use order cancel to PUT /api/v2/orders/{orderId}/cancel.",
 		Example: `  costco-sameday-pp-cli order cancel-options --order-delivery-id <id> --json`,
 		Annotations: map[string]string{
-			"pp:narrative": "order.cancel-options",
-			"pp:charge":    "false",
+			"pp:narrative":  "order.cancel-options",
+			"pp:charge":     "false",
+			"mcp:read-only": "true",
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if orderDeliveryID == "" {
@@ -425,15 +436,20 @@ Use order cancel-options to list CustomerCancelSelections reasons first.`,
 			if err != nil {
 				return classifyAPIError(cmd.OutOrStdout(), err, flags)
 			}
-			return printNarrativeJSON(cmd, flags, map[string]any{
-				"canceled":     status >= 200 && status < 300,
+			canceled := client.RESTResponseSucceeded(status, data)
+			out := map[string]any{
+				"canceled":     canceled,
 				"dry_run":      false,
 				"would_charge": false,
 				"http_status":  status,
 				"method":       "PUT",
 				"path":         path,
 				"response":     json.RawMessage(data),
-			})
+			}
+			if !canceled {
+				out["success"] = false
+			}
+			return printNarrativeJSON(cmd, flags, out)
 		},
 	}
 	cmd.Flags().StringVar(&orderID, "order-id", "", "Order id path segment for PUT /api/v2/orders/{orderId}/cancel (required)")

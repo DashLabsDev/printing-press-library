@@ -944,8 +944,21 @@ func (c *Client) doInternal(ctx context.Context, method, path string, params map
 		}
 		bodyBytes = b
 	}
+	// GraphQL POST: fold flag params into body variables before hash injection.
+	if strings.Contains(path, "graphql") && strings.EqualFold(method, http.MethodPost) {
+		var coalErr error
+		bodyBytes, params, coalErr = coalesceGraphQLPOSTBody(params, bodyBytes)
+		if coalErr != nil {
+			return nil, 0, coalErr
+		}
+	}
 	bodyBytes = c.applyPersistedQueryBodyOverrides(bodyBytes)
 	params = c.applyPersistedQueryParamOverrides(params)
+	if strings.Contains(path, "graphql") {
+		if err := enforceGraphQLOperationSafety(ctx, params, bodyBytes); err != nil {
+			return nil, 0, err
+		}
+	}
 
 	// Resolve auth material before the dry-run branch so --dry-run can preview
 	// exactly what would be sent. Uses only cached credentials; a token that
@@ -990,7 +1003,7 @@ func (c *Client) doInternal(ctx context.Context, method, path string, params map
 		}
 		// Proactive rate limiting — wait before sending
 		adaptiveStarted := time.Now()
-		c.limiter.Wait()
+		c.limiter.Wait(ctx)
 		if c.platformSession != nil {
 			c.platformSession.RecordRateLimitWait(time.Since(adaptiveStarted))
 		}
@@ -1319,14 +1332,16 @@ func (c *Client) applyPersistedQueryParamOverrides(params map[string]string) map
 	if len(params) == 0 {
 		return params
 	}
+	// Always fold loose flag params into variables when an operationName is present,
+	// even if we lack a persisted-query hash for this operation.
 	operationName := params["operationName"]
 	if operationName == "" {
-		return params
+		return foldGraphQLVariables(params)
 	}
 	hashes := c.persistedQueryHashes()
 	hash := hashes[operationName]
 	if hash == "" {
-		return params
+		return foldGraphQLVariables(params)
 	}
 
 	updated := make(map[string]string, len(params))
@@ -1355,7 +1370,9 @@ func (c *Client) applyPersistedQueryParamOverrides(params map[string]string) map
 		return params
 	}
 	updated["extensions"] = string(data)
-	// GraphQL persisted-query GETs require a variables object even when empty.
+	// Fold flag-shaped query params into GraphQL variables, then ensure a
+	// variables object exists (persisted-query GETs require it even when empty).
+	updated = foldGraphQLVariables(updated)
 	if updated["variables"] == "" {
 		updated["variables"] = "{}"
 	}
@@ -1649,6 +1666,21 @@ func wrapBinaryResponse(ct string, body []byte) (json.RawMessage, error) {
 		return nil, fmt.Errorf("encoding binary response: %w", err)
 	}
 	return json.RawMessage(out), nil
+}
+
+// UnwrapBinaryResponse recovers original bytes from wrapBinaryResponse's JSON
+// envelope. Ordinary JSON is left intact so file delivery of API objects is
+// not treated as media.
+func UnwrapBinaryResponse(body []byte) (raw []byte, contentType string, ok bool) {
+	var env binaryResponseEnvelope
+	if err := json.Unmarshal(body, &env); err != nil || !env.PPBinary || env.Encoding != "base64" {
+		return nil, "", false
+	}
+	raw, err := base64.StdEncoding.DecodeString(env.Data)
+	if err != nil {
+		return nil, "", false
+	}
+	return raw, env.ContentType, true
 }
 
 // sanitizeJSONResponse strips known JSONP/XSSI prefixes and UTF-8 BOM from
