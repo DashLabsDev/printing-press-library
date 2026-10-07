@@ -21,7 +21,7 @@ func newSlotsAvailableservicesCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "availableservices",
 		Short:       "GraphQL query AvailableServices (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli slots availableservices --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli slots availableservices --operation-name AvailableServices",
 		Annotations: map[string]string{"pp:endpoint": "slots.availableservices", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

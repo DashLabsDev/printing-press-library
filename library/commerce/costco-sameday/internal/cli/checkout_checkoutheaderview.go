@@ -17,7 +17,7 @@ func newCheckoutCheckoutheaderviewCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "checkoutheaderview",
 		Short:       "GraphQL query CheckoutHeaderView (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli checkout checkoutheaderview --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli checkout checkoutheaderview --operation-name CheckoutHeaderView",
 		Annotations: map[string]string{"pp:endpoint": "checkout.checkoutheaderview", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

@@ -21,7 +21,7 @@ func newProductsItemsCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "items",
 		Short:       "GraphQL query Items (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli products items --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli products items --operation-name Items",
 		Annotations: map[string]string{"pp:endpoint": "products.items", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

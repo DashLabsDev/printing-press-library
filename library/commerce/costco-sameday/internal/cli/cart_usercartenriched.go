@@ -20,7 +20,7 @@ func newCartUsercartenrichedCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "usercartenriched",
 		Short:       "GraphQL query UserCartEnriched (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli cart usercartenriched --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli cart usercartenriched --operation-name UserCartEnriched",
 		Annotations: map[string]string{"pp:endpoint": "cart.usercartenriched", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

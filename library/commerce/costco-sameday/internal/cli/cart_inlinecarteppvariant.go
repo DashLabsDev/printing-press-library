@@ -17,7 +17,7 @@ func newCartInlinecarteppvariantCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "inlinecarteppvariant",
 		Short:       "GraphQL query InlineCartEppVariant (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli cart inlinecarteppvariant --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli cart inlinecarteppvariant --operation-name InlineCartEppVariant",
 		Annotations: map[string]string{"pp:endpoint": "cart.inlinecarteppvariant", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

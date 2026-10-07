@@ -765,6 +765,42 @@ func TestMergeKeepRicherJSON(t *testing.T) {
 	}
 }
 
+
+func TestMergeKeepRicherJSONExplicitClears(t *testing.T) {
+	// Explicit null / empty string / empty array from a fresh response must
+	// overwrite stale saved values. Absent keys must still be preserved.
+	cleared, ok := mergeKeepRicherJSON(
+		"mutations",
+		json.RawMessage(`{"id":"1","name":"old","note":"keep-me","tags":["a","b"],"meta":{"a":1}}`),
+		json.RawMessage(`{"id":"1","name":"","note":null,"tags":[],"meta":{"a":9}}`),
+	)
+	if !ok {
+		t.Fatal("explicit-clear merge returned !ok")
+	}
+	var obj map[string]any
+	if err := json.Unmarshal(cleared, &obj); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if obj["name"] != "" {
+		t.Fatalf("empty string must clear name, got %v", obj["name"])
+	}
+	if obj["note"] != nil {
+		t.Fatalf("explicit null must clear note, got %v", obj["note"])
+	}
+	tags, _ := obj["tags"].([]any)
+	if tags == nil {
+		// json null vs empty — we expect empty array
+		t.Fatalf("tags missing, got %s", cleared)
+	}
+	if len(tags) != 0 {
+		t.Fatalf("empty array must clear tags, got %v", tags)
+	}
+	meta, _ := obj["meta"].(map[string]any)
+	if fmt.Sprint(meta["a"]) != "9" {
+		t.Fatalf("nested merge should apply, meta=%v", meta)
+	}
+}
+
 func TestLookupFieldValue_DottedPathAndTrailingUnderscore(t *testing.T) {
 	nested := map[string]any{
 		"entityInfo": map[string]any{"entityId": "ent-1"},

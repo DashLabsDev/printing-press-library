@@ -20,7 +20,7 @@ func newProductsAutosuggestionsCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "autosuggestions",
 		Short:       "GraphQL query Autosuggestions (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli products autosuggestions --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli products autosuggestions --operation-name Autosuggestions",
 		Annotations: map[string]string{"pp:endpoint": "products.autosuggestions", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

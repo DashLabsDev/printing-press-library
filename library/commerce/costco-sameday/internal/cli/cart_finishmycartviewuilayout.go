@@ -18,7 +18,7 @@ func newCartFinishmycartviewuilayoutCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "finishmycartviewuilayout",
 		Short:       "GraphQL query FinishMyCartViewUILayout (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli cart finishmycartviewuilayout --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli cart finishmycartviewuilayout --operation-name FinishMyCartViewUILayout",
 		Annotations: map[string]string{"pp:endpoint": "cart.finishmycartviewuilayout", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

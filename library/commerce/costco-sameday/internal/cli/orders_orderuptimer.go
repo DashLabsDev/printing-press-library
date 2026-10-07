@@ -17,7 +17,7 @@ func newOrdersOrderuptimerCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "orderuptimer",
 		Short:       "GraphQL query OrderUpTimer (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli orders orderuptimer --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli orders orderuptimer --operation-name OrderUpTimer",
 		Annotations: map[string]string{"pp:endpoint": "orders.orderuptimer", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

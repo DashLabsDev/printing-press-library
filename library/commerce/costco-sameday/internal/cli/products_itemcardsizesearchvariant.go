@@ -17,7 +17,7 @@ func newProductsItemcardsizesearchvariantCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "itemcardsizesearchvariant",
 		Short:       "GraphQL query ItemCardSizeSearchVariant (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli products itemcardsizesearchvariant --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli products itemcardsizesearchvariant --operation-name ItemCardSizeSearchVariant",
 		Annotations: map[string]string{"pp:endpoint": "products.itemcardsizesearchvariant", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

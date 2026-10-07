@@ -23,7 +23,7 @@ func newCartFloatingcartmessagesCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "floatingcartmessages",
 		Short:       "GraphQL query FloatingCartMessages (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli cart floatingcartmessages --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli cart floatingcartmessages --operation-name FloatingCartMessages",
 		Annotations: map[string]string{"pp:endpoint": "cart.floatingcartmessages", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

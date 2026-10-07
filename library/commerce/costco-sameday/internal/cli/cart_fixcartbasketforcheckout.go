@@ -21,7 +21,7 @@ func newCartFixcartbasketforcheckoutCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "fixcartbasketforcheckout",
 		Short:       "GraphQL query FixCartBasketForCheckout (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli cart fixcartbasketforcheckout --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli cart fixcartbasketforcheckout --operation-name FixCartBasketForCheckout",
 		Annotations: map[string]string{"pp:endpoint": "cart.fixcartbasketforcheckout", "pp:method": "POST", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !stdinBody {

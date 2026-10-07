@@ -70,3 +70,37 @@ func TestGraphQLResponseSucceededHonesty(t *testing.T) {
 		t.Fatal("REST verify synthetic must not count as success")
 	}
 }
+
+func TestApplyPersistedQueryParamOverridesKeepsRESTQueryParams(t *testing.T) {
+	c := &Client{}
+	params := map[string]string{"source": "web"}
+	out := c.applyPersistedQueryParamOverrides(params)
+	if out["source"] != "web" {
+		t.Fatalf("REST cancel source=web must remain a query param, got %v", out)
+	}
+	if _, ok := out["variables"]; ok {
+		t.Fatalf("REST params must not be folded into variables, got %v", out)
+	}
+}
+
+func TestApplyPersistedQueryParamOverridesStillFoldsGraphQL(t *testing.T) {
+	c := &Client{}
+	params := map[string]string{
+		"operationName": "Items",
+		"shopId":        "123",
+	}
+	out := c.applyPersistedQueryParamOverrides(params)
+	if out["operationName"] != "Items" {
+		t.Fatalf("operationName=%q", out["operationName"])
+	}
+	if _, ok := out["shopId"]; ok {
+		t.Fatal("shopId should be folded into variables for GraphQL")
+	}
+	var vars map[string]any
+	if err := json.Unmarshal([]byte(out["variables"]), &vars); err != nil {
+		t.Fatal(err)
+	}
+	if vars["shopId"] != "123" {
+		t.Fatalf("shopId=%v", vars["shopId"])
+	}
+}

@@ -17,7 +17,7 @@ func newProductsViewlayoutsearchresultsCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "viewlayoutsearchresults",
 		Short:       "GraphQL query ViewLayoutSearchResults (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli products viewlayoutsearchresults --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli products viewlayoutsearchresults --operation-name ViewLayoutSearchResults",
 		Annotations: map[string]string{"pp:endpoint": "products.viewlayoutsearchresults", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

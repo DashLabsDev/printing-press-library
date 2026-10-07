@@ -1332,11 +1332,12 @@ func (c *Client) applyPersistedQueryParamOverrides(params map[string]string) map
 	if len(params) == 0 {
 		return params
 	}
-	// Always fold loose flag params into variables when an operationName is present,
-	// even if we lack a persisted-query hash for this operation.
+	// Fold loose flag params into GraphQL variables only when this is a GraphQL
+	// request (operationName present). REST calls such as order cancel
+	// (PUT .../cancel?source=web) must keep query params unchanged.
 	operationName := params["operationName"]
 	if operationName == "" {
-		return foldGraphQLVariables(params)
+		return params
 	}
 	hashes := c.persistedQueryHashes()
 	hash := hashes[operationName]

@@ -162,7 +162,7 @@ This checks your configuration and credentials.
 ### 4. Try Your First Command
 
 ```bash
-costco-sameday-pp-cli account gethouseholdbyuser --operation-name example-resource
+costco-sameday-pp-cli account gethouseholdbyuser --operation-name GetHouseholdByUser
 ```
 
 ## Usage
@@ -343,18 +343,18 @@ The local store's schema version stamp is one-way: once this version of `costco-
 
 ```bash
 # Human-readable table (default in terminal, JSON when piped)
-costco-sameday-pp-cli account gethouseholdbyuser --operation-name example-resource
+costco-sameday-pp-cli account gethouseholdbyuser --operation-name GetHouseholdByUser
 
 # JSON for scripting and agents
-costco-sameday-pp-cli account gethouseholdbyuser --operation-name example-resource --json
+costco-sameday-pp-cli account gethouseholdbyuser --operation-name GetHouseholdByUser --json
 # Filter to specific fields by name
-costco-sameday-pp-cli account gethouseholdbyuser --operation-name example-resource --json --select <field>[,<field>...]
+costco-sameday-pp-cli account gethouseholdbyuser --operation-name GetHouseholdByUser --json --select <field>[,<field>...]
 
 # Dry run — show the request without sending
-costco-sameday-pp-cli account gethouseholdbyuser --operation-name example-resource --dry-run
+costco-sameday-pp-cli account gethouseholdbyuser --operation-name GetHouseholdByUser --dry-run
 
 # Agent mode — JSON + compact + no prompts in one flag
-costco-sameday-pp-cli account gethouseholdbyuser --operation-name example-resource --agent
+costco-sameday-pp-cli account gethouseholdbyuser --operation-name GetHouseholdByUser --agent
 ```
 
 ## Agent Usage

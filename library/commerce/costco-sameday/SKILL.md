@@ -174,7 +174,7 @@ Global format flags share one contract on promoted, novel, sync, and `--deliver`
 - **Filterable** — `--select` keeps a subset of fields. Dotted paths descend into nested structures; arrays traverse element-wise. Critical for keeping context small on verbose APIs:
 
   ```bash
-  costco-sameday-pp-cli account gethouseholdbyuser --operation-name example-resource --agent
+  costco-sameday-pp-cli account gethouseholdbyuser --operation-name GetHouseholdByUser --agent
   ```
 - **Previewable** — `--dry-run` shows the request without sending
 - **Offline-friendly** — sync/search commands can use the local SQLite store when available
@@ -446,7 +446,7 @@ A profile is a saved set of flag values, reused across invocations. Use it when 
 
 ```
 costco-sameday-pp-cli profile save briefing --json
-costco-sameday-pp-cli --profile briefing account gethouseholdbyuser --operation-name example-resource
+costco-sameday-pp-cli --profile briefing account gethouseholdbyuser --operation-name GetHouseholdByUser
 costco-sameday-pp-cli profile list --json
 costco-sameday-pp-cli profile show briefing
 costco-sameday-pp-cli profile delete briefing --yes

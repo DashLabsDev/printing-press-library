@@ -24,7 +24,7 @@ func newSessionComplementaryproductitemsCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "complementaryproductitems",
 		Short:       "GraphQL query ComplementaryProductItems (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli session complementaryproductitems --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli session complementaryproductitems --operation-name ComplementaryProductItems",
 		Annotations: map[string]string{"pp:endpoint": "session.complementaryproductitems", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

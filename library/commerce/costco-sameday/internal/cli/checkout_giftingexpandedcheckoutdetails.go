@@ -17,7 +17,7 @@ func newCheckoutGiftingexpandedcheckoutdetailsCmd(flags *rootFlags) *cobra.Comma
 	cmd := &cobra.Command{
 		Use:         "giftingexpandedcheckoutdetails",
 		Short:       "GraphQL query GiftingExpandedCheckoutDetails (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli checkout giftingexpandedcheckoutdetails --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli checkout giftingexpandedcheckoutdetails --operation-name GiftingExpandedCheckoutDetails",
 		Annotations: map[string]string{"pp:endpoint": "checkout.giftingexpandedcheckoutdetails", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

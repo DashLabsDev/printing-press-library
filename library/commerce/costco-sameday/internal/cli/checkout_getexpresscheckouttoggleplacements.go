@@ -19,7 +19,7 @@ func newCheckoutGetexpresscheckouttoggleplacementsCmd(flags *rootFlags) *cobra.C
 	cmd := &cobra.Command{
 		Use:         "getexpresscheckouttoggleplacements",
 		Short:       "GraphQL query GetExpressCheckoutTogglePlacements (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli checkout getexpresscheckouttoggleplacements --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli checkout getexpresscheckouttoggleplacements --operation-name GetExpressCheckoutTogglePlacements",
 		Annotations: map[string]string{"pp:endpoint": "checkout.getexpresscheckouttoggleplacements", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

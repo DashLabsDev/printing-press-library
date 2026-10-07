@@ -29,7 +29,7 @@ func newProductsSearchresultsplacementsCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "searchresultsplacements",
 		Short:       "GraphQL query SearchResultsPlacements (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli products searchresultsplacements --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli products searchresultsplacements --operation-name SearchResultsPlacements",
 		Annotations: map[string]string{"pp:endpoint": "products.searchresultsplacements", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

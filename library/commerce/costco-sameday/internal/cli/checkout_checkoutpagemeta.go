@@ -17,7 +17,7 @@ func newCheckoutCheckoutpagemetaCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "checkoutpagemeta",
 		Short:       "GraphQL query CheckoutPageMeta (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli checkout checkoutpagemeta --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli checkout checkoutpagemeta --operation-name CheckoutPageMeta",
 		Annotations: map[string]string{"pp:endpoint": "checkout.checkoutpagemeta", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

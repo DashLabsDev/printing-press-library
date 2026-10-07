@@ -17,7 +17,7 @@ func newProductsPostaddtocartsearchlayoutqueryCmd(flags *rootFlags) *cobra.Comma
 	cmd := &cobra.Command{
 		Use:         "postaddtocartsearchlayoutquery",
 		Short:       "GraphQL query PostAddToCartSearchLayoutQuery (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli products postaddtocartsearchlayoutquery --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli products postaddtocartsearchlayoutquery --operation-name PostAddToCartSearchLayoutQuery",
 		Annotations: map[string]string{"pp:endpoint": "products.postaddtocartsearchlayoutquery", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

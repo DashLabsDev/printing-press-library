@@ -17,7 +17,7 @@ func newAccountGethouseholdbyuserCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "gethouseholdbyuser",
 		Short:       "GraphQL query GetHouseholdByUser (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli account gethouseholdbyuser --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli account gethouseholdbyuser --operation-name GetHouseholdByUser",
 		Annotations: map[string]string{"pp:endpoint": "account.gethouseholdbyuser", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

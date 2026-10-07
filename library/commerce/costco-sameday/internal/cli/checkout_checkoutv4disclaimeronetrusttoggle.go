@@ -17,7 +17,7 @@ func newCheckoutCheckoutv4disclaimeronetrusttoggleCmd(flags *rootFlags) *cobra.C
 	cmd := &cobra.Command{
 		Use:         "checkoutv4disclaimeronetrusttoggle",
 		Short:       "GraphQL query CheckoutV4DisclaimerOneTrustToggle (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli checkout checkoutv4disclaimeronetrusttoggle --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli checkout checkoutv4disclaimeronetrusttoggle --operation-name CheckoutV4DisclaimerOneTrustToggle",
 		Annotations: map[string]string{"pp:endpoint": "checkout.checkoutv4disclaimeronetrusttoggle", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

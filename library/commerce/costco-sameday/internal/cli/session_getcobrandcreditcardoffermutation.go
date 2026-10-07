@@ -20,7 +20,7 @@ func newSessionGetcobrandcreditcardoffermutationCmd(flags *rootFlags) *cobra.Com
 	cmd := &cobra.Command{
 		Use:         "getcobrandcreditcardoffermutation",
 		Short:       "GraphQL mutation GetCobrandCreditCardOfferMutation (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli session getcobrandcreditcardoffermutation --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli session getcobrandcreditcardoffermutation --operation-name GetCobrandCreditCardOfferMutation",
 		Annotations: map[string]string{"pp:endpoint": "session.getcobrandcreditcardoffermutation", "pp:method": "POST", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !stdinBody {

@@ -17,7 +17,7 @@ func newCartCartswitchervariantCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "cartswitchervariant",
 		Short:       "GraphQL query CartSwitcherVariant (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli cart cartswitchervariant --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli cart cartswitchervariant --operation-name CartSwitcherVariant",
 		Annotations: map[string]string{"pp:endpoint": "cart.cartswitchervariant", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

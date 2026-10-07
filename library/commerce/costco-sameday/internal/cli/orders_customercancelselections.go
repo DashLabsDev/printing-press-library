@@ -20,7 +20,7 @@ func newOrdersCustomercancelselectionsCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "customercancelselections",
 		Short:       "GraphQL query CustomerCancelSelections — cancel-reason options UI.",
-		Example:     "  costco-sameday-pp-cli orders customercancelselections --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli orders customercancelselections --operation-name CustomerCancelSelections",
 		Annotations: map[string]string{"pp:endpoint": "orders.customercancelselections", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

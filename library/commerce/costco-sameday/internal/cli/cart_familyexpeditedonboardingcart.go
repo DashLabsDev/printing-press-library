@@ -17,7 +17,7 @@ func newCartFamilyexpeditedonboardingcartCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "familyexpeditedonboardingcart",
 		Short:       "GraphQL query FamilyExpeditedOnboardingCart (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli cart familyexpeditedonboardingcart --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli cart familyexpeditedonboardingcart --operation-name FamilyExpeditedOnboardingCart",
 		Annotations: map[string]string{"pp:endpoint": "cart.familyexpeditedonboardingcart", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

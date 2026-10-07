@@ -17,7 +17,7 @@ func newProductsItemdetailviewlayoutCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "itemdetailviewlayout",
 		Short:       "GraphQL query ItemDetailViewLayout (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli products itemdetailviewlayout --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli products itemdetailviewlayout --operation-name ItemDetailViewLayout",
 		Annotations: map[string]string{"pp:endpoint": "products.itemdetailviewlayout", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

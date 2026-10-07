@@ -2005,12 +2005,12 @@ func fingerprintScalar(value any) (any, bool) {
 //
 // Policy (do-not-shrink / keep-richer):
 //   - First write (no existing) stores incoming unchanged.
-//   - Object keys present only on existing are kept.
+//   - Object keys present only on existing are kept (absent ≠ cleared).
 //   - Objects merge recursively; incoming keys go through the same policy
 //     rather than wholesale replacement.
-//   - A container (object/array) is never replaced by a scalar or null.
-//   - An incoming empty array does not replace a non-empty existing array
-//     (list omitted the collection vs sent a new one).
+//   - A container (object/array) is never replaced by a non-null scalar.
+//   - Explicit incoming null, empty string, or empty array clears the
+//     prior value (fresh response overwrite). Absent keys stay.
 //   - Object arrays match by the same identity stack as ExtractResourceID
 //     (configured / dotted override, generic id, resource-scoped suffix)
 //     plus item-local suffix keys (currency_code, accountId) and sku.
@@ -2058,11 +2058,9 @@ func decodeJSONValue(data json.RawMessage) (any, error) {
 }
 
 func mergeKeepRicherValue(resourceType string, existing, incoming any) any {
+	// Explicit null from a fresh response clears the field (do not keep stale).
 	if incoming == nil {
-		if existing != nil {
-			return existing
-		}
-		return incoming
+		return nil
 	}
 	existingObj, existingIsObj := existing.(map[string]any)
 	incomingObj, incomingIsObj := incoming.(map[string]any)
@@ -2077,9 +2075,8 @@ func mergeKeepRicherValue(resourceType string, existing, incoming any) any {
 	if isJSONContainer(existing) && !isJSONContainer(incoming) {
 		return existing
 	}
-	if isJSONEmpty(incoming) && !isJSONEmpty(existing) {
-		return existing
-	}
+	// Explicit empty string / empty values from incoming replace existing.
+	// Absent keys are handled in mergeKeepRicherObject (not present here).
 	return incoming
 }
 
@@ -2099,8 +2096,9 @@ func mergeKeepRicherObject(resourceType string, existing, incoming map[string]an
 }
 
 func mergeKeepRicherArray(resourceType string, existing, incoming []any) []any {
-	if len(incoming) == 0 && len(existing) > 0 {
-		return existing
+	// Explicit empty array clears; do not preserve stale nonempty existing.
+	if len(incoming) == 0 {
+		return incoming
 	}
 	existingByID := indexObjectArrayByIdentity(resourceType, existing)
 	if len(existingByID) == 0 {

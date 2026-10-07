@@ -25,7 +25,7 @@ func newSlotsSlotcampaignplacementCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "slotcampaignplacement",
 		Short:       "GraphQL query SlotCampaignPlacement (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli slots slotcampaignplacement --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli slots slotcampaignplacement --operation-name SlotCampaignPlacement",
 		Annotations: map[string]string{"pp:endpoint": "slots.slotcampaignplacement", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

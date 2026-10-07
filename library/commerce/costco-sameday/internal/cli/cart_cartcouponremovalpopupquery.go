@@ -18,7 +18,7 @@ func newCartCartcouponremovalpopupqueryCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "cartcouponremovalpopupquery",
 		Short:       "GraphQL query CartCouponRemovalPopupQuery (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli cart cartcouponremovalpopupquery --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli cart cartcouponremovalpopupquery --operation-name CartCouponRemovalPopupQuery",
 		Annotations: map[string]string{"pp:endpoint": "cart.cartcouponremovalpopupquery", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

@@ -20,7 +20,7 @@ func newCartCartcheckoutvalidationCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "cartcheckoutvalidation",
 		Short:       "GraphQL query CartCheckoutValidation (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli cart cartcheckoutvalidation --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli cart cartcheckoutvalidation --operation-name CartCheckoutValidation",
 		Annotations: map[string]string{"pp:endpoint": "cart.cartcheckoutvalidation", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

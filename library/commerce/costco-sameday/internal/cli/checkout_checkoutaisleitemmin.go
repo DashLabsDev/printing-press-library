@@ -18,7 +18,7 @@ func newCheckoutCheckoutaisleitemminCmd(flags *rootFlags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:         "checkoutaisleitemmin",
 		Short:       "GraphQL query CheckoutAisleItemMin (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli checkout checkoutaisleitemmin --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli checkout checkoutaisleitemmin --operation-name CheckoutAisleItemMin",
 		Annotations: map[string]string{"pp:endpoint": "checkout.checkoutaisleitemmin", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"

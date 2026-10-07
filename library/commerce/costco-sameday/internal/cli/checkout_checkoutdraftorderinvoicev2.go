@@ -19,7 +19,7 @@ func newCheckoutCheckoutdraftorderinvoicev2Cmd(flags *rootFlags) *cobra.Command 
 	cmd := &cobra.Command{
 		Use:         "checkoutdraftorderinvoicev2",
 		Short:       "GraphQL query CheckoutDraftOrderInvoiceV2 (persistedQuery)",
-		Example:     "  costco-sameday-pp-cli checkout checkoutdraftorderinvoicev2 --operation-name example-resource",
+		Example:     "  costco-sameday-pp-cli checkout checkoutdraftorderinvoicev2 --operation-name CheckoutDraftOrderInvoiceV2",
 		Annotations: map[string]string{"pp:endpoint": "checkout.checkoutdraftorderinvoicev2", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := "/graphql"
