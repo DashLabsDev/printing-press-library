@@ -377,6 +377,14 @@ Exit code 0 under cap, 8 over — gate a scheduled run on this before it fires (
 
 Standard bearer auth with your inference key via OPENROUTER_API_KEY covers models, credits, key status, and chat. Two surfaces need the separate provisioning (management) key created in the dashboard: key administration (/keys) and account-wide usage rollups (/activity, analytics). A 401 or 403 on those commands with an otherwise-working key means you are holding the inference key where the management key is required — not a broken setup. Live-verified 2026-09: /activity returns 403 'Only management keys can fetch activity' on an inference key.
 
+The CLI reads a single env var (`OPENROUTER_API_KEY`); it does not read `OPENROUTER_MANAGEMENT_KEY`. To call management-key endpoints, set your management key as the API key for that invocation. Ensure `OPENROUTER_MANAGEMENT_KEY` is set in your environment first:
+
+```bash
+# Prerequisite: export OPENROUTER_MANAGEMENT_KEY=<your-management-key>
+OPENROUTER_API_KEY="${OPENROUTER_MANAGEMENT_KEY}" openrouter-pp-cli keys list --agent
+OPENROUTER_API_KEY="${OPENROUTER_MANAGEMENT_KEY}" openrouter-pp-cli activity --agent
+```
+
 Run `openrouter-pp-cli doctor` to verify setup.
 
 ## Agent Mode
