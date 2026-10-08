@@ -7,7 +7,7 @@ Every other OpenRouter tool wraps chat; this one governs it. A synced local mirr
 Learn more at [OpenRouter](https://openrouter.ai/docs).
 
 Created by [@rvdlaar](https://github.com/rvdlaar) (Rick van de Laar).
-Contributors: [@Quantman1974](https://github.com/Quantman1974) (Quantman1974).
+Contributors: [@Quantman1974](https://github.com/Quantman1974) (Quantman1974), [@Bhumika-1432006](https://github.com/Bhumika-1432006) (Bhumika-1432006).
 
 ## Install
 
