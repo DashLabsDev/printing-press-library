@@ -12,6 +12,10 @@ import (
 	"github.com/pelletier/go-toml/v2"
 )
 
+// AuthSourceOpenAlexEnv labels a credential taken from OPENALEX_API_KEY; the
+// client sends it only to https://api.openalex.org.
+const AuthSourceOpenAlexEnv = "env:OPENALEX_API_KEY"
+
 type Config struct {
 	BaseURL       string            `toml:"base_url"`
 	AuthHeaderVal string            `toml:"auth_header"`
@@ -49,6 +53,14 @@ func Load(configPath string) (*Config, error) {
 	cfg.snapshotFileConfig()
 
 	// Env var overrides
+	// PATCH(thelancet-openalex-api-key): OpenAlex meters per key, so send the
+	// key as a Bearer header (never in the URL). The client's masking already
+	// handles "Bearer <token>" values.
+	if v := strings.TrimSpace(os.Getenv("OPENALEX_API_KEY")); v != "" {
+		cfg.AuthHeaderVal = "Bearer " + v
+		cfg.AuthSource = AuthSourceOpenAlexEnv
+		cfg.markEnvOverride("AuthHeaderVal")
+	}
 
 	// Label config-file-derived credentials so doctor can distinguish
 	// "credentials persisted on disk" from "no credentials at all" — without
