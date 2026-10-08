@@ -1,0 +1,30 @@
+{
+  "schema_version": 2,
+  "id": "costco-sameday-transport-charge-gate-outcomes-merge-clears",
+  "applied_at": "2026-10-07",
+  "base_run_id": "20261007-135457",
+  "base_printing_press_version": "4.31.7",
+  "summary": "Transport-layer FinalizeCheckout gate needing BOTH --yes and --confirm-charge (operationName in params/body/batch, query text, persisted hash, URL); FinalizeCheckout/cancel outcome classification; explicit empty values clear saved fields; drop unused PRINTING_PRESS_CLIENT_PROFILE from manifest and auth_env_vars.",
+  "reason": "Greptile 1/5 on 317f993: charge consent and order-success checks incomplete, cleared data stays saved, required profile does nothing.",
+  "files": [
+    "internal/client/graphql_guard.go",
+    "internal/client/client.go",
+    "internal/client/graphql_guard_test.go",
+    "internal/cli/order_narrative.go",
+    "internal/cli/charge_gate_test.go",
+    "internal/mcp/charge_gate_test.go",
+    "internal/store/store.go",
+    "internal/store/upsert_batch_test.go",
+    "manifest.json",
+    ".printing-press.json"
+  ],
+  "markers": [
+    "enforceChargeGate",
+    "WithChargeConsent",
+    "requestTargetsFinalizeCheckout",
+    "finalizeCheckoutHashes",
+    "ClassifyFinalizeCheckoutResponse",
+    "isJSONEmpty(incoming)"
+  ],
+  "validated_outcome": "go test ./internal/client ./internal/cli ./internal/store ./internal/mcp (TestChargeGate*, TestClassifyFinalizeCheckoutResponse, TestRESTResponseSucceededCancelCases, TestUpdatecheckoutCannotFinalizeCheckout, TestOrderPlace*, TestOrderCancelOutcome, TestMCPEndpointToolCannotFinalizeCheckout, TestMergeKeepRicherJSONExplicitEmptiesOverwriteContainers, TestUpsertFreshResponseClearsSavedFields)"
+}

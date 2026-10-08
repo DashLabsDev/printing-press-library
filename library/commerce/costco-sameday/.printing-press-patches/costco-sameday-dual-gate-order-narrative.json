@@ -1,0 +1,24 @@
+{
+  "schema_version": 2,
+  "id": "costco-sameday-dual-gate-order-narrative",
+  "applied_at": "2026-10-07",
+  "base_run_id": "20261007-135457",
+  "base_printing_press_version": "4.31.7",
+  "summary": "Narrative order preview/tip/place (dual-gate FinalizeCheckout) and REST cancel; charged/canceled honesty; mcp:read-only on preview/cancel-options.",
+  "reason": "Paid-test sniff found FinalizeCheckout; cancel sniff found REST PUT cancel (not GraphQL). Raw generation would expose ungated charge/cancel surfaces.",
+  "files": [
+    "internal/cli/order_narrative.go",
+    "internal/cli/order_narrative_test.go"
+  ],
+  "markers": [
+    "registerNovelCommand",
+    "confirm-charge",
+    "FinalizeCheckout",
+    "/api/v2/orders/",
+    "refusing to cancel",
+    "WithChargeConsent",
+    "ClassifyFinalizeCheckoutResponse",
+    "mcp:read-only"
+  ],
+  "validated_outcome": "go test ./internal/cli/ -run TestOrder; go test ./internal/client/ -run TestGraphQL; place without flags refuses; charged false on errors/verify."
+}

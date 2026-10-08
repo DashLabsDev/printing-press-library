@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-10-07T13:54:57.01577412Z",
+  "printing_press_version": "4.31.7",
+  "api_name": "costco-sameday",
+  "display_name": "Costco Sameday",
+  "cli_name": "costco-sameday-pp-cli",
+  "creator": {
+    "handle": "DashLabsDev",
+    "name": "Dash Labs"
+  },
+  "owner": "dashlabsdev",
+  "printer": "DashLabsDev",
+  "printer_name": "Dash Labs",
+  "spec_path": "spec.yaml",
+  "spec_format": "internal",
+  "spec_source": "sniffed",
+  "spec_checksum": "sha256:95c0b425bba58e90f9f8e9649576d97b9f8e622dd0e2c5a3b287e1fdf6da677c",
+  "run_id": "20261007-135457",
+  "category": "commerce",
+  "description": "Costco Same-Day (sameday.costco.com) GraphQL CLI. Cookie auth after Costco Azure B2C SSO.",
+  "mcp_binary": "costco-sameday-pp-mcp",
+  "mcp_tool_count": 61,
+  "mcp_ready": "partial",
+  "api_version": "0.1.0",
+  "auth_type": "cookie",
+  "novel_features": [
+    {
+      "name": "Dual-gated place order",
+      "command": "order place",
+      "description": "Charge via FinalizeCheckout only when both --yes and --confirm-charge are set; --dry-run never POSTs the charge mutation."
+    },
+    {
+      "name": "Checkout preview without charge",
+      "command": "order preview",
+      "description": "Read-only CheckoutDraftOrderInvoiceV2 / CheckoutCmd totals; never calls FinalizeCheckout."
+    },
+    {
+      "name": "Tip update via UpdateCheckout",
+      "command": "order tip",
+      "description": "Mutate tip with UpdateCheckout tipsUpdate (requires --yes); --dry-run safe; never charges."
+    },
+    {
+      "name": "Gated REST order cancel",
+      "command": "order cancel",
+      "description": "Cancel via PUT /api/v2/orders/{orderId}/cancel?source=web; requires --yes; --dry-run never sends. Not a GraphQL mutation."
+    },
+    {
+      "name": "Cancel options inventory",
+      "command": "order cancel-options",
+      "description": "Read CustomerCancelSelections cancel-reason options (read-only)."
+    }
+  ],
+  "novel_features_built": [
+    {
+      "name": "Dual-gated place order",
+      "command": "order place",
+      "description": "Charge via FinalizeCheckout only when both --yes and --confirm-charge are set; --dry-run never POSTs the charge mutation."
+    },
+    {
+      "name": "Checkout preview without charge",
+      "command": "order preview",
+      "description": "Read-only CheckoutDraftOrderInvoiceV2 / CheckoutCmd totals; never calls FinalizeCheckout."
+    },
+    {
+      "name": "Tip update via UpdateCheckout",
+      "command": "order tip",
+      "description": "Mutate tip with UpdateCheckout tipsUpdate (requires --yes); --dry-run safe; never charges."
+    },
+    {
+      "name": "Gated REST order cancel",
+      "command": "order cancel",
+      "description": "Cancel via PUT /api/v2/orders/{orderId}/cancel?source=web; requires --yes; --dry-run never sends. Not a GraphQL mutation."
+    },
+    {
+      "name": "Cancel options inventory",
+      "command": "order cancel-options",
+      "description": "Read CustomerCancelSelections cancel-reason options (read-only)."
+    }
+  ]
+}

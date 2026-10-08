@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "id": "costco-sameday-persisted-query-seed",
+  "applied_at": "2026-10-07",
+  "base_run_id": "20261007-135457",
+  "base_printing_press_version": "4.31.7",
+  "summary": "Embed persisted-query hash seed, set extensions.version=1 + empty variables, and fix Examples that used example-resource.",
+  "reason": "Live GraphQL GETs returned BLANK_QUERY without sha256Hash; dogfood happy_path also overwrote operationName with example-resource from Examples.",
+  "files": [
+    "internal/client/client.go",
+    "internal/client/persisted_queries_seed.json"
+  ],
+  "markers": [
+    "persisted_queries_seed.json",
+    "persisted[\"version\"]",
+    "updated[\"variables\"]"
+  ],
+  "validated_outcome": "cart activecartid --dry-run shows extensions.persistedQuery.version=1 and sha256Hash; live call no longer returns BLANK_QUERY."
+}

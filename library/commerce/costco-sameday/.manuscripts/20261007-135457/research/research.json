@@ -1,0 +1,198 @@
+{
+  "api_name": "costco-sameday",
+  "novelty_score": 8,
+  "alternatives": [
+    {
+      "name": "instacart-pp-cli",
+      "reason": "Different product surface; Costco Same-Day uses sameday.costco.com."
+    },
+    {
+      "name": "costco-ecom receipts CLI",
+      "reason": "Warehouse e-com receipts are not Same-Day checkout."
+    }
+  ],
+  "gaps": [
+    "VGS card tokenization (createVgsCardInstrument) intentionally not exposed",
+    "OTP/cold-start SSO path not automated; cookie jar / auth login required",
+    "riskData (Forter/recaptcha) may be required for some live FinalizeCheckout paths"
+  ],
+  "patterns": [
+    "Persisted-query GraphQL on sameday.costco.com",
+    "Cookie session after Costco Azure B2C SSO",
+    "Dual-gate charge: --yes AND --confirm-charge; --dry-run never POSTs FinalizeCheckout",
+    "Cancel is REST PUT /api/v2/orders/{orderId}/cancel?source=web (not GraphQL), gated with --yes"
+  ],
+  "recommendation": "proceed",
+  "researched_at": "2026-10-07T01:10:20Z",
+  "novel_features": [
+    {
+      "name": "Dual-gated place order",
+      "command": "order place",
+      "description": "Charge via FinalizeCheckout only when both --yes and --confirm-charge are set; --dry-run never POSTs.",
+      "rationale": "Prevents silent agent charges.",
+      "example": "costco-sameday-pp-cli order place --checkout-session-id <id> --dry-run",
+      "why_it_matters": "Explicit dual confirmation before live charge.",
+      "group": "Safe checkout"
+    },
+    {
+      "name": "Checkout preview without charge",
+      "command": "order preview",
+      "description": "Read-only invoice/totals; never FinalizeCheckout.",
+      "rationale": "Safe first step.",
+      "example": "costco-sameday-pp-cli order preview --checkout-session-id <id> --json",
+      "why_it_matters": "Preview before tip/place.",
+      "group": "Safe checkout"
+    },
+    {
+      "name": "Tip update via UpdateCheckout",
+      "command": "order tip",
+      "description": "UpdateCheckout tipsUpdate; --yes; never charges.",
+      "rationale": "Tip is not FinalizeCheckout.",
+      "example": "costco-sameday-pp-cli order tip --checkout-session-id <id> --tip-input-token <token> --dry-run",
+      "why_it_matters": "Adjust tip safely.",
+      "group": "Safe checkout"
+    },
+    {
+      "name": "Gated REST order cancel",
+      "command": "order cancel",
+      "description": "PUT /api/v2/orders/{orderId}/cancel?source=web; requires --yes; --dry-run never sends.",
+      "rationale": "Cancel is REST not GraphQL; must be gated.",
+      "example": "costco-sameday-pp-cli order cancel --order-id <id> --dry-run",
+      "why_it_matters": "Honest cancel without accidental PUTs.",
+      "group": "Post-checkout"
+    },
+    {
+      "name": "Cancel options inventory",
+      "command": "order cancel-options",
+      "description": "CustomerCancelSelections read-only.",
+      "rationale": "Options UI separate from cancel PUT.",
+      "example": "costco-sameday-pp-cli order cancel-options --order-delivery-id <id> --json",
+      "why_it_matters": "List reasons before cancel.",
+      "group": "Post-checkout"
+    }
+  ],
+  "novel_features_built": [
+    {
+      "name": "Dual-gated place order",
+      "command": "order place",
+      "description": "Charge via FinalizeCheckout only when both --yes and --confirm-charge are set; --dry-run never POSTs.",
+      "rationale": "Prevents silent agent charges.",
+      "example": "costco-sameday-pp-cli order place --checkout-session-id <id> --dry-run",
+      "why_it_matters": "Explicit dual confirmation before live charge.",
+      "group": "Safe checkout"
+    },
+    {
+      "name": "Checkout preview without charge",
+      "command": "order preview",
+      "description": "Read-only invoice/totals; never FinalizeCheckout.",
+      "rationale": "Safe first step.",
+      "example": "costco-sameday-pp-cli order preview --checkout-session-id <id> --json",
+      "why_it_matters": "Preview before tip/place.",
+      "group": "Safe checkout"
+    },
+    {
+      "name": "Tip update via UpdateCheckout",
+      "command": "order tip",
+      "description": "UpdateCheckout tipsUpdate; --yes; never charges.",
+      "rationale": "Tip is not FinalizeCheckout.",
+      "example": "costco-sameday-pp-cli order tip --checkout-session-id <id> --tip-input-token <token> --dry-run",
+      "why_it_matters": "Adjust tip safely.",
+      "group": "Safe checkout"
+    },
+    {
+      "name": "Gated REST order cancel",
+      "command": "order cancel",
+      "description": "PUT /api/v2/orders/{orderId}/cancel?source=web; requires --yes; --dry-run never sends.",
+      "rationale": "Cancel is REST not GraphQL; must be gated.",
+      "example": "costco-sameday-pp-cli order cancel --order-id <id> --dry-run",
+      "why_it_matters": "Honest cancel without accidental PUTs.",
+      "group": "Post-checkout"
+    },
+    {
+      "name": "Cancel options inventory",
+      "command": "order cancel-options",
+      "description": "CustomerCancelSelections read-only.",
+      "rationale": "Options UI separate from cancel PUT.",
+      "example": "costco-sameday-pp-cli order cancel-options --order-delivery-id <id> --json",
+      "why_it_matters": "List reasons before cancel.",
+      "group": "Post-checkout"
+    }
+  ],
+  "auth": {
+    "type": "cookie",
+    "hosts": [
+      "sameday.costco.com"
+    ],
+    "notes": "Browser session cookies after Costco Azure B2C SSO. Never ship HARs or cookie values."
+  },
+  "narrative": {
+    "display_name": "Costco Same-Day",
+    "headline": "CLI/MCP for Costco Same-Day GraphQL plus gated REST cancel on sameday.costco.com.",
+    "value_prop": "Search, cart, checkout preview, tip update, dual-gated FinalizeCheckout, and REST order cancel \u2014 without exposing VGS tokenization or ungated charge.",
+    "auth_narrative": "Authenticate with a Costco Same-Day browser session (cookies after Azure B2C SSO). Run auth login or import a local jar, then doctor.",
+    "quickstart": [
+      {
+        "command": "costco-sameday-pp-cli doctor",
+        "comment": "Verify cookie auth"
+      },
+      {
+        "command": "costco-sameday-pp-cli order preview --checkout-session-id <id> --json",
+        "comment": "Read-only invoice"
+      },
+      {
+        "command": "costco-sameday-pp-cli order place --checkout-session-id <id> --dry-run",
+        "comment": "Simulate place; never charges"
+      },
+      {
+        "command": "costco-sameday-pp-cli order cancel --order-id <id> --dry-run",
+        "comment": "Simulate cancel PUT; never sends"
+      },
+      {
+        "command": "costco-sameday-pp-cli order cancel --order-id <id> --yes",
+        "comment": "LIVE cancel"
+      }
+    ],
+    "troubleshoots": [
+      {
+        "symptom": "doctor reports auth not configured",
+        "fix": "Run auth login or restore cookie jar for sameday.costco.com."
+      },
+      {
+        "symptom": "order place refuses",
+        "fix": "Pass both --yes and --confirm-charge, or --dry-run."
+      },
+      {
+        "symptom": "order cancel refuses",
+        "fix": "Pass --yes for live PUT cancel, or --dry-run to simulate."
+      }
+    ],
+    "when_to_use": "Use for Costco Same-Day cart/checkout/cancel against sameday.costco.com with honest charge and cancel gates.",
+    "anti_triggers": [
+      "Do not place a live order without explicit intent and both --yes and --confirm-charge",
+      "Do not cancel without --yes",
+      "Do not commit HARs, credentials, or card data"
+    ],
+    "recipes": [
+      {
+        "title": "Dry-run place order",
+        "command": "costco-sameday-pp-cli order place --checkout-session-id <id> --yes --confirm-charge --dry-run",
+        "explanation": "Shows FinalizeCheckout payload; charged stays false."
+      },
+      {
+        "title": "Dry-run cancel",
+        "command": "costco-sameday-pp-cli order cancel --order-id <id> --dry-run",
+        "explanation": "Shows PUT /api/v2/orders/{id}/cancel?source=web; never sends."
+      },
+      {
+        "title": "List cancel reasons",
+        "command": "costco-sameday-pp-cli order cancel-options --order-delivery-id <id> --json",
+        "explanation": "Read-only CustomerCancelSelections."
+      }
+    ],
+    "trigger_phrases": [
+      "costco same day order",
+      "cancel costco same-day order",
+      "costco sameday checkout"
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "manifest_version": "0.3",
+  "name": "costco-sameday-pp-mcp",
+  "display_name": "Costco Sameday",
+  "version": "0.1.0",
+  "description": "Costco Same-Day (sameday.costco.com) GraphQL CLI. Cookie auth after Costco Azure B2C SSO.",
+  "author": {
+    "name": "CLI Printing Press"
+  },
+  "license": "Apache-2.0",
+  "server": {
+    "type": "binary",
+    "entry_point": "bin/costco-sameday-pp-mcp",
+    "mcp_config": {
+      "command": "${__dirname}/bin/costco-sameday-pp-mcp",
+      "args": [],
+      "env": {
+        "COSTCO_SAMEDAY_BASE_URL": "${user_config.costco_sameday_base_url}",
+        "COSTCO_SAMEDAY_USER_AGENT": "${user_config.costco_sameday_user_agent}"
+      }
+    }
+  },
+  "user_config": {
+    "costco_sameday_base_url": {
+      "type": "string",
+      "title": "COSTCO_SAMEDAY_BASE_URL",
+      "description": "Optional. Sets COSTCO_SAMEDAY_BASE_URL for the Costco Sameday MCP server. Per-instance, non-secret setting; not a credential."
+    },
+    "costco_sameday_user_agent": {
+      "type": "string",
+      "title": "COSTCO_SAMEDAY_USER_AGENT",
+      "description": "Optional. Sets COSTCO_SAMEDAY_USER_AGENT for the Costco Sameday MCP server. Per-instance, non-secret setting; not a credential."
+    }
+  },
+  "compatibility": {
+    "claude_desktop": ">=1.0.0",
+    "platforms": [
+      "darwin",
+      "linux",
+      "win32"
+    ]
+  }
+}
