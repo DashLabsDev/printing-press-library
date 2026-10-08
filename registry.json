@@ -5951,6 +5951,53 @@
       }
     },
     {
+      "name": "costco-sameday",
+      "category": "commerce",
+      "api": "Costco Sameday",
+      "description": "Costco Same-Day (sameday.costco.com) GraphQL CLI. Cookie auth after Costco Azure B2C SSO.",
+      "search_terms": [
+        "costco-sameday",
+        "Costco Sameday",
+        "costco-sameday-pp-cli",
+        "Costco Same-Day (sameday.costco.com) GraphQL CLI. Cookie auth after Costco Azure B2C SSO.",
+        "Dual-gated place order",
+        "order place",
+        "Charge via FinalizeCheckout only when both --yes and --confirm-charge are set; --dry-run never POSTs the charge mutation.",
+        "Checkout preview without charge",
+        "order preview",
+        "Read-only CheckoutDraftOrderInvoiceV2 / CheckoutCmd totals; never calls FinalizeCheckout.",
+        "Tip update via UpdateCheckout",
+        "order tip",
+        "Mutate tip with UpdateCheckout tipsUpdate (requires --yes); --dry-run safe; never charges.",
+        "Gated REST order cancel",
+        "order cancel",
+        "Cancel via PUT /api/v2/orders/{orderId}/cancel?source=web; requires --yes; --dry-run never sends. Not a GraphQL mutation.",
+        "Cancel options inventory",
+        "order cancel-options",
+        "Read CustomerCancelSelections cancel-reason options (read-only)."
+      ],
+      "path": "library/commerce/costco-sameday",
+      "printer": "DashLabsDev",
+      "printer_name": "Dash Labs",
+      "creator": {
+        "handle": "DashLabsDev",
+        "name": "Dash Labs"
+      },
+      "mcp": {
+        "binary": "costco-sameday-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 61,
+        "public_tool_count": 0,
+        "auth_type": "cookie",
+        "env_vars": [],
+        "mcp_ready": "partial",
+        "spec_format": "internal"
+      }
+    },
+    {
       "name": "cpsc-recalls",
       "category": "other",
       "api": "Cpsc Recall Retrieval",
@@ -18488,9 +18535,9 @@
       "path": "library/productivity/notion",
       "release": {
         "cli_name": "notion-pp-cli",
-        "version": "2026.9.1",
-        "released_at": "2026-09-11T09:22:21Z",
-        "source_commit": "81f5764eda401077520268afe74913c0f21f5b7e"
+        "version": "2026.10.1",
+        "released_at": "2026-10-08T08:49:24Z",
+        "source_commit": "23ffe1396b8a9b3c2d7c66ac3029976e38504700"
       },
       "printer": "neektza",
       "printer_name": "Nikica Jokic",
