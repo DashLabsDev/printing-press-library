@@ -419,9 +419,9 @@
       "path": "library/developer-tools/agent-capture",
       "release": {
         "cli_name": "agent-capture-pp-cli",
-        "version": "2026.8.3",
-        "released_at": "2026-08-17T08:05:15Z",
-        "source_commit": "ba10f29591fbda62d3286618c00607a9ef9a46e5"
+        "version": "2026.10.1",
+        "released_at": "2026-10-07T08:58:29Z",
+        "source_commit": "b631967bfaeae6f1c2deca9d07668df771cc532e"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -4933,7 +4933,15 @@
         "Ergonomic v3 Aliases (docs + chat)",
         "docs",
         "Top-level `docs` and `chat` commands with idiomatic verbs (search, get, pages, page, listing, create, edit, send, react, reply, members, followers, messages) replacing the spec-derived workspaces/docs/<verb>-public and workspaces/chat/get-channels paths. ~22 aliases total. Original verbs kept as Cobra aliases for back-compat.",
-        "The generator names commands after API operationIds, which preserves a 1:1 mapping back to the spec but is rough on humans. ClickUp's v3 docs and chat surfaces are reachable via short, memorable verbs without losing the original paths."
+        "The generator names commands after API operationIds, which preserves a 1:1 mapping back to the spec but is rough on humans. ClickUp's v3 docs and chat surfaces are reachable via short, memorable verbs without losing the original paths.",
+        "Multipart Task Attachment Upload",
+        "task attach",
+        "Upload one or more local files to a task as real multipart/form-data (one POST per file, part field `attachment`, per-file MIME type). Accepts custom task IDs via --custom-task-ids --team-id, validates every file before sending anything, and --dry-run previews the upload without sending.",
+        "The generated attachment commands sent a JSON body to an endpoint that only accepts multipart/form-data, so uploads never worked. A hand-authored multipart path reuses the client's auth, headers, rate limiter and cache invalidation, and skips 5xx retries to avoid duplicate attachments.",
+        "Task Attachment Listing with Comment Counts",
+        "task attachments",
+        "List a task's attachments as rows (id, title, extension, size, url, total_comments, resolved_comments, open_comments) from GET /v2/task/{id}, with custom task ID support.",
+        "Attachment comment counts are buried in the full task payload; open = total - resolved is what reviewers actually need. The public API exposes counts only, not comment text."
       ],
       "path": "library/project-management/clickup",
       "release": {
@@ -4948,6 +4956,12 @@
         "handle": "kjmagnan1s",
         "name": "Kevin Magnan"
       },
+      "contributors": [
+        {
+          "handle": "ddubyah",
+          "name": "Darren Wallace"
+        }
+      ],
       "mcp": {
         "binary": "clickup-pp-mcp",
         "transports": [
@@ -18747,9 +18761,9 @@
       "path": "library/developer-tools/nvd",
       "release": {
         "cli_name": "nvd-pp-cli",
-        "version": "2026.9.1",
-        "released_at": "2026-09-11T09:22:21Z",
-        "source_commit": "81f5764eda401077520268afe74913c0f21f5b7e"
+        "version": "2026.10.1",
+        "released_at": "2026-10-07T08:58:29Z",
+        "source_commit": "b631967bfaeae6f1c2deca9d07668df771cc532e"
       },
       "printer": "hnshah",
       "printer_name": "Hiten Shah",
@@ -19794,6 +19808,10 @@
         {
           "handle": "Quantman1974",
           "name": "Quantman1974"
+        },
+        {
+          "handle": "Bhumika-1432006",
+          "name": "Bhumika-1432006"
         }
       ],
       "mcp": {
@@ -23403,9 +23421,9 @@
       "path": "library/project-management/redmine",
       "release": {
         "cli_name": "redmine-pp-cli",
-        "version": "2026.9.1",
-        "released_at": "2026-09-11T09:22:21Z",
-        "source_commit": "81f5764eda401077520268afe74913c0f21f5b7e"
+        "version": "2026.10.1",
+        "released_at": "2026-10-07T08:58:29Z",
+        "source_commit": "85bf5cba56a6243559dd4bc03e5776d279da4795"
       },
       "printer": "yosimasu",
       "printer_name": "Masu Lin",
@@ -24749,9 +24767,9 @@
       "path": "library/developer-tools/scrape-do",
       "release": {
         "cli_name": "scrape-do-pp-cli",
-        "version": "2026.9.1",
-        "released_at": "2026-09-11T09:22:21Z",
-        "source_commit": "81f5764eda401077520268afe74913c0f21f5b7e"
+        "version": "2026.10.1",
+        "released_at": "2026-10-07T08:58:29Z",
+        "source_commit": "f9f034d71565567546954940e8a57749d7712920"
       },
       "printer": "Charles-Garrison",
       "printer_name": "Charles Garrison",
@@ -29094,9 +29112,9 @@
       "path": "library/developer-tools/thelancet",
       "release": {
         "cli_name": "thelancet-pp-cli",
-        "version": "2026.10.2",
-        "released_at": "2026-10-04T08:54:26Z",
-        "source_commit": "7376d5fc0da12663c1234a0e72e19912516c76d2"
+        "version": "2026.10.3",
+        "released_at": "2026-10-07T08:57:14Z",
+        "source_commit": "e528b1131f07785707827a4741abc0b57d3a24bd"
       },
       "printer": "laci141",
       "printer_name": "laci141",
