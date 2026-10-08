@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "slug": "costco-sameday",
+  "cli_name": "costco-sameday-pp-cli",
+  "version": "2026.10.1",
+  "released_at": "2026-10-08T08:51:28Z",
+  "source_commit": "75f7fcbe1d4094a289fa6a5feb5a9684dfe3a96d",
+  "printing_press_version": "4.31.7",
+  "run_id": "20261007-135457",
+  "changes": [
+    {
+      "title": "feat(costco-sameday): Same-Day GraphQL CLI with dual-gated place and REST cancel",
+      "pr": 2273,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/2273",
+      "commit": "75f7fcbe1d4094a289fa6a5feb5a9684dfe3a96d"
+    }
+  ]
+}

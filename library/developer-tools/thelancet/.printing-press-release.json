@@ -2,17 +2,17 @@
   "schema_version": 1,
   "slug": "thelancet",
   "cli_name": "thelancet-pp-cli",
-  "version": "2026.10.3",
-  "released_at": "2026-10-07T08:57:14Z",
-  "source_commit": "e528b1131f07785707827a4741abc0b57d3a24bd",
+  "version": "2026.10.4",
+  "released_at": "2026-10-08T08:51:28Z",
+  "source_commit": "2710330bfb94b5248bacf883e88553f19b998766",
   "printing_press_version": "4.24.0",
   "run_id": "20260617-072858-2f9fe13e",
   "changes": [
     {
-      "title": "feat(thelancet): curate --sort velocity (recent-window citation velocity)",
-      "pr": 2274,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/2274",
-      "commit": "e528b1131f07785707827a4741abc0b57d3a24bd"
+      "title": "feat(thelancet): send OPENALEX_API_KEY to OpenAlex",
+      "pr": 2278,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/2278",
+      "commit": "2710330bfb94b5248bacf883e88553f19b998766"
     }
   ]
 }

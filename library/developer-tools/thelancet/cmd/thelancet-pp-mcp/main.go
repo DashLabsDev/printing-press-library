@@ -8,7 +8,7 @@ import (
 	mcptools "github.com/mvanhorn/printing-press-library/library/developer-tools/thelancet/internal/mcp"
 )
 
-var version = "2026.10.3"
+var version = "2026.10.4"
 
 func main() {
 	s := server.NewMCPServer(

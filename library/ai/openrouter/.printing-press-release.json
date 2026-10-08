@@ -2,17 +2,17 @@
   "schema_version": 1,
   "slug": "openrouter",
   "cli_name": "openrouter-pp-cli",
-  "version": "2026.9.2",
-  "released_at": "2026-09-11T09:22:21Z",
-  "source_commit": "81f5764eda401077520268afe74913c0f21f5b7e",
+  "version": "2026.10.1",
+  "released_at": "2026-10-08T08:51:28Z",
+  "source_commit": "8ca2c5a70d27a6b5d9afb0a85d6e79fca50ba753",
   "printing_press_version": "4.31.4",
   "run_id": "20260901-171359-a49ee862",
   "changes": [
     {
-      "title": "fix: fail closed on ambiguous fleet write retries",
-      "pr": 1978,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/1978",
-      "commit": "81f5764eda401077520268afe74913c0f21f5b7e"
+      "title": "docs(openrouter): add management key workaround to Auth Setup in SKILL.md",
+      "pr": 2280,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/2280",
+      "commit": "8ca2c5a70d27a6b5d9afb0a85d6e79fca50ba753"
     }
   ]
 }
