@@ -91,6 +91,7 @@ These capabilities aren't available in any other tool for this API.
 - `notion-pp-cli data-sources create-a-database` — Create a data source
 - `notion-pp-cli data-sources retrieve-a` — Retrieve a data source
 - `notion-pp-cli data-sources update-a` — Update a data source
+- `notion-pp-cli data-sources query post-database <data_source_id>` — Query a data source. Note: the leaf command is `post-database`, not a bare `query` — `data-sources query` is an intermediate group that prints help. This differs from `databases query <id>`, which executes directly.
 
 **databases** — Database endpoints
 
