@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "slug": "dropbox",
+  "cli_name": "dropbox-pp-cli",
+  "version": "2026.10.1",
+  "released_at": "2026-10-08T19:37:55Z",
+  "source_commit": "90f21d928bb7e6bd062206bdc6298032a8f870bd",
+  "printing_press_version": "4.33.2",
+  "run_id": "20261006-161517-620ff191",
+  "changes": [
+    {
+      "title": "feat(dropbox): add dropbox",
+      "pr": 2283,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/2283",
+      "commit": "90f21d928bb7e6bd062206bdc6298032a8f870bd"
+    }
+  ]
+}
