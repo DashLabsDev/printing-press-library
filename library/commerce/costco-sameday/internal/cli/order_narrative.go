@@ -293,25 +293,37 @@ Card PANs/CVV are never accepted here; payment must already be attached on the c
 				return err
 			}
 			params := map[string]string{"operationName": "FinalizeCheckout"}
-			ctx := client.WithFinalizeCheckoutConsent(cmd.Context())
+			// The client re-checks BOTH flags at the transport layer.
+			ctx := client.WithChargeConsent(cmd.Context(), flags.yes, confirmCharge)
 			ctx = client.WithDeclaredGraphQLOperation(ctx, "FinalizeCheckout")
 			data, status, err := c.PostWithParams(ctx, "/graphql", params, body)
 			if err != nil {
 				return classifyAPIError(cmd.OutOrStdout(), err, flags)
 			}
-			charged := client.GraphQLResponseSucceeded(status, data)
+			outcome := client.ClassifyFinalizeCheckoutResponse(status, data)
+			charged := outcome == client.ChargeConfirmed
 			out := map[string]any{
-				"would_charge": true,
-				"dry_run":      false,
-				"charged":      charged,
-				"http_status":  status,
-				"operation":    "FinalizeCheckout",
-				"response":     json.RawMessage(data),
+				"would_charge":  true,
+				"dry_run":       false,
+				"charged":       charged,
+				"charge_status": outcome,
+				"http_status":   status,
+				"operation":     "FinalizeCheckout",
+				"response":      json.RawMessage(data),
 			}
 			if !charged {
 				out["success"] = false
 			}
-			return printNarrativeJSON(cmd, flags, out)
+			if err := printNarrativeJSON(cmd, flags, out); err != nil {
+				return err
+			}
+			switch outcome {
+			case client.ChargeNotCharged:
+				return fmt.Errorf("FinalizeCheckout did not charge (HTTP %d with errors or a verify-mode no-op reply); see response above", status)
+			case client.ChargeUnconfirmed:
+				return fmt.Errorf("FinalizeCheckout charge is UNCONFIRMED (HTTP %d, no finalizeCheckout result): check order history before retrying to avoid a double charge", status)
+			}
+			return nil
 		},
 	}
 	cmd.Flags().StringVar(&checkoutSessionID, "checkout-session-id", "", "Checkout session id from InitializeCheckout")
@@ -449,7 +461,13 @@ Use order cancel-options to list CustomerCancelSelections reasons first.`,
 			if !canceled {
 				out["success"] = false
 			}
-			return printNarrativeJSON(cmd, flags, out)
+			if err := printNarrativeJSON(cmd, flags, out); err != nil {
+				return err
+			}
+			if !canceled {
+				return fmt.Errorf("order cancel not confirmed (HTTP %d with an error body or a verify-mode no-op reply); see response above", status)
+			}
+			return nil
 		},
 	}
 	cmd.Flags().StringVar(&orderID, "order-id", "", "Order id path segment for PUT /api/v2/orders/{orderId}/cancel (required)")

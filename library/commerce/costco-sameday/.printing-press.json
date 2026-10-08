@@ -24,17 +24,6 @@
   "mcp_ready": "partial",
   "api_version": "0.1.0",
   "auth_type": "cookie",
-  "auth_env_vars": [
-    "PRINTING_PRESS_CLIENT_PROFILE"
-  ],
-  "auth_env_var_specs": [
-    {
-      "name": "PRINTING_PRESS_CLIENT_PROFILE",
-      "kind": "per_call",
-      "required": true,
-      "sensitive": false
-    }
-  ],
   "novel_features": [
     {
       "name": "Dual-gated place order",

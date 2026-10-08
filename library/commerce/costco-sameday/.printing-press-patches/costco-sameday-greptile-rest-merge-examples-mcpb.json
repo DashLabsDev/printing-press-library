@@ -4,24 +4,19 @@
   "applied_at": "2026-10-07",
   "base_run_id": "20261007-135457",
   "base_printing_press_version": "4.31.7",
-  "summary": "REST cancel keeps source=web (no GraphQL variable fold); saved-data explicit clears overwrite; restore real operation names in examples; MCPB PRINTING_PRESS_CLIENT_PROFILE binding.",
+  "summary": "REST cancel keeps source=web (no GraphQL variable fold); restore real operation names in generated examples. (Merge-clear and MCPB profile parts superseded by costco-sameday-transport-charge-gate-outcomes-merge-clears.)",
   "reason": "Greptile 0/5 on ccbe119: cancel source folded into variables; merge kept stale empties; examples used example-resource; CI Validate MCPB manifest contract failed.",
   "files": [
     "internal/client/client.go",
     "internal/client/graphql_guard_test.go",
-    "internal/store/store.go",
-    "internal/store/upsert_batch_test.go",
-    "internal/cli/*.go (Example lines)",
-    "manifest.json",
+    "internal/cli/products_items.go",
     "README.md",
     "SKILL.md"
   ],
   "markers": [
     "Fold loose flag params into GraphQL variables only when this is a GraphQL",
-    "Explicit null from a fresh response clears",
-    "PRINTING_PRESS_CLIENT_PROFILE",
     "TestApplyPersistedQueryParamOverridesKeepsRESTQueryParams",
-    "TestMergeKeepRicherJSONExplicitClears"
+    "--operation-name Items"
   ],
   "validated_outcome": "go test ./internal/client/ -run TestFold|TestEnforce|TestApplyPersisted; go test ./internal/store/ -run TestMergeKeepRicher; go test ./internal/cli/ -run Order|Narrative; go test ./internal/mcp/"
 }

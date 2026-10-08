@@ -16,8 +16,8 @@
     "FinalizeCheckout",
     "/api/v2/orders/",
     "refusing to cancel",
-    "WithFinalizeCheckoutConsent",
-    "GraphQLResponseSucceeded",
+    "WithChargeConsent",
+    "ClassifyFinalizeCheckoutResponse",
     "mcp:read-only"
   ],
   "validated_outcome": "go test ./internal/cli/ -run TestOrder; go test ./internal/client/ -run TestGraphQL; place without flags refuses; charged false on errors/verify."

@@ -911,6 +911,24 @@ func (c *Client) doMutation(ctx context.Context, method, path string, params map
 // mutationIntent extends that gate to GET action endpoints whose wire method
 // is not itself a mutating verb.
 func (c *Client) doInternal(ctx context.Context, method, path string, params map[string]string, body any, headerOverrides map[string]string, readOnlyIntent bool, mutationIntent bool) (json.RawMessage, int, error) {
+	// Charge gate (hand-authored, see graphql_guard.go): refuse anything that
+	// targets FinalizeCheckout unless order place supplied BOTH --yes and
+	// --confirm-charge. Runs before verify short-circuit, dry-run, auth, and
+	// send, for every verb and path, on the caller's raw params and body.
+	finalizeHashes := c.finalizeCheckoutHashes()
+	{
+		var rawBody []byte
+		if body != nil {
+			b, err := json.Marshal(body)
+			if err != nil {
+				return nil, 0, fmt.Errorf("marshaling body: %w", err)
+			}
+			rawBody = b
+		}
+		if err := enforceChargeGate(ctx, path, params, rawBody, finalizeHashes); err != nil {
+			return nil, 0, err
+		}
+	}
 	// Verify-mode transport-layer gate. When the verifier (or any consumer
 	// that sets PRINTING_PRESS_VERIFY=1) drives a mutating verb or explicit
 	// mutation intent without the LIVE_HTTP=1 opt-in, return a synthetic
@@ -954,10 +972,13 @@ func (c *Client) doInternal(ctx context.Context, method, path string, params map
 	}
 	bodyBytes = c.applyPersistedQueryBodyOverrides(bodyBytes)
 	params = c.applyPersistedQueryParamOverrides(params)
-	if strings.Contains(path, "graphql") {
-		if err := enforceGraphQLOperationSafety(ctx, params, bodyBytes); err != nil {
-			return nil, 0, err
-		}
+	// Re-check the exact bytes that will be sent (persisted-query hashes are
+	// injected above), then the declared-operation lock.
+	if err := enforceChargeGate(ctx, path, params, bodyBytes, finalizeHashes); err != nil {
+		return nil, 0, err
+	}
+	if err := enforceGraphQLOperationSafety(ctx, params, bodyBytes); err != nil {
+		return nil, 0, err
 	}
 
 	// Resolve auth material before the dry-run branch so --dry-run can preview
@@ -1378,6 +1399,28 @@ func (c *Client) applyPersistedQueryParamOverrides(params map[string]string) map
 		updated["variables"] = "{}"
 	}
 	return updated
+}
+
+// finalizeCheckoutHashes returns every known persisted-query hash for the
+// FinalizeCheckout charge mutation (user registry and embedded seed), so a
+// request that carries only the hash is still caught by the charge gate.
+func (c *Client) finalizeCheckoutHashes() []string {
+	seen := map[string]struct{}{}
+	var out []string
+	add := func(h string) {
+		h = strings.TrimSpace(h)
+		if h == "" {
+			return
+		}
+		if _, ok := seen[h]; ok {
+			return
+		}
+		seen[h] = struct{}{}
+		out = append(out, h)
+	}
+	add(c.persistedQueryHashes()[finalizeCheckoutOperation])
+	add(hashesFromPersistedQueryEntries(decodePersistedQueryEntries(persistedQueriesSeedJSON))[finalizeCheckoutOperation])
+	return out
 }
 
 func (c *Client) persistedQueryHashes() map[string]string {

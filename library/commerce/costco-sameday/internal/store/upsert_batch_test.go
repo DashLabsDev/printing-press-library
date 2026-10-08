@@ -765,7 +765,6 @@ func TestMergeKeepRicherJSON(t *testing.T) {
 	}
 }
 
-
 func TestMergeKeepRicherJSONExplicitClears(t *testing.T) {
 	// Explicit null / empty string / empty array from a fresh response must
 	// overwrite stale saved values. Absent keys must still be preserved.
@@ -1181,5 +1180,65 @@ func TestFTSMatchQuerySanitizesPunctuation(t *testing.T) {
 				t.Fatalf("close rows: %v", err)
 			}
 		})
+	}
+}
+
+func TestMergeKeepRicherJSONExplicitEmptiesOverwriteContainers(t *testing.T) {
+	cases := []struct {
+		name     string
+		existing string
+		incoming string
+		key      string
+		want     string
+	}{
+		{"null clears object", `{"id":"1","addr":{"line1":"x"}}`, `{"id":"1","addr":null}`, "addr", `null`},
+		{"empty string clears object", `{"id":"1","addr":{"line1":"x"}}`, `{"id":"1","addr":""}`, "addr", `""`},
+		{"empty object clears object", `{"id":"1","addr":{"line1":"x","zip":"1"}}`, `{"id":"1","addr":{}}`, "addr", `{}`},
+		{"empty array clears array", `{"id":"1","items":[{"id":"a"}]}`, `{"id":"1","items":[]}`, "items", `[]`},
+		{"empty string clears string", `{"id":"1","note":"old"}`, `{"id":"1","note":""}`, "note", `""`},
+		{"absent key preserved", `{"id":"1","note":"old"}`, `{"id":"1"}`, "note", `"old"`},
+		{"non-empty scalar keeps richer object", `{"id":"1","addr":{"line1":"x"}}`, `{"id":"1","addr":"addr_1"}`, "addr", `{"line1":"x"}`},
+	}
+	for _, tc := range cases {
+		got, ok := mergeKeepRicherJSON("mutations", json.RawMessage(tc.existing), json.RawMessage(tc.incoming))
+		if !ok {
+			t.Fatalf("%s: merge returned !ok", tc.name)
+		}
+		var obj map[string]json.RawMessage
+		if err := json.Unmarshal(got, &obj); err != nil {
+			t.Fatalf("%s: unmarshal: %v", tc.name, err)
+		}
+		if string(obj[tc.key]) != tc.want {
+			t.Fatalf("%s: %s = %s, want %s (merged %s)", tc.name, tc.key, obj[tc.key], tc.want, got)
+		}
+	}
+}
+
+func TestUpsertFreshResponseClearsSavedFields(t *testing.T) {
+	s, err := Open(filepath.Join(t.TempDir(), "data.db"))
+	if err != nil {
+		t.Fatalf("open: %v", err)
+	}
+	defer s.Close()
+	first := json.RawMessage(`{"id":"ord-1","note":"leave at door","tags":["a"],"addr":{"line1":"x"},"keep":"yes"}`)
+	if _, _, err := s.UpsertBatch("mutations", []json.RawMessage{first}); err != nil {
+		t.Fatalf("first upsert: %v", err)
+	}
+	fresh := json.RawMessage(`{"id":"ord-1","note":"","tags":[],"addr":null}`)
+	if _, _, err := s.UpsertBatch("mutations", []json.RawMessage{fresh}); err != nil {
+		t.Fatalf("fresh upsert: %v", err)
+	}
+	got, err := s.Get("mutations", "ord-1")
+	if err != nil {
+		t.Fatalf("get: %v", err)
+	}
+	var obj map[string]json.RawMessage
+	if err := json.Unmarshal(got, &obj); err != nil {
+		t.Fatal(err)
+	}
+	for key, want := range map[string]string{"note": `""`, "tags": `[]`, "addr": `null`, "keep": `"yes"`} {
+		if string(obj[key]) != want {
+			t.Fatalf("%s = %s, want %s (stored %s)", key, obj[key], want, got)
+		}
 	}
 }

@@ -16,7 +16,7 @@
     "internal/cli/cart_updatecartitemsmutation.go"
   ],
   "markers": [
-    "WithFinalizeCheckoutConsent",
+    "WithChargeConsent",
     "foldGraphQLVariables",
     "enforceGraphQLOperationSafety",
     "declaredOp",

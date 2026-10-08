@@ -2008,9 +2008,10 @@ func fingerprintScalar(value any) (any, bool) {
 //   - Object keys present only on existing are kept (absent ≠ cleared).
 //   - Objects merge recursively; incoming keys go through the same policy
 //     rather than wholesale replacement.
-//   - A container (object/array) is never replaced by a non-null scalar.
-//   - Explicit incoming null, empty string, or empty array clears the
-//     prior value (fresh response overwrite). Absent keys stay.
+//   - Explicit incoming null, "", {} or [] clears the prior value, even a
+//     richer object/array (fresh response overwrite). Absent keys stay.
+//   - A non-empty container (object/array) is never replaced by a
+//     non-empty scalar (list summary vs. saved detail).
 //   - Object arrays match by the same identity stack as ExtractResourceID
 //     (configured / dotted override, generic id, resource-scoped suffix)
 //     plus item-local suffix keys (currency_code, accountId) and sku.
@@ -2058,9 +2059,12 @@ func decodeJSONValue(data json.RawMessage) (any, error) {
 }
 
 func mergeKeepRicherValue(resourceType string, existing, incoming any) any {
-	// Explicit null from a fresh response clears the field (do not keep stale).
-	if incoming == nil {
-		return nil
+	// A key the fresh response explicitly supplies as empty (null, "", {} or
+	// []) is a clear: it overwrites the saved value, even when the saved value
+	// is a richer object or array. Only ABSENT keys are preserved (handled in
+	// mergeKeepRicherObject, which never reaches here for them).
+	if isJSONEmpty(incoming) {
+		return incoming
 	}
 	existingObj, existingIsObj := existing.(map[string]any)
 	incomingObj, incomingIsObj := incoming.(map[string]any)
@@ -2072,11 +2076,11 @@ func mergeKeepRicherValue(resourceType string, existing, incoming any) any {
 	if existingIsArr && incomingIsArr {
 		return mergeKeepRicherArray(resourceType, existingArr, incomingArr)
 	}
+	// Keep-richer: a non-empty scalar summary (e.g. an id string in a list
+	// payload) does not replace a saved non-empty detail object/array.
 	if isJSONContainer(existing) && !isJSONContainer(incoming) {
 		return existing
 	}
-	// Explicit empty string / empty values from incoming replace existing.
-	// Absent keys are handled in mergeKeepRicherObject (not present here).
 	return incoming
 }
 
@@ -2096,7 +2100,8 @@ func mergeKeepRicherObject(resourceType string, existing, incoming map[string]an
 }
 
 func mergeKeepRicherArray(resourceType string, existing, incoming []any) []any {
-	// Explicit empty array clears; do not preserve stale nonempty existing.
+	// Explicit empty array clears (mergeKeepRicherValue already returns early
+	// for it; kept here for direct callers).
 	if len(incoming) == 0 {
 		return incoming
 	}
