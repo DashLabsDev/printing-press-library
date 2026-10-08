@@ -4946,9 +4946,9 @@
       "path": "library/project-management/clickup",
       "release": {
         "cli_name": "clickup-pp-cli",
-        "version": "2026.9.1",
-        "released_at": "2026-09-11T09:22:21Z",
-        "source_commit": "81f5764eda401077520268afe74913c0f21f5b7e"
+        "version": "2026.10.1",
+        "released_at": "2026-10-08T08:51:28Z",
+        "source_commit": "30bf274b623b86a1fd1a804e44f305176c0cdafd"
       },
       "printer": "kjmagnan1s",
       "printer_name": "Kevin Magnan",
@@ -5977,6 +5977,12 @@
         "Read CustomerCancelSelections cancel-reason options (read-only)."
       ],
       "path": "library/commerce/costco-sameday",
+      "release": {
+        "cli_name": "costco-sameday-pp-cli",
+        "version": "2026.10.1",
+        "released_at": "2026-10-08T08:51:28Z",
+        "source_commit": "75f7fcbe1d4094a289fa6a5feb5a9684dfe3a96d"
+      },
       "printer": "DashLabsDev",
       "printer_name": "Dash Labs",
       "creator": {
@@ -7461,6 +7467,63 @@
         "tool_count": 3,
         "public_tool_count": 3,
         "auth_type": "none",
+        "env_vars": [],
+        "mcp_ready": "full",
+        "spec_format": "internal"
+      }
+    },
+    {
+      "name": "dropbox",
+      "category": "productivity",
+      "api": "Dropbox",
+      "description": "Find duplicates, sync conflicts, and stale shared links across a whole Dropbox, then clean up with plans you preview first.",
+      "search_terms": [
+        "dropbox",
+        "dropbox-pp-cli",
+        "Find duplicates, sync conflicts, and stale shared links across a whole Dropbox, then clean up with plans you preview first.",
+        "Conflicted-copy cleanup",
+        "conflicts",
+        "Find Dropbox conflicted copies and Selective Sync Conflict folders, compare each one to its original file by file, and plan removal only for copies that add nothing.",
+        "Shared-link audit and bulk revoke",
+        "links audit",
+        "List every shared link you own with its visibility and expiry, flag links to files that no longer exist, and plan bulk revokes.",
+        "Rule-based organizer",
+        "organize",
+        "Turn a glob and a destination template like /Photos/{year}/{month} into a move plan, with missing folders and name collisions worked out before anything moves.",
+        "Account overview",
+        "overview",
+        "See quota, space by top-level folder, file type, and year, real duplicate totals, conflict copies, and how much space code folders like node_modules take.",
+        "Batched, journaled apply",
+        "apply",
+        "Preview a plan, then run it with --yes in Dropbox batch jobs of up to 1000 items that retry on lock contention and record every change in a local journal.",
+        "Structure lint",
+        "mess",
+        "List empty folders, single-file folders, loose files at the root, 'Copy of' and '(1)' names, very deep paths, and near-duplicate folder names like Taxes and Taxes 2.",
+        "Plan validator",
+        "plan check",
+        "Check a plan against the index before it runs: files that changed since planning, name collisions, case-only renames, code folders, and moves that would change who can see a file.",
+        "Undo a batch",
+        "undo",
+        "Reverse an applied batch: move files back and restore soft-deleted files from the revision recorded when they were deleted.",
+        "Change journal",
+        "journal",
+        "List applied batches with their results and how many days remain to restore deleted files."
+      ],
+      "path": "library/productivity/dropbox",
+      "printer": "cathrynlavery",
+      "printer_name": "Cathryn Lavery",
+      "creator": {
+        "handle": "cathrynlavery",
+        "name": "Cathryn Lavery"
+      },
+      "mcp": {
+        "binary": "dropbox-pp-mcp",
+        "transports": [
+          "stdio"
+        ],
+        "tool_count": 41,
+        "public_tool_count": 0,
+        "auth_type": "oauth2",
         "env_vars": [],
         "mcp_ready": "full",
         "spec_format": "internal"
@@ -19841,9 +19904,9 @@
       "path": "library/ai/openrouter",
       "release": {
         "cli_name": "openrouter-pp-cli",
-        "version": "2026.9.2",
-        "released_at": "2026-09-11T09:22:21Z",
-        "source_commit": "81f5764eda401077520268afe74913c0f21f5b7e"
+        "version": "2026.10.1",
+        "released_at": "2026-10-08T08:51:28Z",
+        "source_commit": "8ca2c5a70d27a6b5d9afb0a85d6e79fca50ba753"
       },
       "printer": "rvdlaar",
       "printer_name": "Rick van de Laar",
@@ -29159,9 +29222,9 @@
       "path": "library/developer-tools/thelancet",
       "release": {
         "cli_name": "thelancet-pp-cli",
-        "version": "2026.10.3",
-        "released_at": "2026-10-07T08:57:14Z",
-        "source_commit": "e528b1131f07785707827a4741abc0b57d3a24bd"
+        "version": "2026.10.4",
+        "released_at": "2026-10-08T08:51:28Z",
+        "source_commit": "2710330bfb94b5248bacf883e88553f19b998766"
       },
       "printer": "laci141",
       "printer_name": "laci141",
