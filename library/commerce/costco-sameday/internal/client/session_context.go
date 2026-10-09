@@ -84,7 +84,7 @@ func ValidatePostalCode(zip string) error {
 	if zip == "" || postalCodeRe.MatchString(zip) {
 		return nil
 	}
-	return fmt.Errorf("invalid --zip %q: expected a 5-digit US ZIP code", zip)
+	return fmt.Errorf("%q is not a 5-digit US ZIP code", zip)
 }
 
 // SessionContext is the shop/cart/location context a signed-in web session

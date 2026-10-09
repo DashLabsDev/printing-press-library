@@ -120,6 +120,9 @@ func TestZipFlagDrivesShopLookupForSlots(t *testing.T) {
 	if _, err := runRoot(t, "session", "context"); err == nil || ExitCode(err) != 2 {
 		t.Fatalf("invalid COSTCO_SAMEDAY_ZIP should be a usage error, got %v", err)
 	}
+	if _, err := runRoot(t, "slots", "availableservices", "--zip", "98027", "--json"); err != nil {
+		t.Fatalf("valid --zip must override a bad COSTCO_SAMEDAY_ZIP: %v", err)
+	}
 }
 
 func TestGeneratedReadCommandFailsOnGraphQLErrors(t *testing.T) {

@@ -205,7 +205,7 @@ func TestSessionContextZipFallbacks(t *testing.T) {
 		t.Fatalf("env ZIP = %+v err=%v", sc, err)
 	}
 	c2.SetSessionPostalCode("abc")
-	if _, err := c2.ResolveSessionContext(context.Background(), SessionNeeds{Shop: true}); err == nil || !strings.Contains(err.Error(), "5-digit") {
+	if _, err := c2.ResolveSessionContext(context.Background(), SessionNeeds{Shop: true}); err == nil || !strings.Contains(err.Error(), "5-digit US ZIP") {
 		t.Fatalf("invalid ZIP not rejected: %v", err)
 	}
 }

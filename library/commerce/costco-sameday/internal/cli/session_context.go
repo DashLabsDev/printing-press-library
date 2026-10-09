@@ -32,10 +32,13 @@ func init() {
 		}
 	})
 	registerClientHook(func(c *client.Client) error {
-		if err := client.ValidatePostalCode(sessionZipFlag); err != nil {
-			return usageErr(err)
-		}
-		if env := os.Getenv(client.SessionZipEnv); env != "" {
+		if strings.TrimSpace(sessionZipFlag) != "" {
+			if err := client.ValidatePostalCode(sessionZipFlag); err != nil {
+				return usageErr(fmt.Errorf("invalid --zip: %w", err))
+			}
+		} else if env := os.Getenv(client.SessionZipEnv); strings.TrimSpace(env) != "" {
+			// Only the selected source is validated: a valid --zip overrides
+			// a bad environment value.
 			if err := client.ValidatePostalCode(env); err != nil {
 				return usageErr(fmt.Errorf("invalid %s: %w", client.SessionZipEnv, err))
 			}
