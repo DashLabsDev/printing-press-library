@@ -2,17 +2,17 @@
   "schema_version": 1,
   "slug": "namecheap",
   "cli_name": "namecheap-pp-cli",
-  "version": "2026.10.1",
-  "released_at": "2026-10-09T20:29:38Z",
-  "source_commit": "bc43bfb64809b98a7f44a1e1cee826cf11bc542c",
+  "version": "2026.10.2",
+  "released_at": "2026-10-09T20:30:33Z",
+  "source_commit": "f13addeb35c48ae23cf3a93304900c026f1ad04a",
   "printing_press_version": "4.6.0",
   "run_id": "20260514-namecheap",
   "changes": [
     {
-      "title": "fix(namecheap): correct printer handle cathryn-lavery -\u003e cathrynlavery",
-      "pr": 2294,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/2294",
-      "commit": "bc43bfb64809b98a7f44a1e1cee826cf11bc542c"
+      "title": "fix(namecheap): credit creator as cathrynlavery",
+      "pr": 2290,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/2290",
+      "commit": "f13addeb35c48ae23cf3a93304900c026f1ad04a"
     }
   ]
 }
