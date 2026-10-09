@@ -84,16 +84,73 @@ func (p chromeProfile) profileLocation() string {
 	return p.Channel + "/" + p.Dir
 }
 
+// sessionCookieName is the only cookie Same-Day needs to identify a signed-in
+// user. The Costco SSO callback (/rest/sso/auth/costco/callback) sets it.
+const sessionCookieName = "__Host-instacart_sid"
+
+// optionalSessionCookies are sent by the browser alongside the session cookie
+// but are not required for auth. Anonymous visitors receive ahoy_* and
+// X-IC-bcx without signing in, and Same-Day stopped setting
+// _instacart_session_id in 2026. Keep them when present; never fail without them.
+var optionalSessionCookies = []string{"_instacart_session_id", "X-IC-bcx", "ahoy_visitor", "ahoy_visit", "build_sha"}
+
+// requiredAuthCookies lists the cookies that must be present for login to
+// succeed. It also ranks Chrome profiles during auto-detection.
 func requiredAuthCookies() []string {
-	raw := []string{"__Host-instacart_sid", "_instacart_session_id", "X-IC-bcx", "ahoy_visitor", "ahoy_visit", "build_sha"}
-	out := raw[:0]
-	for _, name := range raw {
-		name = strings.TrimSpace(name)
-		if name != "" {
-			out = append(out, name)
+	return []string{sessionCookieName}
+}
+
+type sessionCookie struct {
+	Name  string
+	Value string
+}
+
+// selectSessionCookies parses an imported Cookie header and returns every
+// well-formed cookie in it, in order, de-duplicated by name (last wins, as in
+// a browser jar). It fails only when the required session cookie is missing or
+// malformed. Malformed optional cookies are dropped and reported by name only;
+// values are never included in errors or output.
+func selectSessionCookies(header string) (kept []sessionCookie, dropped []string, err error) {
+	header = trimCookieHeaderPrefix(header)
+	index := map[string]int{}
+	sawRequired := false
+	requiredMalformed := false
+	for _, part := range strings.Split(header, ";") {
+		part = strings.TrimSpace(part)
+		if part == "" {
+			continue
 		}
+		name, value, ok := strings.Cut(part, "=")
+		name = strings.TrimSpace(name)
+		value = strings.TrimSpace(value)
+		if !ok || name == "" {
+			continue
+		}
+		if _, perr := http.ParseCookie(name + "=" + value); perr != nil {
+			if name == sessionCookieName {
+				requiredMalformed = true
+			} else {
+				dropped = append(dropped, name)
+			}
+			continue
+		}
+		if name == sessionCookieName {
+			sawRequired = true
+		}
+		if i, exists := index[name]; exists {
+			kept[i].Value = value
+			continue
+		}
+		index[name] = len(kept)
+		kept = append(kept, sessionCookie{Name: name, Value: value})
 	}
-	return out
+	if !sawRequired {
+		if requiredMalformed {
+			return nil, dropped, fmt.Errorf("cookie %q is malformed; update the browser extractor (pycookiecheat 0.8.0 or newer) or re-copy the Cookie header from DevTools; refusing to save credentials", sessionCookieName)
+		}
+		return nil, dropped, fmt.Errorf("required session cookie %q not found for sameday.costco.com; sign in at https://sameday.costco.com and copy the Cookie header from a fresh request", sessionCookieName)
+	}
+	return kept, dropped, nil
 }
 
 func newAuthLoginCmd(flags *rootFlags) *cobra.Command {
@@ -110,6 +167,11 @@ Use --chrome to read cookies from Chrome for sameday.costco.com.
 Use --browser as an alias for --chrome.
 --chrome and --browser require a cookie extraction tool (pycookiecheat, cookies, or cookie-scoop-cli).
 Use --cookies-file to import Playwright storage-state JSON or a raw Cookie header file.
+Use --cookies-file - to read a raw Cookie header from stdin (e.g. piped from pbpaste).
+
+Only the __Host-instacart_sid session cookie is required. Other cookies in the
+import (X-IC-bcx, ahoy_visitor, ahoy_visit, build_sha, _instacart_session_id,
+and so on) are kept when present and never required.
 
 If you have multiple Chrome profiles, pycookiecheat and cookie-scoop-cli can
 auto-detect which profile is logged in. Use --profile to select a specific
@@ -117,6 +179,7 @@ profile by name when the installed backend supports it.`,
 		Example: `  costco-sameday-pp-cli auth login --chrome
   costco-sameday-pp-cli auth login --browser
   costco-sameday-pp-cli auth login --cookies-file storage-state.json
+  pbpaste | costco-sameday-pp-cli auth login --cookies-file -
   costco-sameday-pp-cli auth login --chrome --profile "Work"`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			w := cmd.OutOrStdout()
@@ -145,13 +208,23 @@ profile by name when the installed backend supports it.`,
 			fromPressAuth := false
 			fromCookiesFile := false
 			if cookiesFile != "" {
-				imported, err := loadCookiesFromFile(cookiesFile, domain)
+				var imported importedCookieFile
+				var err error
+				if cookiesFile == "-" {
+					imported, err = loadCookiesFromReader(cmd.InOrStdin(), domain)
+				} else {
+					imported, err = loadCookiesFromFile(cookiesFile, domain)
+				}
 				if err != nil {
 					return authErr(err)
 				}
 				cookies = imported.Header
 				fromCookiesFile = true
-				fmt.Fprintf(w, "Loaded cookies from %s for %s.\n", cookiesFile, domain)
+				source := cookiesFile
+				if source == "-" {
+					source = "stdin"
+				}
+				fmt.Fprintf(w, "Loaded cookies from %s for %s.\n", source, domain)
 			}
 			if !fromCookiesFile {
 				if pressAuthPath, err := exec.LookPath("press-auth"); err == nil {
@@ -227,35 +300,38 @@ profile by name when the installed backend supports it.`,
 				}
 			} // end if !fromPressAuth
 
-			// Cookie extractors read Chrome's evolving on-disk schema. Refuse
-			// malformed output before it reaches TOML or net/http: stale tools can
-			// otherwise persist binary schema metadata as credentials and leave the
-			// CLI unable to parse its own config on the next invocation.
+			// Same-Day authenticates on __Host-instacart_sid alone. Keep every
+			// other well-formed cookie the browser would send to
+			// sameday.costco.com (optional cookies such as X-IC-bcx or ahoy_*)
+			// so requests match the browser, but never require them: the site
+			// no longer sets _instacart_session_id. Malformed pairs are dropped
+			// before they reach TOML or net/http; a stale extractor that
+			// corrupts the session cookie still fails loudly.
+			kept, dropped, err := selectSessionCookies(cookies)
+			if len(dropped) > 0 {
+				fmt.Fprintf(w, "Skipped malformed optional cookies: %s\n", strings.Join(dropped, ", "))
+			}
+			if err != nil {
+				loginURL := "https://" + strings.TrimPrefix(domain, ".")
+				fmt.Fprintf(w, "\n%s %v\n", red("ERROR"), err)
+				fmt.Fprintln(w, "")
+				fmt.Fprintln(w, "Log in to your account:")
+				fmt.Fprintf(w, "\n  %s\n\n", loginURL)
+				fmt.Fprintln(w, "Then run one of:")
+				fmt.Fprintf(w, "\n  costco-sameday-pp-cli auth login --chrome\n")
+				fmt.Fprintf(w, "  pbpaste | costco-sameday-pp-cli auth login --cookies-file -\n")
+				return authErr(err)
+			}
+			pairs := make([]string, 0, len(kept))
+			jarCookies := make(map[string]string, len(kept))
+			for _, c := range kept {
+				pairs = append(pairs, c.Name+"="+c.Value)
+				jarCookies[c.Name] = c.Value
+			}
+			cookies = strings.Join(pairs, "; ")
 			if err := validateExtractedCookieHeader(cookies); err != nil {
 				return authErr(err)
 			}
-			// Unfiltered, the persisted blob carries every cookie the target
-			// domain has set (CSRF, WAF, anti-bot fingerprints, etc.) into the
-			// Cookie header on every request, which routinely trips upstream
-			// WAFs and shadows the real credential.
-			cookieMap := parseCookieString(cookies)
-			requiredCookies := []string{"__Host-instacart_sid", "_instacart_session_id", "X-IC-bcx", "ahoy_visitor", "ahoy_visit", "build_sha"}
-			kept := make([]string, 0, len(requiredCookies))
-			for _, name := range requiredCookies {
-				v, ok := cookieMap[name]
-				if !ok {
-					loginURL := "https://" + strings.TrimPrefix(domain, ".")
-					fmt.Fprintf(w, "\n%s Cookie %q not found for %s.\n", red("ERROR"), name, domain)
-					fmt.Fprintln(w, "")
-					fmt.Fprintln(w, "Log in to your account:")
-					fmt.Fprintf(w, "\n  %s\n\n", loginURL)
-					fmt.Fprintln(w, "Then run this command again:")
-					fmt.Fprintf(w, "\n  costco-sameday-pp-cli auth login --chrome\n")
-					return authErr(fmt.Errorf("cookie %q not found for %s", name, domain))
-				}
-				kept = append(kept, name+"="+v)
-			}
-			cookies = strings.Join(kept, "; ")
 
 			// Step 5: Save to config
 			cfg, err := config.Load(flags.configPath)
@@ -267,22 +343,25 @@ profile by name when the installed backend supports it.`,
 			if err := cfg.SaveTokens("", "", cookies, "", time.Time{}); err != nil {
 				return configErr(fmt.Errorf("saving cookies: %w", err))
 			}
-			// Persist the required cookies so client.LoadCookieJar() carries
+			// Persist the kept cookies so client.LoadCookieJar() carries
 			// them on subsequent invocations; the SaveTokens blob above feeds
 			// the Authorization header path but is invisible to the HTTP
 			// client's cookie jar.
-			jarCookies := make(map[string]string, len(requiredCookies))
-			for _, name := range requiredCookies {
-				if v, ok := cookieMap[name]; ok {
-					jarCookies[name] = v
-				}
-			}
 			if err := client.WriteCookieJarFromMap(domain, jarCookies); err != nil {
 				fmt.Fprintf(w, "warning: persisting cookie jar: %v (credentials still saved)\n", err)
 			}
 
-			count := len(strings.Split(cookies, ";"))
-			fmt.Fprintf(w, "%s Found %d cookies for %s\n", green("OK"), count, domain)
+			var missingOptional []string
+			for _, name := range optionalSessionCookies {
+				if _, ok := jarCookies[name]; !ok {
+					missingOptional = append(missingOptional, name)
+				}
+			}
+			if len(missingOptional) > 0 {
+				fmt.Fprintf(w, "Optional cookies not present (not required): %s\n", strings.Join(missingOptional, ", "))
+			}
+
+			fmt.Fprintf(w, "%s Found session cookie %s plus %d other cookies for %s\n", green("OK"), sessionCookieName, len(kept)-1, domain)
 			fmt.Fprintf(w, "Session saved to %s\n", credentialSavePath(cfg))
 			return nil
 		},
@@ -291,7 +370,7 @@ profile by name when the installed backend supports it.`,
 	cmd.Flags().BoolVar(&browserFlag, "chrome", false, "Read cookies from Chrome")
 	cmd.Flags().BoolVar(&browserFlag, "browser", false, "Alias for --chrome")
 	cmd.Flags().StringVar(&profileFlag, "profile", "", "Chrome profile name, or channel-qualified (e.g. \"Work\", \"Chrome Beta/Default\")")
-	cmd.Flags().StringVar(&cookiesFile, "cookies-file", "", "Import cookies from a Playwright storage-state JSON file or raw Cookie header file")
+	cmd.Flags().StringVar(&cookiesFile, "cookies-file", "", "Import cookies from a Playwright storage-state JSON file or raw Cookie header file (- for stdin)")
 	return cmd
 }
 func cookieToolSupportsProfiles(tool string) bool {
@@ -1059,6 +1138,20 @@ func loadCookiesFromFile(path string, domain string) (importedCookieFile, error)
 	if err != nil {
 		return importedCookieFile{}, fmt.Errorf("reading cookies file: %w", err)
 	}
+	return parseCookiesData(data, domain)
+}
+
+// loadCookiesFromReader imports cookies from a stream (`--cookies-file -`),
+// so a Cookie header can be piped from the clipboard without touching disk.
+func loadCookiesFromReader(r io.Reader, domain string) (importedCookieFile, error) {
+	data, err := io.ReadAll(io.LimitReader(r, 1<<20))
+	if err != nil {
+		return importedCookieFile{}, fmt.Errorf("reading cookies from stdin: %w", err)
+	}
+	return parseCookiesData(data, domain)
+}
+
+func parseCookiesData(data []byte, domain string) (importedCookieFile, error) {
 	var state struct {
 		Cookies []struct {
 			Name     string  `json:"name"`

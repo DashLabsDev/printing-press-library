@@ -142,7 +142,7 @@ Or import an existing browser capture:
 costco-sameday-pp-cli auth login --cookies-file storage-state.json
 ```
 
-`--cookies-file` accepts Playwright storage-state JSON or a raw `Cookie:` header text file. The Chrome path requires a cookie extraction tool. Install one:
+`--cookies-file` accepts Playwright storage-state JSON or a raw `Cookie:` header text file. Use `--cookies-file -` to read the header from stdin (for example `pbpaste | costco-sameday-pp-cli auth login --cookies-file -`). Only the `__Host-instacart_sid` session cookie is required; other Same-Day cookies are kept when present. The Chrome path requires a cookie extraction tool. Install one:
 
 ```bash
 pip install pycookiecheat          # Python (recommended)
