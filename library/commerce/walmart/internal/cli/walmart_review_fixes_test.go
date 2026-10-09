@@ -7,14 +7,17 @@ package cli
 import (
 	"bytes"
 	"encoding/json"
+	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/spf13/cobra"
 
+	"github.com/mvanhorn/printing-press-library/library/commerce/walmart/internal/client"
 	"github.com/mvanhorn/printing-press-library/library/commerce/walmart/internal/cliutil"
 )
 
@@ -210,5 +213,165 @@ func TestClassifyAccountProbe(t *testing.T) {
 		if got := classifyAccountProbe([]byte(body)); !strings.HasPrefix(got, want) {
 			t.Fatalf("%s: got %q want prefix %q", body, got, want)
 		}
+	}
+}
+
+func TestCookiesFileExpiredAuthReadsLapsed(t *testing.T) {
+	now := time.Now()
+	future := float64(now.Add(24 * time.Hour).Unix())
+	past := float64(now.Add(-time.Minute).Unix())
+	b, _ := json.Marshal(map[string]any{"cookies": []map[string]any{
+		{"name": "CID", "value": "fake-cid", "domain": ".walmart.com", "expires": future},
+		{"name": "SPID", "value": "fake-spid", "domain": ".walmart.com", "expires": future},
+		{"name": "customer", "value": "fake-cust", "domain": ".walmart.com", "expires": -1},
+		{"name": "auth", "value": "fake-auth", "domain": ".walmart.com", "expires": past},
+	}})
+	f, err := parseCookiesFileData(b, "walmart.com", now)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(f.Header, "auth=") {
+		t.Fatalf("expired auth must not reach the header: %q", f.Header)
+	}
+	rows := importedRowsFromFile(f.Cookies, now)
+	sess := classifyWalmartSession(parseCookieString(f.Header), authCookieExpiry(rows), now)
+	if sess.State != sessionLapsed {
+		t.Fatalf("expired auth must read as lapsed, got %+v", sess)
+	}
+	for _, r := range rows {
+		if r.Name == "customer" && !r.Expires.IsZero() {
+			t.Fatal("expires -1 must be a session cookie (zero expiry)")
+		}
+	}
+}
+
+func TestCookiesFileExtensionArrayFormat(t *testing.T) {
+	now := time.Now()
+	b, _ := json.Marshal([]map[string]any{
+		{"name": "fake_a", "value": "1", "domain": ".walmart.com", "path": "/", "expirationDate": float64(now.Add(time.Hour).Unix()) + 0.5, "secure": true, "httpOnly": true},
+		{"name": "fake_s", "value": "2", "domain": "www.walmart.com", "session": true, "expirationDate": float64(now.Add(time.Hour).Unix())},
+		{"name": "fake_x", "value": "3", "domain": ".walmart.com", "expirationDate": float64(now.Add(-time.Hour).Unix())},
+		{"name": "fake_other", "value": "4", "domain": ".example.com"},
+	})
+	f, err := parseCookiesFileData(b, "walmart.com", now)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := map[string]*http.Cookie{}
+	for _, c := range f.Cookies {
+		got[c.Name] = c
+	}
+	if len(got) != 2 || got["fake_a"] == nil || got["fake_s"] == nil {
+		t.Fatalf("want fake_a and fake_s only, got %v (header %q)", got, f.Header)
+	}
+	if got["fake_a"].Expires.IsZero() || !got["fake_a"].HttpOnly || !got["fake_a"].Secure {
+		t.Fatalf("fake_a lost expiry/flags: %+v", got["fake_a"])
+	}
+	if !got["fake_s"].Expires.IsZero() {
+		t.Fatal("session:true must ignore expirationDate")
+	}
+}
+
+func TestCookiesFileNetscapeFormat(t *testing.T) {
+	now := time.Now()
+	future := now.Add(time.Hour).Unix()
+	pastTS := now.Add(-time.Hour).Unix()
+	txt := "# Netscape HTTP Cookie File\n" +
+		".walmart.com\tTRUE\t/\tTRUE\t" + itoa(future) + "\tfake_n1\tv1\n" +
+		"#HttpOnly_www.walmart.com\tFALSE\t/account\tTRUE\t0\tfake_n2\tv2\n" +
+		".walmart.com\tTRUE\t/\tFALSE\t" + itoa(pastTS) + "\tfake_n3\tv3\n"
+	f, err := parseCookiesFileData([]byte(txt), "walmart.com", now)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if f.Header != "fake_n1=v1; fake_n2=v2" {
+		t.Fatalf("header: %q", f.Header)
+	}
+	rows := importedRowsFromFile(f.Cookies, now)
+	if len(rows) != 2 || rows[0].Expires.Unix() != future || !rows[0].Secure {
+		t.Fatalf("n1 row: %+v", rows)
+	}
+	if !rows[1].HTTPOnly || !rows[1].Expires.IsZero() || rows[1].Path != "/account" || rows[1].Domain != "www.walmart.com" {
+		t.Fatalf("n2 row: %+v", rows[1])
+	}
+}
+
+func TestCookiesFileAllExpiredAndBadJSON(t *testing.T) {
+	now := time.Now()
+	b, _ := json.Marshal(map[string]any{"cookies": []map[string]any{
+		{"name": "fake_old", "value": "1", "domain": ".walmart.com", "expires": float64(now.Add(-time.Hour).Unix())},
+	}})
+	if _, err := parseCookiesFileData(b, "walmart.com", now); err == nil || !strings.Contains(err.Error(), "expired") {
+		t.Fatalf("all-expired must error clearly, got %v", err)
+	}
+	if _, err := parseCookiesFileData([]byte(`{"not":"cookies"`), "walmart.com", now); err == nil {
+		t.Fatal("malformed JSON must not fall through to a raw header")
+	}
+	f, err := parseCookiesFileData([]byte("Cookie: fake_h=1;fake_i=2"), "walmart.com", now)
+	if err != nil || f.Header != "fake_h=1;fake_i=2" {
+		t.Fatalf("raw header: %q %v", f.Header, err)
+	}
+}
+
+func itoa(v int64) string { return strconv.FormatInt(v, 10) }
+
+func TestDescribeSavedSession(t *testing.T) {
+	now := time.Date(2026, 3, 4, 12, 0, 0, 0, time.UTC)
+	base := []client.ImportedCookie{
+		{Name: "CID", Value: "fake-secret-cid", Domain: ".walmart.com", Expires: now.Add(24 * time.Hour)},
+		{Name: "SPID", Value: "fake-secret-spid", Domain: ".walmart.com"},
+		{Name: "customer", Value: "fake-secret-cust", Domain: ".walmart.com"},
+	}
+	with := func(extra ...client.ImportedCookie) []client.ImportedCookie {
+		return append(append([]client.ImportedCookie{}, base...), extra...)
+	}
+	cases := []struct {
+		name   string
+		rows   []client.ImportedCookie
+		active bool
+		want   string
+	}{
+		{"expiring", with(client.ImportedCookie{Name: "auth", Value: "fake-secret-auth", Domain: ".walmart.com", Expires: now.Add(25 * time.Minute)}), true, "Auth cookie: expires"},
+		{"session", with(client.ImportedCookie{Name: "auth", Value: "fake-secret-auth", Domain: ".walmart.com"}), true, "session cookie (no expiry"},
+		{"expired", with(client.ImportedCookie{Name: "auth", Value: "fake-secret-auth", Domain: ".walmart.com", Expires: now.Add(-time.Minute)}), false, "Auth cookie: expired"},
+		{"missing", with(), false, "Auth cookie: not present"},
+		{"empty", nil, false, "no saved browser cookies"},
+	}
+	for _, tc := range cases {
+		lines, active := describeSavedSession(tc.rows, now)
+		out := strings.Join(lines, "\n")
+		if active != tc.active || !strings.Contains(out, tc.want) {
+			t.Fatalf("%s: active=%v out=%q", tc.name, active, out)
+		}
+		if strings.Contains(out, "fake-secret") {
+			t.Fatalf("%s: cookie values must never be printed: %q", tc.name, out)
+		}
+	}
+	lines, _ := describeSavedSession(with(client.ImportedCookie{Name: "auth", Value: "x", Domain: ".walmart.com", Expires: now.Add(-time.Minute)}), now)
+	if !strings.Contains(strings.Join(lines, "\n"), "Cookies: 4 saved (2 session-only, 1 expired)") {
+		t.Fatalf("counts: %q", lines)
+	}
+}
+
+func TestEmitReadAgentReportsLiveSource(t *testing.T) {
+	var buf bytes.Buffer
+	cmd := &cobra.Command{}
+	cmd.SetOut(&buf)
+	flags := &rootFlags{agent: true, asJSON: true}
+	if err := emitRead(cmd, flags, map[string]any{"stores": []fakeRow{{Name: "fake-store"}}}, nil); err != nil {
+		t.Fatal(err)
+	}
+	var env struct {
+		Meta    map[string]any `json:"meta"`
+		Results json.RawMessage
+	}
+	if err := json.Unmarshal(buf.Bytes(), &env); err != nil {
+		t.Fatalf("%q: %v", buf.String(), err)
+	}
+	if env.Meta["source"] != "live" {
+		t.Fatalf("meta.source = %v, want live (%s)", env.Meta["source"], buf.String())
+	}
+	if !strings.Contains(string(env.Results), "fake-store") {
+		t.Fatalf("results lost: %s", buf.String())
 	}
 }

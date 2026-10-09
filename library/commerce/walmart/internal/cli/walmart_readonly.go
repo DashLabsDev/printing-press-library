@@ -49,12 +49,20 @@ func wantJSON(cmd *cobra.Command, flags *rootFlags) bool {
 // --compact, --csv, --plain, --quiet and --agent behave like every other
 // command. rows (may be nil) is the list rendered by the row-oriented
 // formats (--csv, --plain, --quiet); JSON keeps the full envelope.
+//
+// These commands just fetched fresh, uncached data from walmart.com, so the
+// --agent envelope reports meta.source "live" (the shared printJSONFiltered
+// path assumes "local").
 func emitRead(cmd *cobra.Command, flags *rootFlags, full any, rows any) error {
-	w := cmd.OutOrStdout()
+	v := full
 	if rows != nil && (flags.csv || flags.plain || flags.quiet) {
-		return printJSONFiltered(w, rows, flags)
+		v = rows
 	}
-	return printJSONFiltered(w, full, flags)
+	raw, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	return printOutputWithFlagsMeta(cmd.OutOrStdout(), json.RawMessage(raw), flags, map[string]any{"source": "live"})
 }
 
 // requireLiveSource rejects --data-source local for Walmart reads. They only

@@ -298,6 +298,17 @@ func mergeAndWriteCookieRows(path string, rows []persistedCookie) error {
 		all = append(all, r)
 		idx[key] = len(all) - 1
 	}
+	// Expired rows (including Max-Age<=0 / past-Expires deletions) are
+	// removed rather than persisted, so a deleted cookie cannot come back.
+	now := time.Now()
+	live := all[:0]
+	for _, r := range all {
+		if !r.Expires.IsZero() && !r.Expires.After(now) {
+			continue
+		}
+		live = append(live, r)
+	}
+	all = live
 	data, err := json.MarshalIndent(all, "", "  ")
 	if err != nil {
 		return err
@@ -306,6 +317,30 @@ func mergeAndWriteCookieRows(path string, rows []persistedCookie) error {
 		return err
 	}
 	return os.WriteFile(path, data, 0o600)
+}
+
+// PersistedCookies returns the cookies saved in the on-disk jar (values
+// included; callers must not print them). Missing or unreadable jar files
+// return nil. PATCH(walmart-cookie-fidelity).
+func PersistedCookies() []ImportedCookie {
+	path := cookieJarPath()
+	if path == "" {
+		return nil
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil
+	}
+	var rows []persistedCookie
+	if json.Unmarshal(data, &rows) != nil {
+		return nil
+	}
+	out := make([]ImportedCookie, 0, len(rows))
+	for _, r := range rows {
+		out = append(out, ImportedCookie{Name: r.Name, Value: r.Value, Domain: r.Domain, Path: r.Path,
+			Expires: r.Expires, Secure: r.Secure, HTTPOnly: r.HTTP})
+	}
+	return out
 }
 
 func shouldReplaceShadowingCookie(existing, incoming persistedCookie) bool {
@@ -448,7 +483,9 @@ func (j *cookieJar) SetCookies(u *url.URL, cookies []*http.Cookie) {
 
 func (j *cookieJar) persistLocked(u *url.URL, cookies []*http.Cookie) {
 	rows := make([]persistedCookie, 0, len(cookies))
+	now := time.Now()
 	for _, c := range cookies {
+		expires := persistedExpiry(c, now)
 		domain := c.Domain
 		if domain == "" {
 			domain = "." + u.Host
@@ -462,10 +499,26 @@ func (j *cookieJar) persistLocked(u *url.URL, cookies []*http.Cookie) {
 			Value:   c.Value,
 			Domain:  domain,
 			Path:    path,
-			Expires: c.Expires,
+			Expires: expires,
 			Secure:  c.Secure,
 			HTTP:    c.HttpOnly,
 		})
 	}
 	_ = mergeAndWriteCookieRows(j.path, rows)
+}
+
+// persistedExpiry turns a Set-Cookie's lifetime into an absolute expiry.
+// net/http keeps Max-Age in MaxAge and leaves Expires zero, so without this a
+// "Max-Age=1800" cookie would persist as a never-expiring session cookie and
+// a "Max-Age=0" deletion would persist as a live cookie. Max-Age wins over
+// Expires (RFC 6265 5.3). PATCH(walmart-cookie-fidelity).
+func persistedExpiry(c *http.Cookie, now time.Time) time.Time {
+	switch {
+	case c.MaxAge > 0:
+		return now.Add(time.Duration(c.MaxAge) * time.Second).UTC()
+	case c.MaxAge < 0:
+		return time.Unix(1, 0).UTC()
+	default:
+		return c.Expires
+	}
 }

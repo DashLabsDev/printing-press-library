@@ -1,0 +1,32 @@
+{
+  "schema_version": 2,
+  "id": "walmart-live-reads-and-cookie-expiry-contracts",
+  "applied_at": "2026-10-09",
+  "base_run_id": "20261009-032035",
+  "base_printing_press_version": "4.31.7",
+  "summary": "Walmart reads are live-only (reject --data-source local before any request), print through the shared output path with meta.source live, and the doctor account probe is uncached and trusts only GraphQL account data without errors; cookie imports keep per-cookie scope and expiry across every file format, response cookies honor Max-Age (deletions are removed), and auth status reports the session and auth-cookie expiry without values; cart link accepts --items for MCP multi-item input, a harness-refused --open --json still returns the URL, and a cart read remembers the requested cart id.",
+  "reason": "The generated paths assumed a local store, labelled fresh reads as local, treated any HTTP 200 as valid credentials, flattened cookie scope to .walmart.com, dropped Max-Age, and ignored expiry, so an expired or deleted Walmart auth cookie could look active and scripts could not trust source or output flags.",
+  "files": [
+    "internal/cli/walmart_readonly.go",
+    "internal/cli/walmart_shop.go",
+    "internal/cli/walmart_cart.go",
+    "internal/cli/doctor.go",
+    "internal/cli/auth.go",
+    "internal/client/cookiejar.go",
+    "internal/cli/walmart_review_fixes_test.go",
+    "internal/client/cookiejar_expiry_test.go"
+  ],
+  "markers": [
+    "requireLiveSource",
+    "emitRead",
+    "classifyAccountProbe",
+    "parseCookiesFileData",
+    "importedRowsFromFile",
+    "persistedExpiry",
+    "PersistedCookies",
+    "describeSavedSession",
+    "rememberFetchedCartID",
+    "splitItemsFlag"
+  ],
+  "validated_outcome": "Offline tests with fake values: TestLocalDataSourceRejectedBeforeNetwork, TestEmitReadAgentReportsLiveSource, TestClassifyAccountProbe, TestCookiesFile* (Playwright, extension array, Netscape, expired auth reads lapsed), TestSetCookiesPersistsMaxAgeAndDropsDeletions, TestDescribeSavedSession, TestCartLinkHarnessJSONKeepsURL; MCP tools/call cart_link with items returned one 3-item link."
+}

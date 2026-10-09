@@ -111,7 +111,7 @@ walmart-pp-cli which "<capability in your own words>"
 
 ## Auth Setup
 
-Import a signed-in walmart.com browser session with auth login --chrome (or --cookies-file), then run doctor.
+Import a signed-in walmart.com browser session with auth login --chrome (or --cookies-file with Playwright storage-state JSON, a browser-extension cookie export, a Netscape cookies.txt file or a raw Cookie header), then run doctor. auth status shows whether the session is active and when the short-lived auth cookie expires.
 
 Run `walmart-pp-cli doctor` to verify setup.
 

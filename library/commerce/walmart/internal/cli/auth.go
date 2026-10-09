@@ -20,6 +20,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -112,7 +113,9 @@ func newAuthLoginCmd(flags *rootFlags) *cobra.Command {
 Use --chrome to read cookies from Chrome for .walmart.com.
 Use --browser as an alias for --chrome.
 --chrome and --browser require a cookie extraction tool (pycookiecheat, cookies, or cookie-scoop-cli).
-Use --cookies-file to import Playwright storage-state JSON or a raw Cookie header file.
+Use --cookies-file to import Playwright storage-state JSON, a browser-extension
+cookie export (JSON array), a Netscape cookies.txt file, or a raw Cookie header.
+Expired cookies are skipped; auth status shows when the auth cookie expires.
 
 If you have multiple Chrome profiles, pycookiecheat and cookie-scoop-cli can
 auto-detect which profile is logged in. Use --profile to select a specific
@@ -359,6 +362,16 @@ func newAuthStatusCmd(flags *rootFlags) *cobra.Command {
 			fmt.Fprintf(w, "  Source: %s\n", cfg.AuthSource)
 			fmt.Fprintf(w, "  Domain: .walmart.com\n")
 			fmt.Fprintf(w, "  Config: %s\n", cfg.Path)
+			// PATCH(walmart-session-check): report the saved session and the
+			// short-lived auth cookie's expiry (names and times only, never values).
+			if lines, active := describeSavedSession(client.PersistedCookies(), time.Now()); len(lines) > 0 {
+				for i, l := range lines {
+					if i == 0 && !active {
+						l = yellow(l)
+					}
+					fmt.Fprintf(w, "  %s\n", l)
+				}
+			}
 			return nil
 		},
 	}
@@ -1168,59 +1181,188 @@ func loadCookiesFromFile(path string, domain string) (importedCookieFile, error)
 	if err != nil {
 		return importedCookieFile{}, fmt.Errorf("reading cookies file: %w", err)
 	}
-	var state struct {
-		Cookies []struct {
-			Name     string  `json:"name"`
-			Value    string  `json:"value"`
-			Domain   string  `json:"domain"`
-			Path     string  `json:"path"`
-			Expires  float64 `json:"expires"`
-			Secure   bool    `json:"secure"`
-			HTTPOnly bool    `json:"httpOnly"`
-		} `json:"cookies"`
+	return parseCookiesFileData(data, domain, time.Now())
+}
+
+// cookieFileRow is one cookie from a structured export, before domain
+// filtering. Expires is zero for session cookies (no expiry).
+type cookieFileRow struct {
+	Name, Value, Domain, Path string
+	Expires                   time.Time
+	Secure, HTTPOnly          bool
+}
+
+// parseCookiesFileData accepts, in order: Playwright storage-state JSON
+// ({"cookies":[...]} with "expires" in Unix seconds, -1 for session
+// cookies), browser-extension JSON arrays (Cookie-Editor / EditThisCookie:
+// [{"name","value","domain","expirationDate","session",...}]), Netscape
+// cookies.txt (tab-separated, expiry in Unix seconds, 0 for session), and a
+// raw Cookie header. Structured formats keep each cookie's scope and expiry;
+// expired rows are dropped from both the header and the jar rows so an
+// expired "auth" cookie reads as lapsed, not active.
+// PATCH(walmart-cookie-fidelity).
+func parseCookiesFileData(data []byte, domain string, now time.Time) (importedCookieFile, error) {
+	trimmed := strings.TrimSpace(string(data))
+	if trimmed == "" {
+		return importedCookieFile{}, fmt.Errorf("cookies file is empty")
 	}
-	if err := json.Unmarshal(data, &state); err == nil {
+	var rows []cookieFileRow
+	format := ""
+	switch {
+	case strings.HasPrefix(trimmed, "{"):
+		var state struct {
+			Cookies []struct {
+				Name     string  `json:"name"`
+				Value    string  `json:"value"`
+				Domain   string  `json:"domain"`
+				Path     string  `json:"path"`
+				Expires  float64 `json:"expires"`
+				Secure   bool    `json:"secure"`
+				HTTPOnly bool    `json:"httpOnly"`
+			} `json:"cookies"`
+		}
+		if err := json.Unmarshal([]byte(trimmed), &state); err != nil {
+			return importedCookieFile{}, fmt.Errorf("cookies file is JSON but not Playwright storage state: %w", err)
+		}
 		if len(state.Cookies) == 0 {
 			return importedCookieFile{}, fmt.Errorf("cookies file contains an empty cookies array")
 		}
-		parts := make([]string, 0, len(state.Cookies))
-		cookies := make([]*http.Cookie, 0, len(state.Cookies))
+		format = "Playwright storage state"
 		for _, c := range state.Cookies {
-			if !cookieDomainMatches(c.Domain, domain) {
-				continue
-			}
-			name := strings.TrimSpace(c.Name)
-			if name == "" {
-				continue
-			}
-			path := c.Path
-			if path == "" {
-				path = "/"
-			}
-			ck := &http.Cookie{
-				Name:     name,
-				Value:    c.Value,
-				Domain:   c.Domain,
-				Path:     path,
-				Secure:   c.Secure,
-				HttpOnly: c.HTTPOnly,
-			}
-			if c.Expires > 0 {
-				ck.Expires = time.Unix(int64(c.Expires), 0)
-			}
-			cookies = append(cookies, ck)
-			parts = append(parts, name+"="+c.Value)
+			rows = append(rows, cookieFileRow{Name: c.Name, Value: c.Value, Domain: c.Domain, Path: c.Path,
+				Expires: unixSecondsExpiry(c.Expires), Secure: c.Secure, HTTPOnly: c.HTTPOnly})
 		}
-		if len(parts) == 0 {
-			return importedCookieFile{}, fmt.Errorf("cookies file contains no cookies for %s", domain)
+	case strings.HasPrefix(trimmed, "["):
+		var arr []struct {
+			Name           string  `json:"name"`
+			Value          string  `json:"value"`
+			Domain         string  `json:"domain"`
+			Path           string  `json:"path"`
+			ExpirationDate float64 `json:"expirationDate"`
+			Expires        float64 `json:"expires"`
+			Session        bool    `json:"session"`
+			Secure         bool    `json:"secure"`
+			HTTPOnly       bool    `json:"httpOnly"`
 		}
-		return importedCookieFile{Header: strings.Join(parts, "; "), Cookies: cookies}, nil
+		if err := json.Unmarshal([]byte(trimmed), &arr); err != nil {
+			return importedCookieFile{}, fmt.Errorf("cookies file is a JSON array but not a cookie export: %w", err)
+		}
+		if len(arr) == 0 {
+			return importedCookieFile{}, fmt.Errorf("cookies file contains an empty cookies array")
+		}
+		format = "browser cookie export"
+		for _, c := range arr {
+			exp := c.ExpirationDate
+			if exp == 0 {
+				exp = c.Expires
+			}
+			r := cookieFileRow{Name: c.Name, Value: c.Value, Domain: c.Domain, Path: c.Path, Secure: c.Secure, HTTPOnly: c.HTTPOnly}
+			if !c.Session {
+				r.Expires = unixSecondsExpiry(exp)
+			}
+			rows = append(rows, r)
+		}
+	case looksLikeNetscapeCookies(trimmed):
+		format = "Netscape cookies.txt"
+		rows = parseNetscapeCookies(trimmed)
+	default:
+		header := trimCookieHeaderPrefix(trimmed)
+		if header == "" {
+			return importedCookieFile{}, fmt.Errorf("cookies file is empty")
+		}
+		return importedCookieFile{Header: header, Cookies: parseCookieHeaderCookies(header)}, nil
 	}
-	header := trimCookieHeaderPrefix(string(data))
-	if header == "" {
-		return importedCookieFile{}, fmt.Errorf("cookies file is empty")
+
+	parts := make([]string, 0, len(rows))
+	cookies := make([]*http.Cookie, 0, len(rows))
+	expired := 0
+	for _, c := range rows {
+		if !cookieDomainMatches(c.Domain, domain) {
+			continue
+		}
+		name := strings.TrimSpace(c.Name)
+		if name == "" {
+			continue
+		}
+		if !c.Expires.IsZero() && !c.Expires.After(now) {
+			expired++
+			continue
+		}
+		path := c.Path
+		if path == "" {
+			path = "/"
+		}
+		cookies = append(cookies, &http.Cookie{
+			Name:     name,
+			Value:    c.Value,
+			Domain:   c.Domain,
+			Path:     path,
+			Expires:  c.Expires,
+			Secure:   c.Secure,
+			HttpOnly: c.HTTPOnly,
+		})
+		parts = append(parts, name+"="+c.Value)
 	}
-	return importedCookieFile{Header: header, Cookies: parseCookieHeaderCookies(header)}, nil
+	if len(parts) == 0 {
+		if expired > 0 {
+			return importedCookieFile{}, fmt.Errorf("all %d cookies for %s in the %s file have expired; export a fresh session", expired, domain, format)
+		}
+		return importedCookieFile{}, fmt.Errorf("cookies file contains no cookies for %s", domain)
+	}
+	return importedCookieFile{Header: strings.Join(parts, "; "), Cookies: cookies}, nil
+}
+
+// unixSecondsExpiry converts an export's Unix-seconds expiry (fractional
+// allowed) to a time; zero or negative means a session cookie.
+func unixSecondsExpiry(v float64) time.Time {
+	if v <= 0 {
+		return time.Time{}
+	}
+	sec := int64(v)
+	return time.Unix(sec, int64((v-float64(sec))*1e9)).UTC()
+}
+
+func looksLikeNetscapeCookies(s string) bool {
+	if strings.HasPrefix(s, "# Netscape HTTP Cookie File") || strings.HasPrefix(s, "# HTTP Cookie File") {
+		return true
+	}
+	for _, line := range strings.Split(s, "\n") {
+		line = strings.TrimSpace(line)
+		if line == "" || (strings.HasPrefix(line, "#") && !strings.HasPrefix(line, "#HttpOnly_")) {
+			continue
+		}
+		return len(strings.Split(line, "\t")) == 7
+	}
+	return false
+}
+
+// parseNetscapeCookies reads cookies.txt lines: domain, include-subdomains,
+// path, secure, expiry (Unix seconds, 0 = session), name, value. A
+// "#HttpOnly_" domain prefix marks an HttpOnly cookie.
+func parseNetscapeCookies(s string) []cookieFileRow {
+	var rows []cookieFileRow
+	for _, line := range strings.Split(s, "\n") {
+		line = strings.TrimRight(line, "\r")
+		httpOnly := false
+		if strings.HasPrefix(line, "#HttpOnly_") {
+			httpOnly = true
+			line = strings.TrimPrefix(line, "#HttpOnly_")
+		}
+		if strings.TrimSpace(line) == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		f := strings.Split(line, "\t")
+		if len(f) != 7 {
+			continue
+		}
+		exp, _ := strconv.ParseFloat(strings.TrimSpace(f[4]), 64)
+		rows = append(rows, cookieFileRow{
+			Domain: strings.TrimSpace(f[0]), Path: strings.TrimSpace(f[2]),
+			Secure: strings.EqualFold(strings.TrimSpace(f[3]), "TRUE"), Expires: unixSecondsExpiry(exp),
+			Name: strings.TrimSpace(f[5]), Value: f[6], HTTPOnly: httpOnly,
+		})
+	}
+	return rows
 }
 
 func trimCookieHeaderPrefix(s string) string {
@@ -1516,4 +1658,72 @@ func evalDocumentCookieViaCDP(wsURL, domain string) (string, error) {
 		}
 		return result.Result.Value, nil
 	}
+}
+
+// describeSavedSession summarizes the persisted cookie jar for auth status:
+// the session state, the auth cookie's expiry (or that it is a session
+// cookie with no expiry, or already expired) and cookie counts. It never
+// includes cookie values. active reports whether the session looks usable.
+func describeSavedSession(rows []client.ImportedCookie, now time.Time) (lines []string, active bool) {
+	if len(rows) == 0 {
+		return []string{"Session: no saved browser cookies (run auth login --chrome)"}, false
+	}
+	live := map[string]string{}
+	var liveAuth, expiredAuth []client.ImportedCookie
+	sessionOnly, expired := 0, 0
+	for _, r := range rows {
+		isExpired := !r.Expires.IsZero() && !r.Expires.After(now)
+		switch {
+		case isExpired:
+			expired++
+		case r.Expires.IsZero():
+			sessionOnly++
+		}
+		if r.Name == "auth" {
+			if isExpired {
+				expiredAuth = append(expiredAuth, r)
+			} else {
+				liveAuth = append(liveAuth, r)
+			}
+		}
+		if !isExpired {
+			live[r.Name] = r.Value
+		}
+	}
+	// Latest live auth expiry; a live auth with no expiry is a session cookie.
+	var authExp time.Time
+	sessionAuth := false
+	for _, r := range liveAuth {
+		if r.Expires.IsZero() {
+			sessionAuth = true
+			continue
+		}
+		if r.Expires.After(authExp) {
+			authExp = r.Expires
+		}
+	}
+	if sessionAuth {
+		authExp = time.Time{}
+	}
+	sess := classifyWalmartSession(live, authExp, now)
+	lines = append(lines, "Session: "+sess.Detail)
+	const layout = "2006-01-02 15:04 MST"
+	switch {
+	case len(liveAuth) > 0 && sessionAuth:
+		lines = append(lines, "Auth cookie: session cookie (no expiry set; ends when Walmart drops the session)")
+	case len(liveAuth) > 0:
+		lines = append(lines, fmt.Sprintf("Auth cookie: expires %s (in %s)", authExp.Local().Format(layout), authExp.Sub(now).Round(time.Minute)))
+	case len(expiredAuth) > 0:
+		last := expiredAuth[0].Expires
+		for _, r := range expiredAuth[1:] {
+			if r.Expires.After(last) {
+				last = r.Expires
+			}
+		}
+		lines = append(lines, fmt.Sprintf("Auth cookie: expired %s", last.Local().Format(layout)))
+	default:
+		lines = append(lines, "Auth cookie: not present")
+	}
+	lines = append(lines, fmt.Sprintf("Cookies: %d saved (%d session-only, %d expired)", len(rows), sessionOnly, expired))
+	return lines, sess.State == sessionActive
 }
