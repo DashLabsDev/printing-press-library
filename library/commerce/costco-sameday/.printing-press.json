@@ -7,9 +7,9 @@
   "cli_name": "costco-sameday-pp-cli",
   "creator": {
     "handle": "DashLabsDev",
-    "name": "Thomas McCormick"
+    "name": "DashLabsDev"
   },
-  "owner": "dashlabsdev",
+  "owner": "DashLabsDev",
   "printer": "DashLabsDev",
   "printer_name": "Thomas McCormick",
   "spec_path": "spec.yaml",
