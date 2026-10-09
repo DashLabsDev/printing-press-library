@@ -256,6 +256,7 @@ Read only:
 Cart link (prints a URL; optional `--open` launches your browser; never mutates via API):
 
 - **`walmart-pp-cli cart link <item[:qty]>…`** — build `https://affil.walmart.com/cart/addToCart?items=ID|qty,…`. **ADDS / increments** quantity on whatever is already in the browser cart. Works signed out (guest cart; items carry over on sign-in) or signed in. `cart add` is an alias.
+- Extra items can also go in one comma-separated `--items` value (e.g. `--items 44391152:2,10450114`); MCP clients use this field for multi-item links.
 - Open the URL yourself, then pick a time and check out on walmart.com. The CLI does not update, remove, reserve, or check out.
 
 ```bash

@@ -97,10 +97,21 @@ func fetchCart(cmd *cobra.Command, flags *rootFlags, cartID string) (*walmart.Ca
 	if err != nil {
 		return nil, err
 	}
-	if v.CartID != "" {
-		rememberCartID(v.CartID)
-	}
+	rememberFetchedCartID(v.CartID, cartID)
 	return v, nil
+}
+
+// rememberFetchedCartID persists the cart id after a successful read: the id
+// the response reports, or else the id that was requested (flag, env or
+// remembered), so a later run without --cart-id reuses the same cart.
+func rememberFetchedCartID(responseID, requestedID string) {
+	if id := strings.TrimSpace(responseID); id != "" {
+		rememberCartID(id)
+		return
+	}
+	if id := strings.TrimSpace(requestedID); id != "" {
+		rememberCartID(id)
+	}
 }
 
 func printCart(w io.Writer, v *walmart.CartView) {
@@ -156,7 +167,7 @@ func newCartCmd(flags *rootFlags) *cobra.Command {
 				return err
 			}
 			if wantJSON(cmd, flags) {
-				return writeJSON(cmd.OutOrStdout(), v)
+				return emitRead(cmd, flags, v, v.Items)
 			}
 			printCart(cmd.OutOrStdout(), v)
 			return nil
@@ -182,6 +193,9 @@ type cartLinkPlan struct {
 	Note        string                  `json:"note"`
 	Instruction string                  `json:"next,omitempty"`
 	Opened      bool                    `json:"opened,omitempty"`
+	// Refusal is set when a Printing Press harness blocked --open; the URL
+	// is still reported so a --json caller gets one complete object.
+	Refusal *harnessRefusalResult `json:"refusal,omitempty"`
 }
 
 // parseLinkItemArgs accepts item ids / product URLs, optionally with :qty
@@ -234,6 +248,7 @@ func isAllDigits(s string) bool {
 func newCartLinkCmd(flags *rootFlags) *cobra.Command {
 	var qty int
 	var open bool
+	var extraItems string
 	cmd := &cobra.Command{
 		Use:   "link <item[:qty]> [<item[:qty]>...]",
 		Short: "Print one Walmart affiliate add-to-cart URL (ADDS to the existing cart; never mutates via API)",
@@ -250,6 +265,8 @@ never POSTs a cart mutation and never touches your cart cookies.
 
 Pass item ids from search / product output (US item ids). Optional per-item
 quantity as item:qty (default 1, or --qty for every arg without :qty).
+Additional items can also be passed as one comma-separated --items value
+(handy for MCP and scripts); they are appended after the positional items.
 
 Default: print the URL only. Pass --open (or --launch) to also open it in
 your default browser. Under Printing Press verify/dogfood harnesses the
@@ -260,16 +277,18 @@ URL is still printed but the browser is never launched.
   walmart-pp-cli cart link 51259338:2 44391152:1
   walmart-pp-cli cart link 51259338 44391152 --qty 2
   walmart-pp-cli cart link 51259338:2 --open
+  walmart-pp-cli cart link 51259338 --items 44391152:2,10450114
 `, "\n"),
 		Annotations: map[string]string{
 			"mcp:read-only": "true",
 			"pp:happy-args": "item=51259338;item=44391152:2",
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) == 0 {
+			all := append(append([]string{}, args...), splitItemsFlag(extraItems)...)
+			if len(all) == 0 {
 				return usageErr(errors.New("at least one item id (or product URL) is required\n\n" + cmd.UsageString()))
 			}
-			items, err := parseLinkItemArgs(args, qty)
+			items, err := parseLinkItemArgs(all, qty)
 			if err != nil {
 				return usageErr(err)
 			}
@@ -285,13 +304,27 @@ URL is still printed but the browser is never launched.
 			}
 			launch := open && !flags.noInput && !flags.dryRun
 			if launch && cliutil.IsAnyHarness() {
+				if flags.asJSON {
+					// One JSON object: the link plan plus the refusal.
+					harness := cliutil.HarnessName()
+					if harness == "" {
+						harness = "harness"
+					}
+					plan.Refusal = &harnessRefusalResult{
+						Refused: true,
+						Harness: harness,
+						Action:  "launch browser",
+						Reason:  "Printing Press harness refuses visible side effects",
+						Would:   "run launch browser; no visible side effect performed",
+					}
+					plan.Instruction = "browser launch refused under the harness; copy the url into your browser"
+					return printJSONFiltered(cmd.OutOrStdout(), plan, flags)
+				}
 				if err := writeHarnessRefusal(cmd.OutOrStdout(), flags, "launch browser"); err != nil {
 					return err
 				}
 				// Still print the URL so harnesses can assert on it.
-				if !flags.asJSON {
-					fmt.Fprintln(cmd.OutOrStdout(), link)
-				}
+				fmt.Fprintln(cmd.OutOrStdout(), link)
 				return nil
 			}
 			if launch {
@@ -306,7 +339,7 @@ URL is still printed but the browser is never launched.
 			// Bare URL unless the user asked for --json/--agent. Non-TTY
 			// alone must not force JSON so the URL stays pipeable.
 			if flags.asJSON {
-				return writeJSON(cmd.OutOrStdout(), plan)
+				return printJSONFiltered(cmd.OutOrStdout(), plan, flags)
 			}
 			fmt.Fprintln(cmd.OutOrStdout(), link)
 			if isTerminal(cmd.OutOrStdout()) {
@@ -321,7 +354,15 @@ URL is still printed but the browser is never launched.
 	cmd.Flags().IntVar(&qty, "qty", 1, "Default quantity for args without :qty (the link increments)")
 	cmd.Flags().BoolVar(&open, "open", false, "Also open the URL in your default browser (default: print only)")
 	cmd.Flags().BoolVar(&open, "launch", false, "Alias for --open")
+	cmd.Flags().StringVar(&extraItems, "items", "", "More items as a comma-separated list of item[:qty], e.g. 44391152:2,10450114 (appended to positional items)")
 	return cmd
+}
+
+// splitItemsFlag splits a --items value on commas and whitespace.
+func splitItemsFlag(v string) []string {
+	return strings.FieldsFunc(v, func(r rune) bool {
+		return r == ',' || r == ' ' || r == '\t' || r == '\n'
+	})
 }
 
 func newSlotsCmd(flags *rootFlags) *cobra.Command {
@@ -379,7 +420,7 @@ and pick a time yourself after adding items via cart link.
 				}
 			}
 			if wantJSON(cmd, flags) {
-				return writeJSON(cmd.OutOrStdout(), map[string]any{"slots": v, "reservation": cart.Reservation})
+				return emitRead(cmd, flags, map[string]any{"slots": v, "reservation": cart.Reservation}, nil)
 			}
 			w := cmd.OutOrStdout()
 			fmt.Fprintf(w, "Mode %s", mode)

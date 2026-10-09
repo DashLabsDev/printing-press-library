@@ -1,10 +1,10 @@
 name: walmart
-description: Walmart Pickup & Delivery CLI. Reads via orchestra; cart link prints an affiliate add-to-cart URL. Never mutates the cart; never checkout.
-  view and pickup/delivery time slots. Cart adds open Walmart''s affiliate add-to-cart
-  link in your browser; removals, quantity decreases and slot reservations drive your
-  own Chrome via Chrome DevTools when you pass --browser. Every write needs --yes.
-  Checkout, order placement and Pickup/Delivery mode switching are never sent. Cookie
-  auth imported from a signed-in browser session.'
+description: 'Walmart Pickup & Delivery CLI. Read-only search, product, store, order,
+  cart and pickup/delivery time-slot reads via Walmart orchestra GraphQL. cart link
+  prints one affiliate add-to-cart URL that you open yourself (it adds to the browser
+  cart, signed in or as a guest). The CLI never mutates the cart, never reserves a slot,
+  never switches Pickup/Delivery mode and never checks out. Cookie auth imported from
+  a signed-in browser session.'
 version: 0.1.0
 base_url: https://www.walmart.com
 spec_source: sniffed

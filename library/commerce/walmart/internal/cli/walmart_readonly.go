@@ -37,8 +37,34 @@ func init() {
 	})
 }
 
+// wantJSON reports whether a Walmart read should skip its human table and
+// go through the shared output path (--json, --agent, --select, --compact,
+// --csv, --plain, --quiet, or a non-terminal stdout).
 func wantJSON(cmd *cobra.Command, flags *rootFlags) bool {
-	return flags.asJSON || !isTerminal(cmd.OutOrStdout())
+	return flags.asJSON || flags.agent || flags.csv || flags.plain || flags.quiet ||
+		flags.compact || strings.TrimSpace(flags.selectFields) != "" || !isTerminal(cmd.OutOrStdout())
+}
+
+// emitRead routes a read result through printJSONFiltered so --select,
+// --compact, --csv, --plain, --quiet and --agent behave like every other
+// command. rows (may be nil) is the list rendered by the row-oriented
+// formats (--csv, --plain, --quiet); JSON keeps the full envelope.
+func emitRead(cmd *cobra.Command, flags *rootFlags, full any, rows any) error {
+	w := cmd.OutOrStdout()
+	if rows != nil && (flags.csv || flags.plain || flags.quiet) {
+		return printJSONFiltered(w, rows, flags)
+	}
+	return printJSONFiltered(w, full, flags)
+}
+
+// requireLiveSource rejects --data-source local for Walmart reads. They only
+// read live from walmart.com and have no local store, so "local" must fail
+// before any network request instead of silently going online.
+func requireLiveSource(flags *rootFlags) error {
+	if flags != nil && strings.EqualFold(strings.TrimSpace(flags.dataSource), "local") {
+		return usageErr(fmt.Errorf("this command reads live from walmart.com and has no local data; use --data-source auto or live"))
+	}
+	return nil
 }
 
 func writeJSON(w io.Writer, v any) error {
@@ -80,6 +106,9 @@ func newOrdersListCmd(flags *rootFlags) *cobra.Command {
 			if err != nil {
 				return err
 			}
+			if err := requireLiveSource(flags); err != nil { // pp:data-source live
+				return err
+			}
 			c, err := flags.newClient()
 			if err != nil {
 				return err
@@ -94,7 +123,7 @@ func newOrdersListCmd(flags *rootFlags) *cobra.Command {
 				return err
 			}
 			if wantJSON(cmd, flags) {
-				return writeJSON(cmd.OutOrStdout(), page)
+				return emitRead(cmd, flags, page, page.Orders)
 			}
 			tw := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 2, 2, ' ', 0)
 			fmt.Fprintln(tw, "DATE\tTYPE\tITEMS\tTOTAL\tORDER ID\tGROUP")
@@ -135,6 +164,9 @@ func newOrdersGetCmd(flags *rootFlags) *cobra.Command {
 			if err != nil {
 				return usageErr(err)
 			}
+			if err := requireLiveSource(flags); err != nil { // pp:data-source live
+				return err
+			}
 			c, err := flags.newClient()
 			if err != nil {
 				return err
@@ -150,7 +182,7 @@ func newOrdersGetCmd(flags *rootFlags) *cobra.Command {
 				return classifyAPIError(cmd.OutOrStdout(), err, flags)
 			}
 			if wantJSON(cmd, flags) {
-				return writeJSON(cmd.OutOrStdout(), d)
+				return emitRead(cmd, flags, d, nil)
 			}
 			w := cmd.OutOrStdout()
 			fmt.Fprintf(w, "Order %s  %s  %s  %d items\n\n", d.ID, d.OrderDate, d.Type, d.ItemCount)
@@ -195,6 +227,9 @@ func newSearchCmd(flags *rootFlags) *cobra.Command {
 			q := strings.Join(args, " ")
 			if page < 1 {
 				page = 1
+			}
+			if err := requireLiveSource(flags); err != nil { // pp:data-source live
+				return err
 			}
 			c, err := flags.newClient()
 			if err != nil {
@@ -256,7 +291,7 @@ func newSearchCmd(flags *rootFlags) *cobra.Command {
 				return nil
 			}
 			if wantJSON(cmd, flags) {
-				return writeJSON(cmd.OutOrStdout(), res)
+				return emitRead(cmd, flags, res, res.Products)
 			}
 			tw := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 2, 2, ' ', 0)
 			fmt.Fprintln(tw, "PRICE\tUNIT\tAVAILABILITY\tFULFILLMENT\tITEM ID\tNAME")

@@ -4,6 +4,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/mvanhorn/printing-press-library/library/commerce/walmart/internal/walmart"
@@ -257,11 +258,14 @@ func newDoctorCmd(flags *rootFlags) *cobra.Command {
 						if !strings.HasPrefix(verifyPath, "/") {
 							verifyPath = "/" + verifyPath
 						}
-						_, authErr := c.GetWithHeaders(cmd.Context(), verifyPath, authParams, authHeaders)
+						// PATCH(walmart-doctor-probes): uncached, and a 200 alone is
+						// not proof; orchestra returns GraphQL errors / null data
+						// with HTTP 200 for signed-out sessions.
+						authBody, authErr := c.GetWithHeadersNoCache(cmd.Context(), verifyPath, authParams, authHeaders)
 						var authAPIErr *client.APIError
 						switch {
 						case authErr == nil:
-							report["credentials"] = "valid"
+							report["credentials"] = classifyAccountProbe(authBody)
 						case errors.As(authErr, &authAPIErr):
 							switch {
 							case authAPIErr.StatusCode == 401:
@@ -585,4 +589,35 @@ func doctorExitForFailOn(failOn string, report map[string]any) error {
 		return fmt.Errorf("doctor: unknown --fail-on value %q (valid: stale, warn, error)", failOn)
 	}
 	return nil
+}
+
+// classifyAccountProbe inspects the accountLandingPage GraphQL body. HTTP 200
+// with a non-empty "errors" array or null/empty "data" means the session was
+// not accepted, so only a body carrying account data reports "valid".
+func classifyAccountProbe(body []byte) string {
+	var env struct {
+		Data   map[string]json.RawMessage `json:"data"`
+		Errors []struct {
+			Message string `json:"message"`
+		} `json:"errors"`
+	}
+	if err := json.Unmarshal(body, &env); err != nil {
+		return "WARN not verified (account probe returned a non-JSON body; possibly a bot challenge) — run auth login --chrome and retry"
+	}
+	if len(env.Errors) > 0 {
+		msg := strings.TrimSpace(env.Errors[0].Message)
+		if len(msg) > 120 {
+			msg = msg[:120]
+		}
+		if msg == "" {
+			msg = "GraphQL error"
+		}
+		return "invalid (account probe returned GraphQL errors: " + msg + ") — re-import cookies with auth login --chrome"
+	}
+	for _, v := range env.Data {
+		if s := strings.TrimSpace(string(v)); s != "" && s != "null" && s != "{}" {
+			return "valid"
+		}
+	}
+	return "WARN not verified (account probe returned no account data) — re-import cookies with auth login --chrome"
 }

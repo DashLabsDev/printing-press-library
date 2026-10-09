@@ -153,6 +153,11 @@ profile by name when the installed backend supports it.`,
 					return authErr(err)
 				}
 				cookies = imported.Header
+				// Keep each imported row's real domain, path and expiry so the jar
+				// mirrors the browser (same-name cookies on different hosts stay
+				// separate; expired rows are dropped). Raw Cookie headers carry no
+				// scope, so those still fall back to .walmart.com below.
+				importedBrowserCookies = importedRowsFromFile(imported.Cookies, time.Now())
 				fromCookiesFile = true
 				fmt.Fprintf(w, "Loaded cookies from %s for %s.\n", cookiesFile, domain)
 			}
@@ -1248,10 +1253,36 @@ func cookieDomainMatches(cookieDomain string, targetDomain string) bool {
 	return candidate == target || strings.HasSuffix(candidate, "."+target) || (strings.Contains(candidate, ".") && strings.HasSuffix(target, "."+candidate))
 }
 
+// importedRowsFromFile converts scoped cookies from a Playwright storage-state
+// file into jar rows. Rows without a domain (raw Cookie header imports) are
+// skipped so the caller's .walmart.com fallback applies; expired rows are
+// dropped. PATCH(walmart-cookie-fidelity).
+func importedRowsFromFile(cookies []*http.Cookie, now time.Time) []client.ImportedCookie {
+	var rows []client.ImportedCookie
+	for _, c := range cookies {
+		if c == nil || strings.TrimSpace(c.Name) == "" || strings.TrimSpace(c.Domain) == "" {
+			continue
+		}
+		if !c.Expires.IsZero() && !c.Expires.After(now) {
+			continue
+		}
+		path := c.Path
+		if path == "" {
+			path = "/"
+		}
+		rows = append(rows, client.ImportedCookie{
+			Name: c.Name, Value: c.Value, Domain: c.Domain, Path: path,
+			Expires: c.Expires, Secure: c.Secure, HTTPOnly: c.HttpOnly,
+		})
+	}
+	return rows
+}
+
 // parseCookieString splits a "name1=value1; name2=value2" string into a map.
+// Whitespace after ';' is optional ("a=1;b=2" is a valid Cookie header).
 func parseCookieString(cookies string) map[string]string {
 	m := make(map[string]string)
-	for _, pair := range strings.Split(cookies, "; ") {
+	for _, pair := range strings.Split(cookies, ";") {
 		pair = strings.TrimSpace(pair)
 		if pair == "" {
 			continue

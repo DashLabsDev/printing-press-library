@@ -19,6 +19,9 @@ import (
 // commands live in walmart_cart.go.
 
 func orchestraGet(cmd *cobra.Command, flags *rootFlags, subgraph, op, hash, vars, pageURL, pathSuffix string, extra map[string]string) ([]byte, error) {
+	if err := requireLiveSource(flags); err != nil { // pp:data-source live
+		return nil, err
+	}
 	c, err := flags.newClient()
 	if err != nil {
 		return nil, err
@@ -70,7 +73,7 @@ func newProductCmd(flags *rootFlags) *cobra.Command {
 				return err
 			}
 			if wantJSON(cmd, flags) {
-				return writeJSON(cmd.OutOrStdout(), d)
+				return emitRead(cmd, flags, d, nil)
 			}
 			w := cmd.OutOrStdout()
 			fmt.Fprintf(w, "%s\n", d.Name)
@@ -138,7 +141,7 @@ func newStoreCmd(flags *rootFlags) *cobra.Command {
 				return err
 			}
 			if wantJSON(cmd, flags) {
-				return writeJSON(cmd.OutOrStdout(), map[string]any{"stores": stores})
+				return emitRead(cmd, flags, map[string]any{"stores": stores}, stores)
 			}
 			tw := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 2, 2, ' ', 0)
 			fmt.Fprintln(tw, "ID\tDISTANCE\tNAME\tADDRESS\tPICKUP")

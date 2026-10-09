@@ -94,7 +94,7 @@ Read only: `orders list|get`, `search`, `product get`, `store list`, `cart view`
 
 Cart link (mcp:read-only; prints a URL; does not call the cart API):
 
-- `cart link <item[:qty]>…` / `cart add …` — print one affiliate add-to-cart URL (ADDS to the existing browser cart; works signed out as a guest cart that carries over on sign-in, or signed in); `--open` / `--launch` opens the default browser
+- `cart link <item[:qty]>…` / `cart add …` — print one affiliate add-to-cart URL (ADDS to the existing browser cart; works signed out as a guest cart that carries over on sign-in, or signed in); `--open` / `--launch` opens the default browser; extra items can go in one comma-separated `--items` value (the MCP tool's multi-item field)
 - User opens the URL, picks a time, and checks out themselves. No update/remove/reserve commands.
 
 Cart id: `--cart-id` once, then remembered. On bot challenge / dropped connection: stop; ask user to clear walmart.com and `auth login --chrome`.
