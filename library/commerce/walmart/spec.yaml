@@ -1,0 +1,167 @@
+name: walmart
+description: Walmart Pickup & Delivery CLI. Reads via orchestra; cart link prints an affiliate add-to-cart URL. Never mutates the cart; never checkout.
+  view and pickup/delivery time slots. Cart adds open Walmart''s affiliate add-to-cart
+  link in your browser; removals, quantity decreases and slot reservations drive your
+  own Chrome via Chrome DevTools when you pass --browser. Every write needs --yes.
+  Checkout, order placement and Pickup/Delivery mode switching are never sent. Cookie
+  auth imported from a signed-in browser session.'
+version: 0.1.0
+base_url: https://www.walmart.com
+spec_source: sniffed
+http_transport: browser-http
+health_check_path: /
+required_headers:
+- name: accept
+  value: application/json
+- name: content-type
+  value: application/json
+- name: x-o-bu
+  value: WALMART-US
+- name: x-o-mart
+  value: B2C
+- name: x-o-platform
+  value: rweb
+- name: x-o-platform-version
+  value: usweb-1.317.0
+- name: x-o-segment
+  value: oaoh
+- name: x-o-ccm
+  value: server
+- name: tenant-id
+  value: elh9ie
+- name: wm_mp
+  value: 'true'
+- name: x-latency-trace
+  value: '1'
+- name: x-enable-server-timing
+  value: '1'
+auth:
+  type: cookie
+  header: ''
+  format: ''
+  env_vars: []
+  cookie_domain: .walmart.com
+  cookies:
+  - auth
+  - CID
+  login_url: https://www.walmart.com/account/login
+  verify_path: /orchestra/cph/graphql/accountLandingPage/2f963ee1e058e674901ce63f1529bc8890bd53b48cf942ed121285019a1cd323?variables=%7B%22isCashiLinked%22%3Afalse%2C%22enableCountryCallingCode%22%3Afalse%2C%22enablePhoneCollection%22%3Afalse%2C%22enableMembershipId%22%3Afalse%2C%22enableMembershipAutoRenew%22%3Afalse%2C%22enableMembershipQuery%22%3Atrue%2C%22enableWcp%22%3Afalse%2C%22enableMembershipAutoRenewalModal%22%3Afalse%2C%22includeResidencyRegionInfo%22%3Atrue%2C%22sessionInput%22%3A%7B%7D%2C%22includeSessionInfo%22%3Afalse%7D
+auth_warnings:
+- Session is the full walmart.com cookie set; auth + CID are the minimum. PerimeterX (_px*) and Akamai cookies must be replayed too.
+- Chrome HAR export strips cookies; import with auth login --chrome or --cookies-file.
+- Orchestra GraphQL returns 412/418/429/456 to scripted traffic; the CLI stops on the first challenge.
+- Never trigger login or SMS verification from the CLI.
+config:
+  format: toml
+  path: ~/.config/walmart-pp-cli/config.toml
+resources:
+  orders:
+    description: Walmart purchase history (online and in-store), read only
+    endpoints:
+      history:
+        method: GET
+        path: /orchestra/cph/graphql/PurchaseHistoryV3/4db6dcf1c46a4f833d68495dec2796180deb99adfdd9182fd53f100869eebcc0
+        description: Purchase history page (PurchaseHistoryV3 persisted query)
+        params:
+        - name: variables
+          type: string
+          required: false
+          positional: false
+          default: '{"input":{"cursor":"","search":"","filterIds":[],"limit":10,"type":null,"minTimestamp":null,"maxTimestamp":null,"filters":{"minTimestamp":null,"maxTimestamp":null,"filterIds":[]},"enabledFeatures":[],"isStrictSearch":false,"eligibleFeatures":{"isEbtEligible":false,"enablePhFiltersEnhancement":true,"isBnbEligible":false,"isWcpAccEligible":false,"isLotOnOdpEnable":true,"isSolutranEligible":false},"searchItemIdentifierId":""},"platform":"WEB","enableIsWcpOrder":false,"enableWcpPhaseOrder":false,"enableReturnStatusTracker":false}'
+          description: GraphQL variables JSON for persisted query PurchaseHistoryV3
+          fields: []
+        body: []
+        response:
+          type: object
+          item: PurchaseHistoryV3
+        pagination: null
+        header_overrides:
+        - name: x-apollo-operation-name
+          value: PurchaseHistoryV3
+        - name: x-o-gql-query
+          value: query PurchaseHistoryV3
+        - name: wm_page_url
+          value: https://www.walmart.com/orders
+        - name: Referer
+          value: https://www.walmart.com/orders
+      detail:
+        method: GET
+        path: /orchestra/orders/graphql/getOrder/ef2bd0d9ecb03b1e3275ecc250017f5529adc9b33fda8f71a359e1a470e543a8
+        description: One order with line items and price details (getOrder persisted query)
+        params:
+        - name: variables
+          type: string
+          required: false
+          positional: false
+          default: '{"orderId":"","orderIsInStore":false}'
+          description: GraphQL variables JSON for persisted query getOrder
+          fields: []
+        body: []
+        response:
+          type: object
+          item: getOrder
+        pagination: null
+        header_overrides:
+        - name: x-apollo-operation-name
+          value: getOrder
+        - name: x-o-gql-query
+          value: query getOrder
+        - name: wm_page_url
+          value: https://www.walmart.com/orders
+        - name: Referer
+          value: https://www.walmart.com/orders
+      items:
+        method: GET
+        path: /orchestra/cph/graphql/ItemHistory/ba7fc5662250eb1264738ced3e0f16deadd9f69d7c9d5738f432a5d904c62a7a
+        description: Recently purchased items across orders (ItemHistory persisted query)
+        params:
+        - name: variables
+          type: string
+          required: false
+          positional: false
+          default: '{"input":{}}'
+          description: GraphQL variables JSON for persisted query ItemHistory
+          fields: []
+        body: []
+        response:
+          type: object
+          item: ItemHistory
+        pagination: null
+        header_overrides:
+        - name: x-apollo-operation-name
+          value: ItemHistory
+        - name: x-o-gql-query
+          value: query ItemHistory
+        - name: wm_page_url
+          value: https://www.walmart.com/orders
+        - name: Referer
+          value: https://www.walmart.com/orders
+  account:
+    description: Account landing data used to verify the session, read only
+    endpoints:
+      landing:
+        method: GET
+        path: /orchestra/cph/graphql/accountLandingPage/2f963ee1e058e674901ce63f1529bc8890bd53b48cf942ed121285019a1cd323
+        description: Account landing page (accountLandingPage persisted query)
+        params:
+        - name: variables
+          type: string
+          required: false
+          positional: false
+          default: '{"isCashiLinked":false,"enableCountryCallingCode":false,"enablePhoneCollection":false,"enableMembershipId":false,"enableMembershipAutoRenew":false,"enableMembershipQuery":true,"enableWcp":false,"enableMembershipAutoRenewalModal":false,"includeResidencyRegionInfo":true,"sessionInput":{},"includeSessionInfo":false}'
+          description: GraphQL variables JSON for persisted query accountLandingPage
+          fields: []
+        body: []
+        response:
+          type: object
+          item: accountLandingPage
+        pagination: null
+        header_overrides:
+        - name: x-apollo-operation-name
+          value: accountLandingPage
+        - name: x-o-gql-query
+          value: query accountLandingPage
+        - name: wm_page_url
+          value: https://www.walmart.com/account
+        - name: Referer
+          value: https://www.walmart.com/account

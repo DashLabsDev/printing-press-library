@@ -1,0 +1,23 @@
+{
+  "schema_version": 2,
+  "applied_at": "2026-10-09",
+  "base_run_id": "20261009-032035",
+  "base_printing_press_version": "4.31.7",
+  "id": "walmart-cookie-fidelity",
+  "summary": "auth login replaces the cookie jar with the browser's exact rows (real domain/path/expiry); persisted jar is the only cookie source (no duplicate seeding); same-key browser duplicates are still sent.",
+  "reason": "Offline comparison found 21 cookie names sent twice (credential seed + response-rotated copies) and two stale anti-bot cookies left over from an earlier session because login merged instead of replacing.",
+  "files": [
+    "internal/cli/auth.go",
+    "internal/client/cookiejar.go",
+    "internal/client/client.go",
+    "internal/client/walmart_shape_test.go"
+  ],
+  "markers": [
+    "PATCH(walmart-cookie-fidelity)",
+    "ReplaceCookieJar",
+    "ImportedCookie",
+    "PersistedJarLoaded",
+    "shadow"
+  ],
+  "validated_outcome": "Offline: CLI cookie name multiset equals what Chrome would send (73/73, no extras); TestReplaceCookieJarMirrorsBrowser."
+}

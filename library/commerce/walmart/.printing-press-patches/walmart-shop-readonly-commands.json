@@ -1,0 +1,33 @@
+{
+  "schema_version": 2,
+  "applied_at": "2026-10-09",
+  "base_run_id": "20261009-032035",
+  "base_printing_press_version": "4.31.7",
+  "id": "walmart-shop-readonly-commands",
+  "summary": "Read-only product get (ItemById), store list (nearByNodes), cart view (getCart GET) and search --filter/--sort/--list-filters. slots is now built by walmart-cart-slot-commands.",
+  "reason": "Second capture added the product page, store chooser list, empty cart page and a brand-filtered search. Variables are embedded as templates with every session value replaced by placeholders.",
+  "files": [
+    "internal/walmart/shop.go",
+    "internal/walmart/shop_test.go",
+    "internal/walmart/templates/ItemById.json",
+    "internal/walmart/templates/nearByNodes.json",
+    "internal/walmart/templates/getCart.json",
+    "internal/walmart/walmart.go",
+    "internal/cli/walmart_shop.go",
+    "internal/cli/walmart_readonly.go",
+    "internal/client/walmart_guard_test.go",
+    "README.md",
+    "SKILL.md"
+  ],
+  "markers": [
+    "ParseProduct",
+    "ParseStores",
+    "ParseCart",
+    "ValidateFacet",
+    "allSortAndFilterFacets",
+    "{{ITEM_ID}}",
+    "{{POSTAL_CODE}}",
+    "{{CART_ID}}"
+  ],
+  "validated_outcome": "go test ./internal/walmart ./internal/client (synthetic fixtures). Live 2026-10-09 10:36-10:40 CT after the request-fidelity fix: cart view, product get PASS (no challenge)."
+}

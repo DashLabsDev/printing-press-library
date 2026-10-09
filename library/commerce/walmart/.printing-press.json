@@ -1,0 +1,130 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-10-09T03:20:35.406076538Z",
+  "printing_press_version": "4.31.7",
+  "api_name": "walmart",
+  "display_name": "Walmart",
+  "cli_name": "walmart-pp-cli",
+  "creator": {
+    "handle": "DashLabsDev",
+    "name": "DashLabsDev"
+  },
+  "owner": "DashLabsDev",
+  "printer": "DashLabsDev",
+  "printer_name": "Thomas McCormick",
+  "spec_path": "spec.yaml",
+  "spec_format": "internal",
+  "spec_source": "sniffed",
+  "spec_checksum": "sha256:b563a3b909b6523ae188019de005e28c601b3b3fbdac711a4c8f9d86b07d6ade",
+  "run_id": "20261009-032035",
+  "category": "commerce",
+  "description": "Walmart Pickup & Delivery from the terminal \u2014 reads via orchestra, cart changes via affiliate link only.",
+  "mcp_binary": "walmart-pp-mcp",
+  "mcp_tool_count": 4,
+  "mcp_ready": "partial",
+  "api_version": "0.1.0",
+  "auth_type": "cookie",
+  "novel_features": [
+    {
+      "name": "Purchase history with filters",
+      "command": "orders list",
+      "description": "PurchaseHistoryV3 persisted query with --type in-store/online, --status completed/in-progress, --search and cursor paging; read-only."
+    },
+    {
+      "name": "Order detail with line items",
+      "command": "orders get",
+      "description": "getOrder line items (name, item id, quantity, line price) plus subtotal, tax, fees and total; customer, address and payment fields are never emitted."
+    },
+    {
+      "name": "Store-aware product search",
+      "command": "search",
+      "description": "Parses the server-rendered search page for price, unit price, aisle, availability and pickup/delivery fulfillment at the session's store."
+    },
+    {
+      "name": "Read-only guard and bot-challenge stop",
+      "command": "orders list",
+      "description": "Client refuses non-GET requests and denylisted cart/checkout/slot/order mutations, and stops (no retry) on PerimeterX 412/418/429/456 or /blocked."
+    },
+    {
+      "name": "Product availability at your store",
+      "command": "product get",
+      "description": "ItemById persisted query: price, unit price, stock, pickup/delivery/shipping status and seller; shopper location fields are never emitted."
+    },
+    {
+      "name": "Nearby pickup stores",
+      "command": "store list",
+      "description": "nearByNodes query for a ZIP: store id, distance, address, pickup types and hours; view only, never sets a store."
+    },
+    {
+      "name": "Cart view",
+      "command": "cart view",
+      "description": "getCart GET with a supplied cart id: items, mode, store and slot-reserved flag; MergeAndGetCart and every cart mutation stay blocked."
+    },
+    {
+      "name": "Search filters",
+      "command": "search",
+      "description": "--filter type:value (e.g. brand:Great Value), --sort and --list-filters from the page's sort/filter facets."
+    }
+  ],
+  "novel_features_built": [
+    {
+      "name": "Purchase history with filters",
+      "command": "orders list",
+      "description": "PurchaseHistoryV3 persisted query with --type in-store/online, --status completed/in-progress, --search and cursor paging; read-only."
+    },
+    {
+      "name": "Order detail with line items",
+      "command": "orders get",
+      "description": "getOrder line items (name, item id, quantity, line price) plus subtotal, tax, fees and total; customer, address and payment fields are never emitted."
+    },
+    {
+      "name": "Store-aware product search",
+      "command": "search",
+      "description": "Parses the server-rendered search page for price, unit price, aisle, availability and pickup/delivery fulfillment at the session's store."
+    },
+    {
+      "name": "Read-only guard and bot-challenge stop",
+      "command": "orders list",
+      "description": "Client refuses non-GET requests and denylisted cart/checkout/slot/order mutations, and stops (no retry) on PerimeterX 412/418/429/456 or /blocked."
+    },
+    {
+      "name": "Product availability at your store",
+      "command": "product get",
+      "description": "ItemById persisted query: price, unit price, stock, pickup/delivery/shipping status and seller; shopper location fields are never emitted."
+    },
+    {
+      "name": "Nearby pickup stores",
+      "command": "store list",
+      "description": "nearByNodes query for a ZIP: store id, distance, address, pickup types and hours; view only, never sets a store."
+    },
+    {
+      "name": "Cart view",
+      "command": "cart view",
+      "description": "getCart GET with a supplied cart id: items, mode, store and slot-reserved flag; MergeAndGetCart and every cart mutation stay blocked."
+    },
+    {
+      "name": "Search filters",
+      "command": "search",
+      "description": "--filter type:value (e.g. brand:Great Value), --sort and --list-filters from the page's sort/filter facets."
+    }
+  ],
+  "verify": {
+    "mode": "mock",
+    "pass_rate": 96.96969696969697,
+    "passed": 32,
+    "total": 33,
+    "failed": 1,
+    "data_pipeline": true,
+    "verdict": "WARN"
+  },
+  "scorecard": {
+    "steinberger": {
+      "percentage": 78,
+      "grade": "B (1 of 24 dimensions unverified: live_api_verification)",
+      "total": 78
+    },
+    "unverified_dimensions": [
+      "live_api_verification"
+    ]
+  }
+}
