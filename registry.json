@@ -7510,6 +7510,12 @@
         "List applied batches with their results and how many days remain to restore deleted files."
       ],
       "path": "library/productivity/dropbox",
+      "release": {
+        "cli_name": "dropbox-pp-cli",
+        "version": "2026.10.1",
+        "released_at": "2026-10-08T19:37:55Z",
+        "source_commit": "90f21d928bb7e6bd062206bdc6298032a8f870bd"
+      },
       "printer": "cathrynlavery",
       "printer_name": "Cathryn Lavery",
       "creator": {
@@ -16463,9 +16469,9 @@
       "path": "library/marketing/loops",
       "release": {
         "cli_name": "loops-pp-cli",
-        "version": "2026.10.1",
-        "released_at": "2026-10-02T19:18:45Z",
-        "source_commit": "208781893b2a1077f86862d1eee2ebbb715f642e"
+        "version": "2026.10.2",
+        "released_at": "2026-10-09T20:16:39Z",
+        "source_commit": "2ddf77d5ce3ac4ec263f7e9cf0f4f7cae32b9b0e"
       },
       "printer": "cathrynlavery",
       "printer_name": "Cathryn Lavery",
@@ -17999,7 +18005,7 @@
         "released_at": "2026-09-11T09:22:21Z",
         "source_commit": "81f5764eda401077520268afe74913c0f21f5b7e"
       },
-      "printer": "cathryn-lavery",
+      "printer": "cathrynlavery",
       "printer_name": "Cathryn Lavery",
       "creator": {
         "handle": "cathryn-lavery",
@@ -29222,9 +29228,9 @@
       "path": "library/developer-tools/thelancet",
       "release": {
         "cli_name": "thelancet-pp-cli",
-        "version": "2026.10.4",
-        "released_at": "2026-10-08T08:51:28Z",
-        "source_commit": "2710330bfb94b5248bacf883e88553f19b998766"
+        "version": "2026.10.5",
+        "released_at": "2026-10-09T08:59:31Z",
+        "source_commit": "6542406ce782b705602ef8cbc35852d217624edc"
       },
       "printer": "laci141",
       "printer_name": "laci141",
