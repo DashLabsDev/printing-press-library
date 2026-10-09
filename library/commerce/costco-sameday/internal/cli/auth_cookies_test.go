@@ -167,7 +167,7 @@ func TestCookieHeaderFromCurlDashB(t *testing.T) {
 		"  -H 'accept: application/json' \\\n" +
 		"  -b '__Host-instacart_sid=" + fakeSID + "; ahoy_visit=" + fakeVisit + "' \\\n" +
 		"  -H 'x-client-identifier: web'"
-	got, err := cookieHeaderFromText(curl)
+	got, err := headerOnly(curl)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -178,7 +178,7 @@ func TestCookieHeaderFromCurlDashB(t *testing.T) {
 
 func TestCookieHeaderFromCurlHeaderAndAnsiQuotes(t *testing.T) {
 	curl := "curl $'https://sameday.costco.com/graphql' -H $'cookie: __Host-instacart_sid=" + fakeSID + "; build_sha=" + fakeBuild + "' --compressed"
-	got, err := cookieHeaderFromText(curl)
+	got, err := headerOnly(curl)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -190,7 +190,7 @@ func TestCookieHeaderFromCurlHeaderAndAnsiQuotes(t *testing.T) {
 
 func TestCookieHeaderFromCopiedRequestHeaders(t *testing.T) {
 	text := ":authority: sameday.costco.com\n:method: GET\naccept: application/json\ncookie: __Host-instacart_sid=" + fakeSID + "; X-IC-bcx=" + fakeBCX + "\nx-client-identifier: web\n"
-	got, err := cookieHeaderFromText(text)
+	got, err := headerOnly(text)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -200,7 +200,7 @@ func TestCookieHeaderFromCopiedRequestHeaders(t *testing.T) {
 }
 
 func TestCookieHeaderFromCurlWithoutCookieFails(t *testing.T) {
-	_, err := cookieHeaderFromText("curl 'https://sameday.costco.com/graphql' -H 'accept: application/json'")
+	_, err := headerOnly("curl 'https://sameday.costco.com/graphql' -H 'accept: application/json'")
 	if err == nil || !strings.Contains(err.Error(), "no cookie") {
 		t.Fatalf("expected a clear no-cookie error, got %v", err)
 	}
@@ -229,4 +229,9 @@ func TestMissingSessionCookieErrorExplainsHttpOnly(t *testing.T) {
 	if err == nil || !strings.Contains(err.Error(), "HttpOnly") || !strings.Contains(err.Error(), "Copy as cURL") {
 		t.Fatalf("error should explain HttpOnly and the cURL path: %v", err)
 	}
+}
+
+func headerOnly(text string) (string, error) {
+	h, _, err := extractCookieHeader(text)
+	return h, err
 }

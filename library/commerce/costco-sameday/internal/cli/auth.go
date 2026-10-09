@@ -146,9 +146,12 @@ func selectSessionCookies(header string) (kept []sessionCookie, dropped []string
 	}
 	if !sawRequired {
 		if requiredMalformed {
-			return nil, dropped, fmt.Errorf("cookie %q is malformed; update the browser extractor (pycookiecheat 0.8.0 or newer) or re-copy the Cookie header from DevTools; refusing to save credentials", sessionCookieName)
+			return nil, dropped, &cookieImportError{Stage: stageParsePairs, Msg: fmt.Sprintf("cookie %q is malformed; update the browser extractor (pycookiecheat 0.8.0 or newer) or re-copy from DevTools with Copy as cURL (bash); refusing to save credentials", sessionCookieName)}
 		}
-		return nil, dropped, fmt.Errorf("required session cookie %q not found for sameday.costco.com; it is HttpOnly, so document.cookie and page scripts cannot see it. In Chrome DevTools > Network, right-click a sameday.costco.com graphql request > Copy > Copy as cURL (bash), then pipe it to auth login --cookies-file -", sessionCookieName)
+		if len(kept) == 0 {
+			return nil, dropped, &cookieImportError{Stage: stageParsePairs, Msg: "no name=value cookie pairs found in the extracted cookie text"}
+		}
+		return nil, dropped, &cookieImportError{Stage: stageRequireSession, Msg: fmt.Sprintf("required session cookie %q not found for sameday.costco.com (found %d other cookies); it is HttpOnly, so document.cookie and page scripts cannot see it. In Chrome DevTools > Network, right-click a sameday.costco.com graphql request > Copy > Copy as cURL (bash), then pipe it to auth login --cookies-file -; run with --diagnose to list cookie names", sessionCookieName, len(kept))}
 	}
 	return kept, dropped, nil
 }
@@ -157,6 +160,7 @@ func newAuthLoginCmd(flags *rootFlags) *cobra.Command {
 	var browserFlag bool
 	var profileFlag string
 	var cookiesFile string
+	var diagnose bool
 
 	cmd := &cobra.Command{
 		Use:   "login",
@@ -170,6 +174,8 @@ Use --cookies-file to import Playwright storage-state JSON or a raw Cookie heade
 Use --cookies-file - to read from stdin (e.g. piped from pbpaste). Stdin and
 files accept a raw Cookie header, DevTools "Copy request headers" output, or
 DevTools "Copy as cURL (bash)" output; only the cookie is used.
+Add --diagnose to check an input without saving: it prints the byte count,
+detected format, parse stage, and cookie names only, never values.
 
 Only the __Host-instacart_sid session cookie is required. Other cookies in the
 import (X-IC-bcx, ahoy_visitor, ahoy_visit, build_sha, _instacart_session_id,
@@ -182,10 +188,32 @@ profile by name when the installed backend supports it.`,
   costco-sameday-pp-cli auth login --browser
   costco-sameday-pp-cli auth login --cookies-file storage-state.json
   pbpaste | costco-sameday-pp-cli auth login --cookies-file -
+  pbpaste | costco-sameday-pp-cli auth login --cookies-file - --diagnose
   costco-sameday-pp-cli auth login --chrome --profile "Work"`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			w := cmd.OutOrStdout()
 			domain := "sameday.costco.com"
+			if diagnose {
+				if cookiesFile == "" || browserFlag {
+					return usageErr(fmt.Errorf("--diagnose works with --cookies-file (use --cookies-file - for stdin)"))
+				}
+				var data []byte
+				var err error
+				if cookiesFile == "-" {
+					data, err = readCookieInput(cmd.InOrStdin())
+				} else {
+					data, err = os.ReadFile(cookiesFile)
+				}
+				if err != nil {
+					return authErr(&cookieImportError{Stage: stageRead, Msg: "could not read the input"})
+				}
+				d := diagnoseCookieInput(data, domain)
+				writeCookieDiagnosis(w, d)
+				if d.Stage != stageOK {
+					return authErr(fmt.Errorf("diagnosis: not importable (failed at stage %s)", d.Stage))
+				}
+				return nil
+			}
 			if !browserFlag && cookiesFile == "" {
 				fmt.Fprintln(w, "Use --chrome, --browser, or --cookies-file to authenticate from your browser session:")
 				fmt.Fprintf(cmd.OutOrStdout(), "  costco-sameday-pp-cli auth login --chrome\n")
@@ -226,7 +254,7 @@ profile by name when the installed backend supports it.`,
 				if source == "-" {
 					source = "stdin"
 				}
-				fmt.Fprintf(w, "Loaded cookies from %s for %s.\n", source, domain)
+				fmt.Fprintf(w, "Loaded cookies from %s for %s (input format: %s).\n", source, domain, imported.Format)
 			}
 			if !fromCookiesFile {
 				if pressAuthPath, err := exec.LookPath("press-auth"); err == nil {
@@ -372,6 +400,7 @@ profile by name when the installed backend supports it.`,
 	cmd.Flags().BoolVar(&browserFlag, "chrome", false, "Read cookies from Chrome")
 	cmd.Flags().BoolVar(&browserFlag, "browser", false, "Alias for --chrome")
 	cmd.Flags().StringVar(&profileFlag, "profile", "", "Chrome profile name, or channel-qualified (e.g. \"Work\", \"Chrome Beta/Default\")")
+	cmd.Flags().BoolVar(&diagnose, "diagnose", false, "With --cookies-file: report input size, format, parse stage, and cookie NAMES only; never prints values or saves anything")
 	cmd.Flags().StringVar(&cookiesFile, "cookies-file", "", "Import cookies from a Playwright storage-state JSON file or raw Cookie header file (- for stdin)")
 	return cmd
 }
@@ -1133,12 +1162,13 @@ func extractViaCookiesCLI(domain string) (string, error) {
 type importedCookieFile struct {
 	Header  string
 	Cookies []*http.Cookie
+	Format  string
 }
 
 func loadCookiesFromFile(path string, domain string) (importedCookieFile, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return importedCookieFile{}, fmt.Errorf("reading cookies file: %w", err)
+		return importedCookieFile{}, &cookieImportError{Stage: stageRead, Msg: fmt.Sprintf("reading cookies file: %v", err)}
 	}
 	return parseCookiesData(data, domain)
 }
@@ -1146,9 +1176,9 @@ func loadCookiesFromFile(path string, domain string) (importedCookieFile, error)
 // loadCookiesFromReader imports cookies from a stream (`--cookies-file -`),
 // so a Cookie header can be piped from the clipboard without touching disk.
 func loadCookiesFromReader(r io.Reader, domain string) (importedCookieFile, error) {
-	data, err := io.ReadAll(io.LimitReader(r, 1<<20))
+	data, err := readCookieInput(r)
 	if err != nil {
-		return importedCookieFile{}, fmt.Errorf("reading cookies from stdin: %w", err)
+		return importedCookieFile{}, err
 	}
 	return parseCookiesData(data, domain)
 }
@@ -1167,7 +1197,7 @@ func parseCookiesData(data []byte, domain string) (importedCookieFile, error) {
 	}
 	if err := json.Unmarshal(data, &state); err == nil {
 		if len(state.Cookies) == 0 {
-			return importedCookieFile{}, fmt.Errorf("cookies file contains an empty cookies array")
+			return importedCookieFile{}, &cookieImportError{Stage: stageExtract, Format: formatStorageState, Msg: "storage-state JSON has an empty cookies array"}
 		}
 		parts := make([]string, 0, len(state.Cookies))
 		cookies := make([]*http.Cookie, 0, len(state.Cookies))
@@ -1198,147 +1228,15 @@ func parseCookiesData(data []byte, domain string) (importedCookieFile, error) {
 			parts = append(parts, name+"="+c.Value)
 		}
 		if len(parts) == 0 {
-			return importedCookieFile{}, fmt.Errorf("cookies file contains no cookies for %s", domain)
+			return importedCookieFile{}, &cookieImportError{Stage: stageExtract, Format: formatStorageState, Msg: "storage-state JSON has no cookies for " + domain}
 		}
-		return importedCookieFile{Header: strings.Join(parts, "; "), Cookies: cookies}, nil
+		return importedCookieFile{Header: strings.Join(parts, "; "), Cookies: cookies, Format: formatStorageState}, nil
 	}
-	header, err := cookieHeaderFromText(string(data))
+	header, format, err := extractCookieHeader(string(data))
 	if err != nil {
 		return importedCookieFile{}, err
 	}
-	return importedCookieFile{Header: header, Cookies: parseCookieHeaderCookies(header)}, nil
-}
-
-// cookieHeaderFromText extracts a Cookie header value from pasted text. It
-// accepts a bare header value ("a=1; b=2"), a "Cookie: ..." line, DevTools
-// "Copy request headers" output (one header per line), or DevTools
-// "Copy as cURL (bash)" output (-b/--cookie or -H 'cookie: ...'). The
-// session cookie __Host-instacart_sid is HttpOnly, so it never appears in
-// document.cookie; these DevTools copy formats do include it.
-func cookieHeaderFromText(text string) (string, error) {
-	text = strings.TrimSpace(strings.TrimPrefix(text, "\ufeff"))
-	if text == "" {
-		return "", fmt.Errorf("cookies file is empty")
-	}
-	if strings.HasPrefix(text, "curl ") || strings.HasPrefix(text, "curl\t") {
-		if header := cookieHeaderFromCurl(text); header != "" {
-			return header, nil
-		}
-		return "", fmt.Errorf("pasted cURL command has no cookie (-b/--cookie or -H 'cookie: ...'); copy it from a sameday.costco.com graphql request in DevTools")
-	}
-	lines := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
-	if len(lines) == 1 {
-		return trimCookieHeaderPrefix(text), nil
-	}
-	var parts []string
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
-		if len(line) > len("cookie:") && strings.EqualFold(line[:len("cookie:")], "cookie:") {
-			if v := strings.TrimSpace(line[len("cookie:"):]); v != "" {
-				parts = append(parts, v)
-			}
-		}
-	}
-	if len(parts) == 0 {
-		return "", fmt.Errorf("pasted text has several lines but no \"cookie:\" line; copy the cookie value, the request headers, or Copy as cURL from DevTools")
-	}
-	return strings.Join(parts, "; "), nil
-}
-
-// cookieHeaderFromCurl pulls cookie values out of a bash-quoted cURL command.
-func cookieHeaderFromCurl(cmd string) string {
-	args := splitShellWords(cmd)
-	var parts []string
-	for i := 0; i < len(args); i++ {
-		a := args[i]
-		next := func() string {
-			if i+1 < len(args) {
-				i++
-				return args[i]
-			}
-			return ""
-		}
-		switch {
-		case a == "-b" || a == "--cookie":
-			if v := strings.TrimSpace(next()); v != "" {
-				parts = append(parts, v)
-			}
-		case strings.HasPrefix(a, "--cookie="):
-			parts = append(parts, strings.TrimSpace(strings.TrimPrefix(a, "--cookie=")))
-		case a == "-H" || a == "--header":
-			h := strings.TrimSpace(next())
-			if len(h) > len("cookie:") && strings.EqualFold(h[:len("cookie:")], "cookie:") {
-				parts = append(parts, strings.TrimSpace(h[len("cookie:"):]))
-			}
-		}
-	}
-	return strings.Join(parts, "; ")
-}
-
-// splitShellWords splits bash-style words: single quotes, double quotes,
-// ANSI-C $'...' quotes (as emitted by Chrome's Copy as cURL), backslash
-// escapes and backslash-newline continuations.
-func splitShellWords(s string) []string {
-	var words []string
-	var cur strings.Builder
-	inWord := false
-	for i := 0; i < len(s); i++ {
-		c := s[i]
-		switch {
-		case c == '\\' && i+1 < len(s) && s[i+1] == '\n':
-			i++
-		case c == '\\' && i+1 < len(s):
-			i++
-			cur.WriteByte(s[i])
-			inWord = true
-		case c == ' ' || c == '\t' || c == '\n' || c == '\r':
-			if inWord {
-				words = append(words, cur.String())
-				cur.Reset()
-				inWord = false
-			}
-		case c == '$' && i+1 < len(s) && s[i+1] == '\'':
-			i += 2
-			for ; i < len(s) && s[i] != '\''; i++ {
-				if s[i] == '\\' && i+1 < len(s) {
-					i++
-					switch s[i] {
-					case 'n':
-						cur.WriteByte('\n')
-					case 't':
-						cur.WriteByte('\t')
-					default:
-						cur.WriteByte(s[i])
-					}
-					continue
-				}
-				cur.WriteByte(s[i])
-			}
-			inWord = true
-		case c == '\'':
-			i++
-			for ; i < len(s) && s[i] != '\''; i++ {
-				cur.WriteByte(s[i])
-			}
-			inWord = true
-		case c == '"':
-			i++
-			for ; i < len(s) && s[i] != '"'; i++ {
-				if s[i] == '\\' && i+1 < len(s) && strings.ContainsRune("\"\\$`", rune(s[i+1])) {
-					i++
-				}
-				cur.WriteByte(s[i])
-			}
-			inWord = true
-		default:
-			cur.WriteByte(c)
-			inWord = true
-		}
-	}
-	if inWord {
-		words = append(words, cur.String())
-	}
-	return words
+	return importedCookieFile{Header: header, Cookies: parseCookieHeaderCookies(header), Format: format}, nil
 }
 
 func trimCookieHeaderPrefix(s string) string {
