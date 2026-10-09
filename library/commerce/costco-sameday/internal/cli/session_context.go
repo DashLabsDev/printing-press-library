@@ -1,4 +1,4 @@
-// Copyright 2026 dashlabsdev and contributors. Licensed under Apache-2.0.
+// Copyright 2026 DashLabsDev and contributors. Licensed under Apache-2.0. See LICENSE.
 // Hand-authored session context: global --zip, `session context`, and the
 // live product search used by `search --data-source live`.
 // Preserved across regenerate via registerNovelCommand / registerClientHook.
