@@ -27,6 +27,11 @@ type cookieJar struct {
 	path   string
 	mu     sync.Mutex
 	loaded int // PATCH(walmart-cookie-fidelity): rows loaded from disk
+	// present is true when the jar file exists and parses, even as an empty
+	// list. An empty saved jar means every cookie expired or was deleted
+	// (logged out); it must not count as "no jar", or client.New would
+	// re-seed the stale cookie string captured at login.
+	present bool
 	// shadow holds browser cookies that net/http's jar cannot store beside a
 	// same-named cookie (e.g. host-only www vs .www), so both still go out
 	// exactly as the browser sends them.
@@ -364,6 +369,7 @@ func (j *cookieJar) loadFromDisk() {
 	if err := json.Unmarshal(data, &rows); err != nil {
 		return
 	}
+	j.present = true
 	// Group cookies by host so a single SetCookies call carries the full
 	// per-host set; the jar keys cookies by host so this matches its shape.
 	byHost := map[string][]*http.Cookie{}
@@ -437,10 +443,13 @@ func ReplaceCookieJar(cookies []ImportedCookie) error {
 	return os.WriteFile(path, data, 0o600)
 }
 
-// PersistedJarLoaded reports whether jar is the on-disk jar and loaded rows.
+// PersistedJarLoaded reports whether jar is the on-disk jar backed by a saved
+// cookie file. An existing but empty file (all cookies expired or deleted)
+// still counts: the session is logged out, and the login-time cookie string
+// must not be seeded back in its place.
 func PersistedJarLoaded(jar http.CookieJar) bool {
 	pj, ok := jar.(*cookieJar)
-	return ok && pj.loaded > 0
+	return ok && (pj.present || pj.loaded > 0)
 }
 
 // Cookies / SetCookies — http.CookieJar interface; delegates to inner jar and
