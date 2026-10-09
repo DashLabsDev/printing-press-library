@@ -345,3 +345,42 @@ func TestSessionCartCacheDroppedAfterMutation(t *testing.T) {
 		t.Fatalf("cart cache survived a mutation: %d lookups", n)
 	}
 }
+
+func TestSessionContextCartResolvedForExplicitShop(t *testing.T) {
+	f, c := newFakeSameDay(t)
+	c.SetSessionPostalCode("98027")
+	if _, err := c.GetMutating(context.Background(), "/graphql", map[string]string{"operationName": "CartTotals", "shopId": "shop-explicit"}); err != nil {
+		t.Fatal(err)
+	}
+	if got := f.varsOf("ActiveCartId")["shopId"]; got != "shop-explicit" {
+		t.Fatalf("cart resolved for shop %v, want the explicit shop", got)
+	}
+	if n := f.count("ShopCollectionScoped"); n != 0 {
+		t.Fatalf("ZIP shop lookup ran despite explicit --shop-id (%d)", n)
+	}
+	if got := f.varsOf("CartTotals"); got["shopId"] != "shop-explicit" || got["cartId"] != "cart-1" {
+		t.Fatalf("CartTotals variables = %v", got)
+	}
+}
+
+func TestSessionCacheUpdatesMergeAcrossClients(t *testing.T) {
+	_, c := newFakeSameDay(t)
+	c2 := New(&config.Config{BaseURL: c.BaseURL}, 5*time.Second, 0)
+	c.updateSessionCache(func(cc *sessionContextCache) {
+		cc.Shops = map[string]cachedShop{"11111": {ShopID: "a", ResolvedAt: time.Now()}}
+	})
+	c2.updateSessionCache(func(cc *sessionContextCache) {
+		if cc.Shops == nil {
+			cc.Shops = map[string]cachedShop{}
+		}
+		cc.Shops["22222"] = cachedShop{ShopID: "b", ResolvedAt: time.Now()}
+	})
+	got := c.loadSessionCache().Shops
+	if got["11111"].ShopID != "a" || got["22222"].ShopID != "b" {
+		t.Fatalf("concurrent updates not merged: %v", got)
+	}
+	matches, _ := filepath.Glob(filepath.Join(filepath.Dir(c.sessionCachePath()), "*.tmp"))
+	if len(matches) != 0 {
+		t.Fatalf("temp files left behind: %v", matches)
+	}
+}

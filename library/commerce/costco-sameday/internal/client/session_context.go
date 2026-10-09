@@ -124,6 +124,9 @@ type SessionNeeds struct {
 	Location bool
 	// Refresh ignores cached values (they are still rewritten).
 	Refresh bool
+	// ShopID, when set (explicit --shop-id), is used as-is: no ZIP lookup,
+	// and the cart is resolved for this shop.
+	ShopID string
 }
 
 func needsForVars(vars []string) SessionNeeds {
@@ -212,12 +215,10 @@ func (c *Client) invalidateSessionCart() {
 	}
 	c.sessionMu().Lock()
 	defer c.sessionMu().Unlock()
-	cache := c.loadSessionCache()
-	if len(cache.Carts) == 0 {
+	if len(c.loadSessionCache().Carts) == 0 {
 		return
 	}
-	cache.Carts = nil
-	c.saveSessionCache(cache)
+	c.updateSessionCache(func(cc *sessionContextCache) { cc.Carts = nil })
 }
 
 func (c *Client) sessionCachePath() string {
@@ -241,23 +242,35 @@ func (c *Client) loadSessionCache() sessionContextCache {
 	return cache
 }
 
-func (c *Client) saveSessionCache(cache sessionContextCache) {
+// updateSessionCache re-reads the cache file, applies mutate to the latest
+// on-disk copy, and writes it back through a unique temp file + rename, so
+// concurrent CLI processes merge per key (last writer wins per entry) instead
+// of replacing each other's whole file or sharing one temp path.
+func (c *Client) updateSessionCache(mutate func(*sessionContextCache)) {
 	path := c.sessionCachePath()
 	if path == "" {
 		return
 	}
+	cache := c.loadSessionCache()
+	mutate(&cache)
 	data, err := json.MarshalIndent(cache, "", "  ")
 	if err != nil {
 		return
 	}
-	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
+	dir := filepath.Dir(path)
+	if err := os.MkdirAll(dir, 0o700); err != nil {
 		return
 	}
-	tmp := path + ".tmp"
-	if err := os.WriteFile(tmp, data, 0o600); err != nil {
+	tmp, err := os.CreateTemp(dir, sessionContextFile+".*.tmp")
+	if err != nil {
 		return
 	}
-	_ = os.Rename(tmp, path)
+	tmpName := tmp.Name()
+	_, werr := tmp.Write(data)
+	cerr := tmp.Close()
+	if werr != nil || cerr != nil || os.Chmod(tmpName, 0o600) != nil || os.Rename(tmpName, path) != nil {
+		_ = os.Remove(tmpName)
+	}
 }
 
 func (c *Client) credentialScopeKey() string {
@@ -287,7 +300,7 @@ func (c *Client) ResolveSessionContext(ctx context.Context, needs SessionNeeds) 
 	defer c.sessionMu().Unlock()
 
 	cache := c.loadSessionCache()
-	dirty := false
+	var updates []func(*sessionContextCache)
 	scope := c.credentialScopeKey()
 	now := time.Now()
 	useCache := !needs.Refresh && !c.NoCache
@@ -297,8 +310,7 @@ func (c *Client) ResolveSessionContext(ctx context.Context, needs SessionNeeds) 
 	case explicit != "":
 		out.PostalCode, out.PostalCodeSource = explicit, "flag"
 		if cache.LastPostalCode != explicit {
-			cache.LastPostalCode = explicit
-			dirty = true
+			updates = append(updates, func(cc *sessionContextCache) { cc.LastPostalCode = explicit })
 		}
 	case strings.TrimSpace(os.Getenv(SessionZipEnv)) != "":
 		out.PostalCode, out.PostalCodeSource = strings.TrimSpace(os.Getenv(SessionZipEnv)), "env"
@@ -310,8 +322,12 @@ func (c *Client) ResolveSessionContext(ctx context.Context, needs SessionNeeds) 
 	}
 
 	defer func() {
-		if dirty {
-			c.saveSessionCache(cache)
+		if len(updates) > 0 {
+			c.updateSessionCache(func(cc *sessionContextCache) {
+				for _, u := range updates {
+					u(cc)
+				}
+			})
 		}
 	}()
 
@@ -324,11 +340,12 @@ func (c *Client) ResolveSessionContext(ctx context.Context, needs SessionNeeds) 
 		g, err := c.fetchGeolocation(ctx)
 		if err == nil {
 			geo = &g
-			if cache.Geolocation == nil {
-				cache.Geolocation = map[string]cachedGeolocation{}
-			}
-			cache.Geolocation[scope] = g
-			dirty = true
+			updates = append(updates, func(cc *sessionContextCache) {
+				if cc.Geolocation == nil {
+					cc.Geolocation = map[string]cachedGeolocation{}
+				}
+				cc.Geolocation[scope] = g
+			})
 		} else if needs.Zone || out.PostalCode == "" {
 			return out, fmt.Errorf("could not resolve delivery location (Geolocation): %w", err)
 		}
@@ -348,7 +365,9 @@ func (c *Client) ResolveSessionContext(ctx context.Context, needs SessionNeeds) 
 		return out, errors.New("could not determine a delivery ZIP; pass --zip <ZIP> or set " + SessionZipEnv)
 	}
 
-	if needs.Shop || needs.Cart {
+	if strings.TrimSpace(needs.ShopID) != "" {
+		out.ShopID = strings.TrimSpace(needs.ShopID)
+	} else if needs.Shop || needs.Cart {
 		if s, ok := cache.Shops[out.PostalCode]; ok && useCache && now.Sub(s.ResolvedAt) < sessionLocationMaxAge && s.ShopID != "" {
 			out.ShopID, out.RetailerLocationID = s.ShopID, s.RetailerLocationID
 		} else {
@@ -357,11 +376,13 @@ func (c *Client) ResolveSessionContext(ctx context.Context, needs SessionNeeds) 
 				return out, fmt.Errorf("could not resolve Costco shopId for ZIP %s: %w", out.PostalCode, err)
 			}
 			out.ShopID, out.RetailerLocationID = shopID, locID
-			if cache.Shops == nil {
-				cache.Shops = map[string]cachedShop{}
-			}
-			cache.Shops[out.PostalCode] = cachedShop{ShopID: shopID, RetailerLocationID: locID, ResolvedAt: now}
-			dirty = true
+			zip := out.PostalCode
+			updates = append(updates, func(cc *sessionContextCache) {
+				if cc.Shops == nil {
+					cc.Shops = map[string]cachedShop{}
+				}
+				cc.Shops[zip] = cachedShop{ShopID: shopID, RetailerLocationID: locID, ResolvedAt: now}
+			})
 		}
 	}
 
@@ -375,11 +396,12 @@ func (c *Client) ResolveSessionContext(ctx context.Context, needs SessionNeeds) 
 				return out, fmt.Errorf("could not resolve the active cartId (requires a signed-in session; run 'costco-sameday-pp-cli auth login --chrome' if it expired): %w", err)
 			}
 			out.CartID = cartID
-			if cache.Carts == nil {
-				cache.Carts = map[string]cachedCart{}
-			}
-			cache.Carts[key] = cachedCart{CartID: cartID, ResolvedAt: now}
-			dirty = true
+			updates = append(updates, func(cc *sessionContextCache) {
+				if cc.Carts == nil {
+					cc.Carts = map[string]cachedCart{}
+				}
+				cc.Carts[key] = cachedCart{CartID: cartID, ResolvedAt: now}
+			})
 		}
 	}
 	return out, nil
@@ -540,6 +562,18 @@ func graphQLVariablePresent(params map[string]string, name string) bool {
 	return false
 }
 
+// graphQLVariableString returns a variable from flat params or variables JSON.
+func graphQLVariableString(params map[string]string, name string) string {
+	if v := strings.TrimSpace(params[name]); v != "" {
+		return v
+	}
+	var vars map[string]any
+	if json.Unmarshal([]byte(params["variables"]), &vars) == nil {
+		return jsonString(vars[name])
+	}
+	return ""
+}
+
 // fillSessionContextParams fills session-derived variables a known read
 // operation declares but the caller left empty. It never overrides explicit
 // values, never runs in verify/dry-run mode, and never fails the request: a
@@ -565,7 +599,12 @@ func (c *Client) fillSessionContextParams(ctx context.Context, method, path stri
 	if len(missing) == 0 {
 		return params, nil
 	}
-	sc, resolveErr := c.ResolveSessionContext(ctx, needsForVars(missing))
+	needs := needsForVars(missing)
+	if graphQLVariablePresent(params, ctxVarShopID) {
+		// Resolve the cart for the caller's shop, never the default ZIP's.
+		needs.ShopID = graphQLVariableString(params, ctxVarShopID)
+	}
+	sc, resolveErr := c.ResolveSessionContext(ctx, needs)
 	updated := make(map[string]string, len(params)+len(missing))
 	for k, v := range params {
 		updated[k] = v

@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/mvanhorn/printing-press-library/library/commerce/costco-sameday/internal/client"
@@ -33,6 +34,11 @@ func init() {
 	registerClientHook(func(c *client.Client) error {
 		if err := client.ValidatePostalCode(sessionZipFlag); err != nil {
 			return usageErr(err)
+		}
+		if env := os.Getenv(client.SessionZipEnv); env != "" {
+			if err := client.ValidatePostalCode(env); err != nil {
+				return usageErr(fmt.Errorf("invalid %s: %w", client.SessionZipEnv, err))
+			}
 		}
 		c.SetSessionPostalCode(sessionZipFlag)
 		return nil

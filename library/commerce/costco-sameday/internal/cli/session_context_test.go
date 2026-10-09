@@ -116,6 +116,10 @@ func TestZipFlagDrivesShopLookupForSlots(t *testing.T) {
 	if _, err := runRoot(t, "slots", "availableservices", "--zip", "6571"); err == nil || ExitCode(err) != 2 {
 		t.Fatalf("invalid --zip should be a usage error, got %v", err)
 	}
+	t.Setenv("COSTCO_SAMEDAY_ZIP", "abc")
+	if _, err := runRoot(t, "session", "context"); err == nil || ExitCode(err) != 2 {
+		t.Fatalf("invalid COSTCO_SAMEDAY_ZIP should be a usage error, got %v", err)
+	}
 }
 
 func TestGeneratedReadCommandFailsOnGraphQLErrors(t *testing.T) {
