@@ -18001,14 +18001,14 @@
       "path": "library/developer-tools/namecheap",
       "release": {
         "cli_name": "namecheap-pp-cli",
-        "version": "2026.9.1",
-        "released_at": "2026-09-11T09:22:21Z",
-        "source_commit": "81f5764eda401077520268afe74913c0f21f5b7e"
+        "version": "2026.10.1",
+        "released_at": "2026-10-09T20:29:38Z",
+        "source_commit": "bc43bfb64809b98a7f44a1e1cee826cf11bc542c"
       },
       "printer": "cathrynlavery",
       "printer_name": "Cathryn Lavery",
       "creator": {
-        "handle": "cathryn-lavery",
+        "handle": "cathrynlavery",
         "name": "Cathryn Lavery"
       },
       "mcp": {
