@@ -148,7 +148,7 @@ func selectSessionCookies(header string) (kept []sessionCookie, dropped []string
 		if requiredMalformed {
 			return nil, dropped, fmt.Errorf("cookie %q is malformed; update the browser extractor (pycookiecheat 0.8.0 or newer) or re-copy the Cookie header from DevTools; refusing to save credentials", sessionCookieName)
 		}
-		return nil, dropped, fmt.Errorf("required session cookie %q not found for sameday.costco.com; sign in at https://sameday.costco.com and copy the Cookie header from a fresh request", sessionCookieName)
+		return nil, dropped, fmt.Errorf("required session cookie %q not found for sameday.costco.com; it is HttpOnly, so document.cookie and page scripts cannot see it. In Chrome DevTools > Network, right-click a sameday.costco.com graphql request > Copy > Copy as cURL (bash), then pipe it to auth login --cookies-file -", sessionCookieName)
 	}
 	return kept, dropped, nil
 }
@@ -167,7 +167,9 @@ Use --chrome to read cookies from Chrome for sameday.costco.com.
 Use --browser as an alias for --chrome.
 --chrome and --browser require a cookie extraction tool (pycookiecheat, cookies, or cookie-scoop-cli).
 Use --cookies-file to import Playwright storage-state JSON or a raw Cookie header file.
-Use --cookies-file - to read a raw Cookie header from stdin (e.g. piped from pbpaste).
+Use --cookies-file - to read from stdin (e.g. piped from pbpaste). Stdin and
+files accept a raw Cookie header, DevTools "Copy request headers" output, or
+DevTools "Copy as cURL (bash)" output; only the cookie is used.
 
 Only the __Host-instacart_sid session cookie is required. Other cookies in the
 import (X-IC-bcx, ahoy_visitor, ahoy_visit, build_sha, _instacart_session_id,
@@ -1200,11 +1202,143 @@ func parseCookiesData(data []byte, domain string) (importedCookieFile, error) {
 		}
 		return importedCookieFile{Header: strings.Join(parts, "; "), Cookies: cookies}, nil
 	}
-	header := trimCookieHeaderPrefix(string(data))
-	if header == "" {
-		return importedCookieFile{}, fmt.Errorf("cookies file is empty")
+	header, err := cookieHeaderFromText(string(data))
+	if err != nil {
+		return importedCookieFile{}, err
 	}
 	return importedCookieFile{Header: header, Cookies: parseCookieHeaderCookies(header)}, nil
+}
+
+// cookieHeaderFromText extracts a Cookie header value from pasted text. It
+// accepts a bare header value ("a=1; b=2"), a "Cookie: ..." line, DevTools
+// "Copy request headers" output (one header per line), or DevTools
+// "Copy as cURL (bash)" output (-b/--cookie or -H 'cookie: ...'). The
+// session cookie __Host-instacart_sid is HttpOnly, so it never appears in
+// document.cookie; these DevTools copy formats do include it.
+func cookieHeaderFromText(text string) (string, error) {
+	text = strings.TrimSpace(strings.TrimPrefix(text, "\ufeff"))
+	if text == "" {
+		return "", fmt.Errorf("cookies file is empty")
+	}
+	if strings.HasPrefix(text, "curl ") || strings.HasPrefix(text, "curl\t") {
+		if header := cookieHeaderFromCurl(text); header != "" {
+			return header, nil
+		}
+		return "", fmt.Errorf("pasted cURL command has no cookie (-b/--cookie or -H 'cookie: ...'); copy it from a sameday.costco.com graphql request in DevTools")
+	}
+	lines := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
+	if len(lines) == 1 {
+		return trimCookieHeaderPrefix(text), nil
+	}
+	var parts []string
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if len(line) > len("cookie:") && strings.EqualFold(line[:len("cookie:")], "cookie:") {
+			if v := strings.TrimSpace(line[len("cookie:"):]); v != "" {
+				parts = append(parts, v)
+			}
+		}
+	}
+	if len(parts) == 0 {
+		return "", fmt.Errorf("pasted text has several lines but no \"cookie:\" line; copy the cookie value, the request headers, or Copy as cURL from DevTools")
+	}
+	return strings.Join(parts, "; "), nil
+}
+
+// cookieHeaderFromCurl pulls cookie values out of a bash-quoted cURL command.
+func cookieHeaderFromCurl(cmd string) string {
+	args := splitShellWords(cmd)
+	var parts []string
+	for i := 0; i < len(args); i++ {
+		a := args[i]
+		next := func() string {
+			if i+1 < len(args) {
+				i++
+				return args[i]
+			}
+			return ""
+		}
+		switch {
+		case a == "-b" || a == "--cookie":
+			if v := strings.TrimSpace(next()); v != "" {
+				parts = append(parts, v)
+			}
+		case strings.HasPrefix(a, "--cookie="):
+			parts = append(parts, strings.TrimSpace(strings.TrimPrefix(a, "--cookie=")))
+		case a == "-H" || a == "--header":
+			h := strings.TrimSpace(next())
+			if len(h) > len("cookie:") && strings.EqualFold(h[:len("cookie:")], "cookie:") {
+				parts = append(parts, strings.TrimSpace(h[len("cookie:"):]))
+			}
+		}
+	}
+	return strings.Join(parts, "; ")
+}
+
+// splitShellWords splits bash-style words: single quotes, double quotes,
+// ANSI-C $'...' quotes (as emitted by Chrome's Copy as cURL), backslash
+// escapes and backslash-newline continuations.
+func splitShellWords(s string) []string {
+	var words []string
+	var cur strings.Builder
+	inWord := false
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		switch {
+		case c == '\\' && i+1 < len(s) && s[i+1] == '\n':
+			i++
+		case c == '\\' && i+1 < len(s):
+			i++
+			cur.WriteByte(s[i])
+			inWord = true
+		case c == ' ' || c == '\t' || c == '\n' || c == '\r':
+			if inWord {
+				words = append(words, cur.String())
+				cur.Reset()
+				inWord = false
+			}
+		case c == '$' && i+1 < len(s) && s[i+1] == '\'':
+			i += 2
+			for ; i < len(s) && s[i] != '\''; i++ {
+				if s[i] == '\\' && i+1 < len(s) {
+					i++
+					switch s[i] {
+					case 'n':
+						cur.WriteByte('\n')
+					case 't':
+						cur.WriteByte('\t')
+					default:
+						cur.WriteByte(s[i])
+					}
+					continue
+				}
+				cur.WriteByte(s[i])
+			}
+			inWord = true
+		case c == '\'':
+			i++
+			for ; i < len(s) && s[i] != '\''; i++ {
+				cur.WriteByte(s[i])
+			}
+			inWord = true
+		case c == '"':
+			i++
+			for ; i < len(s) && s[i] != '"'; i++ {
+				if s[i] == '\\' && i+1 < len(s) && strings.ContainsRune("\"\\$`", rune(s[i+1])) {
+					i++
+				}
+				cur.WriteByte(s[i])
+			}
+			inWord = true
+		default:
+			cur.WriteByte(c)
+			inWord = true
+		}
+	}
+	if inWord {
+		words = append(words, cur.String())
+	}
+	return words
 }
 
 func trimCookieHeaderPrefix(s string) string {

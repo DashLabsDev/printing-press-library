@@ -161,3 +161,72 @@ func TestRequiredAuthCookiesIsSessionOnly(t *testing.T) {
 		t.Fatalf("requiredAuthCookies() = %v", got)
 	}
 }
+
+func TestCookieHeaderFromCurlDashB(t *testing.T) {
+	curl := "curl 'https://sameday.costco.com/graphql?operationName=FakeOp' \\\n" +
+		"  -H 'accept: application/json' \\\n" +
+		"  -b '__Host-instacart_sid=" + fakeSID + "; ahoy_visit=" + fakeVisit + "' \\\n" +
+		"  -H 'x-client-identifier: web'"
+	got, err := cookieHeaderFromText(curl)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got != "__Host-instacart_sid="+fakeSID+"; ahoy_visit="+fakeVisit {
+		t.Fatalf("unexpected header: %q", got)
+	}
+}
+
+func TestCookieHeaderFromCurlHeaderAndAnsiQuotes(t *testing.T) {
+	curl := "curl $'https://sameday.costco.com/graphql' -H $'cookie: __Host-instacart_sid=" + fakeSID + "; build_sha=" + fakeBuild + "' --compressed"
+	got, err := cookieHeaderFromText(curl)
+	if err != nil {
+		t.Fatal(err)
+	}
+	kept, _, err := selectSessionCookies(got)
+	if err != nil || len(kept) != 2 {
+		t.Fatalf("expected 2 cookies from cURL -H cookie, got %+v err=%v", kept, err)
+	}
+}
+
+func TestCookieHeaderFromCopiedRequestHeaders(t *testing.T) {
+	text := ":authority: sameday.costco.com\n:method: GET\naccept: application/json\ncookie: __Host-instacart_sid=" + fakeSID + "; X-IC-bcx=" + fakeBCX + "\nx-client-identifier: web\n"
+	got, err := cookieHeaderFromText(text)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got != "__Host-instacart_sid="+fakeSID+"; X-IC-bcx="+fakeBCX {
+		t.Fatalf("unexpected header: %q", got)
+	}
+}
+
+func TestCookieHeaderFromCurlWithoutCookieFails(t *testing.T) {
+	_, err := cookieHeaderFromText("curl 'https://sameday.costco.com/graphql' -H 'accept: application/json'")
+	if err == nil || !strings.Contains(err.Error(), "no cookie") {
+		t.Fatalf("expected a clear no-cookie error, got %v", err)
+	}
+}
+
+func TestAuthLoginFromCurlOnStdin(t *testing.T) {
+	isolatedAuthEnv(t)
+	flags := &rootFlags{noCache: true}
+	root := &cobra.Command{Use: "root", SilenceUsage: true, SilenceErrors: true}
+	root.AddCommand(newAuthCmd(flags))
+	root.SetArgs([]string{"auth", "login", "--cookies-file", "-"})
+	root.SetIn(strings.NewReader("curl 'https://sameday.costco.com/graphql' \\\n  -b '__Host-instacart_sid=" + fakeSID + "; ahoy_visitor=" + fakeVisitor + "'\n"))
+	var buf strings.Builder
+	root.SetOut(&buf)
+	root.SetErr(&buf)
+	if err := root.Execute(); err != nil {
+		t.Fatalf("cURL stdin login failed: %v\n%s", err, buf.String())
+	}
+	if strings.Contains(buf.String(), "FAKE") || !strings.Contains(buf.String(), "OK Found session cookie") {
+		t.Fatalf("unexpected output:\n%s", buf.String())
+	}
+}
+
+func TestMissingSessionCookieErrorExplainsHttpOnly(t *testing.T) {
+	_, _, err := selectSessionCookies("ahoy_visit=" + fakeVisit + "; X-IC-bcx=" + fakeBCX)
+	if err == nil || !strings.Contains(err.Error(), "HttpOnly") || !strings.Contains(err.Error(), "Copy as cURL") {
+		t.Fatalf("error should explain HttpOnly and the cURL path: %v", err)
+	}
+}
