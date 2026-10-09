@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "id": "costco-sameday-session-context",
+  "applied_at": "2026-10-08",
+  "base_run_id": "20261007-135457",
+  "base_printing_press_version": "4.31.7",
+  "summary": "Auto-resolve shopId/cartId/zoneId/postalCode/userLocation from the session (global --zip, session context), live search via persisted SearchResultsPlacements POST + Items hydration, and GraphQL errors-with-no-data exit non-zero with the missing variable named.",
+  "reason": "Post-merge smoke of 75f7fcbe: cart activecartid/carttotals, slots availableservices and retailer currentretailer sent null $shopId/$cartId/$userLocation and exited 0; search sent ad-hoc query text and got PersistedQueryNotSupported.",
+  "files": [
+    "internal/client/session_context.go",
+    "internal/client/session_context_test.go",
+    "internal/client/client.go",
+    "internal/client/persisted_queries_seed.json",
+    "internal/cli/session_context.go",
+    "internal/cli/session_context_test.go",
+    "internal/cli/search.go",
+    "README.md"
+  ],
+  "markers": [
+    "fillSessionContextParams",
+    "graphQLResponseError",
+    "userPersistedQueryHashes",
+    "ShopCollectionScoped",
+    "liveProductSearch",
+    "sessionZipFlag",
+    "Session context and ZIP"
+  ],
+  "validated_outcome": "go test ./... (synthetic httptest fixtures) green; live read-only: ZIP 98027 resolves shopId/zoneId anonymously, search sends persisted POST (no PersistedQueryNotSupported), GraphQL variable errors exit 5."
+}

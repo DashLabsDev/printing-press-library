@@ -644,6 +644,10 @@
     "hash": "52789dd449025cf5a99caa1ffdf7549e65d30340b1480cc433380761e3e338bd"
   },
   {
+    "operation_name": "Geolocation",
+    "hash": "bf8acabc0060950a92f3e0e82eea380ec755518c67949016470ef5d98b740bfb"
+  },
+  {
     "operation_name": "GetAccurateRetailerEtas",
     "hash": "382a4e539ffafb2d566b24009cd9bc4b796727b4bb93716a239e349dcc21e864"
   },
@@ -1778,6 +1782,10 @@
   {
     "operation_name": "Sections",
     "hash": "ddbec6486efce17782e81bf480e93dc131a048a0bd660d5699a4b623f4baa14e"
+  },
+  {
+    "operation_name": "ShopCollectionScoped",
+    "hash": "f20693c3c551f0e0fbdcac9b2ca7aa6db50f9224a39967ba5ac767bb2b598f85"
   },
   {
     "operation_name": "SlotCampaignPlacement",

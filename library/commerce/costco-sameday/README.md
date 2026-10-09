@@ -218,6 +218,27 @@ Relocation is one-way. Unsetting `COSTCO_SAMEDAY_HOME` does not move files back 
 
 Existing installs keep working because the platform-default rung matches the legacy layout. On the first auth write, stored secrets leave `config.toml` and are consolidated into `credentials.toml` under the data directory. Run `costco-sameday-pp-cli doctor --fail-on warn` to check path and credential-location warnings in automation.
 
+## Session context and ZIP
+
+Cart, slots, retailer, product and search commands fill `shopId`, `cartId`,
+`zoneId`, `postalCode` and `userLocation` automatically when you omit the
+matching flag. Explicit flags (`--shop-id`, `--cart-id`, ...) always win.
+
+- The Costco shop and zone are looked up from your delivery ZIP. ZIP
+  precedence: `--zip`, then `COSTCO_SAMEDAY_ZIP`, then the last explicit
+  `--zip` (remembered in the state dir), then the account/IP geolocation.
+- The active cart comes from your signed-in session (`ActiveCartId`, falling
+  back to `PersonalActiveCarts`) and is cached for 10 minutes; shop and zone
+  are cached for 24 hours. Use `session context --refresh` to re-resolve.
+- A GraphQL response with `errors` and no data exits non-zero and names the
+  missing variable (for example `missing cartId`) with the flag to pass.
+
+```bash
+costco-sameday-pp-cli session context --zip 98027
+costco-sameday-pp-cli slots availableservices
+costco-sameday-pp-cli search kirkland --data-source live
+```
+
 ## Commands
 
 ### account
@@ -311,6 +332,7 @@ Costco Same-Day retailer GraphQL operations
 
 Costco Same-Day session GraphQL operations
 
+- **`costco-sameday-pp-cli session context`** - Resolve the delivery ZIP, Costco shopId, zoneId and active cartId used to auto-fill other commands
 - **`costco-sameday-pp-cli session complementaryproductitems`** - GraphQL query ComplementaryProductItems (persistedQuery)
 - **`costco-sameday-pp-cli session getcobrandcreditcardoffermutation`** - GraphQL mutation GetCobrandCreditCardOfferMutation (persistedQuery)
 
