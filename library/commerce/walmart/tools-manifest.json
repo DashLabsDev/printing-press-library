@@ -1,0 +1,66 @@
+{
+  "api_name": "walmart",
+  "base_url": "https://www.walmart.com",
+  "description": "Walmart Pickup & Delivery from the terminal \u2014 reads via orchestra, cart changes via affiliate link only.",
+  "mcp_ready": "partial",
+  "http_transport": "browser-http",
+  "auth": {
+    "type": "cookie",
+    "cookie_domain": ".walmart.com",
+    "cookies": [
+      "auth",
+      "CID"
+    ]
+  },
+  "required_headers": [
+    {
+      "name": "accept",
+      "value": "application/json"
+    },
+    {
+      "name": "content-type",
+      "value": "application/json"
+    },
+    {
+      "name": "x-o-bu",
+      "value": "WALMART-US"
+    },
+    {
+      "name": "x-o-mart",
+      "value": "B2C"
+    },
+    {
+      "name": "x-o-platform",
+      "value": "rweb"
+    },
+    {
+      "name": "x-o-platform-version",
+      "value": "usweb-1.317.0"
+    },
+    {
+      "name": "x-o-segment",
+      "value": "oaoh"
+    },
+    {
+      "name": "x-o-ccm",
+      "value": "server"
+    },
+    {
+      "name": "tenant-id",
+      "value": "elh9ie"
+    },
+    {
+      "name": "wm_mp",
+      "value": "true"
+    },
+    {
+      "name": "x-latency-trace",
+      "value": "1"
+    },
+    {
+      "name": "x-enable-server-timing",
+      "value": "1"
+    }
+  ],
+  "tools": []
+}

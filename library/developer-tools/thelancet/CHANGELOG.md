@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.10.5 - 2026-10-09
+
+- fix(thelancet): dedupe works by DOI on upsert (#2282).
+
 ## 2026.10.4 - 2026-10-08
 
 - feat(thelancet): send OPENALEX_API_KEY to OpenAlex (#2278).

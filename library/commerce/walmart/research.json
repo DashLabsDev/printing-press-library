@@ -1,0 +1,201 @@
+{
+  "api_name": "walmart",
+  "novelty_score": 7,
+  "alternatives": [
+    {
+      "name": "costco receipts CLI",
+      "url": "",
+      "language": "",
+      "install_method": "",
+      "stars": 0,
+      "last_updated": "",
+      "command_count": 0,
+      "has_json_output": false,
+      "has_auth_support": false
+    },
+    {
+      "name": "walmart.io affiliate API",
+      "url": "",
+      "language": "",
+      "install_method": "",
+      "stars": 0,
+      "last_updated": "",
+      "command_count": 0,
+      "has_json_output": false,
+      "has_auth_support": false
+    }
+  ],
+  "gaps": [
+    "Slot lookup not captured: the slot drawer never appeared (empty cart; captured product not available for pickup/delivery)",
+    "Cart id lives in browser storage; cart view needs --cart-id (MergeAndGetCart, which returns it, is a mutation and stays blocked)",
+    "Non-empty cart line-item shape not captured; parsed best-effort",
+    "product get (ItemById, pdp subgraph) returned HTTP 412 on its first live call; needs a request-shape comparison against the browser before re-testing",
+    "Persisted-query hashes rotate with web releases; WALMART_HASH_\u003cOP\u003e override",
+    "Session is PerimeterX-protected; re-auth uses SMS and is never triggered by the CLI",
+    "govulncheck failed on the Go toolchain stdlib at generation time (publish gate)"
+  ],
+  "patterns": [
+    "Apollo persisted queries: GET /orchestra/\u003csubgraph\u003e/graphql/\u003cOp\u003e/\u003csha256\u003e?variables=\u003cjson\u003e",
+    "Search is server-rendered; parse __NEXT_DATA__",
+    "Cookie session imported from browser; full cookie set replayed",
+    "Client-side read-only guard and no-retry bot-challenge stop"
+  ],
+  "recommendation": "proceed-after-second-capture",
+  "researched_at": "2026-10-09T03:00:00Z",
+  "novel_features": [
+    {
+      "name": "Purchase history with filters",
+      "command": "orders list",
+      "description": "PurchaseHistoryV3 persisted query with --type in-store/online, --status completed/in-progress, --search and cursor paging; read-only.",
+      "rationale": ""
+    },
+    {
+      "name": "Order detail with line items",
+      "command": "orders get",
+      "description": "getOrder line items (name, item id, quantity, line price) plus subtotal, tax, fees and total; customer, address and payment fields are never emitted.",
+      "rationale": ""
+    },
+    {
+      "name": "Store-aware product search",
+      "command": "search",
+      "description": "Parses the server-rendered search page for price, unit price, aisle, availability and pickup/delivery fulfillment at the session's store.",
+      "rationale": ""
+    },
+    {
+      "name": "Read-only guard and bot-challenge stop",
+      "command": "orders list",
+      "description": "Client refuses non-GET requests and denylisted cart/checkout/slot/order mutations, and stops (no retry) on PerimeterX 412/418/429/456 or /blocked.",
+      "rationale": ""
+    },
+    {
+      "name": "Product availability at your store",
+      "command": "product get",
+      "description": "ItemById persisted query: price, unit price, stock, pickup/delivery/shipping status and seller; shopper location fields are never emitted.",
+      "rationale": ""
+    },
+    {
+      "name": "Nearby pickup stores",
+      "command": "store list",
+      "description": "nearByNodes query for a ZIP: store id, distance, address, pickup types and hours; view only, never sets a store.",
+      "rationale": ""
+    },
+    {
+      "name": "Cart view",
+      "command": "cart view",
+      "description": "getCart GET with a supplied cart id: items, mode, store and slot-reserved flag; MergeAndGetCart and every cart mutation stay blocked.",
+      "rationale": ""
+    },
+    {
+      "name": "Search filters",
+      "command": "search",
+      "description": "--filter type:value (e.g. brand:Great Value), --sort and --list-filters from the page's sort/filter facets.",
+      "rationale": ""
+    }
+  ],
+  "novel_features_built": [
+    {
+      "name": "Purchase history with filters",
+      "command": "orders list",
+      "description": "PurchaseHistoryV3 persisted query with --type in-store/online, --status completed/in-progress, --search and cursor paging; read-only.",
+      "rationale": ""
+    },
+    {
+      "name": "Order detail with line items",
+      "command": "orders get",
+      "description": "getOrder line items (name, item id, quantity, line price) plus subtotal, tax, fees and total; customer, address and payment fields are never emitted.",
+      "rationale": ""
+    },
+    {
+      "name": "Store-aware product search",
+      "command": "search",
+      "description": "Parses the server-rendered search page for price, unit price, aisle, availability and pickup/delivery fulfillment at the session's store.",
+      "rationale": ""
+    },
+    {
+      "name": "Read-only guard and bot-challenge stop",
+      "command": "orders list",
+      "description": "Client refuses non-GET requests and denylisted cart/checkout/slot/order mutations, and stops (no retry) on PerimeterX 412/418/429/456 or /blocked.",
+      "rationale": ""
+    },
+    {
+      "name": "Product availability at your store",
+      "command": "product get",
+      "description": "ItemById persisted query: price, unit price, stock, pickup/delivery/shipping status and seller; shopper location fields are never emitted.",
+      "rationale": ""
+    },
+    {
+      "name": "Nearby pickup stores",
+      "command": "store list",
+      "description": "nearByNodes query for a ZIP: store id, distance, address, pickup types and hours; view only, never sets a store.",
+      "rationale": ""
+    },
+    {
+      "name": "Cart view",
+      "command": "cart view",
+      "description": "getCart GET with a supplied cart id: items, mode, store and slot-reserved flag; MergeAndGetCart and every cart mutation stay blocked.",
+      "rationale": ""
+    },
+    {
+      "name": "Search filters",
+      "command": "search",
+      "description": "--filter type:value (e.g. brand:Great Value), --sort and --list-filters from the page's sort/filter facets.",
+      "rationale": ""
+    }
+  ],
+  "narrative": {
+    "display_name": "Walmart",
+    "headline": "Walmart Pickup \u0026 Delivery from the terminal — reads via orchestra, cart changes via affiliate link only.",
+    "value_prop": "Purchase history, grocery search, product and store lookups, cart view and slot listing, plus a cart link builder that prints one Walmart add-to-cart URL for you to open. The CLI never mutates the cart or checks out.",
+    "auth_narrative": "Import a signed-in walmart.com browser session with auth login --chrome (or --cookies-file), then run doctor.",
+    "quickstart": [
+      {
+        "command": "walmart-pp-cli doctor",
+        "comment": "Verify cookie session"
+      },
+      {
+        "command": "walmart-pp-cli which \"search products\"",
+        "comment": "Find the search command"
+      },
+      {
+        "command": "walmart-pp-cli cart link 51259338:1 44391152:1 14584700257:1",
+        "comment": "Print a multi-item add-to-cart URL (ADDS; open it yourself)"
+      },
+      {
+        "command": "walmart-pp-cli version",
+        "comment": "Show CLI version"
+      }
+    ],
+    "troubleshoots": [
+      {
+        "symptom": "HTTP 412 / bot challenge / connection closed (EOF)",
+        "fix": "Stop. Open walmart.com in a browser, clear any challenge, then re-run walmart-pp-cli auth login --chrome. The CLI does not retry challenges."
+      },
+      {
+        "symptom": "cart link URL opens but items do not appear",
+        "fix": "Confirm you are signed in on walmart.com in that browser. The link ADDS to the existing cart; refresh /cart after the redirect finishes."
+      }
+    ],
+    "when_to_use": "Reach for this CLI when an agent needs Walmart order history, grocery search, or a shareable add-to-cart link without driving checkout.",
+    "anti_triggers": [
+      "Placing or paying for an order",
+      "Switching Pickup vs Delivery mode",
+      "Mutating the cart via API (use cart link and open it yourself instead)"
+    ],
+    "recipes": [
+      {
+        "title": "Build a grocery add-to-cart link",
+        "command": "walmart-pp-cli cart link 51259338:1 44391152:1 14584700257:1"
+      },
+      {
+        "title": "Check session health",
+        "command": "walmart-pp-cli doctor"
+      }
+    ],
+    "trigger_phrases": [
+      "show my recent Walmart orders",
+      "search Walmart for bananas",
+      "build a Walmart add-to-cart link",
+      "list pickup time slots"
+    ]
+  }
+}

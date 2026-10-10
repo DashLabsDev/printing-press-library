@@ -1,0 +1,27 @@
+{
+  "schema_version": 2,
+  "applied_at": "2026-10-09",
+  "base_run_id": "20261009-032035",
+  "base_printing_press_version": "4.31.7",
+  "id": "walmart-request-fidelity",
+  "summary": "Align CLI requests with the captured browser: ItemById path suffix /ip/<id>, browser UA + sec-ch-ua + client hints + cache/priority headers, current x-o-platform-version (WALMART_PLATFORM_VERSION override), ItemById traffic-type/cyomv2enabled/ip-referer/ip-session-traffic-type, no retries on Walmart hosts.",
+  "reason": "Offline name-only comparison against walmart-readonly-3.har after product get returned 412: the CLI omitted the /ip/<itemId> path segment, sent a Windows Chrome 148 UA against cookies minted by Linux Chrome 154, a stale web build id, and none of the client-hint/cache headers.",
+  "files": [
+    "internal/client/walmart_guard.go",
+    "internal/client/walmart_shape_test.go",
+    "internal/client/client.go",
+    "internal/cli/walmart_shop.go",
+    "internal/walmart/shop.go",
+    "internal/cli/doctor.go",
+    "spec.yaml",
+    "tools-manifest.json"
+  ],
+  "markers": [
+    "PATCH(walmart-browser-shape)",
+    "setWalmartBrowserShape",
+    "WalmartPlatformVersion",
+    "ItemPathSuffix",
+    "maxRetries = 0"
+  ],
+  "validated_outcome": "Offline recorder: header names match the browser except baggage and device_profile_ref_id (session/device ids, deliberately not forged); paths and query keys match; no live call made."
+}

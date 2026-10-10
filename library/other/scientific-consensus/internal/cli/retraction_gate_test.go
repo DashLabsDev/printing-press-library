@@ -6,8 +6,12 @@
 package cli
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -27,6 +31,7 @@ type retractionFixture struct {
 	isRetracted bool
 	workType    string
 	citedBy     int
+	abstract    string // single-space-separated words, served as abstract_inverted_index
 }
 
 func (f *fakeRetractionClient) Get(_ context.Context, _ string, params map[string]string) (json.RawMessage, error) {
@@ -37,13 +42,21 @@ func (f *fakeRetractionClient) Get(_ context.Context, _ string, params map[strin
 		if wt == "" {
 			wt = "article"
 		}
+		var inverted map[string][]int
+		if w.abstract != "" {
+			inverted = map[string][]int{}
+			for pos, word := range strings.Fields(w.abstract) {
+				inverted[word] = append(inverted[word], pos)
+			}
+		}
 		results = append(results, map[string]any{
-			"id":               "https://openalex.org/W" + string(rune('1'+i)),
-			"display_name":     w.title,
-			"publication_year": 2021,
-			"cited_by_count":   w.citedBy,
-			"type":             wt,
-			"is_retracted":     w.isRetracted,
+			"abstract_inverted_index": inverted,
+			"id":                      "https://openalex.org/W" + string(rune('1'+i)),
+			"display_name":            w.title,
+			"publication_year":        2021,
+			"cited_by_count":          w.citedBy,
+			"type":                    wt,
+			"is_retracted":            w.isRetracted,
 		})
 	}
 	raw, err := json.Marshal(map[string]any{
@@ -133,6 +146,119 @@ func TestFilterRetracted(t *testing.T) {
 	}
 }
 
+// TestFilterRetractedPropagatesToSameTitleYearTwin pins the measured bug: the
+// same paper indexed twice (a curly-apostrophe copy with no DOI and no flag, and
+// a straight-apostrophe copy that OpenAlex flags) used to be split, the
+// unflagged copy being scored. Works are addressed by ID because the helper
+// returns them partitioned, not in input order.
+func TestFilterRetractedPropagatesToSameTitleYearTwin(t *testing.T) {
+	const (
+		curly    = "Vitamin D reduces falls and hip fractures in vascular Parkinsonism but not in Parkinson’s disease"
+		straight = "Vitamin D reduces falls and hip fractures in vascular Parkinsonism but not in Parkinson's disease"
+	)
+	a := func(year int) scWork { return scWork{ID: "A", Title: curly, Year: year} }
+	b := func(year int) scWork { return scWork{ID: "B", Title: straight, Year: year, IsRetracted: true} }
+
+	tests := []struct {
+		name         string
+		in           []scWork
+		wantKept     int
+		wantExcluded int
+		want         map[string]scengine.Retraction
+	}{
+		{
+			name:         "sato pair, unflagged copy first",
+			in:           []scWork{a(2013), b(2013)},
+			wantKept:     0,
+			wantExcluded: 2,
+			want:         map[string]scengine.Retraction{"A": scengine.RetractionTwin, "B": scengine.RetractionFlagged},
+		},
+		{
+			name:         "sato pair, reversed input order",
+			in:           []scWork{b(2013), a(2013)},
+			wantKept:     0,
+			wantExcluded: 2,
+			want:         map[string]scengine.Retraction{"A": scengine.RetractionTwin, "B": scengine.RetractionFlagged},
+		},
+		{
+			name:         "different year is not a twin",
+			in:           []scWork{a(2013), b(2014)},
+			wantKept:     1,
+			wantExcluded: 1,
+			want:         map[string]scengine.Retraction{"A": scengine.NotRetracted, "B": scengine.RetractionFlagged},
+		},
+		{
+			name:         "year 0 on both never gives or receives a twin mark",
+			in:           []scWork{a(0), b(0)},
+			wantKept:     1,
+			wantExcluded: 1,
+			want:         map[string]scengine.Retraction{"A": scengine.NotRetracted, "B": scengine.RetractionFlagged},
+		},
+		{
+			name: "unrelated title in the same year is kept",
+			in: []scWork{
+				{ID: "C", Title: "Calcium intake and bone density in postmenopausal women", Year: 2013},
+				b(2013),
+			},
+			wantKept:     1,
+			wantExcluded: 1,
+			want:         map[string]scengine.Retraction{"C": scengine.NotRetracted, "B": scengine.RetractionFlagged},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			in := append([]scWork(nil), tt.in...)
+			kept, excluded := filterRetracted(in)
+			if len(kept) != tt.wantKept || len(excluded) != tt.wantExcluded {
+				t.Fatalf("kept %d, excluded %d; want kept %d, excluded %d",
+					len(kept), len(excluded), tt.wantKept, tt.wantExcluded)
+			}
+			got := map[string]scengine.Retraction{}
+			for _, w := range append(append([]scWork{}, kept...), excluded...) {
+				got[w.ID] = w.Retraction
+			}
+			for id, want := range tt.want {
+				if got[id] != want {
+					t.Errorf("work %s: Retraction = %q, want %q", id, got[id], want)
+				}
+			}
+			for i := range in {
+				if in[i].Retraction != scengine.NotRetracted {
+					t.Errorf("input slice mutated: in[%d].Retraction = %q", i, in[i].Retraction)
+				}
+			}
+		})
+	}
+}
+
+// TestPropagateRetractionToTwinsKeepsExistingStatus calls the helper directly:
+// a twin mark is only ever given to a NotRetracted work, and the two source
+// tiers are never overwritten.
+func TestPropagateRetractionToTwinsKeepsExistingStatus(t *testing.T) {
+	works := []scWork{
+		{ID: "decl", Title: "Same Title", Year: 2020, Retraction: scengine.RetractionDeclared},
+		{ID: "flag", Title: "same  title!", Year: 2020, Retraction: scengine.RetractionFlagged},
+		{ID: "none", Title: "SAME title", Year: 2020},
+		{ID: "other", Title: "Same Title", Year: 2021},
+		{ID: "noyear", Title: "Same Title"},
+		{ID: "notitle", Title: "?!", Year: 2020},
+	}
+	propagateRetractionToTwins(works)
+	want := map[string]scengine.Retraction{
+		"decl":    scengine.RetractionDeclared,
+		"flag":    scengine.RetractionFlagged,
+		"none":    scengine.RetractionTwin,
+		"other":   scengine.NotRetracted,
+		"noyear":  scengine.NotRetracted,
+		"notitle": scengine.NotRetracted,
+	}
+	for _, w := range works {
+		if w.Retraction != want[w.ID] {
+			t.Errorf("work %s: Retraction = %q, want %q", w.ID, w.Retraction, want[w.ID])
+		}
+	}
+}
+
 // TestConsensusExcludesRetractedFromScoreAndApex is the end-to-end proof.
 // The retracted work is a meta-analysis (the apex tier) with far more
 // citations than anything else and a supporting finding, so if it reached the
@@ -217,5 +343,108 @@ func TestConsensusExcludesRetractedFromScoreAndApex(t *testing.T) {
 	}
 	if found.Stance != "" {
 		t.Errorf("all_studies stance = %q for an unscored work, want empty", found.Stance)
+	}
+}
+
+// TestConsensusTwinSurvivesRelevanceGate pins the order of detection and the
+// relevance gate. The PICO gate reads abstract + title, so two copies of one
+// paper (same title, same year) split at it on the abstract alone: the flagged
+// copy has none and is dropped, the unflagged copy mentions the outcome and
+// survives. Detection that runs after the gate then sees no flagged match and
+// scores the retracted paper.
+func TestConsensusTwinSurvivesRelevanceGate(t *testing.T) {
+	const title = "Coffee and cognition"
+	c := &fakeRetractionClient{works: []retractionFixture{
+		{title: title, isRetracted: true, citedBy: 100},
+		{title: title, citedBy: 50, abstract: "Coffee intake improved alertness in a cohort study"},
+	}}
+	got, err := computeConsensus(context.Background(), c, "coffee improves alertness", 10, 0, false)
+	if err != nil {
+		t.Fatalf("computeConsensus error: %v", err)
+	}
+	if got.StudyCount != 0 || got.Supporting+got.Refuting+got.Mixed+got.Inconclusive != 0 {
+		t.Errorf("the unflagged twin was scored: study_count=%d supporting=%d refuting=%d mixed=%d inconclusive=%d",
+			got.StudyCount, got.Supporting, got.Refuting, got.Mixed, got.Inconclusive)
+	}
+	if got.RetractedExcluded != 1 {
+		t.Errorf("retracted_excluded = %d, want 1 (only the copy that passed the gate)", got.RetractedExcluded)
+	}
+	if len(got.AllStudies) != 1 {
+		t.Fatalf("all_studies has %d entries, want 1 (the dropped flagged copy must not appear)", len(got.AllStudies))
+	}
+	if r := got.AllStudies[0].Retraction; r != scengine.RetractionTwin {
+		t.Errorf("all_studies[0].retraction = %q, want %q", r, scengine.RetractionTwin)
+	}
+	if got.AllStudies[0].CitedBy != 50 {
+		t.Errorf("all_studies[0].cited_by_count = %d, want 50 (the unflagged copy)", got.AllStudies[0].CitedBy)
+	}
+}
+
+// TestConsensusCommandTwinSurvivesRelevanceGate drives the real consensus
+// command (consensus.go's own markRetractions call, not computeConsensus)
+// against an in-process OpenAlex stand-in. The command builds its client from
+// config, so the base URL is redirected by env; nothing leaves the process and
+// everything the client or config could write is pointed into t.TempDir().
+func TestConsensusCommandTwinSurvivesRelevanceGate(t *testing.T) {
+	const title = "Coffee and cognition"
+	fake := &fakeRetractionClient{works: []retractionFixture{
+		{title: title, isRetracted: true, citedBy: 100},
+		{title: title, citedBy: 50, abstract: "Coffee intake improved alertness in a cohort study"},
+	}}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/works" {
+			http.NotFound(w, r)
+			return
+		}
+		raw, err := fake.Get(r.Context(), r.URL.Path, map[string]string{})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write(raw)
+	}))
+	t.Cleanup(srv.Close)
+
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
+	t.Setenv("XDG_CACHE_HOME", filepath.Join(home, "cache"))
+	t.Setenv("XDG_CONFIG_HOME", filepath.Join(home, "config"))
+	t.Setenv("SCIENTIFIC_CONSENSUS_CONFIG", filepath.Join(home, "config.toml"))
+	t.Setenv("SCIENTIFIC_CONSENSUS_BASE_URL", srv.URL)
+	for _, k := range []string{"ANTHROPIC_API_KEY", "OPENAI_API_KEY", "DEEPSEEK_API_KEY", "GEMINI_API_KEY", "GROQ_API_KEY", "MISTRAL_API_KEY"} {
+		t.Setenv(k, "")
+	}
+
+	var flags rootFlags
+	root := newRootCmd(&flags)
+	var stdout bytes.Buffer
+	root.SetOut(&stdout)
+	root.SetErr(&bytes.Buffer{})
+	root.SetArgs([]string{"consensus", "coffee improves alertness", "--json", "--no-cache", "--enrich=false"})
+	if err := root.Execute(); err != nil {
+		t.Fatalf("consensus command error: %v", err)
+	}
+
+	var got consensusOutput
+	if err := json.Unmarshal(stdout.Bytes(), &got); err != nil {
+		t.Fatalf("decoding command output: %v\n%s", err, stdout.String())
+	}
+	if got.StudyCount != 0 || got.Supporting+got.Refuting+got.Mixed+got.Inconclusive != 0 {
+		t.Errorf("the unflagged twin was scored: study_count=%d supporting=%d refuting=%d mixed=%d inconclusive=%d",
+			got.StudyCount, got.Supporting, got.Refuting, got.Mixed, got.Inconclusive)
+	}
+	if got.RetractedExcluded != 1 {
+		t.Errorf("retracted_excluded = %d, want 1", got.RetractedExcluded)
+	}
+	if len(got.AllStudies) != 1 {
+		t.Fatalf("all_studies has %d entries, want 1 (the flagged copy must be absent)", len(got.AllStudies))
+	}
+	if r := got.AllStudies[0].Retraction; r != scengine.RetractionTwin {
+		t.Errorf("all_studies[0].retraction = %q, want %q", r, scengine.RetractionTwin)
+	}
+	if got.AllStudies[0].CitedBy != 50 {
+		t.Errorf("all_studies[0].cited_by_count = %d, want 50 (the unflagged copy)", got.AllStudies[0].CitedBy)
 	}
 }

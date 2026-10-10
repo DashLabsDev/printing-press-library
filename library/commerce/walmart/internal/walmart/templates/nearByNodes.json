@@ -1,0 +1,26 @@
+{
+ "input": {
+  "postalCode": "{{POSTAL_CODE}}",
+  "accessTypes": [
+   "PICKUP_INSTORE",
+   "PICKUP_CURBSIDE"
+  ],
+  "nodeTypes": [
+   "STORE",
+   "PICKUP_SPOKE",
+   "PICKUP_POPUP"
+  ],
+  "latitude": null,
+  "longitude": null,
+  "radius": null
+ },
+ "checkItemAvailability": false,
+ "checkWeeklyReservation": false,
+ "enableStoreSelectorMarketplacePickup": false,
+ "enableVisionStoreSelector": false,
+ "enableStorePagesAndFinderPhase2": true,
+ "enableStoreBrandFormat": false,
+ "disableNodeAddressPostalCode": false,
+ "enableWICStoreSelector": false,
+ "enableSparkStore": true
+}
