@@ -20,7 +20,8 @@ func newSlotsAvailableservicesCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:         "availableservices",
-		Short:       "GraphQL query AvailableServices (persistedQuery)",
+		Short:       "Checkout service picker (AvailableServices); empty outside checkout, see 'slots etas'",
+		Long:        availableServicesLong,
 		Example:     "  costco-sameday-pp-cli slots availableservices --operation-name AvailableServices",
 		Annotations: map[string]string{"pp:endpoint": "slots.availableservices", "pp:method": "GET", "pp:path": "/graphql"},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -54,6 +55,10 @@ func newSlotsAvailableservicesCmd(flags *rootFlags) *cobra.Command {
 				return classifyAPIError(cmd.OutOrStdout(), err, flags)
 			}
 			outputData := data
+			emptyServices := availableServicesEmpty(data)
+			if emptyServices {
+				fmt.Fprintln(cmd.ErrOrStderr(), "warning: "+availableServicesEmptyNote)
+			}
 			// Print provenance to stderr for human-facing output only.
 			// Machine-format flags (--json, --csv, --compact, --quiet, --plain,
 			// --select) and piped stdout suppress this line; the JSON envelope
@@ -83,6 +88,9 @@ func newSlotsAvailableservicesCmd(flags *rootFlags) *cobra.Command {
 				wrapped, wrapErr = wrapPlatformStructuredOutput(wrapped, flags, "results", true)
 				if wrapErr != nil {
 					return wrapErr
+				}
+				if emptyServices {
+					wrapped = withJSONNote(wrapped, availableServicesEmptyNote)
 				}
 				return printOutput(cmd.OutOrStdout(), wrapped, true)
 			}

@@ -447,7 +447,7 @@ func (c *Client) ResolveSessionContext(ctx context.Context, needs SessionNeeds) 
 		} else {
 			cartID, err := c.fetchActiveCartID(ctx, out.ShopID)
 			if err != nil {
-				return out, fmt.Errorf("could not resolve the active cartId (requires a signed-in session; run 'costco-sameday-pp-cli auth login --chrome' if it expired): %w", err)
+				return out, fmt.Errorf("could not resolve the active cartId (requires a signed-in session; run 'costco-sameday-pp-cli auth login' if it expired): %w", err)
 			}
 			out.CartID = cartID
 			updates = append(updates, func(cc *sessionContextCache) {
@@ -776,7 +776,7 @@ func missingVariableHint(name string) string {
 	case ctxVarShopID:
 		return "shopId is looked up from your delivery ZIP; pass --zip <ZIP> (or --shop-id). Run 'costco-sameday-pp-cli session context --zip <ZIP>' to check."
 	case ctxVarCartID:
-		return "cartId is your active cart and needs a signed-in session; run 'costco-sameday-pp-cli session context' (or 'auth login --chrome' if the session expired), or pass --cart-id."
+		return "cartId is your active cart and needs a signed-in session; run 'costco-sameday-pp-cli session context' (or 'auth login' if the session expired), or pass --cart-id."
 	case ctxVarZoneID, ctxVarPostalCode:
 		return "pass --zip <ZIP>; run 'costco-sameday-pp-cli session context --zip <ZIP>' to check the resolved location."
 	case ctxVarUserLocation:

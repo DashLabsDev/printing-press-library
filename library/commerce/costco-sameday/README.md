@@ -88,7 +88,7 @@ This CLI ships an [MCPB](https://github.com/modelcontextprotocol/mcpb) bundle â€
 The bundle reuses your local browser session â€” set it up first if you haven't:
 
 ```bash
-costco-sameday-pp-cli auth login --chrome
+costco-sameday-pp-cli auth login
 ```
 
 To install:
@@ -130,7 +130,15 @@ See [Install](#install) above.
 
 ### 2. Authenticate
 
-This CLI uses your browser session for authentication. Log in to sameday.costco.com in Chrome, then:
+This CLI uses your Costco Same-Day browser session. The one-step sign-in:
+
+```bash
+costco-sameday-pp-cli auth login
+```
+
+This opens your installed Chrome/Chromium in a separate profile that belongs to the CLI (`<data dir>/login-browser`, not your everyday Chrome profile). Sign in with "Sign in via Costco.com" as usual. The CLI then reads only the Same-Day session cookies (`__Host-instacart_sid` plus companions such as `ahoy_visit`) from that window over the DevTools protocol, saves them with their expiry, and closes the window. It never reads your main Chrome cookie store or the "Chrome Safe Storage" keychain entry. The browser runs only for the login; every other command is plain HTTP. Useful flags: `--timeout 20m`, `--browser-path <chrome>` (or `COSTCO_SAMEDAY_BROWSER`), `--reset-profile`.
+
+Fallbacks: read your main Chrome profile (needs a cookie tool and keychain access):
 
 ```bash
 costco-sameday-pp-cli auth login --chrome
@@ -149,7 +157,7 @@ pip install pycookiecheat          # Python (recommended)
 brew install barnardb/cookies/cookies  # Homebrew
 ```
 
-When your session expires, run `auth login --chrome` again.
+When your session expires, run `auth login` again. `auth status` shows whether the saved session is valid (live read-only probe), guest or signed-in member, and when it expires.
 
 ### 3. Verify Setup
 
@@ -345,7 +353,8 @@ Costco Same-Day session GraphQL operations
 
 Costco Same-Day slots GraphQL operations
 
-- **`costco-sameday-pp-cli slots availableservices`** - GraphQL query AvailableServices (persistedQuery)
+- **`costco-sameday-pp-cli slots etas`** - Earliest delivery/pickup ETA, fee and label for a ZIP (read-only header ETA queries; no cart needed)
+- **`costco-sameday-pp-cli slots availableservices`** - Checkout service picker (AvailableServices); empty outside checkout, use `slots etas` for ZIP availability
 - **`costco-sameday-pp-cli slots slotcampaignplacement`** - GraphQL query SlotCampaignPlacement (persistedQuery)
 
 
@@ -406,7 +415,7 @@ Exit codes: `0` success, `2` usage error, `3` not found, `4` auth error, `5` API
 costco-sameday-pp-cli doctor
 ```
 
-Verifies configuration, credentials, and connectivity to the API.
+Verifies configuration, credentials, and connectivity to the API, and reports the session: valid signed-in member, guest, or expired, plus when it expires.
 
 ## Configuration
 
@@ -417,13 +426,30 @@ Static request headers can be configured under `headers`; per-command header ove
 ## Troubleshooting
 **Authentication errors (exit code 4)**
 - Run `costco-sameday-pp-cli doctor` to check credentials
+
+**Session expired or missing ("run auth login")**
+- `auth status` or `doctor` says `expired or missing session`, or a command exits 4 with `the Same-Day session is missing or expired`.
+- Run `costco-sameday-pp-cli auth login`, sign in in the window that opens, and wait for it to close.
+- `auth status` showing `guest` means the saved cookies are a guest session: delivery ETAs and carts are not your member account. Run `auth login` and use "Sign in via Costco.com".
+
+**Costco is rate-limiting sign-in (HTTP 429 from signin.costco.com)**
+- `auth login` stops with `Costco is rate-limiting sign-in`. Too many sign-in attempts in a short time trip Costco's limiter.
+- Wait about 15-30 minutes, then run `auth login` once. Retrying sooner extends the block. Your saved session (if any) keeps working meanwhile.
+
+**Keychain denied ("Chrome Safe Storage")**
+- `auth login --chrome` reads your main Chrome profile, which needs the "Chrome Safe Storage" keychain entry. If the keychain prompt was denied or does not accept your password, the error says keychain access was denied.
+- Use the browser login instead, which needs no keychain: `costco-sameday-pp-cli auth login`.
+- Or import from DevTools: on a sameday.costco.com graphql request choose Copy > Copy as cURL (bash), then `pbpaste | costco-sameday-pp-cli auth login --cookies-file -` (add `--diagnose` to check the paste without saving).
+
+**`slots availableservices` returns no services**
+- It is the checkout service picker and is empty until a cart is in checkout. Use `costco-sameday-pp-cli slots etas --zip <ZIP>` for delivery and pickup ETAs at a ZIP.
 **Not found errors (exit code 3)**
 - Check the resource ID is correct
 - Run the `list` command to see available items
 
 ## HTTP Transport
 
-This CLI uses standard HTTP transport with HTTP/2 disabled for browser-facing endpoints. It does not require a resident browser process for normal API calls.
+This CLI uses standard HTTP transport with HTTP/2 disabled for browser-facing endpoints. It does not require a resident browser process for normal API calls. `auth login` starts a browser only for sign-in and closes it once the session cookies are captured.
 
 ---
 
