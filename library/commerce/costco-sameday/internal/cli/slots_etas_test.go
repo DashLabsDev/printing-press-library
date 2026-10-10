@@ -72,7 +72,7 @@ func TestSlotsEtasGuestUsesVisitorQueries(t *testing.T) {
 	if dv["postalCode"] != "98027" || dv["serviceType"] != "DELIVERY" {
 		t.Fatalf("visitor delivery vars = %v", dv)
 	}
-	if !reflect.DeepEqual(dv["retailerIds"], []any{"ret-fake"}) || !reflect.DeepEqual(dv["explicitRetailerLocationIds"], []any{"loc-d-fake"}) {
+	if !reflect.DeepEqual(dv["retailerIds"], []any{"ret-fake"}) || !reflect.DeepEqual(dv["explicitRetailerLocationIds"], []any{map[string]any{"retailerId": "ret-fake", "retailerLocationId": "loc-d-fake"}}) {
 		t.Fatalf("visitor delivery ids = %v", dv)
 	}
 	if pv := rec.vars["GetAccurateVisitorRetailerPickupEtas"]; !reflect.DeepEqual(pv["shopIds"], []any{"shop-p-fake"}) {

@@ -355,6 +355,9 @@ Costco Same-Day slots GraphQL operations
 
 - **`costco-sameday-pp-cli slots etas`** - Earliest delivery/pickup ETA, fee and label for a ZIP (read-only header ETA queries; no cart needed)
 - **`costco-sameday-pp-cli slots availableservices`** - Checkout service picker (AvailableServices); empty outside checkout, use `slots etas` for ZIP availability
+- **`costco-sameday-pp-cli slots windows`** - Delivery windows (with savings/price labels) for an open checkout (read-only; `--checkout-session-id` or `$COSTCO_SAMEDAY_CHECKOUT_SESSION_ID`, `--date`)
+- **`costco-sameday-pp-cli slots pick`** - Choose a window on the open checkout (UpdateCheckout `serviceOptionUpdate`; refuses without `--yes`, `--dry-run` previews; never places the order)
+- **`costco-sameday-pp-cli address list`** - Saved delivery address ids with a masked label (read-only; never prints the street). `cart cartsignaledeta` fills `--address-id` and `--subtotal` itself
 - **`costco-sameday-pp-cli slots slotcampaignplacement`** - GraphQL query SlotCampaignPlacement (persistedQuery)
 
 
@@ -440,6 +443,12 @@ Static request headers can be configured under `headers`; per-command header ove
 - `auth login --chrome` reads your main Chrome profile, which needs the "Chrome Safe Storage" keychain entry. If the keychain prompt was denied or does not accept your password, the error says keychain access was denied.
 - Use the browser login instead, which needs no keychain: `costco-sameday-pp-cli auth login`.
 - Or import from DevTools: on a sameday.costco.com graphql request choose Copy > Copy as cURL (bash), then `pbpaste | costco-sameday-pp-cli auth login --cookies-file -` (add `--diagnose` to check the paste without saving).
+
+**`cart updatecartitemsmutation` / `checkout initializecheckout` fail with HTTP 400 "Blank Query"**
+- Fixed in this version: GraphQL POSTs now send operationName, variables and extensions in the JSON body only. Older builds also put them in the URL, which Costco rejects. `order place` used the same path.
+
+**`slots etas` shows no fee**
+- The store-header ETA queries carry only the time and label. The delivery fee and any savings show per window in `slots windows` once a checkout is open.
 
 **`slots availableservices` returns no services**
 - It is the checkout service picker and is empty until a cart is in checkout. Use `costco-sameday-pp-cli slots etas --zip <ZIP>` for delivery and pickup ETAs at a ZIP.

@@ -8,6 +8,12 @@
 // Variable shapes (sameday.costco.com public rspack chunks, 2026-10-10):
 //   GetAccurateRetailerEtas         {addressId, homeLoadUuid, postalCode, retailerIds, serviceType: "DELIVERY"}
 //   GetAccurateVisitorRetailerEtas  {postalCode, retailerIds, explicitRetailerLocationIds, serviceType: "DELIVERY"}
+//     explicitRetailerLocationIds elements are AvailabilityRetailerLocationInput
+//     objects {retailerId, retailerLocationId} (server error confirmed the type).
+// Live response (2026-10): items carry etaSeconds (float), retailerId and
+// viewSection.{etaString, condensedEtaString, homeCondensedEtaString, ...};
+// there is no fee field and no window end, so earliest_end stays empty and the
+// fee is reported only if a future response adds one.
 //   GetAccurate[Visitor]RetailerPickupEtas {shopIds (pickup shops), retailerLocations}
 // Responses: data.getAccurateRetailerEtas[] (delivery, both audiences) and
 // data.pickupEtas[] (pickup); items carry retailerId, retailerLocationId,
@@ -199,6 +205,9 @@ func runSlotsEtas(cmd *cobra.Command, flags *rootFlags, c *client.Client, servic
 	if service != "delivery" && !hasServiceShop(shops, "pickup") {
 		notes = append(notes, "pickup: no Costco pickup shop is listed for this ZIP")
 	}
+	if len(rows) > 0 && !anyFee(rows) {
+		notes = append(notes, etaNoFeeNote)
+	}
 	out["queried"] = queried
 	out["services"] = rows
 	if len(notes) > 0 {
@@ -236,14 +245,22 @@ func hasServiceShop(shops []client.CostcoShop, serviceType string) bool {
 // type starts with the member query; runEtaPlan falls back to the visitor one.
 func etaPlans(service, accountType, zip, retailerID string, shops []client.CostcoShop) []etaQueryPlan {
 	visitor := accountType == accountTypeGuest
-	var deliveryLocs, pickupShops []string
+	var pickupShops []string
+	var deliveryLocs []map[string]any
 	for _, s := range shops {
 		switch s.ServiceType {
 		case "pickup":
 			pickupShops = append(pickupShops, s.ID)
 		default:
 			if s.RetailerLocationID != "" {
-				deliveryLocs = append(deliveryLocs, s.RetailerLocationID)
+				// explicitRetailerLocationIds is [AvailabilityRetailerLocationInput!]:
+				// objects, not bare ids (confirmed live; the site builds
+				// {retailerId, retailerLocationId} the same way).
+				rid := s.RetailerID
+				if rid == "" {
+					rid = retailerID
+				}
+				deliveryLocs = append(deliveryLocs, map[string]any{"retailerId": rid, "retailerLocationId": s.RetailerLocationID})
 			}
 		}
 	}
@@ -257,10 +274,10 @@ func etaPlans(service, accountType, zip, retailerID string, shops []client.Costc
 	return plans
 }
 
-func deliveryEtaPlan(visitor bool, zip, retailerID string, locs []string) etaQueryPlan {
+func deliveryEtaPlan(visitor bool, zip, retailerID string, locs []map[string]any) etaQueryPlan {
 	if visitor {
 		if locs == nil {
-			locs = []string{}
+			locs = []map[string]any{}
 		}
 		return etaQueryPlan{Service: "delivery", Operation: client.EtaDeliveryVisitorOperation, Vars: map[string]any{
 			"postalCode":                  zip,
@@ -529,4 +546,17 @@ func humanTime(rfc string) string {
 		return rfc
 	}
 	return t.Local().Format("Mon 3:04 PM MST")
+}
+
+// etaNoFeeNote explains the missing fee: the header ETA queries carry only
+// etaSeconds and display strings (checked live, 2026-10).
+const etaNoFeeNote = "fee: the store-header ETA queries return no fee; Costco shows the delivery fee at checkout (see slots windows)"
+
+func anyFee(rows []etaRow) bool {
+	for _, r := range rows {
+		if r.Fee != "" {
+			return true
+		}
+	}
+	return false
 }

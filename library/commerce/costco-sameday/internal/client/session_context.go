@@ -17,6 +17,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -48,6 +49,8 @@ const (
 	ctxVarZoneID       = "zoneId"
 	ctxVarPostalCode   = "postalCode"
 	ctxVarUserLocation = "userLocation"
+	ctxVarAddressID    = "addressId"
+	ctxVarSubtotal     = "subtotal"
 )
 
 // sessionContextOperations maps read operations to the session-derived
@@ -75,6 +78,11 @@ var sessionContextOperations = map[string][]string{
 	"SearchResultsPlacements":       {ctxVarShopID, ctxVarZoneID, ctxVarPostalCode},
 	"SlotCampaignPlacement":         {ctxVarShopID, ctxVarZoneID, ctxVarPostalCode},
 	"ComplementaryProductItems":     {ctxVarShopID, ctxVarZoneID, ctxVarPostalCode},
+	// CartSignaledEta: the store header passes the user location's addressId
+	// (chunk 95722); it is filled from the saved address matching the ZIP.
+	// subtotal is SharedMoneyInput {amount, currencyCode}; the site sends
+	// CartTotals.retailerTotal. A bare --subtotal number is wrapped in USD.
+	"CartSignaledEta": {ctxVarShopID, ctxVarCartID, ctxVarPostalCode, ctxVarAddressID, ctxVarSubtotal},
 }
 
 var postalCodeRe = regexp.MustCompile(`^\d{5}$`)
@@ -140,13 +148,13 @@ func needsForVars(vars []string) SessionNeeds {
 		switch v {
 		case ctxVarShopID:
 			n.Shop = true
-		case ctxVarCartID:
+		case ctxVarCartID, ctxVarSubtotal:
 			n.Shop, n.Cart = true, true
 		case ctxVarZoneID:
 			n.Zone = true
 		case ctxVarPostalCode:
 			n.Location = true
-		case ctxVarUserLocation:
+		case ctxVarUserLocation, ctxVarAddressID:
 			n.Location = true
 		}
 	}
@@ -694,6 +702,7 @@ func (c *Client) fillSessionContextParams(ctx context.Context, method, path stri
 	if !ok {
 		return params, nil
 	}
+	params = normalizeMoneyParam(params, ctxVarSubtotal)
 	var missing []string
 	for _, v := range vars {
 		if !graphQLVariablePresent(params, v) {
@@ -729,6 +738,12 @@ func (c *Client) fillSessionContextParams(ctx context.Context, method, path stri
 			val = sc.PostalCode
 		case ctxVarUserLocation:
 			val = sc.UserLocationJSON()
+		case ctxVarSubtotal:
+			val = c.cartSubtotalJSON(ctx, sc)
+		case ctxVarAddressID:
+			if addrs, err := c.UserAddresses(ctx); err == nil {
+				val, _ = PickAddressID(addrs, firstNonEmptyString(graphQLVariableString(updated, ctxVarPostalCode), sc.PostalCode))
+			}
 		}
 		if val != "" {
 			updated[v] = val
@@ -865,4 +880,56 @@ func NewPageViewID() string {
 	b[8] = (b[8] & 0x3f) | 0x80
 	h := hex.EncodeToString(b[:])
 	return h[0:8] + "-" + h[8:12] + "-" + h[12:16] + "-" + h[16:20] + "-" + h[20:32]
+}
+
+func firstNonEmptyString(vals ...string) string {
+	for _, v := range vals {
+		if strings.TrimSpace(v) != "" {
+			return strings.TrimSpace(v)
+		}
+	}
+	return ""
+}
+
+// normalizeMoneyParam wraps a bare numeric flag value ("42.50") as a
+// SharedMoneyInput in USD. JSON objects pass through unchanged.
+func normalizeMoneyParam(params map[string]string, name string) map[string]string {
+	raw := strings.TrimSpace(params[name])
+	if raw == "" || strings.HasPrefix(raw, "{") {
+		return params
+	}
+	if _, err := strconv.ParseFloat(raw, 64); err != nil {
+		return params
+	}
+	out := make(map[string]string, len(params))
+	for k, v := range params {
+		out[k] = v
+	}
+	out[name] = `{"amount":` + raw + `,"currencyCode":"USD"}`
+	return out
+}
+
+// cartSubtotalJSON reads CartTotals.retailerTotal for the resolved cart as a
+// SharedMoneyInput JSON string ("" when unavailable).
+func (c *Client) cartSubtotalJSON(ctx context.Context, sc SessionContext) string {
+	if sc.ShopID == "" || sc.CartID == "" {
+		return ""
+	}
+	payload, err := c.graphQLGet(withSessionResolving(ctx), "CartTotals", map[string]any{"shopId": sc.ShopID, "cartId": sc.CartID}, false)
+	if err != nil {
+		return ""
+	}
+	total, _ := digJSON(payload, "data", "cartTotals", "retailerTotal").(map[string]any)
+	if total == nil || total["amount"] == nil {
+		return ""
+	}
+	cur := jsonString(total["currencyCode"])
+	if cur == "" {
+		cur = "USD"
+	}
+	b, err := json.Marshal(map[string]any{"amount": total["amount"], "currencyCode": cur})
+	if err != nil {
+		return ""
+	}
+	return string(b)
 }

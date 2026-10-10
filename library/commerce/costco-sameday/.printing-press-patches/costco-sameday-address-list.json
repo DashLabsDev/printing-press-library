@@ -1,0 +1,30 @@
+{
+  "schema_version": 2,
+  "applied_at": "2026-10-10",
+  "base_run_id": "20261007-135457",
+  "base_printing_press_version": "4.31.7",
+  "id": "costco-sameday-address-list",
+  "summary": "Adds read-only `address list` (UserAddresses) showing address ids with a masked label (first character of each word, ZIP prefix) and never the street; CartSignaledEta auto-fills addressId from the saved address matching the ZIP (or the only one) and subtotal from CartTotals.retailerTotal, and a bare --subtotal number becomes a USD SharedMoneyInput.",
+  "reason": "cart cartsignaledeta needed an addressId and a SharedMoneyInput subtotal the CLI could not supply.",
+  "shape_sources": {
+    "UserAddresses": "public rspack chunk 95722 (UserAddressManager/AddressSelection/queries.ts): operation query, no variables; response data.userAddresses[] {id, postalCode, streetAddress, viewSection}",
+    "CartSignaledEta": "chunk 95722 store header: variables {cartId, subtotal:{amount: CartTotals.retailerTotal.amount, currencyCode}, shopId, addressId: userLocation.addressId, postalCode, pageType}; pageType is optional (live)"
+  },
+  "files": [
+    "internal/client/addresses.go",
+    "internal/client/session_context.go",
+    "internal/cli/address_list.go",
+    "internal/cli/slots_window_picker_test.go"
+  ],
+  "markers": [
+    "UserAddresses",
+    "PickAddressID",
+    "MaskedAddressLabel",
+    "ctxVarAddressID",
+    "ctxVarSubtotal",
+    "normalizeMoneyParam",
+    "cartSubtotalJSON",
+    "newAddressListCmd"
+  ],
+  "validated_outcome": "Fake-value stub tests: masked label hides the street, auto pick by ZIP, ambiguous returns none, explicit flags win. Live read-only: address list returned ids with masked labels; cart cartsignaledeta answered with an ETA string using the auto-filled addressId and subtotal. Addresses are never cached."
+}

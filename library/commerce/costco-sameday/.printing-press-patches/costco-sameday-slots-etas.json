@@ -13,7 +13,7 @@
     "GetAccurateVisitorRetailerPickupEtas": "public rspack chunk (module 95186): variables {shopIds, retailerLocations}; response data.pickupEtas[]",
     "serviceType enum": "public bundle enum DELIVERY|INSTORE|PICKUP|SCAN_AND_PAY|VIRTUAL",
     "hashes": "internal/client/persisted_queries_seed.json (already present)",
-    "best_guess_live_test": "viewSection label/fee field names, window end (not in the ETA shape), retailerId field on ShopCollectionScoped shops, GetRetailerIdBySlug variables {slug}, explicitRetailerLocationIds element type, UserType / GetCurrentUserName response fields; Instacart sibling CLI has no ETA operations"
+    "live_confirmed_2026-10-10": "Read-only live run with a signed-in member session: items carry etaSeconds (float), retailerId and viewSection {etaString, condensedEtaString, etaTemplateString, homeCondensedEtaString, homeCondensedEtaXMinFormatString, etaVariant}; no fee field and no window end. ShopCollectionScoped shops carry retailerId (Costco = 5); GetRetailerIdBySlug {slug} answers data.retailer.id. explicitRetailerLocationIds is [AvailabilityRetailerLocationInput!] objects {retailerId, retailerLocationId} (server rejected bare ids; fixed). UserType answers data.currentUser {guest, id, userAccount, accountSwitcherOptional}; GetCurrentUserName answers data.currentUser.firstName. No pickup shop is listed for the tested ZIPs; the site also derives pickup ETAs only from serviceType=pickup shops."
   },
   "files": [
     "internal/client/etas.go",
@@ -34,7 +34,9 @@
     "authStatusProbe",
     "withAccountType",
     "CostcoShops",
-    "CostcoRetailerID"
+    "CostcoRetailerID",
+    "etaNoFeeNote",
+    "anyFee"
   ],
-  "validated_outcome": "go build/vet green; go test ./internal/cli (synthetic httptest fixtures, fake ids) green: guest uses visitor queries with postalCode/retailerIds/explicitRetailerLocationIds, member uses member queries with homeLoadUuid, --as skips the probe, unknown falls back to visitor, retailer id comes from shop then GetRetailerIdBySlug then the assumed id, no fake id appears in output, empty AvailableServices warns on stderr and adds a JSON note. Pre-existing TestCacheKeyPartitionsTenantSelectingHeaders failure on base is unchanged."
+  "validated_outcome": "go build/vet green; go test ./internal/cli (synthetic httptest fixtures, fake ids) green: guest uses visitor queries with postalCode/retailerIds/explicitRetailerLocationIds, member uses member queries with homeLoadUuid, --as skips the probe, unknown falls back to visitor, retailer id comes from shop then GetRetailerIdBySlug then the assumed id, no fake id appears in output, empty AvailableServices warns on stderr and adds a JSON note. Pre-existing TestCacheKeyPartitionsTenantSelectingHeaders failure on base is unchanged. Live (read-only, 2026-10-10): member and guest delivery queries answered for two ZIPs; the visitor location type and the no-fee note were fixed and covered by fake-value tests."
 }

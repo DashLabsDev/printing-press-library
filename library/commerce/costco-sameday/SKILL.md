@@ -129,6 +129,9 @@ This CLI uses standard HTTP transport with HTTP/2 disabled for browser-facing en
 
 - `costco-sameday-pp-cli slots etas` — earliest delivery/pickup ETA, fee and label for a ZIP (read-only; `--as auto|member|guest`, `--service all|delivery|pickup`); use this to answer "is Same-Day available at ZIP X"
 - `costco-sameday-pp-cli slots availableservices` — checkout service picker; empty outside checkout (stderr warning and JSON `note` point to `slots etas`)
+- `costco-sameday-pp-cli slots windows --checkout-session-id <id>` — delivery windows and savings labels for an open checkout (read-only; tokens hidden unless `--show-tokens`)
+- `costco-sameday-pp-cli slots pick --checkout-session-id <id> --index N` — choose a window (UpdateCheckout; refuses without `--yes`, `--dry-run` previews; never places the order). Ask the user before passing `--yes`
+- `costco-sameday-pp-cli address list` — saved address ids plus a masked label (read-only; the street is never printed). `cart cartsignaledeta` auto-fills `--address-id` (saved address matching the ZIP) and `--subtotal` (cart total)
 - `costco-sameday-pp-cli slots slotcampaignplacement` — GraphQL query SlotCampaignPlacement (persistedQuery)
 
 
