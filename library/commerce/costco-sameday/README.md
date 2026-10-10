@@ -142,7 +142,7 @@ Or import an existing browser capture:
 costco-sameday-pp-cli auth login --cookies-file storage-state.json
 ```
 
-`--cookies-file` accepts Playwright storage-state JSON or a raw `Cookie:` header text file. The Chrome path requires a cookie extraction tool. Install one:
+`--cookies-file` accepts Playwright storage-state JSON or a raw `Cookie:` header text file. Use `--cookies-file -` to read the header from stdin (for example `pbpaste | costco-sameday-pp-cli auth login --cookies-file -`). Stdin also accepts DevTools "Copy request headers" or "Copy as cURL (bash)" output from a sameday.costco.com request. Only the `__Host-instacart_sid` session cookie is required; it is HttpOnly, so copy it from DevTools Network rather than `document.cookie`. Other Same-Day cookies are kept when present. Add `--diagnose` to check a paste without saving anything: it prints only the byte count, detected format, parse stage, cookie names, and whether `__Host-instacart_sid` is present, never values. The Chrome path requires a cookie extraction tool. Install one:
 
 ```bash
 pip install pycookiecheat          # Python (recommended)
@@ -217,6 +217,32 @@ Precedence matters in fleets: an ambient per-kind variable such as `COSTCO_SAMED
 Relocation is one-way. Unsetting `COSTCO_SAMEDAY_HOME` does not move files back to platform defaults, and `doctor` cannot find credentials left under a former root. Move the files manually before unsetting relocation variables.
 
 Existing installs keep working because the platform-default rung matches the legacy layout. On the first auth write, stored secrets leave `config.toml` and are consolidated into `credentials.toml` under the data directory. Run `costco-sameday-pp-cli doctor --fail-on warn` to check path and credential-location warnings in automation.
+
+## Session context and ZIP
+
+Cart, slots, retailer, product and search commands fill `shopId`, `cartId`,
+`zoneId`, `postalCode` and `userLocation` automatically when you omit the
+matching flag. Explicit flags (`--shop-id`, `--cart-id`, ...) always win.
+
+- The Costco shop and zone are looked up from your delivery ZIP. ZIP
+  precedence: a `postalCode` or `userLocation.postalCode` on this command,
+  then `--zip`, then `COSTCO_SAMEDAY_ZIP`, then the last explicit `--zip`
+  (remembered in the state dir), then the account/IP geolocation. The
+  account/IP zone is used only when its ZIP matches; a different ZIP uses
+  RetailersZone. A postal code on the command selects the shop, zone and cart
+  for that call and is not remembered as the default. An explicit `--shop-id`
+  resolves the cart without a ZIP.
+- The active cart comes from your signed-in session (`ActiveCartId`, falling
+  back to `PersonalActiveCarts`) and is cached for 10 minutes; shop and zone
+  are cached for 24 hours. Use `session context --refresh` to re-resolve.
+- A GraphQL response with `errors` and no data exits non-zero and names the
+  missing variable (for example `missing cartId`) with the flag to pass.
+
+```bash
+costco-sameday-pp-cli session context --zip 98027
+costco-sameday-pp-cli slots availableservices
+costco-sameday-pp-cli search kirkland --data-source live
+```
 
 ## Commands
 
@@ -311,6 +337,7 @@ Costco Same-Day retailer GraphQL operations
 
 Costco Same-Day session GraphQL operations
 
+- **`costco-sameday-pp-cli session context`** - Resolve the delivery ZIP, Costco shopId, zoneId and active cartId used to auto-fill other commands
 - **`costco-sameday-pp-cli session complementaryproductitems`** - GraphQL query ComplementaryProductItems (persistedQuery)
 - **`costco-sameday-pp-cli session getcobrandcreditcardoffermutation`** - GraphQL mutation GetCobrandCreditCardOfferMutation (persistedQuery)
 

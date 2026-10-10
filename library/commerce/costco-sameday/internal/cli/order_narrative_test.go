@@ -57,7 +57,7 @@ func TestOrderCancelRefusesWithoutYes(t *testing.T) {
 	flags := &rootFlags{}
 	root := &cobra.Command{Use: "root"}
 	root.AddCommand(newOrderNarrativeCmd(flags))
-	root.SetArgs([]string{"order", "cancel", "--order-id", "21349809721408208"})
+	root.SetArgs([]string{"order", "cancel", "--order-id", "0000000000"})
 	buf := &bytes.Buffer{}
 	root.SetOut(buf)
 	root.SetErr(buf)
@@ -75,7 +75,7 @@ func TestOrderCancelDryRunNeverSends(t *testing.T) {
 	root := &cobra.Command{Use: "root"}
 	root.PersistentFlags().BoolVar(&flags.dryRun, "dry-run", true, "")
 	root.AddCommand(newOrderNarrativeCmd(flags))
-	root.SetArgs([]string{"order", "cancel", "--order-id", "21349809721408208", "--dry-run"})
+	root.SetArgs([]string{"order", "cancel", "--order-id", "0000000000", "--dry-run"})
 	flags.dryRun = true
 	buf := &bytes.Buffer{}
 	root.SetOut(buf)

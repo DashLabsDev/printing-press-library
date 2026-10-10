@@ -81,7 +81,6 @@ func newSearchCmd(flags *rootFlags) *cobra.Command {
 	var resourceType string
 	var limit int
 	var dbPath string
-	searchResponsePaths := []string{}
 
 	cmd := &cobra.Command{
 		Use:   "search <query>",
@@ -114,12 +113,11 @@ In local mode: searches locally synced data only.`,
 				if err != nil {
 					return err
 				}
-				data, getErr := c.Get(cmd.Context(), "/graphql", map[string]string{
-					"query": query,
-				})
+				// Hand-authored (costco-sameday-session-context): persisted-query
+				// SearchResultsPlacements POST + Items hydration. The server
+				// rejects ad-hoc query text (PersistedQueryNotSupported).
+				results, getErr := liveProductSearch(cmd.Context(), c, query, limit)
 				if getErr == nil {
-					// Live search succeeded
-					results := extractSearchResults(data, searchResponsePaths...)
 					prov := DataProvenance{Source: "live"}
 					return outputSearchResults(cmd, flags, results, limit, prov)
 				}

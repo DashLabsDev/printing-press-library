@@ -1,0 +1,35 @@
+{
+  "schema_version": 2,
+  "applied_at": "2026-10-09",
+  "base_run_id": "20261009-032035",
+  "base_printing_press_version": "4.31.7",
+  "id": "walmart-link-only-cart",
+  "summary": "Cart changes are link-only: cart link (and cart add alias) builds https://affil.walmart.com/cart/addToCart?items=id|qty,\u2026 and prints it; optional --open/--launch opens the user's default browser under the print-by-default harness rules. The link ADDS/increments qty. No CDP/chromedp, no cart update/remove, no slots reserve, no orchestra updateItems/reserveSlotMutation. Reads kept: orders, search, product, store, cart view, slots list.",
+  "reason": "Thomas decided via Grok Bot: no browser disguise and no CDP browser driving. Writes become LINK-ONLY \u2014 CLI turns a list of items into ONE Walmart add-to-cart URL; user opens it and checks out themselves. CLI never mutates the cart. Direct orchestra cart POSTs were dropped by bot protection; affiliate multi-item format confirmed from affil JS (pipe on entry URL, underscore rewrite on page) and anonymous redirect chain.",
+  "files": [
+    "internal/cli/walmart_cart.go",
+    "internal/cli/walmart_cart_test.go",
+    "internal/cli/open_browser.go",
+    "internal/walmart/affil.go",
+    "internal/walmart/affil_test.go",
+    "internal/walmart/cartwrite.go",
+    "internal/client/walmart_guard.go",
+    "internal/client/walmart_guard_test.go",
+    "README.md",
+    "SKILL.md",
+    "manifest.json",
+    "spec.yaml",
+    ".printing-press-patches/walmart-link-only-cart.json"
+  ],
+  "deferred_to_upstream": [],
+  "upstream_tracking": [],
+  "markers": [
+    "AffilAddToCartURL",
+    "cart link",
+    "mcp:read-only",
+    "IsAnyHarness",
+    "ADDS",
+    "--open"
+  ],
+  "validated_outcome": "Maintainer confirmed multi-item affil link added 3/3 items in a signed-in browser. CLI prints URL by default; --open opt-in; harness refuses launch; no CDP."
+}

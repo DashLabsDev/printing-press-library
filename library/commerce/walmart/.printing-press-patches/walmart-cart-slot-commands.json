@@ -1,0 +1,36 @@
+{
+  "schema_version": 2,
+  "applied_at": "2026-10-09",
+  "base_run_id": "20261009-032035",
+  "base_printing_press_version": "4.31.7",
+  "id": "walmart-cart-slot-commands",
+  "summary": "cart view + cart link/add (affiliate URL builder) and slots list. Reads are GETs (getCart, getSlots, ItemById). cart link only prints/opens an affil.walmart.com URL; the CLI never sends updateItems or reserveSlotMutation. Cart id from --cart-id, WALMART_CART_ID, then remembered cart.json (0600).",
+  "reason": "Third capture recorded getCart/getSlots and cart mutations. Cart mutations are not replayed from the CLI (bot drops + Thomas link-only decision). Link builder uses the captured affiliate add-to-cart format.",
+  "files": [
+    "internal/walmart/cartwrite.go",
+    "internal/walmart/cartwrite_test.go",
+    "internal/walmart/shop.go",
+    "internal/walmart/shop_test.go",
+    "internal/walmart/templates/getSlots.json",
+    "internal/cli/walmart_cart.go",
+    "internal/cli/walmart_cart_test.go",
+    "internal/cli/walmart_shop.go",
+    "internal/cli/walmart_readonly.go",
+    "README.md",
+    "SKILL.md",
+    ".printing-press.json",
+    "manifest.json",
+    "tools-manifest.json",
+    "spec.yaml"
+  ],
+  "markers": [
+    "PATCH(walmart-cart-slot-commands)",
+    "resolveCartID",
+    "rememberCartID",
+    "ParseSlots",
+    "SlotMode",
+    "mcp:read-only",
+    "{{MODE}}"
+  ],
+  "validated_outcome": "Link-only v1: cart view and slots list remain GET reads. cart link builds affil.walmart.com multi-item URLs (no orchestra POST). Maintainer confirmed a 3-item link added 3/3 items in a signed-in browser. Offline ParseSlots/ParseCart tests pass. No live cart mutations from the CLI."
+}

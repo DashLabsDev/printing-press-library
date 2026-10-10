@@ -54,6 +54,9 @@ type Client struct {
 	platformLimiterMu sync.Mutex
 	platformLimiters  map[string]*platform.EndpointLimiter
 	platformBudgets   map[string]platform.EndpointBudget
+	// session holds the hand-authored session-context state (--zip and
+	// resolved shop/cart/zone), see session_context.go.
+	session sessionState
 }
 
 func (c *Client) IsDryRun() bool {
@@ -952,6 +955,10 @@ func (c *Client) doInternal(ctx context.Context, method, path string, params map
 	if err := rejectUnresolvedPathParams(path, nil); err != nil {
 		return nil, 0, err
 	}
+	// Session context (hand-authored, see session_context.go): fill shopId /
+	// cartId / zoneId / postalCode / userLocation that a known read operation
+	// declares but the caller left empty. Explicit values always win.
+	params, sessionResolveErr := c.fillSessionContextParams(ctx, method, path, params)
 	targetURL := c.BaseURL + path
 
 	var bodyBytes []byte
@@ -1173,6 +1180,11 @@ func (c *Client) doInternal(ctx context.Context, method, path string, params map
 			if !readOnlyIntent && (mutationIntent || method != http.MethodGet) && !c.DryRun {
 				c.invalidateCacheAfterMutation(path)
 			}
+			// A real wire mutation (cart update, checkout, cancel) can replace
+			// the active cart; drop the cached cartId (session_context.go).
+			if !readOnlyIntent && method != http.MethodGet && !c.DryRun {
+				c.invalidateSessionCart()
+			}
 			// Non-textual bodies (PDF, zip, image, octet-stream) must not be
 			// run through the JSON sanitizer or returned as raw json.RawMessage
 			// — return a self-describing base64 envelope instead. Textual and
@@ -1187,6 +1199,16 @@ func (c *Client) doInternal(ctx context.Context, method, path string, params map
 			if !htmlResponse {
 				if summary, ok := summarizeHTMLDocument(respBody); ok {
 					return nil, resp.StatusCode, fmt.Errorf("%s %s: expected JSON, API returned HTML instead of JSON: %s", method, c.displayURL(path, authHeader), summary)
+				}
+			}
+			// GraphQL read operations that come back with errors and no data
+			// are failures, not empty successes (hand-authored, see
+			// session_context.go). Mutations keep their own classifiers.
+			if strings.Contains(path, "graphql") && (method == http.MethodGet || readOnlyIntent) && !cliutil.IsVerifyEnv() {
+				if op := graphQLOperationName(params, bodyBytes); op != "" {
+					if gqlErr := graphQLResponseError(op, respBody, sessionResolveErr); gqlErr != nil {
+						return nil, resp.StatusCode, gqlErr
+					}
 				}
 			}
 			return json.RawMessage(sanitizeJSONResponse(respBody)), resp.StatusCode, nil
@@ -1424,6 +1446,17 @@ func (c *Client) finalizeCheckoutHashes() []string {
 }
 
 func (c *Client) persistedQueryHashes() map[string]string {
+	// The embedded seed is the base; a user registry (state dir or legacy
+	// config dir) overrides per operation but never hides seed-only ops such
+	// as the session-context lookups.
+	merged := hashesFromPersistedQueryEntries(decodePersistedQueryEntries(persistedQueriesSeedJSON))
+	for op, hash := range c.userPersistedQueryHashes() {
+		merged[op] = hash
+	}
+	return merged
+}
+
+func (c *Client) userPersistedQueryHashes() map[string]string {
 	path := c.persistedQueryRegistryPath()
 	if path == "" {
 		return nil
@@ -1437,14 +1470,10 @@ func (c *Client) persistedQueryHashes() map[string]string {
 			}
 		}
 		if err != nil {
-			return hashesFromPersistedQueryEntries(decodePersistedQueryEntries(persistedQueriesSeedJSON))
+			return nil
 		}
 	}
-	entries := decodePersistedQueryEntries(data)
-	if len(entries) == 0 {
-		entries = decodePersistedQueryEntries(persistedQueriesSeedJSON)
-	}
-	return hashesFromPersistedQueryEntries(entries)
+	return hashesFromPersistedQueryEntries(decodePersistedQueryEntries(data))
 }
 
 func decodePersistedQueryEntries(data []byte) []persistedQueryRegistryEntry {

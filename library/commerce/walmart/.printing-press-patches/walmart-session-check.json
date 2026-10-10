@@ -1,0 +1,20 @@
+{
+  "schema_version": 2,
+  "applied_at": "2026-10-09",
+  "base_run_id": "20261009-032035",
+  "base_printing_press_version": "4.31.7",
+  "id": "walmart-session-check",
+  "summary": "auth login --chrome no longer hard-requires the short-lived `auth` cookie. It requires the long-lived signed-in cookies (CID, SPID, customer); with them and a live `auth` it reports the session as active with its expiry, with them but no live `auth` it imports and warns that the session must be renewed by opening walmart.com, and without them it refuses the session as anonymous. Profile discovery ranks on CID/SPID.",
+  "reason": "Walmart's `auth` cookie lives about 30 minutes and is renewed by site activity from the identity.walmart.com session; an idle but signed-in browser has no `auth` row, which made login fail even though the account was signed in.",
+  "files": [
+    "internal/cli/auth.go",
+    "internal/cli/walmart_session_test.go"
+  ],
+  "markers": [
+    "PATCH(walmart-session-check)",
+    "classifyWalmartSession",
+    "authCookieExpiry",
+    "signedInCookies"
+  ],
+  "validated_outcome": "Synthetic tests cover active, lapsed and anonymous sessions (including a stray auth cookie without signed-in cookies). Live 2026-10-09 11:25 CT: import reported an active session; cart view PASS."
+}

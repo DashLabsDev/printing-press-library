@@ -1,0 +1,18 @@
+{
+  "schema_version": 2,
+  "applied_at": "2026-10-08",
+  "base_run_id": "20261009-032035",
+  "base_printing_press_version": "4.31.7",
+  "id": "walmart-auth-full-cookie-session",
+  "summary": "auth login --chrome keeps the full walmart.com cookie set (still requiring auth and CID), reads via the www host, and honors WALMART_CHROME_USER_DATA_DIR.",
+  "reason": "auth+CID alone is not accepted by the bot-protection layer; some sandboxes keep Chrome's user data dir outside ~/.config.",
+  "files": [
+    "internal/cli/auth.go"
+  ],
+  "markers": [
+    "PATCH(walmart-full-cookie-session)",
+    "PATCH(walmart-chrome-user-data-dir)",
+    "WALMART_CHROME_USER_DATA_DIR"
+  ],
+  "validated_outcome": "Live: import found the session cookies; doctor reports credentials valid. Values never printed."
+}
