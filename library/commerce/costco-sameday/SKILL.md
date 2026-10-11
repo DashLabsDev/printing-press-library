@@ -41,7 +41,7 @@ Costco Same-Day (sameday.costco.com) GraphQL CLI. Cookie auth after Costco Azure
 
 ## HTTP Transport
 
-This CLI uses standard HTTP transport with HTTP/2 disabled for browser-facing endpoints. It does not require a resident browser process for normal API calls. `auth login` starts a browser only for sign-in and closes it after capturing the session cookies.
+This CLI uses standard HTTP transport with HTTP/2 disabled for browser-facing endpoints. It does not require a resident browser process for normal API calls. `auth login` starts a browser only for sign-in and closes it after capturing the session cookies; it drives that browser over `--remote-debugging-pipe` (no DevTools network port; Windows falls back to a 127.0.0.1 random port).
 
 ## Command Reference
 
@@ -127,10 +127,10 @@ This CLI uses standard HTTP transport with HTTP/2 disabled for browser-facing en
 
 **slots** — Costco Same-Day slots GraphQL operations
 
-- `costco-sameday-pp-cli slots etas` — earliest delivery/pickup ETA, fee and label for a ZIP (read-only; `--as auto|member|guest`, `--service all|delivery|pickup`); use this to answer "is Same-Day available at ZIP X"
+- `costco-sameday-pp-cli slots etas` — earliest delivery/pickup ETA, fee and label for a ZIP (read-only; `--as auto|member|guest`, `--service all|delivery|pickup`); exits non-zero with partial output if an ETA query fails; use this to answer "is Same-Day available at ZIP X"
 - `costco-sameday-pp-cli slots availableservices` — checkout service picker; empty outside checkout (stderr warning and JSON `note` point to `slots etas`)
 - `costco-sameday-pp-cli slots windows --checkout-session-id <id>` — delivery windows and savings labels for an open checkout (read-only; tokens hidden unless `--show-tokens`)
-- `costco-sameday-pp-cli slots pick --checkout-session-id <id> --index N` — choose a window (UpdateCheckout; refuses without `--yes`, `--dry-run` previews; never places the order). Ask the user before passing `--yes`
+- `costco-sameday-pp-cli slots pick --checkout-session-id <id> --index N` — choose a window (UpdateCheckout; refuses without `--yes`, `--dry-run` previews; never places the order; a rejected update prints `updated: false` and exits non-zero). Ask the user before passing `--yes`
 - `costco-sameday-pp-cli address list` — saved address ids plus a masked label (read-only; the street is never printed). `cart cartsignaledeta` auto-fills `--address-id` (saved address matching the ZIP) and `--subtotal` (cart total)
 - `costco-sameday-pp-cli slots slotcampaignplacement` — GraphQL query SlotCampaignPlacement (persistedQuery)
 

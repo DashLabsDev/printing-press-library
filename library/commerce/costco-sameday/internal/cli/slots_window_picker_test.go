@@ -155,14 +155,14 @@ func TestMaskedAddressLabelHidesStreet(t *testing.T) {
 
 func TestPickAddressID(t *testing.T) {
 	addrs := []client.SavedAddress{{ID: "a1", PostalCode: "98027"}, {ID: "a2", PostalCode: "10001"}}
-	if id, how := client.PickAddressID(addrs, "10001"); id != "a2" || how != "zip-match" {
-		t.Fatalf("zip match = %s %s", id, how)
+	if id, how, err := client.PickAddressID(addrs, "10001"); id != "a2" || how != "zip-match" || err != nil {
+		t.Fatalf("zip match = %s %s %v", id, how, err)
 	}
-	if id, _ := client.PickAddressID(addrs, "33333"); id != "" {
-		t.Fatalf("ambiguous should be empty, got %s", id)
+	if id, _, err := client.PickAddressID(addrs, "33333"); id != "" || err != nil {
+		t.Fatalf("no match should be empty, got %s %v", id, err)
 	}
-	if id, how := client.PickAddressID(addrs[:1], "33333"); id != "a1" || how != "only-address" {
-		t.Fatalf("only = %s %s", id, how)
+	if id, how, err := client.PickAddressID(addrs[:1], "33333"); id != "a1" || how != "only-address" || err != nil {
+		t.Fatalf("only = %s %s %v", id, how, err)
 	}
 }
 
@@ -207,7 +207,7 @@ func TestCartSignaledEtaAutoFillsAddressAndSubtotal(t *testing.T) {
 	_, _, _ = runRootSplit(t, "cart", "cartsignaledeta", "--zip", "98027", "--address-id", "addr-x-fake", "--subtotal", "50", "--json")
 	v = rec.vars["CartSignaledEta"]
 	sub, _ = v["subtotal"].(map[string]any)
-	if v["addressId"] != "addr-x-fake" || sub["amount"] != float64(50) || sub["currencyCode"] != "USD" {
+	if v["addressId"] != "addr-x-fake" || sub["amount"] != "50" || sub["currencyCode"] != "USD" {
 		t.Fatalf("explicit vars = %v", v)
 	}
 }

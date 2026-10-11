@@ -17,7 +17,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -688,8 +687,10 @@ func postalFromLocationValue(v any) string {
 
 // fillSessionContextParams fills session-derived variables a known read
 // operation declares but the caller left empty. It never overrides explicit
-// values, never runs in verify/dry-run mode, and never fails the request: a
-// resolution error is returned so a later GraphQL error can explain it.
+// values and never runs in verify/dry-run mode. A resolution error is
+// returned so a later GraphQL error can explain it; an *InvalidParamError
+// (bad --subtotal, ambiguous address, explicit cart without a readable
+// total) stops the request before it is sent.
 func (c *Client) fillSessionContextParams(ctx context.Context, method, path string, params map[string]string) (map[string]string, error) {
 	if c == nil || c.DryRun || !strings.Contains(path, "graphql") || !strings.EqualFold(method, "GET") {
 		return params, nil
@@ -702,7 +703,10 @@ func (c *Client) fillSessionContextParams(ctx context.Context, method, path stri
 	if !ok {
 		return params, nil
 	}
-	params = normalizeMoneyParam(params, ctxVarSubtotal)
+	params, err := normalizeMoneyParam(params, ctxVarSubtotal)
+	if err != nil {
+		return params, &InvalidParamError{Err: err}
+	}
 	var missing []string
 	for _, v := range vars {
 		if !graphQLVariablePresent(params, v) {
@@ -739,10 +743,25 @@ func (c *Client) fillSessionContextParams(ctx context.Context, method, path stri
 		case ctxVarUserLocation:
 			val = sc.UserLocationJSON()
 		case ctxVarSubtotal:
-			val = c.cartSubtotalJSON(ctx, sc)
+			// Total the cart the caller named, not the active cart.
+			totalCtx := sc
+			if graphQLVariablePresent(params, ctxVarCartID) {
+				totalCtx.CartID = graphQLVariableString(params, ctxVarCartID)
+			}
+			if graphQLVariablePresent(params, ctxVarShopID) {
+				totalCtx.ShopID = graphQLVariableString(params, ctxVarShopID)
+			}
+			val = c.cartSubtotalJSON(ctx, totalCtx)
+			if val == "" && graphQLVariablePresent(params, ctxVarCartID) {
+				resolveErr = errors.Join(resolveErr, &InvalidParamError{Err: fmt.Errorf("could not read the total of cart %s (--cart-id); pass --subtotal <amount>", totalCtx.CartID)})
+			}
 		case ctxVarAddressID:
 			if addrs, err := c.UserAddresses(ctx); err == nil {
-				val, _ = PickAddressID(addrs, firstNonEmptyString(graphQLVariableString(updated, ctxVarPostalCode), sc.PostalCode))
+				var pickErr error
+				val, _, pickErr = PickAddressID(addrs, firstNonEmptyString(graphQLVariableString(updated, ctxVarPostalCode), sc.PostalCode))
+				if pickErr != nil {
+					resolveErr = errors.Join(resolveErr, &InvalidParamError{Err: pickErr})
+				}
 			}
 		}
 		if val != "" {
@@ -750,6 +769,23 @@ func (c *Client) fillSessionContextParams(ctx context.Context, method, path stri
 		}
 	}
 	return updated, resolveErr
+}
+
+// InvalidParamError is a session-context problem the request must not be
+// sent with (malformed --subtotal, ambiguous saved address, unreadable total
+// for an explicit --cart-id). It fails the command before any request.
+type InvalidParamError struct{ Err error }
+
+func (e *InvalidParamError) Error() string { return e.Err.Error() }
+func (e *InvalidParamError) Unwrap() error { return e.Err }
+
+// AsInvalidParam returns the first *InvalidParamError in err (or nil).
+func AsInvalidParam(err error) *InvalidParamError {
+	var inv *InvalidParamError
+	if errors.As(err, &inv) {
+		return inv
+	}
+	return nil
 }
 
 // GraphQLError reports a GraphQL response that carried errors and no data.
@@ -891,22 +927,62 @@ func firstNonEmptyString(vals ...string) string {
 	return ""
 }
 
-// normalizeMoneyParam wraps a bare numeric flag value ("42.50") as a
-// SharedMoneyInput in USD. JSON objects pass through unchanged.
-func normalizeMoneyParam(params map[string]string, name string) map[string]string {
+// moneyAmountRe is a plain decimal amount: digits, optionally a dot and one
+// or two decimals ("42", "42.5", "42.50"). Signs, exponents, a bare or
+// trailing dot, thousands separators and currency symbols are rejected.
+var moneyAmountRe = regexp.MustCompile(`^(0|[1-9][0-9]*)(\.[0-9]{1,2})?$`)
+
+// normalizeMoneyParam turns a bare amount flag value ("42.50") into a
+// SharedMoneyInput JSON object in USD with the amount as a decimal string.
+// A JSON object must carry a string or number amount in the same form and a
+// three-letter currencyCode; anything else is an error, never passed through.
+func normalizeMoneyParam(params map[string]string, name string) (map[string]string, error) {
 	raw := strings.TrimSpace(params[name])
-	if raw == "" || strings.HasPrefix(raw, "{") {
-		return params
+	if raw == "" {
+		return params, nil
 	}
-	if _, err := strconv.ParseFloat(raw, 64); err != nil {
-		return params
+	amount, currency := raw, "USD"
+	if strings.HasPrefix(raw, "{") {
+		var obj map[string]any
+		dec := json.NewDecoder(strings.NewReader(raw))
+		dec.UseNumber()
+		if err := dec.Decode(&obj); err != nil {
+			return params, fmt.Errorf("invalid --%s: not a JSON object: %v", kebabFlagName(name), err)
+		}
+		switch v := obj["amount"].(type) {
+		case string:
+			amount = strings.TrimSpace(v)
+		case json.Number:
+			amount = v.String()
+		default:
+			return params, fmt.Errorf("invalid --%s: \"amount\" must be a decimal like 42.50", kebabFlagName(name))
+		}
+		if cc, ok := obj["currencyCode"]; ok {
+			s, _ := cc.(string)
+			if len(s) != 3 || strings.ToUpper(s) != s || strings.ToLower(s) == s {
+				return params, fmt.Errorf("invalid --%s: currencyCode must be a three-letter code like USD", kebabFlagName(name))
+			}
+			currency = s
+		}
+		for k := range obj {
+			if k != "amount" && k != "currencyCode" {
+				return params, fmt.Errorf("invalid --%s: unexpected field %q (only amount and currencyCode)", kebabFlagName(name), k)
+			}
+		}
+	}
+	if !moneyAmountRe.MatchString(amount) {
+		return params, fmt.Errorf("invalid --%s %q: use a plain amount like 42 or 42.50 (no sign, exponent, symbol or trailing dot)", kebabFlagName(name), amount)
+	}
+	b, err := json.Marshal(map[string]string{"amount": amount, "currencyCode": currency})
+	if err != nil {
+		return params, err
 	}
 	out := make(map[string]string, len(params))
 	for k, v := range params {
 		out[k] = v
 	}
-	out[name] = `{"amount":` + raw + `,"currencyCode":"USD"}`
-	return out
+	out[name] = string(b)
+	return out, nil
 }
 
 // cartSubtotalJSON reads CartTotals.retailerTotal for the resolved cart as a

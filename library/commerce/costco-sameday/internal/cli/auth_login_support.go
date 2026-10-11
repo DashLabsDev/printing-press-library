@@ -39,7 +39,7 @@ func (b *browserLoginFlags) register(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&b.browserPath, "browser-path", "", "Chrome/Chromium binary for the login window (default: auto-detect, or $"+browserLoginEnvBinary+")")
 	cmd.Flags().StringVar(&b.loginURL, "login-url", sameDayOrigin, "Page the login window opens")
 	cmd.Flags().DurationVar(&b.timeout, "timeout", 10*time.Minute, "How long to wait for you to finish signing in")
-	cmd.Flags().BoolVar(&b.resetProfile, "reset-profile", false, "Delete the CLI's login-window profile first (fresh browser, signs you out of it)")
+	cmd.Flags().BoolVar(&b.resetProfile, "reset-profile", false, "Delete the CLI's login-window profile first (fresh browser, signs you out of it; only a profile auth login created)")
 	cmd.Flags().StringVar(&b.profileDir, "login-profile-dir", "", "Login-window profile directory (default: <data dir>/"+browserLoginProfile+")")
 	cmd.Flags().BoolVar(&b.headless, "login-headless", false, "Run the login window headless (testing only; you cannot sign in headless)")
 	_ = cmd.Flags().MarkHidden("login-headless")
@@ -56,12 +56,8 @@ func runBrowserLoginFromFlags(cmd *cobra.Command, flags *rootFlags, b browserLog
 		dir = d
 	}
 	if b.resetProfile {
-		// Only ever delete a directory this CLI owns.
-		if filepath.Base(dir) != browserLoginProfile && b.profileDir == "" {
-			return browserLoginResult{}, fmt.Errorf("refusing to reset unexpected profile dir %s", dir)
-		}
-		if err := os.RemoveAll(dir); err != nil {
-			return browserLoginResult{}, fmt.Errorf("resetting login profile: %w", err)
+		if err := resetLoginProfileDir(dir); err != nil {
+			return browserLoginResult{}, err
 		}
 	}
 	return runBrowserLogin(cmd.Context(), browserLoginOptions{
@@ -74,6 +70,92 @@ func runBrowserLoginFromFlags(cmd *cobra.Command, flags *rootFlags, b browserLog
 		Probe:       productionCookieProbe(flags),
 		Out:         cmd.ErrOrStderr(),
 	})
+}
+
+// loginProfileMarker is written inside a login profile directory the CLI
+// created. --reset-profile deletes only directories that carry it.
+const (
+	loginProfileMarker        = ".costco-sameday-pp-cli-login-profile"
+	loginProfileMarkerContent = "Created by costco-sameday-pp-cli auth login. --reset-profile may delete this directory.\n"
+)
+
+// prepareLoginProfileDir makes sure the login profile exists and is private.
+// A missing or empty directory is created 0700 and marked as CLI-owned. An
+// existing marked directory is re-tightened to 0700. An existing unmarked,
+// non-empty directory (only reachable via the hidden --login-profile-dir) is
+// used as-is and never marked, so --reset-profile will refuse it.
+func prepareLoginProfileDir(dir string) error {
+	fi, err := os.Lstat(dir)
+	switch {
+	case errors.Is(err, os.ErrNotExist):
+		if err := os.MkdirAll(dir, 0o700); err != nil {
+			return fmt.Errorf("creating login profile dir: %w", err)
+		}
+		return writeLoginProfileMarker(dir)
+	case err != nil:
+		return fmt.Errorf("checking login profile dir: %w", err)
+	case !fi.IsDir():
+		return fmt.Errorf("login profile path %s is not a directory", dir)
+	}
+	if hasLoginProfileMarker(dir) {
+		return os.Chmod(dir, 0o700)
+	}
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return fmt.Errorf("reading login profile dir: %w", err)
+	}
+	if len(entries) == 0 {
+		if err := os.Chmod(dir, 0o700); err != nil {
+			return err
+		}
+		return writeLoginProfileMarker(dir)
+	}
+	return nil
+}
+
+func writeLoginProfileMarker(dir string) error {
+	if err := os.WriteFile(filepath.Join(dir, loginProfileMarker), []byte(loginProfileMarkerContent), 0o600); err != nil {
+		return fmt.Errorf("marking login profile dir: %w", err)
+	}
+	return nil
+}
+
+func hasLoginProfileMarker(dir string) bool {
+	fi, err := os.Lstat(filepath.Join(dir, loginProfileMarker))
+	if err != nil || !fi.Mode().IsRegular() {
+		return false
+	}
+	data, err := os.ReadFile(filepath.Join(dir, loginProfileMarker)) // #nosec G304 -- fixed name inside the profile dir.
+	return err == nil && string(data) == loginProfileMarkerContent
+}
+
+// resetLoginProfileDir deletes the login profile only when it is a real
+// directory (not a symlink) carrying the CLI's marker file. Anything else,
+// including a custom --login-profile-dir or its parent, is refused.
+func resetLoginProfileDir(dir string) error {
+	clean := filepath.Clean(dir)
+	fi, err := os.Lstat(clean)
+	if errors.Is(err, os.ErrNotExist) {
+		return nil
+	}
+	if err != nil {
+		return fmt.Errorf("checking login profile dir: %w", err)
+	}
+	home, _ := os.UserHomeDir()
+	switch {
+	case fi.Mode()&os.ModeSymlink != 0:
+		return fmt.Errorf("refusing to reset %s: it is a symlink", clean)
+	case !fi.IsDir():
+		return fmt.Errorf("refusing to reset %s: not a directory", clean)
+	case clean == string(filepath.Separator) || clean == filepath.VolumeName(clean)+string(filepath.Separator) || (home != "" && clean == filepath.Clean(home)):
+		return fmt.Errorf("refusing to reset %s", clean)
+	case !hasLoginProfileMarker(clean):
+		return fmt.Errorf("refusing to reset %s: it was not created by 'auth login' (no %s marker); delete it yourself if you are sure", clean, loginProfileMarker)
+	}
+	if err := os.RemoveAll(clean); err != nil {
+		return fmt.Errorf("resetting login profile: %w", err)
+	}
+	return nil
 }
 
 // sameDayCookieURL is the origin whose cookies are captured: Same-Day, unless

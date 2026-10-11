@@ -4,7 +4,7 @@
   "applied_at": "2026-10-10",
   "base_run_id": "20261007-135457",
   "base_printing_press_version": "4.31.7",
-  "summary": "Adds read-only `slots etas` (GetAccurateRetailerEtas / GetAccurateRetailerPickupEtas for members, GetAccurateVisitorRetailerEtas / GetAccurateVisitorRetailerPickupEtas for guests, picked from a guest/member probe or --as) printing service type, earliest start/end, fee and label without ids; `slots availableservices` help names it the checkout service picker and an empty services list prints a stderr warning plus a JSON note pointing at `slots etas`; `auth status` and `session context --account-type` report guest vs signed-in member from read-only UserType / GetCurrentUserName / HouseholdByUser probes and cookie NAMES only.",
+  "summary": "Adds read-only `slots etas` (GetAccurateRetailerEtas / GetAccurateRetailerPickupEtas for members, GetAccurateVisitorRetailerEtas / GetAccurateVisitorRetailerPickupEtas for guests, picked from a guest/member probe or --as) printing service type, earliest start/end, fee and label without ids; `slots availableservices` help names it the checkout service picker and an empty services list prints a stderr warning plus a JSON note pointing at `slots etas`; `auth status` and `session context --account-type` report guest vs signed-in member from read-only UserType / GetCurrentUserName / HouseholdByUser probes and cookie NAMES only. A failed ETA query prints the partial result (failed[], partial) and exits non-zero.",
   "reason": "Smoke: `slots availableservices` returned 0 services while the site showed delivery windows. AvailableServices is checkout-scoped, the box session was a guest, and nothing told the user either.",
   "shape_sources": {
     "GetAccurateRetailerEtas": "sameday.costco.com public rspack chunk (module 20847, 2026-10-10): variables {addressId, homeLoadUuid, postalCode, retailerIds, serviceType: DELIVERY}; response data.getAccurateRetailerEtas[] {retailerId, retailerLocationId, etaSeconds, viewSection}",
@@ -36,7 +36,8 @@
     "CostcoShops",
     "CostcoRetailerID",
     "etaNoFeeNote",
-    "anyFee"
+    "anyFee",
+    "failErr"
   ],
   "validated_outcome": "go build/vet green; go test ./internal/cli (synthetic httptest fixtures, fake ids) green: guest uses visitor queries with postalCode/retailerIds/explicitRetailerLocationIds, member uses member queries with homeLoadUuid, --as skips the probe, unknown falls back to visitor, retailer id comes from shop then GetRetailerIdBySlug then the assumed id, no fake id appears in output, empty AvailableServices warns on stderr and adds a JSON note. Pre-existing TestCacheKeyPartitionsTenantSelectingHeaders failure on base is unchanged. Live (read-only, 2026-10-10): member and guest delivery queries answered for two ZIPs; the visitor location type and the no-fee note were fixed and covered by fake-value tests."
 }

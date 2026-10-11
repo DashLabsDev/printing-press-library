@@ -4,7 +4,7 @@
   "applied_at": "2026-10-10",
   "base_run_id": "20261007-135457",
   "base_printing_press_version": "4.31.7",
-  "summary": "auth login with no flags opens the installed Chrome/Chromium headed in a CLI-owned profile (<data dir>/login-browser), waits for the user to sign in, reads only __Host-instacart_sid plus the optional Same-Day companions over CDP (browser target only: Target.getTargets, Storage.getCookies, Browser.close), saves them with the session-cookie expiry and closes the browser; --chrome and --cookies-file stay as fallbacks. Actionable errors: expired/missing session says run auth login, a 429/rate-limit page on a costco.com host aborts with wait 15-30 minutes, keychain/keyring denials from --chrome suggest the browser login or the cURL import. auth status and doctor report the live session verdict (valid member / guest / expired), account type and expiry; auth status exits 4 when the probe shows the session expired.",
+  "summary": "auth login with no flags opens the installed Chrome/Chromium headed in a CLI-owned profile (<data dir>/login-browser), waits for the user to sign in, reads only __Host-instacart_sid plus the optional Same-Day companions over CDP via --remote-debugging-pipe (no DevTools TCP port on macOS/Linux; Windows falls back to a 127.0.0.1 random port; browser target only: Browser.getVersion, Target.getTargets, Storage.getCookies, Browser.close), saves them with the session-cookie expiry and closes the browser; --chrome and --cookies-file stay as fallbacks. Actionable errors: expired/missing session says run auth login, a 429/rate-limit page on a costco.com host aborts with wait 15-30 minutes, keychain/keyring denials from --chrome suggest the browser login or the cURL import. auth status and doctor report the live session verdict (valid member / guest / expired), account type and expiry; auth status exits 4 when the probe shows the session expired.",
   "reason": "The user could not sign the CLI in: Chrome Safe Storage rejected his keychain password, the box Chrome profile only held a guest session, and failures gave no next step.",
   "rules_check": "cli-printing-press skills/printing-press/references/browser-sniff-capture.md forbids shipping a resident browser / browser sidecar transport for normal commands; a login-only browser that exits after capture matches the sanctioned press-auth companion (docs/solutions/logic-errors/auth-login-chrome-broken-2026-05.md, chromedp-controlled Chrome with a separate user-data-dir) and the dominos-pp-cli auth login precedent (library/food-and-dining/dominos/internal/cli/auth_login.go). Normal commands remain plain HTTP.",
   "files": [
@@ -22,7 +22,11 @@
     "go.mod",
     "go.sum",
     "README.md",
-    "SKILL.md"
+    "SKILL.md",
+    "internal/cli/auth_browser_cdp.go",
+    "internal/cli/auth_browser_launch_pipe.go",
+    "internal/cli/auth_browser_launch_windows.go",
+    "internal/cli/greptile_fixes_test.go"
   ],
   "markers": [
     "runBrowserLogin",
@@ -35,7 +39,13 @@
     "checkSessionHealth",
     "session_expires",
     "browserLoginFlags",
-    "Costco is rate-limiting sign-in (HTTP 429 from signin.costco.com)"
+    "Costco is rate-limiting sign-in (HTTP 429 from signin.costco.com)",
+    "startLoginBrowser",
+    "newPipeCDP",
+    "prepareLoginProfileDir",
+    "resetLoginProfileDir",
+    "loginProfileMarker"
   ],
-  "validated_outcome": "go build/vet green; go test ./internal/cli green, including headless Chrome against a local TLS fake sign-in page (guest cookie, /signin, callback that sets the member cookie): only __Host-instacart_sid and ahoy_visit are captured (an unrelated cookie is not), expiry is recorded, the browser's DevTools port closes after capture, a 429 sign-in page aborts with the wait message, a guest-only session times out with a Sign in via Costco.com hint, and auth login end to end saves the session and auth status reports the expiry. auth status / doctor tests use local stubs (member, guest, HTTP 401); no test reaches the real site."
+  "validated_outcome": "go build/vet green; go test ./internal/cli green, including headless Chrome against a local TLS fake sign-in page (guest cookie, /signin, callback that sets the member cookie): only __Host-instacart_sid and ahoy_visit are captured (an unrelated cookie is not), expiry is recorded, the browser's DevTools port closes after capture, a 429 sign-in page aborts with the wait message, a guest-only session times out with a Sign in via Costco.com hint, and auth login end to end saves the session and auth status reports the expiry. auth status / doctor tests use local stubs (member, guest, HTTP 401); no test reaches the real site. Review round: pipe client unit-tested against a fake browser; real headless Chrome login tests pass over the pipe and assert no DevToolsActivePort file, a 0700 profile and the marker; reset tests cover unmarked, forged-marker, symlink, HOME and custom-parent refusals.",
+  "review_fixes": "PR #2310 review: CDP moved from a DevTools TCP port to --remote-debugging-pipe (auth_browser_cdp.go, auth_browser_launch_pipe.go; Windows fallback auth_browser_launch_windows.go binds 127.0.0.1 with a random port, residual risk documented). The login profile is created 0700 with a marker file; --reset-profile deletes only a real (non-symlink) directory carrying that exact marker and refuses anything else, including a custom --login-profile-dir or its parent and HOME."
 }

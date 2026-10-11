@@ -71,7 +71,7 @@ ZIP matches the session ZIP, so this is only needed to pick another one.`),
 					zip = sc.PostalCode
 				}
 			}
-			chosen, how := client.PickAddressID(addrs, zip)
+			chosen, how, pickErr := client.PickAddressID(addrs, zip)
 			rows := make([]addressRow, 0, len(addrs))
 			for i, a := range addrs {
 				rows = append(rows, addressRow{Index: i + 1, AddressID: a.ID, Label: client.MaskedAddressLabel(a), MatchesZIP: zip != "" && a.PostalCode == zip})
@@ -80,6 +80,9 @@ ZIP matches the session ZIP, so this is only needed to pick another one.`),
 			if chosen != "" {
 				out["auto_address_id"] = chosen
 				out["auto_reason"] = how
+			}
+			if pickErr != nil {
+				out["auto_note"] = "several saved addresses match the ZIP; pass --address-id explicitly"
 			}
 			if len(rows) == 0 {
 				out["note"] = "no saved delivery addresses (guest session, or none saved)"
@@ -95,6 +98,9 @@ ZIP matches the session ZIP, so this is only needed to pick another one.`),
 				}
 				if len(rows) == 0 {
 					fmt.Fprintln(w, out["note"])
+				}
+				if pickErr != nil {
+					fmt.Fprintln(w, out["auto_note"])
 				}
 				return nil
 			}

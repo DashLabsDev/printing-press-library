@@ -157,6 +157,9 @@ with 'slots pick --index N --yes'.`),
 					if win.Disabled {
 						line += "  [unavailable]"
 					}
+					if showTokens && win.Token != "" {
+						line += "\n    token: " + win.Token
+					}
 					fmt.Fprintln(w, line)
 				}
 				if len(wins) == 0 {
@@ -169,7 +172,7 @@ with 'slots pick --index N --yes'.`),
 	}
 	cmd.Flags().StringVar(&sessionID, "checkout-session-id", "", "Open checkout session id (default $"+checkoutSessionEnvName+")")
 	cmd.Flags().StringVar(&date, "date", "", "First day to list, YYYY-MM-DD (default today)")
-	cmd.Flags().BoolVar(&showTokens, "show-tokens", false, "Include each window's serviceOptionToken in the output")
+	cmd.Flags().BoolVar(&showTokens, "show-tokens", false, "Include each window's serviceOptionToken (table and --json output)")
 	return cmd
 }
 
@@ -324,16 +327,14 @@ token is fresh) or --token from 'slots windows --show-tokens'.`),
 			if err != nil {
 				return classifyAPIError(cmd.OutOrStdout(), err, flags)
 			}
-			out := map[string]any{"operation": updateCheckoutOp, "action": "serviceOptionUpdate", "http_status": status, "window": preview}
-			var resp map[string]any
-			if json.Unmarshal(data, &resp) == nil {
-				if errs, ok := resp["errors"].([]any); ok && len(errs) > 0 {
-					out["errors"] = errs
-				} else {
-					out["updated"] = true
-				}
+			out, failure := pickResult(data, status, preview)
+			if perr := printNarrativeJSON(cmd, flags, out); perr != nil {
+				return perr
 			}
-			return printNarrativeJSON(cmd, flags, out)
+			if failure != "" {
+				return apiErr(fmt.Errorf("%s did not change the delivery window: %s", updateCheckoutOp, failure))
+			}
+			return nil
 		},
 	}
 	cmd.Flags().StringVar(&sessionID, "checkout-session-id", "", "Open checkout session id (default $"+checkoutSessionEnvName+")")
@@ -341,6 +342,49 @@ token is fresh) or --token from 'slots windows --show-tokens'.`),
 	cmd.Flags().StringVar(&token, "token", "", "serviceOptionToken from 'slots windows --show-tokens'")
 	cmd.Flags().StringVar(&date, "date", "", "First day used when listing windows for --index (default today)")
 	return cmd
+}
+
+// pickResult classifies an UpdateCheckout response. The window counts as
+// changed only when the body parses, carries no top-level GraphQL errors,
+// and data.updateCheckout is present and not an *Error typename. Otherwise
+// updated is false and failure says why (the caller exits non-zero).
+func pickResult(data []byte, status int, preview deliveryWindow) (map[string]any, string) {
+	out := map[string]any{"operation": updateCheckoutOp, "action": "serviceOptionUpdate", "http_status": status, "window": preview, "updated": false}
+	var resp map[string]any
+	if err := json.Unmarshal(data, &resp); err != nil || resp == nil {
+		return out, "response was not a JSON object"
+	}
+	if errs, ok := resp["errors"].([]any); ok && len(errs) > 0 {
+		out["errors"] = errs
+		var msgs []string
+		for _, e := range errs {
+			if m := strAt(e, "message"); m != "" {
+				msgs = append(msgs, m)
+			}
+		}
+		if len(msgs) == 0 {
+			msgs = []string{fmt.Sprintf("%d GraphQL error(s)", len(errs))}
+		}
+		return out, strings.Join(msgs, "; ")
+	}
+	uc, ok := digAny(resp, "data", "updateCheckout").(map[string]any)
+	if !ok || uc == nil {
+		return out, "response had no data.updateCheckout"
+	}
+	// The checkout page treats __typename CheckoutCheckoutErrorResponse
+	// (with errors[]) as a rejected update; match any *Error typename.
+	if tn, _ := uc["__typename"].(string); strings.Contains(tn, "Error") {
+		out["error_type"] = tn
+		msg := firstNonEmpty(strAt(uc, "viewSection", "toastDescriptionString"), strAt(uc, "viewSection", "titleString"), strAt(uc, "message"))
+		if inner, ok := uc["errors"].([]any); ok && len(inner) > 0 {
+			out["errors"] = inner
+			first := inner[0]
+			msg = firstNonEmpty(msg, strAt(first, "message"), strAt(first, "viewSection", "toastDescriptionString"), strAt(first, "viewSection", "titleString"), strAt(first, "__typename"))
+		}
+		return out, firstNonEmpty(msg, tn)
+	}
+	out["updated"] = true
+	return out, ""
 }
 
 func digAny(v any, keys ...string) any {

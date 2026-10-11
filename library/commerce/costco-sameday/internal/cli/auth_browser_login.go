@@ -1,14 +1,16 @@
 // Copyright 2026 DashLabsDev and contributors. Licensed under Apache-2.0. See LICENSE.
 // Hand-authored one-step `auth login`: opens the installed Chrome/Chromium,
 // headed, in a dedicated CLI-owned profile; the user signs in normally; the
-// CLI reads only the Same-Day session cookies from THAT browser over CDP,
-// saves them, and closes the window. It never reads the user's main Chrome
+// CLI reads only the Same-Day session cookies from THAT browser over CDP
+// (--remote-debugging-pipe, so no DevTools TCP port on macOS/Linux), saves
+// them, and closes the window. It never reads the user's main Chrome
 // cookie store or Chrome Safe Storage. The browser exists only for the
 // duration of the login (no resident browser transport); normal commands
 // stay plain HTTP.
 //
 // Detection surface is kept small: the CLI attaches to the browser target
-// only (Target.getTargets, Storage.getCookies, Browser.close). It never
+// only (Browser.getVersion, Target.getTargets, Storage.getCookies,
+// Browser.close). It never
 // attaches to the page, never enables Runtime, never injects script and
 // never types or clicks; Chrome runs without --enable-automation.
 //
@@ -29,12 +31,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/chromedp/cdproto/browser"
-	"github.com/chromedp/cdproto/cdp"
-	"github.com/chromedp/cdproto/network"
-	"github.com/chromedp/cdproto/storage"
-	"github.com/chromedp/cdproto/target"
-	"github.com/chromedp/chromedp"
 	"github.com/mvanhorn/printing-press-library/library/commerce/costco-sameday/internal/cliutil"
 )
 
@@ -180,16 +176,17 @@ func hostMatchesCookie(cookieDomain, host string) bool {
 
 // pickSessionCookies keeps the session cookie and the optional companions
 // for host, nothing else.
-func pickSessionCookies(all []*network.Cookie, host string) ([]sessionCookie, *network.Cookie) {
+func pickSessionCookies(all []cdpCookie, host string) ([]sessionCookie, *cdpCookie) {
 	wanted := map[string]bool{sessionCookieName: true}
 	for _, n := range optionalSessionCookies {
 		wanted[n] = true
 	}
 	var out []sessionCookie
-	var sid *network.Cookie
+	var sid *cdpCookie
 	seen := map[string]bool{}
-	for _, c := range all {
-		if c == nil || !wanted[c.Name] || seen[c.Name] || !hostMatchesCookie(c.Domain, host) {
+	for i := range all {
+		c := &all[i]
+		if !wanted[c.Name] || seen[c.Name] || !hostMatchesCookie(c.Domain, host) {
 			continue
 		}
 		seen[c.Name] = true
@@ -213,6 +210,11 @@ func cookieHeaderOf(cs []sessionCookie) string {
 
 // runBrowserLogin launches the browser, waits for a signed-in session,
 // captures the session cookies and closes the browser.
+//
+// The browser is driven over --remote-debugging-pipe (see
+// auth_browser_cdp.go), so no DevTools TCP port is opened on macOS/Linux;
+// the profile dir is private (0700); and the browser lives only until the
+// cookies are read. Windows falls back to a 127.0.0.1 random port.
 func runBrowserLogin(ctx context.Context, opts browserLoginOptions) (browserLoginResult, error) {
 	var res browserLoginResult
 	if opts.Out == nil {
@@ -240,8 +242,8 @@ func runBrowserLogin(ctx context.Context, opts browserLoginOptions) (browserLogi
 			return res, err
 		}
 	}
-	if err := os.MkdirAll(opts.ProfileDir, 0o700); err != nil {
-		return res, fmt.Errorf("creating login profile dir: %w", err)
+	if err := prepareLoginProfileDir(opts.ProfileDir); err != nil {
+		return res, err
 	}
 	bin, err := findBrowserBinary(opts.BrowserPath)
 	if err != nil {
@@ -251,12 +253,8 @@ func runBrowserLogin(ctx context.Context, opts browserLoginOptions) (browserLogi
 	ctx, cancel := context.WithTimeout(ctx, opts.Timeout)
 	defer cancel()
 
-	portFile := filepath.Join(opts.ProfileDir, "DevToolsActivePort")
-	_ = os.Remove(portFile)
 	args := []string{
 		"--user-data-dir=" + opts.ProfileDir,
-		"--remote-debugging-port=0",
-		"--remote-debugging-address=127.0.0.1",
 		"--no-first-run",
 		"--no-default-browser-check",
 	}
@@ -266,40 +264,52 @@ func runBrowserLogin(ctx context.Context, opts browserLoginOptions) (browserLogi
 	args = append(args, browserLoginExtraFlags...)
 	args = append(args, opts.ExtraFlags...)
 	args = append(args, opts.StartURL)
-	proc := exec.Command(bin, args...) // #nosec G204 -- user-selected local browser binary.
-	proc.Stdout, proc.Stderr = io.Discard, io.Discard
-	if err := proc.Start(); err != nil {
-		return res, fmt.Errorf("starting browser: %w", err)
+	started := time.Now()
+	proc, cdpc, err := startLoginBrowser(bin, args)
+	if err != nil {
+		return res, err
 	}
 	exited := make(chan error, 1)
 	go func() { exited <- proc.Wait() }()
-	killed := false
+	reaped := false
 	defer func() {
-		if !killed {
+		_ = cdpc.Close()
+		if !reaped {
 			_ = proc.Process.Kill()
 			<-exited
 		}
 	}()
 
-	wsURL, err := waitDevToolsURL(ctx, portFile, exited)
-	if err != nil {
-		if errors.Is(err, errProfileInUse) || errors.Is(err, errBrowserClosed) {
-			killed = true // waitDevToolsURL already reaped the process
+	// First contact: the browser answers once it is up. A browser that exits
+	// right away handed off to another window on the same profile.
+	vctx, vcancel := context.WithTimeout(ctx, 30*time.Second)
+	verr := cdpc.Call(vctx, "Browser.getVersion", nil, nil)
+	vcancel()
+	if verr != nil {
+		select {
+		case <-exited:
+			reaped = true
+			if time.Since(started) < 10*time.Second {
+				return res, errProfileInUse
+			}
+			return res, errBrowserClosed
+		case <-time.After(2 * time.Second):
 		}
-		return res, err
+		if ctx.Err() != nil {
+			return res, fmt.Errorf("browser did not answer on the DevTools pipe: %w", ctx.Err())
+		}
+		return res, fmt.Errorf("browser did not answer on the DevTools pipe: %w", verr)
 	}
-	b, err := chromedp.NewBrowser(ctx, wsURL)
-	if err != nil {
-		return res, fmt.Errorf("connecting to the login browser: %w", err)
-	}
-	bctx := cdp.WithExecutor(ctx, b)
+
 	closeBrowser := func() {
 		cctx, ccancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer ccancel()
-		_ = browser.Close().Do(cdp.WithExecutor(cctx, b))
+		if err := cdpc.Call(cctx, "Browser.close", nil, nil); err != nil && !errors.Is(err, errCDPClosed) {
+			return // deferred Kill handles it
+		}
 		select {
 		case <-exited:
-			killed = true
+			reaped = true
 		case <-time.After(5 * time.Second):
 		}
 	}
@@ -327,18 +337,20 @@ func runBrowserLogin(ctx context.Context, opts browserLoginOptions) (browserLogi
 			}
 			return res, ctx.Err()
 		case <-exited:
-			killed = true
+			reaped = true
 			return res, errBrowserClosed
 		case <-ticker.C:
 		}
 
-		infos, err := target.GetTargets().Do(bctx)
-		if err != nil {
+		var targets struct {
+			TargetInfos []cdpTargetInfo `json:"targetInfos"`
+		}
+		if err := cdpc.Call(ctx, "Target.getTargets", nil, &targets); err != nil {
 			continue
 		}
 		pages, onSameDay := 0, false
-		for _, ti := range infos {
-			if ti == nil || ti.Type != "page" {
+		for _, ti := range targets.TargetInfos {
+			if ti.Type != "page" {
 				continue
 			}
 			pages++
@@ -362,11 +374,13 @@ func runBrowserLogin(ctx context.Context, opts browserLoginOptions) (browserLogi
 			closeBrowser()
 			return res, errBrowserClosed
 		}
-		all, err := storage.GetCookies().Do(bctx)
-		if err != nil {
+		var jar struct {
+			Cookies []cdpCookie `json:"cookies"`
+		}
+		if err := cdpc.Call(ctx, "Storage.getCookies", nil, &jar); err != nil {
 			continue
 		}
-		picked, sid := pickSessionCookies(all, cookieHost)
+		picked, sid := pickSessionCookies(jar.Cookies, cookieHost)
 		if sid == nil || sid.Value == "" {
 			continue
 		}
@@ -404,31 +418,5 @@ func runBrowserLogin(ctx context.Context, opts browserLoginOptions) (browserLogi
 		}
 		closeBrowser()
 		return res, nil
-	}
-}
-
-// waitDevToolsURL reads the browser websocket URL Chrome writes to
-// DevToolsActivePort in the profile dir.
-func waitDevToolsURL(ctx context.Context, portFile string, exited <-chan error) (string, error) {
-	tick := time.NewTicker(100 * time.Millisecond)
-	defer tick.Stop()
-	start := time.Now()
-	for {
-		if data, err := os.ReadFile(portFile); err == nil { // #nosec G304 -- CLI-owned profile dir.
-			lines := strings.Split(strings.TrimSpace(string(data)), "\n")
-			if len(lines) >= 2 && strings.TrimSpace(lines[0]) != "" {
-				return "ws://127.0.0.1:" + strings.TrimSpace(lines[0]) + strings.TrimSpace(lines[1]), nil
-			}
-		}
-		select {
-		case <-ctx.Done():
-			return "", fmt.Errorf("browser did not open its DevTools endpoint: %w", ctx.Err())
-		case <-exited:
-			if time.Since(start) < 10*time.Second {
-				return "", errProfileInUse
-			}
-			return "", errBrowserClosed
-		case <-tick.C:
-		}
 	}
 }

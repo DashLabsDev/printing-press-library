@@ -4,7 +4,7 @@
   "base_run_id": "20261007-135457",
   "base_printing_press_version": "4.31.7",
   "id": "costco-sameday-address-list",
-  "summary": "Adds read-only `address list` (UserAddresses) showing address ids with a masked label (first character of each word, ZIP prefix) and never the street; CartSignaledEta auto-fills addressId from the saved address matching the ZIP (or the only one) and subtotal from CartTotals.retailerTotal, and a bare --subtotal number becomes a USD SharedMoneyInput.",
+  "summary": "Adds read-only `address list` (UserAddresses) showing address ids with a masked label (first character of each word, ZIP prefix) and never the street; CartSignaledEta auto-fills addressId from the single saved address matching the ZIP (or the only one; several matches fail with a masked candidate list asking for --address-id) and subtotal from CartTotals.retailerTotal of the explicit --cart-id when given (unreadable total: require --subtotal); --subtotal is strictly validated (plain decimal, at most 2 places) and normalized to a SharedMoneyInput with a string amount.",
   "reason": "cart cartsignaledeta needed an addressId and a SharedMoneyInput subtotal the CLI could not supply.",
   "shape_sources": {
     "UserAddresses": "public rspack chunk 95722 (UserAddressManager/AddressSelection/queries.ts): operation query, no variables; response data.userAddresses[] {id, postalCode, streetAddress, viewSection}",
@@ -14,7 +14,10 @@
     "internal/client/addresses.go",
     "internal/client/session_context.go",
     "internal/cli/address_list.go",
-    "internal/cli/slots_window_picker_test.go"
+    "internal/cli/slots_window_picker_test.go",
+    "internal/client/client.go",
+    "internal/client/money_param_test.go",
+    "internal/cli/greptile_fixes_test.go"
   ],
   "markers": [
     "UserAddresses",
@@ -24,7 +27,10 @@
     "ctxVarSubtotal",
     "normalizeMoneyParam",
     "cartSubtotalJSON",
-    "newAddressListCmd"
+    "newAddressListCmd",
+    "AmbiguousAddressError",
+    "InvalidParamError",
+    "moneyAmountRe"
   ],
-  "validated_outcome": "Fake-value stub tests: masked label hides the street, auto pick by ZIP, ambiguous returns none, explicit flags win. Live read-only: address list returned ids with masked labels; cart cartsignaledeta answered with an ETA string using the auto-filled addressId and subtotal. Addresses are never cached."
+  "validated_outcome": "Fake-value stub tests: masked label hides the street, auto pick by ZIP, several same-ZIP addresses refuse with a masked list and send nothing, explicit --cart-id drives CartTotals, malformed --subtotal is rejected before any request, explicit flags win. Live read-only: address list returned ids with masked labels; cart cartsignaledeta answered with an ETA string using the auto-filled addressId and subtotal. Addresses are never cached."
 }

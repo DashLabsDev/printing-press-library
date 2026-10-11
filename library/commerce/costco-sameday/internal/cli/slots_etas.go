@@ -186,7 +186,7 @@ func runSlotsEtas(cmd *cobra.Command, flags *rootFlags, c *client.Client, servic
 		"retailer_id_source":  ridSource,
 	}
 	var rows []etaRow
-	var queried []string
+	var queried, failed []string
 	now := time.Now()
 	for _, plan := range etaPlans(service, acct.Type, sc.PostalCode, retailerID, shops) {
 		got, op, err := runEtaPlan(ctx, c, plan, acct.Type, retailerID, now)
@@ -195,6 +195,7 @@ func runSlotsEtas(cmd *cobra.Command, flags *rootFlags, c *client.Client, servic
 		}
 		if err != nil {
 			notes = append(notes, fmt.Sprintf("%s ETAs: %v", plan.Service, err))
+			failed = append(failed, plan.Service)
 			continue
 		}
 		if len(got) == 0 {
@@ -213,6 +214,14 @@ func runSlotsEtas(cmd *cobra.Command, flags *rootFlags, c *client.Client, servic
 	if len(notes) > 0 {
 		out["notes"] = notes
 	}
+	// A failed ETA query fails the command (after printing whatever did
+	// come back), so scripts never mistake a failure for "no ETAs".
+	var failErr error
+	if len(failed) > 0 {
+		out["failed"] = failed
+		out["partial"] = len(rows) > 0
+		failErr = apiErr(fmt.Errorf("ETA query failed for %s (see notes)", strings.Join(failed, ", ")))
+	}
 
 	if wantsHumanTable(cmd.OutOrStdout(), flags) {
 		for _, n := range notes {
@@ -221,15 +230,21 @@ func runSlotsEtas(cmd *cobra.Command, flags *rootFlags, c *client.Client, servic
 		fmt.Fprintf(cmd.OutOrStdout(), "ZIP %s (%s) as %s via %s\n", sc.PostalCode, sc.PostalCodeSource, acct.Type, strings.Join(queried, ", "))
 		if len(rows) == 0 {
 			fmt.Fprintln(cmd.OutOrStdout(), "No ETAs returned.")
-			return nil
+			return failErr
 		}
 		table := [][]string{}
 		for _, r := range rows {
 			table = append(table, []string{r.ServiceType, humanTime(r.EarliestStart), humanTime(r.EarliestEnd), r.Fee, r.Label})
 		}
-		return flags.printTable(cmd, []string{"SERVICE", "EARLIEST", "END", "FEE", "LABEL"}, table)
+		if err := flags.printTable(cmd, []string{"SERVICE", "EARLIEST", "END", "FEE", "LABEL"}, table); err != nil {
+			return err
+		}
+		return failErr
 	}
-	return flags.printJSON(cmd, out)
+	if err := flags.printJSON(cmd, out); err != nil {
+		return err
+	}
+	return failErr
 }
 
 func hasServiceShop(shops []client.CostcoShop, serviceType string) bool {

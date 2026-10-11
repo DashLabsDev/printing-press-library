@@ -10,11 +10,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -125,22 +125,19 @@ func TestBrowserLoginCapturesOnlySessionCookiesAndCloses(t *testing.T) {
 	if d := time.Until(res.Expires); d < 47*time.Hour || d > 49*time.Hour {
 		t.Fatalf("expiry = %v", res.Expires)
 	}
-	// The browser must be gone: its DevTools port no longer accepts connections.
-	data, err := os.ReadFile(filepath.Join(opts.ProfileDir, "DevToolsActivePort"))
-	if err == nil {
-		port := strings.SplitN(strings.TrimSpace(string(data)), "\n", 2)[0]
-		deadline := time.Now().Add(10 * time.Second)
-		for {
-			conn, derr := net.DialTimeout("tcp", "127.0.0.1:"+port, 200*time.Millisecond)
-			if derr != nil {
-				break
-			}
-			conn.Close()
-			if time.Now().After(deadline) {
-				t.Fatal("login browser still running after capture")
-			}
-			time.Sleep(200 * time.Millisecond)
+	// Pipe transport: Chrome never opened a DevTools TCP port, so it wrote
+	// no DevToolsActivePort file into the profile.
+	if browserLoginTransport == "pipe" {
+		if _, err := os.Stat(filepath.Join(opts.ProfileDir, "DevToolsActivePort")); err == nil {
+			t.Fatal("login browser opened a DevTools TCP port; want --remote-debugging-pipe only")
 		}
+	}
+	// The profile is private and marked as CLI-owned.
+	if fi, err := os.Stat(opts.ProfileDir); err != nil || (runtime.GOOS != "windows" && fi.Mode().Perm() != 0o700) {
+		t.Fatalf("profile dir perms = %v (%v), want 0700", fi.Mode().Perm(), err)
+	}
+	if !hasLoginProfileMarker(opts.ProfileDir) {
+		t.Fatal("profile dir created without the CLI marker")
 	}
 }
 

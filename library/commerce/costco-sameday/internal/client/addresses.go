@@ -15,6 +15,7 @@ package client
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"unicode"
 )
@@ -51,9 +52,28 @@ func (c *Client) UserAddresses(ctx context.Context) ([]SavedAddress, error) {
 	return out, nil
 }
 
-// PickAddressID chooses the saved address for zip: the one whose postal code
-// matches, else the only address. Returns "" when there is no safe choice.
-func PickAddressID(addrs []SavedAddress, zip string) (string, string) {
+// AmbiguousAddressError reports several saved addresses sharing the ZIP. A
+// ZIP cannot tell them apart, so nothing is picked automatically.
+type AmbiguousAddressError struct {
+	PostalCode string
+	Candidates []SavedAddress
+}
+
+func (e *AmbiguousAddressError) Error() string {
+	var b strings.Builder
+	fmt.Fprintf(&b, "%d saved addresses match ZIP %s; pass --address-id with one of:", len(e.Candidates), maskZIP(e.PostalCode))
+	for _, a := range e.Candidates {
+		fmt.Fprintf(&b, "\n  %s  %s", a.ID, MaskedAddressLabel(a))
+	}
+	b.WriteString("\n(run 'costco-sameday-pp-cli address list' to see all saved addresses)")
+	return b.String()
+}
+
+// PickAddressID chooses the saved address for zip: the single one whose
+// postal code matches, else the only saved address. Several matches return
+// an *AmbiguousAddressError (never an arbitrary pick); no safe choice
+// returns "" with a nil error.
+func PickAddressID(addrs []SavedAddress, zip string) (string, string, error) {
 	zip = strings.TrimSpace(zip)
 	var match []SavedAddress
 	for _, a := range addrs {
@@ -62,12 +82,21 @@ func PickAddressID(addrs []SavedAddress, zip string) (string, string) {
 		}
 	}
 	switch {
-	case len(match) >= 1:
-		return match[0].ID, "zip-match"
+	case len(match) == 1:
+		return match[0].ID, "zip-match", nil
+	case len(match) > 1:
+		return "", "", &AmbiguousAddressError{PostalCode: zip, Candidates: match}
 	case len(addrs) == 1:
-		return addrs[0].ID, "only-address"
+		return addrs[0].ID, "only-address", nil
 	}
-	return "", ""
+	return "", "", nil
+}
+
+func maskZIP(z string) string {
+	if len(z) < 3 {
+		return z
+	}
+	return z[:3] + strings.Repeat("x", len(z)-3)
 }
 
 // MaskedAddressLabel renders a street as a recognisable but masked label:
@@ -92,7 +121,7 @@ func MaskedAddressLabel(a SavedAddress) string {
 	}
 	label := strings.Join(words, " ")
 	if z := a.PostalCode; len(z) >= 3 {
-		zipMask := z[:3] + strings.Repeat("x", len(z)-3)
+		zipMask := maskZIP(z)
 		if label == "" {
 			return zipMask
 		}
