@@ -3493,6 +3493,45 @@
       }
     },
     {
+      "name": "bland",
+      "category": "ai",
+      "api": "Bland",
+      "description": "Send a task-driven call and follow it through to the result.",
+      "search_terms": [
+        "bland",
+        "bland-pp-cli",
+        "Send a task-driven call and follow it through to the result.",
+        "Task-to-outcome runner",
+        "calls task run",
+        "Start one task call, wait for its final status, and return the transcript and outcome together.",
+        "Local task recall",
+        "calls search-task",
+        "Find prior calls made through this CLI by task wording and inspect their returned outcomes."
+      ],
+      "path": "library/ai/bland",
+      "printer": "gregmushen",
+      "printer_name": "Greg Mushen",
+      "creator": {
+        "handle": "gregmushen",
+        "name": "Greg Mushen"
+      },
+      "mcp": {
+        "binary": "bland-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 6,
+        "public_tool_count": 0,
+        "auth_type": "api_key",
+        "env_vars": [
+          "BLAND_API_KEY"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
       "name": "blu-ray",
       "category": "media-and-entertainment",
       "api": "Blu-ray.com",
@@ -5024,9 +5063,9 @@
       "path": "library/health/clinical-trials",
       "release": {
         "cli_name": "clinical-trials-pp-cli",
-        "version": "2026.9.14",
-        "released_at": "2026-09-20T09:11:29Z",
-        "source_commit": "f84e1beb3ea79e637afb7cc6d259c9b4e4e51a35"
+        "version": "2026.10.1",
+        "released_at": "2026-10-11T08:51:48Z",
+        "source_commit": "926bcb7295f02bc36abaa040763c3d2f291a1606"
       },
       "printer": "laci141",
       "printer_name": "laci141",
@@ -13114,6 +13153,59 @@
         ],
         "mcp_ready": "full",
         "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "homedepot",
+      "category": "commerce",
+      "api": "Home Depot",
+      "description": "Search products, manage your cart, and retrieve purchases using your own signed-in session.",
+      "search_terms": [
+        "homedepot",
+        "Home Depot",
+        "homedepot-pp-cli",
+        "Search products, manage your cart, and retrieve purchases using your own signed-in session.",
+        "Confirmed cart results",
+        "cart add",
+        "Reports the resulting cart after the requested change.",
+        "Exact cart line targeting",
+        "cart update",
+        "Updates one explicit cart line and confirms its quantity.",
+        "Honest product availability",
+        "products search",
+        "Returns concrete products and marks absent availability unknown.",
+        "Complete order history",
+        "orders list",
+        "Lists orders across bounded pages in the requested date range.",
+        "Verified session status",
+        "auth status",
+        "Distinguishes stored session presence from a verified signed-in read."
+      ],
+      "path": "library/commerce/homedepot",
+      "printer": "gregmushen",
+      "printer_name": "Greg Mushen",
+      "creator": {
+        "handle": "gregmushen",
+        "name": "Greg Mushen"
+      },
+      "contributors": [
+        {
+          "handle": "gregmushen",
+          "name": "Greg Mushen"
+        }
+      ],
+      "mcp": {
+        "binary": "homedepot-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 3,
+        "public_tool_count": 0,
+        "auth_type": "cookie",
+        "env_vars": [],
+        "mcp_ready": "partial",
+        "spec_format": "internal"
       }
     },
     {
@@ -29116,6 +29208,58 @@
         "auth_type": "bearer_token",
         "env_vars": [
           "TELLA_API_KEY"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "telnyx",
+      "category": "social-and-messaging",
+      "api": "Telnyx",
+      "description": "Telnyx messaging, numbers, and voice endpoints, plus a synced message-history mirror, number setup audits, and spend rollups.",
+      "search_terms": [
+        "telnyx",
+        "telnyx-pp-cli",
+        "Telnyx messaging, numbers, and voice endpoints, plus a synced message-history mirror, number setup audits, and spend rollups.",
+        "Conversation view",
+        "conversation",
+        "See the delivery timeline with one guest or vendor number: direction, status, parts and cost (Telnyx records carry no message bodies).",
+        "Number audit",
+        "numbers audit",
+        "Find owned numbers that cannot text: missing messaging profile or missing 10DLC campaign assignment.",
+        "Spend rollup",
+        "spend",
+        "Total messaging cost by number, profile, direction, or day, with balance runway.",
+        "Failure report",
+        "failures",
+        "Failed and undelivered texts grouped by error code and recipient.",
+        "Unanswered threads",
+        "inbox unanswered",
+        "Contacts whose latest text was inbound with no reply yet.",
+        "Agent-safe send",
+        "text",
+        "Send a text after checking the sender is wired correctly and showing recent history; requires --yes."
+      ],
+      "path": "library/social-and-messaging/telnyx",
+      "printer": "gregmushen",
+      "printer_name": "Greg Mushen",
+      "creator": {
+        "handle": "gregmushen",
+        "name": "Greg Mushen"
+      },
+      "mcp": {
+        "binary": "telnyx-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 210,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "TELNYX_API_KEY",
+          "TELNYX_BEARER_AUTH"
         ],
         "mcp_ready": "full",
         "spec_format": "openapi3"
