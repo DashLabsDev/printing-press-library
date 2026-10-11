@@ -1,6 +1,6 @@
 module github.com/mvanhorn/printing-press-library/library/commerce/costco-sameday
 
-go 1.26.6
+go 1.26.9
 
 require (
 	github.com/gorilla/websocket v1.5.3
