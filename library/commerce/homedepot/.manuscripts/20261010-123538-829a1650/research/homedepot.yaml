@@ -1,0 +1,59 @@
+name: homedepot
+display_name: Home Depot
+description: Signed-in Home Depot product search, cart management, and purchase history.
+version: 0.1.0
+category: commerce
+base_url: https://www.homedepot.com
+spec_source: sniffed
+auth:
+  type: cookie
+  header: Cookie
+  cookie_domain: homedepot.com
+  cookies: [THD_CUSTOMER]
+  instructions: Sign in in Safari and run auth import, or use auth login --chrome. Run auth status --verify to confirm the session.
+  key_url: https://www.homedepot.com
+config:
+  format: toml
+  path: ~/.config/homedepot-pp-cli/config.toml
+mcp:
+  endpoint_tools: hidden
+resources:
+  federation-gateway:
+    description: Developer transport for observed cart operations; use cart commands for shopping.
+    syncable: false
+    endpoints:
+      graphql:
+        method: POST
+        path: /federation-gateway/graphql
+        base_url: https://apionline.homedepot.com
+        mutation: true
+        description: Replay an observed Home Depot GraphQL request.
+        params:
+          - {name: opname, type: string, required: true}
+        body_json_fallback: true
+        body_required: true
+        response: {type: object}
+  oms:
+    description: Developer transport for observed order requests; use orders commands for purchases.
+    syncable: false
+    endpoints:
+      list_order_history:
+        method: POST
+        path: /oms/customer/order/v1/user/{userId}/orderhistory
+        mutation: false
+        description: Read purchase history with a complete observed body.
+        params:
+          - {name: userId, type: string, required: true, positional: true}
+        body_json_fallback: true
+        body_required: true
+        response: {type: object}
+      get_order_details:
+        method: POST
+        path: /oms/customer/order/v1/user/{userId}/orderdetails
+        mutation: false
+        description: Read one purchase with a complete observed body.
+        params:
+          - {name: userId, type: string, required: true, positional: true}
+        body_json_fallback: true
+        body_required: true
+        response: {type: object}

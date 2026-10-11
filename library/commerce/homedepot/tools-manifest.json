@@ -1,0 +1,48 @@
+{
+  "api_name": "homedepot",
+  "base_url": "https://www.homedepot.com",
+  "description": "Search products, manage your cart, and retrieve purchases using your own signed-in session.",
+  "mcp_ready": "partial",
+  "http_transport": "browser-chrome-h2",
+  "mcp": {
+    "endpoint_tools": "hidden"
+  },
+  "auth": {
+    "type": "cookie",
+    "header": "Cookie",
+    "key_url": "https://www.homedepot.com",
+    "cookie_domain": "homedepot.com",
+    "cookies": [
+      "THD_CUSTOMER"
+    ]
+  },
+  "required_headers": [],
+  "tools": [],
+  "novel_features": [
+    {
+      "name": "Confirmed cart results",
+      "command": "cart add",
+      "description": "Reports the resulting cart after the requested change."
+    },
+    {
+      "name": "Exact cart line targeting",
+      "command": "cart update",
+      "description": "Updates one explicit cart line and confirms its quantity."
+    },
+    {
+      "name": "Honest product availability",
+      "command": "products search",
+      "description": "Returns concrete products and marks absent availability unknown."
+    },
+    {
+      "name": "Complete order history",
+      "command": "orders list",
+      "description": "Lists orders across bounded pages in the requested date range."
+    },
+    {
+      "name": "Verified session status",
+      "command": "auth status",
+      "description": "Distinguishes stored session presence from a verified signed-in read."
+    }
+  ]
+}

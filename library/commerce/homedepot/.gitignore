@@ -1,0 +1,8 @@
+# Root-anchored so cmd/<binary>/ source stays tracked.
+/homedepot-pp-cli
+/homedepot-pp-cli.exe
+/homedepot-pp-mcp
+/homedepot-pp-mcp.exe
+/bin/
+/build/
+/dist/

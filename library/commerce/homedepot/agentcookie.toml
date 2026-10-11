@@ -1,0 +1,16 @@
+# agentcookie.toml: secrets-bus adoption manifest v2
+# See docs/spec-agentcookie-secrets-bus-v2-adoption.md
+schema_version = 2
+name = "homedepot-pp-cli"
+display_name = "Home Depot Observed"
+description = "Unofficial endpoints observed in Safari or documented by MIT community client."
+project_kind = "cli"
+
+[secrets.file]
+path = "~/.config/homedepot-pp-cli/config.toml"
+
+[sync]
+default = false
+
+[sync.keys]
+HOMEDEPOT_CUSTOMER_COOKIE = true

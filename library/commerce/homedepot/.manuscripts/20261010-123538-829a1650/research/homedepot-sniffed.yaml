@@ -1,0 +1,690 @@
+name: homedepot
+description: Discovered API spec for apionline-homedepot
+version: 0.1.0
+base_url: https://www.homedepot.com
+spec_source: sniffed
+auth:
+    type: none
+    header: ""
+    format: ""
+    env_vars: []
+auth_warnings:
+    - 'rejected auth candidate "offset" from body: search input'
+    - 'rejected auth candidate "query" from body: search input'
+config:
+    format: toml
+    path: ~/.config/homedepot-pp-cli/config.toml
+resources:
+    federation-gateway:
+        description: Operations on graphql
+        endpoints:
+            create_graphql:
+                method: POST
+                path: /federation-gateway/graphql
+                base_url: https://apionline.homedepot.com
+                description: POST /federation-gateway/graphql
+                params:
+                    - name: opname
+                      type: string
+                      required: false
+                      positional: false
+                      default: null
+                      description: ""
+                      fields: []
+                body:
+                    - name: operationName
+                      type: string
+                      required: true
+                      positional: false
+                      default: null
+                      description: ""
+                      fields: []
+                    - name: query
+                      type: string
+                      required: true
+                      positional: false
+                      default: null
+                      description: ""
+                      fields: []
+                    - name: variables
+                      type: object
+                      required: true
+                      positional: false
+                      default: null
+                      description: ""
+                      fields:
+                        - name: requestContext
+                          type: object
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields:
+                            - name: isBrandPricingPolicyCompliant
+                              type: boolean
+                              required: true
+                              positional: false
+                              default: null
+                              description: ""
+                              fields: []
+                            - name: isLite
+                              type: boolean
+                              required: true
+                              positional: false
+                              default: null
+                              description: ""
+                              fields: []
+                            - name: optimalFulfillment
+                              type: boolean
+                              required: true
+                              positional: false
+                              default: null
+                              description: ""
+                              fields: []
+                            - name: tmxProfileId
+                              type: string
+                              required: true
+                              positional: false
+                              default: null
+                              description: ""
+                              fields: []
+                request_content_type: application/json
+                response:
+                    type: object
+                    item: Graphql
+                pagination: null
+    oms:
+        description: Operations on buyitagain
+        endpoints:
+            create_buyitagain:
+                method: POST
+                path: /oms/customer/order/v1/user/{userId}/buyitagain
+                description: POST /oms/customer/order/v1/user/{userId}/buyitagain
+                params:
+                    - name: userId
+                      type: string
+                      required: true
+                      positional: true
+                      default: null
+                      description: The userId path segment
+                      fields: []
+                body:
+                    - name: customerAccountId
+                      type: string
+                      required: true
+                      positional: false
+                      default: null
+                      description: ""
+                      fields: []
+                    - name: endDate
+                      type: string
+                      required: true
+                      positional: false
+                      default: null
+                      description: ""
+                      fields: []
+                    - name: offset
+                      type: string
+                      required: true
+                      positional: false
+                      default: null
+                      description: ""
+                      fields: []
+                    - name: startDate
+                      type: string
+                      required: true
+                      positional: false
+                      default: null
+                      description: ""
+                      fields: []
+                    - name: timezone
+                      type: string
+                      required: true
+                      positional: false
+                      default: null
+                      description: ""
+                      fields: []
+                request_content_type: application/json
+                response:
+                    type: array
+                    item: BuyitagainBuyAgainItem
+                pagination: null
+                response_path: buyAgainItems
+            create_deliveryTracker:
+                method: POST
+                path: /oms/customer/order/v1/user/{userId}/deliveryTracker
+                description: POST /oms/customer/order/v1/user/{userId}/deliveryTracker
+                params:
+                    - name: userId
+                      type: string
+                      required: true
+                      positional: true
+                      default: null
+                      description: The userId path segment
+                      fields: []
+                body:
+                    - name: deliveryTrackerRequest
+                      type: object
+                      required: true
+                      positional: false
+                      default: null
+                      description: ""
+                      fields:
+                        - name: customerId
+                          type: string
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                        - name: fulfillmentType
+                          type: string
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                        - name: lineItems
+                          type: array
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields:
+                            - name: lineId
+                              type: string
+                              required: true
+                              positional: false
+                              default: null
+                              description: ""
+                              fields: []
+                            - name: returnWindow
+                              type: integer
+                              required: true
+                              positional: false
+                              default: null
+                              description: ""
+                              fields: []
+                        - name: orderNumber
+                          type: string
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                        - name: trackingNumber
+                          type: string
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                request_content_type: application/json
+                response:
+                    type: object
+                    item: DeliveryTracker
+                pagination: null
+            create_orderdetails:
+                method: POST
+                path: /oms/customer/order/v1/user/{userId}/orderdetails
+                description: POST /oms/customer/order/v1/user/{userId}/orderdetails
+                params:
+                    - name: userId
+                      type: string
+                      required: true
+                      positional: true
+                      default: null
+                      description: The userId path segment
+                      fields: []
+                body:
+                    - name: orderDetailsRequest
+                      type: object
+                      required: true
+                      positional: false
+                      default: null
+                      description: ""
+                      fields:
+                        - name: customerAccountId
+                          type: string
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                        - name: encryptedOrderNumbers
+                          type: string
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                        - name: groupAndSortBy
+                          type: object
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields:
+                            - name: filterResponse
+                              type: boolean
+                              required: true
+                              positional: false
+                              default: null
+                              description: ""
+                              fields: []
+                            - name: groupBy
+                              type: string
+                              required: true
+                              positional: false
+                              default: null
+                              description: ""
+                              fields: []
+                        - name: orderNumber
+                          type: string
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                        - name: overrideAttributesList
+                          type: array
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields:
+                            - name: name
+                              type: string
+                              required: true
+                              positional: false
+                              default: null
+                              description: ""
+                              fields: []
+                            - name: value
+                              type: string
+                              required: true
+                              positional: false
+                              default: null
+                              description: ""
+                              fields: []
+                        - name: requestOriginatedFrom
+                          type: string
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                        - name: searchType
+                          type: string
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                        - name: timezone
+                          type: string
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                request_content_type: application/json
+                response:
+                    type: array
+                    item: OrderdetailChargeTransaction
+                pagination: null
+                response_path: chargeTransactions
+            create_orderhistory:
+                method: POST
+                path: /oms/customer/order/v1/user/{userId}/orderhistory
+                description: POST /oms/customer/order/v1/user/{userId}/orderhistory
+                params:
+                    - name: userId
+                      type: string
+                      required: true
+                      positional: true
+                      default: null
+                      description: The userId path segment
+                      fields: []
+                body:
+                    - name: orderHistoryRequest
+                      type: object
+                      required: true
+                      positional: false
+                      default: null
+                      description: ""
+                      fields:
+                        - name: customerAccountId
+                          type: string
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                        - name: endDate
+                          type: string
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                        - name: pageNumber
+                          type: integer
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                        - name: pageSize
+                          type: integer
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                        - name: resultsFilter
+                          type: string
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                        - name: searchType
+                          type: string
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                        - name: searchValue
+                          type: string
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                        - name: sortBy
+                          type: string
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                        - name: sortOrder
+                          type: string
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                        - name: startDate
+                          type: string
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                        - name: timezone
+                          type: string
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                request_content_type: application/json
+                response:
+                    type: array
+                    item: OrderhistoryOrder
+                pagination: null
+                response_path: orders
+            create_spend:
+                method: POST
+                path: /oms/customer/order/v1/user/{userId}/spend
+                description: POST /oms/customer/order/v1/user/{userId}/spend
+                params:
+                    - name: userId
+                      type: string
+                      required: true
+                      positional: true
+                      default: null
+                      description: The userId path segment
+                      fields: []
+                body:
+                    - name: customerSpendRequest
+                      type: object
+                      required: true
+                      positional: false
+                      default: null
+                      description: ""
+                      fields:
+                        - name: customerAccountId
+                          type: string
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                        - name: groupType
+                          type: string
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                        - name: resultsFilter
+                          type: string
+                          required: true
+                          positional: false
+                          default: null
+                          description: ""
+                          fields: []
+                request_content_type: application/json
+                response:
+                    type: array
+                    item: SpendCustomerSpendByYear
+                pagination: null
+                response_path: customerSpendByYear
+types:
+    AddToCart:
+        fields:
+            - name: __typename
+              type: string
+            - name: cartId
+              type: string
+            - name: descriptiveAttr
+              type: object
+            - name: itemCount
+              type: integer
+            - name: itemGrouping
+              type: object
+            - name: items
+              type: array
+            - name: localization
+              type: object
+            - name: messages
+              type: array
+            - name: promos
+              type: array
+            - name: totals
+              type: object
+    BuyitagainBuyAgainItem:
+        fields:
+            - name: buyItAgainImage
+              type: string
+            - name: itemDescFromCatalog
+              type: string
+            - name: itemId
+              type: string
+            - name: pipSeoUrl
+              type: string
+    CartInfo:
+        fields:
+            - name: __typename
+              type: string
+            - name: cartId
+              type: string
+            - name: descriptiveAttr
+              type: object
+            - name: itemCount
+              type: integer
+            - name: itemGrouping
+              type: object
+            - name: items
+              type: array
+            - name: localization
+              type: object
+            - name: messages
+              type: array
+            - name: promos
+              type: array
+            - name: totals
+              type: object
+    CreditAmount:
+        fields:
+            - name: amount
+              type: string
+            - name: currency
+              type: string
+    Data:
+        fields:
+            - name: addToCart
+              type: ref:AddToCart
+              omit_empty: true
+            - name: cartInfo
+              type: ref:CartInfo
+              omit_empty: true
+    DeliveryTracker:
+        fields:
+            - name: deliveryType
+              type: string
+            - name: estimatedDeliveryWindow
+              type: ref:EstimatedDeliveryWindow
+            - name: links
+              type: ref:Links
+            - name: pickUpDetails
+              type: ref:PickUpDetails
+              omit_empty: true
+            - name: status
+              type: string
+            - name: statusDetails
+              type: ref:StatusDetails
+            - name: trackingNumber
+              type: string
+    EstimatedDeliveryWindow:
+        fields:
+            - name: date
+              type: string
+            - name: timeliness
+              type: string
+    Graphql:
+        fields:
+            - name: data
+              type: ref:Data
+    Links:
+        fields:
+            - name: deliveryTrackerUrl
+              type: string
+    OrderdetailChargeTransaction:
+        fields:
+            - name: chargeIdentifier
+              type: string
+              omit_empty: true
+            - name: creditAmount
+              type: ref:CreditAmount
+              omit_empty: true
+            - name: paymentMethodCode
+              type: string
+              omit_empty: true
+    OrderhistoryOrder:
+        fields:
+            - name: POJobName
+              type: string
+              omit_empty: true
+            - name: accountIdType
+              type: string
+            - name: accountIdUsed
+              type: string
+            - name: accountIdValue
+              type: string
+            - name: detailsSource
+              type: string
+            - name: invoiceNumbers
+              type: array
+              omit_empty: true
+            - name: isApoFpo
+              type: bool
+            - name: orderNumber
+              type: string
+            - name: orderNumbers
+              type: array
+            - name: orderOrigin
+              type: string
+            - name: otherDiscountAmount
+              type: integer
+            - name: preTaxAmount
+              type: integer
+            - name: purchaserFirstName
+              type: string
+            - name: purchaserId
+              type: string
+            - name: purchaserLastName
+              type: string
+            - name: receiptAddedDate
+              type: string
+            - name: receiptDetails
+              type: string
+            - name: registerNumber
+              type: integer
+            - name: salesDate
+              type: string
+            - name: showReceiptImage
+              type: bool
+            - name: storeName
+              type: string
+              omit_empty: true
+            - name: storeNumber
+              type: integer
+            - name: tenders
+              type: '[]ref:Tender'
+            - name: totalAmount
+              type: integer
+            - name: transactionId
+              type: integer
+            - name: transactionIdWithCheckDigit
+              type: integer
+            - name: transactionKey
+              type: string
+            - name: transactionOrigin
+              type: string
+            - name: transactionType
+              type: string
+    PickUpDetails:
+        fields:
+            - name: contactName
+              type: string
+            - name: storeName
+              type: string
+            - name: storeNumber
+              type: integer
+    SpendCustomerSpendByYear:
+        fields:
+            - name: grossSales
+              type: integer
+            - name: proxtraSpend
+              type: integer
+            - name: savings
+              type: integer
+            - name: year
+              type: integer
+    StatusDetails:
+        fields:
+            - name: date
+              type: string
+    Tender:
+        fields:
+            - name: amount
+              type: string
+            - name: type
+              type: string
+            - name: value
+              type: string

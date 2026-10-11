@@ -1,0 +1,111 @@
+openapi: 3.0.3
+info:
+  title: Home Depot observed shopper endpoints
+  version: 0.1.0
+  description: Unofficial endpoints observed in Safari or documented by MIT community client. Requests may require a logged-in session and browser-fingerprint transport.
+servers:
+  - url: https://www.homedepot.com
+components:
+  securitySchemes:
+    customerCookie:
+      type: apiKey
+      in: cookie
+      name: THD_CUSTOMER
+  schemas:
+    GraphQLRequest:
+      type: object
+      required: [operationName, query, variables]
+      properties:
+        operationName: {type: string}
+        query: {type: string}
+        variables: {type: object, additionalProperties: true}
+    GraphQLResponse:
+      type: object
+      properties:
+        data: {type: object, additionalProperties: true}
+        errors: {type: array, items: {type: object, additionalProperties: true}}
+paths:
+  /federation-gateway/graphql:
+    post:
+      operationId: graphql
+      summary: Run a Home Depot shopper GraphQL operation
+      description: Observed searchModel on www.homedepot.com and getCart on apionline.homedepot.com. This generic operation does not imply other operations are safe or supported.
+      security: [{customerCookie: []}]
+      parameters:
+        - name: opname
+          in: query
+          required: true
+          schema: {type: string}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/GraphQLRequest'}
+      responses:
+        '200':
+          description: GraphQL response
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/GraphQLResponse'}
+  /oms/customer/order/v1/user/{userId}/orderhistory:
+    post:
+      operationId: listOrderHistory
+      summary: List the signed-in customer's online and in-store order summaries
+      security: [{customerCookie: []}]
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: {type: string}
+        - name: Authorization
+          in: header
+          required: true
+          schema: {type: string}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [orderHistoryRequest]
+              properties:
+                orderHistoryRequest:
+                  type: object
+                  required: [pageSize, pageNumber, startDate, endDate, timezone]
+                  properties:
+                    pageSize: {type: integer}
+                    pageNumber: {type: integer}
+                    startDate: {type: string, format: date}
+                    endDate: {type: string, format: date}
+                    timezone: {type: string}
+      responses:
+        '200':
+          description: Order history page
+          content:
+            application/json:
+              schema: {type: object, additionalProperties: true}
+  /oms/customer/order/v1/user/{userId}/orderdetails:
+    post:
+      operationId: getOrderDetails
+      summary: Get detail for an online or in-store order
+      security: [{customerCookie: []}]
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: {type: string}
+        - name: Authorization
+          in: header
+          required: true
+          schema: {type: string}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {type: object, additionalProperties: true}
+      responses:
+        '200':
+          description: Order detail
+          content:
+            application/json:
+              schema: {type: object, additionalProperties: true}

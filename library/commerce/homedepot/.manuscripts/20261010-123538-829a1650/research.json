@@ -1,0 +1,180 @@
+{
+  "api_name": "homedepot",
+  "novelty_score": 6,
+  "alternatives": [
+    {
+      "name": "homedepot-go",
+      "url": "https://github.com/fnziman/homedepot-go",
+      "language": "Go",
+      "install_method": "",
+      "stars": 0,
+      "last_updated": "",
+      "command_count": 0,
+      "has_json_output": false,
+      "has_auth_support": false
+    },
+    {
+      "name": "mcp-homedepot",
+      "url": "https://github.com/markswendsen-code/mcp-homedepot",
+      "language": "TypeScript",
+      "install_method": "",
+      "stars": 0,
+      "last_updated": "",
+      "command_count": 0,
+      "has_json_output": false,
+      "has_auth_support": false
+    }
+  ],
+  "gaps": [],
+  "patterns": [],
+  "recommendation": "proceed",
+  "researched_at": "2026-10-10T21:03:21.976634Z",
+  "novel_features": [
+    {
+      "name": "Confirmed cart results",
+      "command": "cart add",
+      "description": "Reports the resulting cart after the requested change.",
+      "rationale": "Uses a cart read after the mutation to confirm the requested quantity.",
+      "example": "homedepot-pp-cli cart add 100001123 --store 4706 --dry-run --agent",
+      "why_it_matters": "Reports the resulting cart after the requested change.",
+      "group": "Signed-in shopping"
+    },
+    {
+      "name": "Exact cart line targeting",
+      "command": "cart update",
+      "description": "Updates one explicit cart line and confirms its quantity.",
+      "rationale": "Resolves the current line and its fulfillment context before updating.",
+      "example": "homedepot-pp-cli cart update sample-line --quantity 2 --dry-run --agent",
+      "why_it_matters": "Updates one explicit cart line and confirms its quantity.",
+      "group": "Signed-in shopping"
+    },
+    {
+      "name": "Honest product availability",
+      "command": "products search",
+      "description": "Returns concrete products and marks absent availability unknown.",
+      "rationale": "Extracts ordered website product state without inferring stock from price.",
+      "example": "homedepot-pp-cli products search pencils --agent",
+      "why_it_matters": "Returns concrete products and marks absent availability unknown.",
+      "group": "Signed-in shopping"
+    },
+    {
+      "name": "Complete order history",
+      "command": "orders list",
+      "description": "Lists orders across bounded pages in the requested date range.",
+      "rationale": "Traverses OMS pages and rejects incomplete or repeated responses.",
+      "example": "homedepot-pp-cli orders list --agent",
+      "why_it_matters": "Lists orders across bounded pages in the requested date range.",
+      "group": "Signed-in shopping"
+    },
+    {
+      "name": "Verified session status",
+      "command": "auth status",
+      "description": "Distinguishes stored session presence from a verified signed-in read.",
+      "rationale": "Combines private cookie metadata with an optional protected OMS probe.",
+      "example": "homedepot-pp-cli auth status --agent",
+      "why_it_matters": "Distinguishes stored session presence from a verified signed-in read.",
+      "group": "Signed-in shopping"
+    }
+  ],
+  "novel_features_built": [
+    {
+      "name": "Confirmed cart results",
+      "command": "cart add",
+      "description": "Reports the resulting cart after the requested change.",
+      "rationale": "Uses a cart read after the mutation to confirm the requested quantity.",
+      "example": "homedepot-pp-cli cart add 100001123 --store 4706 --dry-run --agent",
+      "why_it_matters": "Reports the resulting cart after the requested change.",
+      "group": "Signed-in shopping"
+    },
+    {
+      "name": "Exact cart line targeting",
+      "command": "cart update",
+      "description": "Updates one explicit cart line and confirms its quantity.",
+      "rationale": "Resolves the current line and its fulfillment context before updating.",
+      "example": "homedepot-pp-cli cart update sample-line --quantity 2 --dry-run --agent",
+      "why_it_matters": "Updates one explicit cart line and confirms its quantity.",
+      "group": "Signed-in shopping"
+    },
+    {
+      "name": "Honest product availability",
+      "command": "products search",
+      "description": "Returns concrete products and marks absent availability unknown.",
+      "rationale": "Extracts ordered website product state without inferring stock from price.",
+      "example": "homedepot-pp-cli products search pencils --agent",
+      "why_it_matters": "Returns concrete products and marks absent availability unknown.",
+      "group": "Signed-in shopping"
+    },
+    {
+      "name": "Complete order history",
+      "command": "orders list",
+      "description": "Lists orders across bounded pages in the requested date range.",
+      "rationale": "Traverses OMS pages and rejects incomplete or repeated responses.",
+      "example": "homedepot-pp-cli orders list --agent",
+      "why_it_matters": "Lists orders across bounded pages in the requested date range.",
+      "group": "Signed-in shopping"
+    },
+    {
+      "name": "Verified session status",
+      "command": "auth status",
+      "description": "Distinguishes stored session presence from a verified signed-in read.",
+      "rationale": "Combines private cookie metadata with an optional protected OMS probe.",
+      "example": "homedepot-pp-cli auth status --agent",
+      "why_it_matters": "Distinguishes stored session presence from a verified signed-in read.",
+      "group": "Signed-in shopping"
+    }
+  ],
+  "narrative": {
+    "display_name": "Home Depot",
+    "headline": "Search products, manage your cart, and retrieve purchases using your own signed-in session.",
+    "value_prop": "Read products and past purchases through direct HTTP. Cart changes target explicit items and return a verified resulting cart.",
+    "auth_narrative": "Sign in to homedepot.com in Safari, then run homedepot-pp-cli auth import. For Chrome, run homedepot-pp-cli auth login --chrome. Session cookies preserve domain, path and expiry in a private 0600 local file at ~/.local/share/homedepot-pp-cli/cookies.json, or the directory selected by --home. An absolute HOMEDEPOT_COOKIE_FILE selects another private file. Imports verify a protected request before replacing the stored session. Run homedepot-pp-cli auth status --verify for a live check; auth logout removes the stored session. No developer API key is needed.",
+    "quickstart": [
+      {
+        "command": "homedepot-pp-cli doctor --dry-run",
+        "comment": "Inspect configuration safely."
+      },
+      {
+        "command": "homedepot-pp-cli products search pencils --agent",
+        "comment": "Find product IDs and prices."
+      },
+      {
+        "command": "homedepot-pp-cli cart show --agent",
+        "comment": "Inspect current line IDs and quantities."
+      },
+      {
+        "command": "homedepot-pp-cli orders list --agent",
+        "comment": "Find recent online and in-store purchases."
+      }
+    ],
+    "when_to_use": "Use for signed-in Home Depot product searches, cart changes, and purchase history.",
+    "anti_triggers": [
+      "Checkout and payment",
+      "Delivery scheduling",
+      "Bulk inventory collection"
+    ],
+    "recipes": [
+      {
+        "title": "Find products",
+        "command": "homedepot-pp-cli products search pencils --agent --select item_id,name,price",
+        "explanation": "Return only shopping identifiers, names and prices."
+      },
+      {
+        "title": "Inspect cart",
+        "command": "homedepot-pp-cli cart show --agent",
+        "explanation": "Get line IDs before changing quantities."
+      },
+      {
+        "title": "Find recent purchases",
+        "command": "homedepot-pp-cli orders list --agent",
+        "explanation": "Return recent order references."
+      }
+    ],
+    "trigger_phrases": [
+      "search Home Depot products",
+      "show my Home Depot cart",
+      "find my Home Depot purchases",
+      "use homedepot",
+      "run homedepot"
+    ]
+  }
+}

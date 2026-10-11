@@ -1,0 +1,27 @@
+{
+  "manifest_version": "0.3",
+  "name": "homedepot-pp-mcp",
+  "display_name": "Home Depot",
+  "version": "0.1.0",
+  "description": "Unofficial endpoints observed in Safari or documented by MIT community client.",
+  "author": {
+    "name": "CLI Printing Press"
+  },
+  "license": "Apache-2.0",
+  "server": {
+    "type": "binary",
+    "entry_point": "bin/homedepot-pp-mcp",
+    "mcp_config": {
+      "command": "${__dirname}/bin/homedepot-pp-mcp",
+      "args": []
+    }
+  },
+  "compatibility": {
+    "claude_desktop": ">=1.0.0",
+    "platforms": [
+      "darwin",
+      "linux",
+      "win32"
+    ]
+  }
+}

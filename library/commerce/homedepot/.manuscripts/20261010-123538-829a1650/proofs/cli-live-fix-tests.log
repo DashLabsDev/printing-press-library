@@ -1,0 +1,19 @@
+?   	homedepot-pp-cli/cmd/homedepot-pp-cli	[no test files]
+ok  	homedepot-pp-cli/cmd/homedepot-pp-mcp	0.404s
+?   	homedepot-pp-cli/internal/cache	[no test files]
+ok  	homedepot-pp-cli/internal/cli	2.846s
+?   	homedepot-pp-cli/internal/cli/playbooks	[no test files]
+ok  	homedepot-pp-cli/internal/client	(cached)
+ok  	homedepot-pp-cli/internal/cliutil	(cached)
+?   	homedepot-pp-cli/internal/cliutil/testenv	[no test files]
+ok  	homedepot-pp-cli/internal/config	(cached)
+ok  	homedepot-pp-cli/internal/learn	1.717s
+ok  	homedepot-pp-cli/internal/learn/entities	(cached)
+ok  	homedepot-pp-cli/internal/learn/lookups	(cached)
+ok  	homedepot-pp-cli/internal/learn/patterns	(cached)
+ok  	homedepot-pp-cli/internal/mcp	3.482s
+ok  	homedepot-pp-cli/internal/mcp/bound	(cached)
+ok  	homedepot-pp-cli/internal/mcp/cobratree	(cached)
+ok  	homedepot-pp-cli/internal/platform	(cached)
+ok  	homedepot-pp-cli/internal/store	(cached)
+?   	homedepot-pp-cli/internal/types	[no test files]
