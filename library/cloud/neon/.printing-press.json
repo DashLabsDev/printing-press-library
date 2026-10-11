@@ -1,0 +1,131 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-10-10T23:50:19.923882Z",
+  "printing_press_version": "4.33.4",
+  "api_name": "neon",
+  "display_name": "Neon",
+  "cli_name": "neon-pp-cli",
+  "creator": {
+    "handle": "gregmushen",
+    "name": "Greg Mushen"
+  },
+  "owner": "gregmushen",
+  "printer": "gregmushen",
+  "printer_name": "Greg Mushen",
+  "spec_path": "spec.json",
+  "spec_format": "openapi3",
+  "spec_source": "official",
+  "spec_checksum": "sha256:a90b0a406820fd13590ab221655b178ca86804ba79e94549cbe20393885b8872",
+  "run_id": "20261010-145639-66213866",
+  "category": "cloud",
+  "description": "Neon API commands in one static binary, plus a local fleet mirror for stale-branch cleanup, usage trends and compute audits.",
+  "mcp_binary": "neon-pp-mcp",
+  "mcp_tool_count": 184,
+  "mcp_ready": "full",
+  "api_version": "v2",
+  "auth_type": "bearer_token",
+  "auth_preference": "BearerAuth",
+  "auth_env_vars": [
+    "NEON_API_KEY"
+  ],
+  "auth_key_url": "https://neon.com/docs/manage/api-keys",
+  "novel_features": [
+    {
+      "name": "Stale branches",
+      "command": "stale",
+      "description": "Find idle or expired branches across every project from the local mirror (run sync first), with delete commands for non-default branches."
+    },
+    {
+      "name": "Fleet tree",
+      "command": "tree",
+      "description": "See every org, project, branch and compute in one hierarchy from the local mirror (run sync first)."
+    },
+    {
+      "name": "Usage trends",
+      "command": "usage trend",
+      "description": "Track compute, storage and transfer per project with period-over-period deltas; on plans without consumption history (below Launch/Scale) it uses per-sync snapshots (basis: sync-snapshots)."
+    },
+    {
+      "name": "Usage top",
+      "command": "usage top",
+      "description": "Rank projects by compute, storage, transfer or written data; on plans without consumption history it ranks period-to-date totals from sync snapshots (basis: sync-snapshots)."
+    },
+    {
+      "name": "Operation wait",
+      "command": "wait",
+      "description": "Block until a branch's async operations finish; exits 0 when done, 6 if an operation failed, 8 on timeout."
+    },
+    {
+      "name": "Preview branch up",
+      "command": "preview up",
+      "description": "Create a real branch (or reuse an existing one by name), wait until ready and print its connection string; --expires applies only to newly created branches."
+    },
+    {
+      "name": "Branch prune",
+      "command": "prune",
+      "description": "Preview idle or expired branches to delete (from the local mirror); --yes actually deletes them, always skipping default and protected branches."
+    },
+    {
+      "name": "Compute audit",
+      "command": "compute audit",
+      "description": "Flag computes that never scale to zero, have fixed autoscaling, or are oversized on non-default branches, from the local mirror (run sync first)."
+    }
+  ],
+  "novel_features_built": [
+    {
+      "name": "Stale branches",
+      "command": "stale",
+      "description": "Find idle or expired branches across every project, with ready-to-run delete commands."
+    },
+    {
+      "name": "Fleet tree",
+      "command": "tree",
+      "description": "See every org, project, branch and compute in one hierarchy."
+    },
+    {
+      "name": "Usage trends",
+      "command": "usage trend",
+      "description": "Track compute, storage and transfer per project with period-over-period deltas."
+    },
+    {
+      "name": "Usage top",
+      "command": "usage top",
+      "description": "Rank projects by compute hours, storage or data transfer over a window."
+    },
+    {
+      "name": "Operation wait",
+      "command": "wait",
+      "description": "Block until a branch's async operations finish, with a timeout and typed exit codes."
+    },
+    {
+      "name": "Preview branch up",
+      "command": "preview up",
+      "description": "Create or reuse a named branch, set it to expire, wait until ready and print its connection string."
+    },
+    {
+      "name": "Branch prune",
+      "command": "prune",
+      "description": "Delete idle or expired branches, previewing by default and skipping default and protected branches."
+    },
+    {
+      "name": "Compute audit",
+      "command": "compute audit",
+      "description": "Flag computes that never scale to zero, have fixed autoscaling, or are oversized on non-default branches."
+    }
+  ],
+  "verify": {
+    "mode": "mock",
+    "pass_rate": 100,
+    "passed": 214,
+    "total": 214,
+    "data_pipeline": true,
+    "verdict": "PASS"
+  },
+  "scorecard": {
+    "steinberger": {
+      "percentage": 96,
+      "grade": "A",
+      "total": 96
+    }
+  }
+}

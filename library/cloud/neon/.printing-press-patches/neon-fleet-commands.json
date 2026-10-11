@@ -1,0 +1,42 @@
+{
+  "schema_version": 2,
+  "id": "neon-fleet-commands",
+  "applied_at": "2026-10-10",
+  "base_run_id": "20261010-145639-66213866",
+  "base_printing_press_version": "4.33.4",
+  "summary": "Neon fleet and branch-lifecycle commands (stale, tree, usage, wait, preview up, prune, compute audit) with safety contracts a reprint must keep.",
+  "reason": "Contracts: prune previews unless --yes and re-checks every branch live before DELETE (skip default/protected, skip when live activity is recent or no activity timestamp exists, treat 404 as gone, report per-branch status); preview up is idempotent by branch name, waits for its create operations (and, after a 409, the other run's) before returning a connection string, and infers database/role; wait walks the full operation history once (Neon ignores branch filters), then re-checks tracked operations by ID plus new head operations, and only fails on operations it saw running or that started during the wait; usage commands choose consumption history or sync snapshots per project, because consumption history is plan-gated; storage ranking uses one measurement (snapshot bytes) because history reports byte-months.",
+  "files": [
+    "internal/cli/compute.go",
+    "internal/cli/compute_audit.go",
+    "internal/cli/compute_audit_test.go",
+    "internal/cli/neon_commands_test.go",
+    "internal/cli/neon_consumption.go",
+    "internal/cli/neon_live.go",
+    "internal/cli/neon_local.go",
+    "internal/cli/neon_sync_extra.go",
+    "internal/cli/neon_sync_extra_test.go",
+    "internal/cli/preview.go",
+    "internal/cli/preview_up.go",
+    "internal/cli/preview_up_test.go",
+    "internal/cli/prune.go",
+    "internal/cli/prune_test.go",
+    "internal/cli/stale.go",
+    "internal/cli/stale_test.go",
+    "internal/cli/tree.go",
+    "internal/cli/tree_test.go",
+    "internal/cli/usage.go",
+    "internal/cli/usage_top.go",
+    "internal/cli/usage_top_test.go",
+    "internal/cli/usage_trend.go",
+    "internal/cli/usage_trend_test.go",
+    "internal/cli/wait.go",
+    "internal/cli/wait_test.go"
+  ],
+  "call_sites": [
+    "selectStale(db",
+    "waitNeonOperations(ctx",
+    "flattenNeonConsumption(env.Projects)"
+  ],
+  "validated_outcome": "Provider handler tests exercise the adapter and lifecycle behavior; live proof remains blocked by environment."
+}

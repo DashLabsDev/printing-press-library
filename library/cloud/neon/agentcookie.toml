@@ -1,0 +1,16 @@
+# agentcookie.toml: secrets-bus adoption manifest v2
+# See docs/spec-agentcookie-secrets-bus-v2-adoption.md
+schema_version = 2
+name = "neon-pp-cli"
+display_name = "Neon"
+description = "Neon API commands in one static binary, plus a local fleet mirror for stale-branch cleanup, usage trends and compute audits."
+project_kind = "cli"
+
+[secrets.file]
+path = "~/.config/neon-pp-cli/config.toml"
+
+[sync]
+default = false
+
+[sync.keys]
+NEON_API_KEY = true

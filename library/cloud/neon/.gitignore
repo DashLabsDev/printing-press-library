@@ -1,0 +1,8 @@
+# Root-anchored so cmd/<binary>/ source stays tracked.
+/neon-pp-cli
+/neon-pp-cli.exe
+/neon-pp-mcp
+/neon-pp-mcp.exe
+/bin/
+/build/
+/dist/

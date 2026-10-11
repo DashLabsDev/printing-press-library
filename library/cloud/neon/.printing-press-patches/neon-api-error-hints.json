@@ -1,0 +1,12 @@
+{
+  "schema_version": 2,
+  "id": "neon-api-error-hints",
+  "applied_at": "2026-10-10",
+  "base_run_id": "20261010-145639-66213866",
+  "base_printing_press_version": "4.33.4",
+  "summary": "Hook Neon-specific hints into classifyAPIError for org-API-key and plan-gated refusals.",
+  "reason": "Neon returns these as 404/403; the generic hint said 'resource not found', which misleads users and agents.",
+  "files": ["internal/cli/helpers.go", "internal/cli/neon_errors.go"],
+  "call_sites": ["if hinted := neonAPIErrorHint(err, msg); hinted != nil {"],
+  "validated_outcome": "neon-pp-cli regions with an org API key prints the org-key hint; consumption v2 on a non-Scale plan prints the plan hint."
+}

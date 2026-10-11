@@ -1,0 +1,270 @@
+{
+  "api_name": "neon",
+  "novelty_score": 0,
+  "alternatives": [
+    {
+      "name": "neonctl",
+      "url": "https://github.com/neondatabase/neonctl",
+      "language": "TypeScript",
+      "install_method": "",
+      "stars": 117,
+      "last_updated": "",
+      "command_count": 22,
+      "has_json_output": false,
+      "has_auth_support": false
+    },
+    {
+      "name": "mcp-server-neon",
+      "url": "https://github.com/neondatabase/mcp-server-neon",
+      "language": "TypeScript",
+      "install_method": "",
+      "stars": 650,
+      "last_updated": "",
+      "command_count": 0,
+      "has_json_output": false,
+      "has_auth_support": false
+    }
+  ],
+  "gaps": [],
+  "patterns": [],
+  "recommendation": "proceed",
+  "researched_at": "2026-10-10T22:01:13Z",
+  "novel_features": [
+    {
+      "name": "Stale branches",
+      "command": "stale",
+      "description": "Find idle or expired branches across every project from the local mirror (run sync first), with delete commands for non-default branches.",
+      "rationale": "Joins synced branch activity, expiration and endpoint data that no single API call returns.",
+      "example": "neon-pp-cli stale --idle 14d --agent",
+      "why_it_matters": "Reach for this before cleanup to see which preview branches are safe to remove.",
+      "group": "Fleet hygiene"
+    },
+    {
+      "name": "Fleet tree",
+      "command": "tree",
+      "description": "See every org, project, branch and compute in one hierarchy from the local mirror (run sync first).",
+      "rationale": "Built from a local join of synced orgs, projects, branches and endpoints instead of dozens of API calls.",
+      "example": "neon-pp-cli tree --json",
+      "why_it_matters": "Use it to orient in an unfamiliar Neon account in one call.",
+      "group": "Fleet hygiene"
+    },
+    {
+      "name": "Usage trends",
+      "command": "usage trend",
+      "description": "Track compute, storage and transfer per project with period-over-period deltas; on plans without consumption history (below Launch/Scale) it uses per-sync snapshots (basis: sync-snapshots).",
+      "rationale": "Requires consumption history stored locally across syncs.",
+      "example": "neon-pp-cli usage trend --since 30d --agent",
+      "why_it_matters": "Use for questions about how usage changed over time.",
+      "group": "Cost visibility"
+    },
+    {
+      "name": "Usage top",
+      "command": "usage top",
+      "description": "Rank projects by compute, storage, transfer or written data; on plans without consumption history it ranks period-to-date totals from sync snapshots (basis: sync-snapshots).",
+      "rationale": "Aggregates synced consumption samples locally.",
+      "example": "neon-pp-cli usage top --metric compute --since 7d --agent",
+      "why_it_matters": "Use to find which project drove a bill spike.",
+      "group": "Cost visibility"
+    },
+    {
+      "name": "Operation wait",
+      "command": "wait",
+      "description": "Block until a branch's async operations finish; exits 0 when done, 6 if an operation failed, 8 on timeout.",
+      "rationale": "Chains operation polling the API leaves to the caller.",
+      "example": "neon-pp-cli wait --branch pr-123 --project-id lucky-sun-123456 --timeout 5m",
+      "why_it_matters": "Use in CI or agent flows before connecting to a freshly created branch.",
+      "group": "Preview branch workflow"
+    },
+    {
+      "name": "Preview branch up",
+      "command": "preview up",
+      "description": "Create a real branch (or reuse an existing one by name), wait until ready and print its connection string; --expires applies only to newly created branches.",
+      "rationale": "Idempotent find-or-create plus wait plus connection URI is several API calls with polling.",
+      "example": "neon-pp-cli preview up pr-123 --project-id lucky-sun-123456 --expires 7d --agent",
+      "why_it_matters": "Use for per-PR databases; safe to re-run.",
+      "group": "Preview branch workflow"
+    },
+    {
+      "name": "Branch prune",
+      "command": "prune",
+      "description": "Preview idle or expired branches to delete (from the local mirror); --yes actually deletes them, always skipping default and protected branches.",
+      "rationale": "Uses the same local selection as stale with safe-by-default deletion.",
+      "example": "neon-pp-cli prune --idle 14d",
+      "why_it_matters": "Use after stale to actually clean up.",
+      "group": "Fleet hygiene"
+    },
+    {
+      "name": "Compute audit",
+      "command": "compute audit",
+      "description": "Flag computes that never scale to zero, have fixed autoscaling, or are oversized on non-default branches, from the local mirror (run sync first).",
+      "rationale": "Scans synced endpoint settings across all projects.",
+      "example": "neon-pp-cli compute audit --agent",
+      "why_it_matters": "Use to find the cheapest cost wins in a Neon fleet.",
+      "group": "Cost visibility"
+    }
+  ],
+  "novel_features_built": [
+    {
+      "name": "Stale branches",
+      "command": "stale",
+      "description": "Find idle or expired branches across every project from the local mirror (run sync first), with delete commands for non-default branches.",
+      "rationale": "Joins synced branch activity, expiration and endpoint data that no single API call returns.",
+      "example": "neon-pp-cli stale --idle 14d --agent",
+      "why_it_matters": "Reach for this before cleanup to see which preview branches are safe to remove.",
+      "group": "Fleet hygiene"
+    },
+    {
+      "name": "Fleet tree",
+      "command": "tree",
+      "description": "See every org, project, branch and compute in one hierarchy from the local mirror (run sync first).",
+      "rationale": "Built from a local join of synced orgs, projects, branches and endpoints instead of dozens of API calls.",
+      "example": "neon-pp-cli tree --json",
+      "why_it_matters": "Use it to orient in an unfamiliar Neon account in one call.",
+      "group": "Fleet hygiene"
+    },
+    {
+      "name": "Usage trends",
+      "command": "usage trend",
+      "description": "Track compute, storage and transfer per project with period-over-period deltas; on plans without consumption history (below Launch/Scale) it uses per-sync snapshots (basis: sync-snapshots).",
+      "rationale": "Requires consumption history stored locally across syncs.",
+      "example": "neon-pp-cli usage trend --since 30d --agent",
+      "why_it_matters": "Use for questions about how usage changed over time.",
+      "group": "Cost visibility"
+    },
+    {
+      "name": "Usage top",
+      "command": "usage top",
+      "description": "Rank projects by compute, storage, transfer or written data; on plans without consumption history it ranks period-to-date totals from sync snapshots (basis: sync-snapshots).",
+      "rationale": "Aggregates synced consumption samples locally.",
+      "example": "neon-pp-cli usage top --metric compute --since 7d --agent",
+      "why_it_matters": "Use to find which project drove a bill spike.",
+      "group": "Cost visibility"
+    },
+    {
+      "name": "Operation wait",
+      "command": "wait",
+      "description": "Block until a branch's async operations finish; exits 0 when done, 6 if an operation failed, 8 on timeout.",
+      "rationale": "Chains operation polling the API leaves to the caller.",
+      "example": "neon-pp-cli wait --branch pr-123 --project-id lucky-sun-123456 --timeout 5m",
+      "why_it_matters": "Use in CI or agent flows before connecting to a freshly created branch.",
+      "group": "Preview branch workflow"
+    },
+    {
+      "name": "Preview branch up",
+      "command": "preview up",
+      "description": "Create a real branch (or reuse an existing one by name), wait until ready and print its connection string; --expires applies only to newly created branches.",
+      "rationale": "Idempotent find-or-create plus wait plus connection URI is several API calls with polling.",
+      "example": "neon-pp-cli preview up pr-123 --project-id lucky-sun-123456 --expires 7d --agent",
+      "why_it_matters": "Use for per-PR databases; safe to re-run.",
+      "group": "Preview branch workflow"
+    },
+    {
+      "name": "Branch prune",
+      "command": "prune",
+      "description": "Preview idle or expired branches to delete (from the local mirror); --yes actually deletes them, always skipping default and protected branches.",
+      "rationale": "Uses the same local selection as stale with safe-by-default deletion.",
+      "example": "neon-pp-cli prune --idle 14d",
+      "why_it_matters": "Use after stale to actually clean up.",
+      "group": "Fleet hygiene"
+    },
+    {
+      "name": "Compute audit",
+      "command": "compute audit",
+      "description": "Flag computes that never scale to zero, have fixed autoscaling, or are oversized on non-default branches, from the local mirror (run sync first).",
+      "rationale": "Scans synced endpoint settings across all projects.",
+      "example": "neon-pp-cli compute audit --agent",
+      "why_it_matters": "Use to find the cheapest cost wins in a Neon fleet.",
+      "group": "Cost visibility"
+    }
+  ],
+  "auth": {
+    "canonical_env_var": "NEON_API_KEY"
+  },
+  "narrative": {
+    "display_name": "Neon",
+    "headline": "Neon API commands in one static binary, plus a local fleet mirror for stale-branch cleanup, usage trends and compute audits.",
+    "value_prop": "Manage Neon projects, branches, computes, roles and databases from the terminal with agent-native JSON and no Node runtime. Sync your account locally to get stale, tree, usage trend and compute audit, and use preview up and wait for per-PR branch workflows.",
+    "quickstart": [
+      {
+        "command": "neon-pp-cli doctor --dry-run",
+        "comment": "Check configuration without touching the network"
+      },
+      {
+        "command": "neon-pp-cli projects list --json",
+        "comment": "Confirm your NEON_API_KEY works"
+      },
+      {
+        "command": "neon-pp-cli sync",
+        "comment": "Mirror projects, branches and endpoints locally"
+      },
+      {
+        "command": "neon-pp-cli tree",
+        "comment": "See the whole fleet at once"
+      },
+      {
+        "command": "neon-pp-cli stale --idle 14d",
+        "comment": "Find branches nobody is using"
+      }
+    ],
+    "troubleshoots": [
+      {
+        "symptom": "401 Unauthorized",
+        "fix": "Create an API key in the Neon console (Account settings \u003e API keys), then: export NEON_API_KEY=napi_xxx"
+      },
+      {
+        "symptom": "404 not allowed for organization API keys",
+        "fix": "Org API keys cannot call /users/me, /regions or /api_keys; use projects list and organizations commands instead"
+      },
+      {
+        "symptom": "423 Locked when creating or deleting a branch",
+        "fix": "Another operation is running: neon-pp-cli wait --branch pr-123 --project-id lucky-sun-123456, then retry"
+      },
+      {
+        "symptom": "Local commands show no data",
+        "fix": "Run neon-pp-cli sync first"
+      }
+    ],
+    "when_to_use": "Use this CLI to manage Neon control-plane resources: projects, branches, computes, roles, databases, operations and consumption. It suits per-PR branch automation, fleet audits and cost questions across many projects.",
+    "anti_triggers": [
+      "Running SQL queries against a database; use psql with the connection string",
+      "Schema migrations; use your migration tool",
+      "Billing invoices and payment methods; use the Neon console"
+    ],
+    "recipes": [
+      {
+        "title": "Per-PR database",
+        "command": "neon-pp-cli preview up pr-123 --project-id lucky-sun-123456 --expires 7d --agent",
+        "explanation": "Creates or reuses the branch and prints its connection string."
+      },
+      {
+        "title": "Cleanup preview",
+        "command": "neon-pp-cli stale --idle 14d --agent --select branch_name,project_id,last_active_at",
+        "explanation": "Narrow output to the fields you need for a cleanup decision."
+      },
+      {
+        "title": "Bill spike",
+        "command": "neon-pp-cli usage top --metric compute --since 7d",
+        "explanation": "Rank projects by compute over the last week."
+      },
+      {
+        "title": "Clean up idle branches",
+        "command": "neon-pp-cli prune --idle 14d",
+        "explanation": "Previews what would be deleted; re-run with --yes to delete (default and protected branches are always skipped)."
+      },
+      {
+        "title": "Save a default project",
+        "command": "neon-pp-cli context set --project-id lucky-sun-123456",
+        "explanation": "connection-string, preview up and wait then work without --project-id."
+      }
+    ],
+    "trigger_phrases": [
+      "find stale neon branches",
+      "clean up old neon branches",
+      "neon usage this week",
+      "create a neon preview branch",
+      "get a neon connection string",
+      "use neon",
+      "run neon"
+    ]
+  }
+}

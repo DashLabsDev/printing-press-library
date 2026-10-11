@@ -1,0 +1,55 @@
+version: 2
+project_name: neon-pp-cli
+changelog:
+  disable: true
+builds:
+  - id: neon-pp-cli
+    main: ./cmd/neon-pp-cli
+    binary: neon-pp-cli
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X github.com/mvanhorn/printing-press-library/library/cloud/neon/internal/cli.version={{ .Version }}
+    targets:
+      - darwin_amd64
+      - darwin_arm64
+      - linux_amd64
+      - linux_arm64
+      - windows_amd64
+      - windows_arm64
+  - id: neon-pp-mcp
+    main: ./cmd/neon-pp-mcp
+    binary: neon-pp-mcp
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
+    targets:
+      - darwin_amd64
+      - darwin_arm64
+      - linux_amd64
+      - linux_arm64
+      - windows_amd64
+      - windows_arm64
+archives:
+  - formats: [tar.gz]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+checksum:
+  name_template: checksums.txt
+brews:
+  - name: neon-pp-cli
+    repository:
+      owner: gregmushen
+      name: homebrew-tap
+    homepage: "https://github.com/mvanhorn/printing-press-library"
+    description: "Neon API commands in one static binary, plus a local fleet mirror for stale-branch cleanup, usage trends and compute audits."
+    install: |
+      bin.install "neon-pp-cli"
+      bin.install "neon-pp-mcp"

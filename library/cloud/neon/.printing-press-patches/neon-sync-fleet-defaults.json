@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "id": "neon-sync-fleet-defaults",
+  "applied_at": "2026-10-10",
+  "base_run_id": "20261010-145639-66213866",
+  "base_printing_press_version": "4.33.4",
+  "summary": "Sync projects and endpoints by default and flatten org-scoped consumption timeframes.",
+  "reason": "Generated defaults omit projects and endpoints; consumption needs rolling query defaults and organization scope. Preserve branch ancestry before generic parent metadata overwrites it.",
+  "files": [
+    "internal/cli/sync.go"
+  ],
+  "call_sites": [
+    "return syncNeonConsumption(ctx, c, db",
+    "Name: \"endpoints\", ParentTable: \"projects\"",
+    "obj[\"branch_parent_id\"] = parent",
+    "return []string{\"projects\", \"users-me-organizations\", \"consumption-history-projects\""
+  ],
+  "validated_outcome": "Provider handler tests exercise the adapter and lifecycle behavior; live proof remains blocked by environment."
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": 2,
+  "id": "neon-sync-pagination-snapshots",
+  "applied_at": "2026-10-10",
+  "base_run_id": "20261010-145639-66213866",
+  "base_printing_press_version": "4.33.4",
+  "summary": "Treat Neon's echoed cursor on an empty final page as end of list, and record per-project usage snapshots after a clean projects+branches sync.",
+  "reason": "Generated sticky-cursor guard aborted projects/operations sync as stuck, so they were never marked complete; consumption history is plan-gated (Launch/Scale), so usage commands need snapshot data.",
+  "files": ["internal/cli/sync.go"],
+  "call_sites": [
+    "if nextCursor != \"\" && nextCursor == lastNextCursor && fetchedThisPage == 0 {",
+    "if nextCursor != \"\" && nextCursor == lastNextCursor && len(items) == 0 {",
+    "neonSnapshotEligible(neonClean, neonDirty)"
+  ],
+  "validated_outcome": "Live sync against an org API key completes projects/branches/endpoints/operations with no stuck_pagination warnings; snapshot tests in neon_usage_snapshots_test.go."
+}
