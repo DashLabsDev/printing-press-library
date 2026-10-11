@@ -1,0 +1,14 @@
+{
+  "schema_version": 2,
+  "id": "telnyx-campaign-cost-path",
+  "applied_at": "2026-10-10",
+  "base_run_id": "20261010-145909-a2160f77",
+  "base_printing_press_version": "4.33.4",
+  "summary": "get-campaign-cost calls /10dlc/campaign/usecase/cost.",
+  "reason": "Spec path /10dlc/campaign/usecase_cost returns 404 live.",
+  "files": [
+    "internal/cli/10dlc_get-campaign-cost.go",
+    "internal/mcp/code_orch.go",
+    "tools-manifest.json"
+  ]
+}

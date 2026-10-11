@@ -1,0 +1,14 @@
+{
+  "schema_version": 2,
+  "id": "telnyx-detail-records-record-type",
+  "applied_at": "2026-10-10",
+  "base_run_id": "20261010-145909-a2160f77",
+  "base_printing_press_version": "4.33.4",
+  "summary": "Default filter[record_type]=messaging for sync and the detail-records command.",
+  "reason": "GET /detail_records returns 400 without record_type.",
+  "files": [
+    "internal/cli/telnyx_sync_defaults.go",
+    "internal/cli/sync.go",
+    "internal/cli/promoted_detail-records.go"
+  ]
+}

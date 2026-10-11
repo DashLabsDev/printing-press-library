@@ -1,0 +1,16 @@
+{
+  "schema_version": 2,
+  "id": "telnyx-list-all-pagination",
+  "applied_at": "2026-10-10",
+  "base_run_id": "20261010-145909-a2160f77",
+  "base_printing_press_version": "4.33.4",
+  "summary": "Generated list commands page with page[number]/page[size] (Telnyx v2) or page/recordsPerPage (10DLC) under --all; 10DLC sync resources use page/recordsPerPage. --all honors a --page JSON start page/size.",
+  "reason": "Generator passed a bare page param, so --all refetched page 1 and 10DLC sync stopped after 20 rows.",
+  "files": [
+    "internal/cli/promoted_detail-records.go",
+    "internal/cli/phone-numbers_list.go",
+    "internal/cli/sync.go",
+    "internal/cli/telnyx_sync_defaults.go"
+  ],
+  "validated_outcome": "detail-records --all returned 1105 unique rows live; 10dlc sync completed."
+}

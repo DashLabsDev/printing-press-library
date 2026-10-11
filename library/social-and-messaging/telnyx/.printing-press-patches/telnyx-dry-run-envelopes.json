@@ -1,0 +1,14 @@
+{
+  "schema_version": 2,
+  "id": "telnyx-dry-run-envelopes",
+  "applied_at": "2026-10-10",
+  "base_run_id": "20261010-145909-a2160f77",
+  "base_printing_press_version": "4.33.4",
+  "summary": "jobs list/prune and media download emit writeDryRun envelopes; tail examples name a real resource.",
+  "reason": "Template dry-run paths returned non-envelope output; tail example errored.",
+  "files": [
+    "internal/cli/jobs.go",
+    "internal/cli/media_download_media.go",
+    "internal/cli/tail.go"
+  ]
+}

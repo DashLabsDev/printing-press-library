@@ -1,0 +1,53 @@
+{
+  "manifest_version": "0.3",
+  "name": "telnyx-pp-mcp",
+  "display_name": "Telnyx",
+  "version": "2.0.0",
+  "description": "Telnyx messaging, numbers, and voice endpoints, plus a synced message-history mirror, number setup audits, and spend rollups.",
+  "author": {
+    "name": "CLI Printing Press"
+  },
+  "license": "Apache-2.0",
+  "server": {
+    "type": "binary",
+    "entry_point": "bin/telnyx-pp-mcp",
+    "mcp_config": {
+      "command": "${__dirname}/bin/telnyx-pp-mcp",
+      "args": [],
+      "env": {
+        "TELNYX_API_KEY": "${user_config.telnyx_api_key}",
+        "TELNYX_API_TOKEN": "${user_config.telnyx_api_token}",
+        "TELNYX_BEARER_AUTH": "${user_config.telnyx_bearer_auth}"
+      }
+    }
+  },
+  "user_config": {
+    "telnyx_api_key": {
+      "type": "string",
+      "title": "TELNYX_API_KEY",
+      "description": "Optional. Sets TELNYX_API_KEY for the Telnyx MCP server.",
+      "sensitive": true
+    },
+    "telnyx_api_token": {
+      "type": "string",
+      "title": "TELNYX_API_TOKEN",
+      "description": "Sets TELNYX_API_TOKEN for the Telnyx MCP server. Required by the generated client for credential refresh or hand-written auth flow.",
+      "sensitive": true,
+      "required": true
+    },
+    "telnyx_bearer_auth": {
+      "type": "string",
+      "title": "TELNYX_BEARER_AUTH",
+      "description": "Optional. Sets TELNYX_BEARER_AUTH for the Telnyx MCP server.",
+      "sensitive": true
+    }
+  },
+  "compatibility": {
+    "claude_desktop": ">=1.0.0",
+    "platforms": [
+      "darwin",
+      "linux",
+      "win32"
+    ]
+  }
+}

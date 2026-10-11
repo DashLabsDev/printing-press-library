@@ -1,0 +1,12 @@
+{
+  "schema_version": 2,
+  "id": "telnyx-api-token-alias",
+  "applied_at": "2026-10-10",
+  "base_run_id": "20261010-145909-a2160f77",
+  "base_printing_press_version": "4.33.4",
+  "summary": "Accept TELNYX_API_TOKEN as an alias when TELNYX_API_KEY is unset.",
+  "reason": "Common existing shell convention.",
+  "files": [
+    "internal/config/config.go"
+  ]
+}

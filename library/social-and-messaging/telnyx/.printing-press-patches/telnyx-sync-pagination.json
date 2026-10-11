@@ -1,0 +1,12 @@
+{
+  "schema_version": 2,
+  "id": "telnyx-sync-pagination",
+  "applied_at": "2026-10-10",
+  "base_run_id": "20261010-145909-a2160f77",
+  "base_printing_press_version": "4.33.4",
+  "summary": "Sync uses page[number]/page[size]; detail-records page size 50; active_calls dependent removed.",
+  "reason": "Generator emitted bare page param so only page 1 synced; API caps detail_records at 50; active_calls 422s for non-call-control connections.",
+  "files": [
+    "internal/cli/sync.go"
+  ]
+}

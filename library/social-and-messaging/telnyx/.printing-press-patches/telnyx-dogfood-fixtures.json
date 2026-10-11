@@ -1,0 +1,12 @@
+{
+  "schema_version": 2,
+  "id": "telnyx-dogfood-fixtures",
+  "applied_at": "2026-10-10",
+  "base_run_id": "20261010-145909-a2160f77",
+  "base_printing_press_version": "4.33.4",
+  "summary": "Examples and example-value happy-args on ID-dependent generated commands; no-error-path-probe on list-by-parent endpoints.",
+  "reason": "Spec doc IDs 404 on real accounts; generator omitted examples for underivable IDs.",
+  "files": [
+    "internal/cli/10dlc_get-brand.go"
+  ]
+}

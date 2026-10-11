@@ -1,0 +1,1 @@
+Polish: scorecard 98->98, verify 100->100, gosec 1->0 (text.go db.Close error discarded explicitly), tools-audit 0. 44 gosec findings in generator-emitted files filed as retro candidates. ship_recommendation: ship.

@@ -1,0 +1,8 @@
+# Root-anchored so cmd/<binary>/ source stays tracked.
+/telnyx-pp-cli
+/telnyx-pp-cli.exe
+/telnyx-pp-mcp
+/telnyx-pp-mcp.exe
+/bin/
+/build/
+/dist/
