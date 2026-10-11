@@ -369,3 +369,47 @@ func TestSlotsEtasFailedQueryExitsNonZeroWithPartialOutput(t *testing.T) {
 		t.Fatalf("delivery only: %v", err)
 	}
 }
+
+// fakeBrowserBin writes a stub "browser" script (Unix only).
+func fakeBrowserBin(t *testing.T, body string) string {
+	t.Helper()
+	if runtime.GOOS == "windows" {
+		t.Skip("shell-script browser stub is Unix-only")
+	}
+	p := filepath.Join(t.TempDir(), "fake-chrome")
+	if err := os.WriteFile(p, []byte("#!/bin/sh\n"+body+"\n"), 0o700); err != nil {
+		t.Fatal(err)
+	}
+	return p
+}
+
+func TestBrowserLoginHonorsShortTimeoutWhenBrowserIsSilent(t *testing.T) {
+	bin := fakeBrowserBin(t, "sleep 30")
+	start := time.Now()
+	_, err := runBrowserLogin(context.Background(), browserLoginOptions{
+		StartURL: "https://example.test/", ProfileDir: filepath.Join(t.TempDir(), browserLoginProfile),
+		BrowserPath: bin, Timeout: 1500 * time.Millisecond, Out: io.Discard,
+	})
+	if el := time.Since(start); el > 6*time.Second {
+		t.Fatalf("login waited %s past a 1.5s timeout", el)
+	}
+	var te *browserLoginTimeoutError
+	if !errors.As(err, &te) {
+		t.Fatalf("err = %v, want timeout", err)
+	}
+}
+
+func TestBrowserLoginEarlyExitIsProfileInUse(t *testing.T) {
+	bin := fakeBrowserBin(t, "exit 0")
+	start := time.Now()
+	_, err := runBrowserLogin(context.Background(), browserLoginOptions{
+		StartURL: "https://example.test/", ProfileDir: filepath.Join(t.TempDir(), browserLoginProfile),
+		BrowserPath: bin, Timeout: 30 * time.Second, Out: io.Discard,
+	})
+	if !errors.Is(err, errProfileInUse) {
+		t.Fatalf("err = %v, want profile-in-use", err)
+	}
+	if el := time.Since(start); el > 6*time.Second {
+		t.Fatalf("early exit took %s to detect", el)
+	}
+}

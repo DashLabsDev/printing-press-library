@@ -265,12 +265,10 @@ func runBrowserLogin(ctx context.Context, opts browserLoginOptions) (browserLogi
 	args = append(args, opts.ExtraFlags...)
 	args = append(args, opts.StartURL)
 	started := time.Now()
-	proc, cdpc, err := startLoginBrowser(bin, args)
+	proc, cdpc, exited, err := startLoginBrowser(ctx, bin, args)
 	if err != nil {
 		return res, err
 	}
-	exited := make(chan error, 1)
-	go func() { exited <- proc.Wait() }()
 	reaped := false
 	defer func() {
 		_ = cdpc.Close()
@@ -286,6 +284,13 @@ func runBrowserLogin(ctx context.Context, opts browserLoginOptions) (browserLogi
 	verr := cdpc.Call(vctx, "Browser.getVersion", nil, nil)
 	vcancel()
 	if verr != nil {
+		if ctx.Err() != nil {
+			// Login deadline passed before the browser answered.
+			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+				return res, &browserLoginTimeoutError{Timeout: opts.Timeout}
+			}
+			return res, ctx.Err()
+		}
 		select {
 		case <-exited:
 			reaped = true
@@ -294,9 +299,6 @@ func runBrowserLogin(ctx context.Context, opts browserLoginOptions) (browserLogi
 			}
 			return res, errBrowserClosed
 		case <-time.After(2 * time.Second):
-		}
-		if ctx.Err() != nil {
-			return res, fmt.Errorf("browser did not answer on the DevTools pipe: %w", ctx.Err())
 		}
 		return res, fmt.Errorf("browser did not answer on the DevTools pipe: %w", verr)
 	}
