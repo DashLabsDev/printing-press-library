@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "slug": "neon",
+  "cli_name": "neon-pp-cli",
+  "version": "2026.10.1",
+  "released_at": "2026-10-11T08:52:49Z",
+  "source_commit": "4141b069a41683bacda7ea902116e94091f3ba10",
+  "printing_press_version": "4.33.4",
+  "run_id": "20261010-145639-66213866",
+  "changes": [
+    {
+      "title": "feat(neon): add neon",
+      "pr": 2303,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/2303",
+      "commit": "4141b069a41683bacda7ea902116e94091f3ba10"
+    }
+  ]
+}

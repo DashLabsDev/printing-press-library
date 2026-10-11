@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "slug": "bland",
+  "cli_name": "bland-pp-cli",
+  "version": "2026.10.1",
+  "released_at": "2026-10-11T08:52:49Z",
+  "source_commit": "26b2299662558c224ad765c0faa9a997305deb75",
+  "printing_press_version": "4.32.6",
+  "run_id": "20260929-130152-8c6bfe27",
+  "changes": [
+    {
+      "title": "feat(bland): add bland",
+      "pr": 2086,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/2086",
+      "commit": "26b2299662558c224ad765c0faa9a997305deb75"
+    }
+  ]
+}

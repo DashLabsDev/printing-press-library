@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "slug": "homedepot",
+  "cli_name": "homedepot-pp-cli",
+  "version": "2026.10.1",
+  "released_at": "2026-10-11T08:52:49Z",
+  "source_commit": "b3416e5b57cfbbedda5a52dd620c1d0d5b78c9c5",
+  "printing_press_version": "4.33.4",
+  "run_id": "20261010-123538-829a1650",
+  "changes": [
+    {
+      "title": "feat(homedepot): add homedepot",
+      "pr": 2301,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/2301",
+      "commit": "b3416e5b57cfbbedda5a52dd620c1d0d5b78c9c5"
+    }
+  ]
+}
