@@ -5,11 +5,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -667,6 +669,11 @@ func TestMalformedPriceAbortsPlace(t *testing.T) {
 			_, _ = w.Write([]byte(`<html><head><meta name="api-client-token" content="dummy-client-token"><meta name="api-session-token" content="dummy-session-token"></head></html>`))
 			return
 		}
+		if strings.Contains(r.URL.Path, "/select_events/") && strings.Contains(r.URL.Path, "/items") {
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`<html><body><input name="info[parent_id]" value="608348"></body></html>`))
+			return
+		}
 		if r.URL.Path == "/api/v1/orders" {
 			ordersPostCount++
 			w.WriteHeader(http.StatusOK)
@@ -803,8 +810,10 @@ func TestOrderAddOptionAmbiguity(t *testing.T) {
 <html>
 <body>
 <form>
-  <label><input name="info[options][]" value="101">Extra Sauce (+$1.00)</label>
-  <label><input name="info[options][]" value="102">Extra Cheese (+$2.00)</label>
+  <div class="option-group">
+    <label><input name="info[options][]" value="101">Extra Sauce (+$1.00)</label>
+    <label><input name="info[options][]" value="102">Extra Cheese (+$2.00)</label>
+  </div>
 </form>
 </body>
 </html>
@@ -848,5 +857,377 @@ func TestOrderAddOptionAmbiguity(t *testing.T) {
 	}
 	if !strings.Contains(err.Error(), "ambiguous option") {
 		t.Errorf("unexpected error message: %v", err)
+	}
+}
+
+func TestOrderAddRequiredOptionGroup(t *testing.T) {
+	tempHome := t.TempDir()
+	t.Setenv("FOODA_HOME", tempHome)
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		if strings.Contains(r.URL.Path, "/items/") {
+			// Item details page with required option group (Item 2)
+			_, _ = w.Write([]byte(`
+<html>
+<body>
+<form>
+  <div class="option-group">
+    <div class="required">
+      <h3>1. Spice Level</h3>
+      <span class="required">(Required:1)</span>
+    </div>
+    <label class="checkbox"><input name="info[options][]" value="201" checked="checked">Medium</label>
+    <label class="checkbox"><input name="info[options][]" value="202">Spicy</label>
+  </div>
+</form>
+</body>
+</html>
+			`))
+			return
+		}
+		_, _ = w.Write([]byte(`
+<html>
+<body>
+<div class="item" data-vendor_name="Yum Yubu">
+  <a href="/items/1" class="item__link js-item-show-link">
+    <div class="item__name">Chicken Biryani</div>
+  </a>
+</div>
+</body>
+</html>
+		`))
+	}))
+	defer server.Close()
+
+	cfg, _ := config.Load("")
+	cfg.BaseURL = server.URL
+	_ = client.New(cfg, 0, 0)
+
+	cfgPath := filepath.Join(tempHome, "config", "fooda_config.json")
+	_ = os.MkdirAll(filepath.Join(tempHome, "config"), 0o700)
+	cfgJSON, _ := json.Marshal(map[string]any{"base_url": server.URL})
+	_ = os.WriteFile(cfgPath, cfgJSON, 0o600)
+
+	// Subtest A: no --option -> pre-checked defaults are automatically sent
+	{
+		cmd := RootCmd()
+		cmd.SetArgs([]string{"order", "add", "Chicken Biryani", "--event", "S608348", "--account", "over-acct", "--building", "over-bldg", "--json"})
+		cmd.PersistentFlags().Set("config", cfgPath)
+
+		var stdout, stderr bytes.Buffer
+		cmd.SetOut(&stdout)
+		cmd.SetErr(&stderr)
+
+		if err := cmd.Execute(); err != nil {
+			t.Fatalf("Subtest A failed: expected no-option default to succeed, got error: %v", err)
+		}
+		out := stdout.String()
+		var parsed map[string]any
+		_ = json.Unmarshal([]byte(out), &parsed)
+		item, _ := parsed["item"].(map[string]any)
+		opts, _ := item["options"].([]any)
+		if len(opts) != 1 || opts[0] != "Medium" {
+			t.Errorf("expected default option 'Medium' in dry-run JSON, got: %v", opts)
+		}
+	}
+
+	// Subtest B: --option Spicy -> replaces default with Spicy
+	{
+		cmd := RootCmd()
+		cmd.SetArgs([]string{"order", "add", "Chicken Biryani", "--event", "S608348", "--option", "Spicy", "--account", "over-acct", "--building", "over-bldg", "--json"})
+		cmd.PersistentFlags().Set("config", cfgPath)
+
+		var stdout, stderr bytes.Buffer
+		cmd.SetOut(&stdout)
+		cmd.SetErr(&stderr)
+
+		if err := cmd.Execute(); err != nil {
+			t.Fatalf("Subtest B failed: expected option Spicy to succeed, got error: %v", err)
+		}
+		out := stdout.String()
+		var parsed map[string]any
+		_ = json.Unmarshal([]byte(out), &parsed)
+		item, _ := parsed["item"].(map[string]any)
+		opts, _ := item["options"].([]any)
+		if len(opts) != 1 || opts[0] != "Spicy" {
+			t.Errorf("expected option 'Spicy' in dry-run JSON, got: %v", opts)
+		}
+	}
+
+	// Subtest C: invalid (too many choices selected for Required:1)
+	{
+		cmd := RootCmd()
+		cmd.SetArgs([]string{"order", "add", "Chicken Biryani", "--event", "S608348", "--option", "Medium", "--option", "Spicy", "--account", "over-acct", "--building", "over-bldg"})
+		cmd.PersistentFlags().Set("config", cfgPath)
+
+		var stdout, stderr bytes.Buffer
+		cmd.SetOut(&stdout)
+		cmd.SetErr(&stderr)
+
+		err := cmd.Execute()
+		if err == nil {
+			t.Fatalf("Subtest C expected error for choosing multiple options on Required:1 group, but it succeeded")
+		}
+		if !strings.Contains(err.Error(), "invalid number of options selected") {
+			t.Errorf("unexpected error message: %v", err)
+		}
+	}
+}
+
+func TestSecurityFirstNoCapturedTokens(t *testing.T) {
+	files, err := filepath.Glob("../client/testdata/*.html")
+	if err != nil {
+		t.Fatalf("failed to glob testdata: %v", err)
+	}
+	if len(files) == 0 {
+		t.Fatalf("no testdata files found")
+	}
+
+	for _, path := range files {
+		data, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatalf("failed to read %s: %v", path, err)
+		}
+		content := string(data)
+
+		regMeta := regexp.MustCompile(`name="api-(?:session|client)-token"\s+content="([^"]+)"`)
+		for _, m := range regMeta.FindAllStringSubmatch(content, -1) {
+			token := m[1]
+			if !strings.HasPrefix(strings.ToUpper(token), "DUMMY") {
+				t.Errorf("file %s contains non-dummy meta token: %q", path, token)
+			}
+		}
+
+		regAuthToken := regexp.MustCompile(`name="authenticity_token"\s+value="([^"]+)"`)
+		for _, m := range regAuthToken.FindAllStringSubmatch(content, -1) {
+			token := m[1]
+			if !strings.HasPrefix(strings.ToUpper(token), "DUMMY") {
+				t.Errorf("file %s contains non-dummy authenticity_token: %q", path, token)
+			}
+		}
+
+		regCSRF := regexp.MustCompile(`name="csrf-token"\s+content="([^"]+)"`)
+		for _, m := range regCSRF.FindAllStringSubmatch(content, -1) {
+			token := m[1]
+			if !strings.HasPrefix(strings.ToUpper(token), "DUMMY") {
+				t.Errorf("file %s contains non-dummy csrf-token: %q", path, token)
+			}
+		}
+	}
+}
+
+func TestPrintCartItemsAndPricingPriceFormat(t *testing.T) {
+	items := []map[string]any{
+		{"name": "Item with price_cents", "price_cents": 1599.0, "quantity": 1},
+		{"name": "Item with legacy string price", "price": "10.00", "quantity": 1},
+		{"name": "Item with legacy number price", "price": 5.99, "quantity": 1},
+		{"name": "Item with unavailable price", "quantity": 1},
+	}
+
+	var stdout bytes.Buffer
+	err := printCartItemsAndPricing(&stdout, items, map[string]any{
+		"subtotal_cents":     1000,
+		"tax_cents":          100,
+		"delivery_fee_cents": 200,
+		"subsidy_cents":      500,
+		"subsidy_code":       "TEST",
+		"total_cents":        800,
+	}, nil, &rootFlags{})
+
+	if err != nil {
+		t.Fatalf("printCartItemsAndPricing failed: %v", err)
+	}
+
+	out := stdout.String()
+	if !strings.Contains(out, "Item with price_cents ($15.99") {
+		t.Errorf("expected format for price_cents, got: %s", out)
+	}
+	if !strings.Contains(out, "Item with legacy string price ($10.00") {
+		t.Errorf("expected format for legacy string price, got: %s", out)
+	}
+	if !strings.Contains(out, "Item with legacy number price ($5.99") {
+		t.Errorf("expected format for legacy number price, got: %s", out)
+	}
+	if !strings.Contains(out, "Item with unavailable price (price unavailable") {
+		t.Errorf("expected format for unavailable price, got: %s", out)
+	}
+}
+
+func TestOrderPlaceNoEventEndToEnd(t *testing.T) {
+	tempHome := t.TempDir()
+	t.Setenv("FOODA_HOME", tempHome)
+
+	var receivedPost []byte
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		if r.URL.Path == "/my" {
+			_, _ = w.Write([]byte(`<html><head><meta name="api-client-token" content="dummy-client-token"><meta name="api-session-token" content="dummy-session-token"></head></html>`))
+			return
+		}
+		if r.URL.Path == "/graphql" {
+			// Mock searchPublicEvents response
+			_, _ = w.Write([]byte(`{
+				"data": {
+					"searchPublicEvents": {
+						"events": {
+							"nodes": [
+								{
+									"id": "608639",
+									"startTime": "2026-10-15T12:00:00Z",
+									"endTime": "2026-10-15T13:00:00Z",
+									"status": "ACTIVE",
+									"__typename": "DeliveryEventPublic",
+									"url": "https://app.fooda.com/accounts/8358/select_events/S609639/items",
+									"deliveryWindow": {
+										"startTime": "2026-10-15T12:00:00Z"
+									}
+								}
+							]
+						}
+					}
+				}
+			}`))
+			return
+		}
+		if r.URL.Path == "/api/v2/select_events/by" {
+			_, _ = w.Write([]byte(`{"select_event":{"id":608639,"locations":[{"id":123}]}}`))
+			return
+		}
+		if r.URL.Path == "/api/v1/cart/items" {
+			_, _ = w.Write([]byte(`{"data":{"items":[{"name":"Taco","price_cents":1000,"quantity":1}]}}`))
+			return
+		}
+		if r.URL.Path == "/api/v1/cart/price" {
+			_, _ = w.Write([]byte(`{"data":{"pricing":{"total_cents": 0}}}`))
+			return
+		}
+		if r.URL.Path == "/api/v1/orders" {
+			body, _ := io.ReadAll(r.Body)
+			receivedPost = body
+			_, _ = w.Write([]byte(`{"data":{"orders":[{"id":9999,"request_id":"uuid-new","status":"placed","delivery_time":"today","subtotal_amount_cents":1000,"subsidy_cents":1000,"total_cents":0,"items":[{"name":"Taco","quantity":1}]}]}}`))
+			return
+		}
+	}))
+	defer server.Close()
+
+	cfg, _ := config.Load("")
+	cfg.BaseURL = server.URL
+	_ = client.New(cfg, 0, 0)
+
+	cmd := RootCmd()
+	cmd.SetArgs([]string{"order", "place", "--confirm", "--account", "over-acct", "--building", "over-bldg"})
+	cfgPath := filepath.Join(tempHome, "config", "fooda_config.json")
+	_ = os.MkdirAll(filepath.Join(tempHome, "config"), 0o700)
+	cfgJSON, _ := json.Marshal(map[string]any{"base_url": server.URL})
+	_ = os.WriteFile(cfgPath, cfgJSON, 0o600)
+	cmd.PersistentFlags().Set("config", cfgPath)
+
+	var stdout, stderr bytes.Buffer
+	cmd.SetOut(&stdout)
+	cmd.SetErr(&stderr)
+
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("order place end-to-end failed: %v, stderr: %s", err, stderr.String())
+	}
+
+	var parsed map[string]any
+	if err := json.Unmarshal(receivedPost, &parsed); err != nil {
+		t.Fatalf("failed to parse received POST body: %v", err)
+	}
+	locs, _ := parsed["locations"].([]any)
+	if len(locs) == 0 {
+		t.Fatalf("locations missing from POST body: %s", string(receivedPost))
+	}
+	loc, _ := locs[0].(map[string]any)
+	if fmt.Sprintf("%v", loc["select_event_id"]) != "608639" {
+		t.Errorf("expected select_event_id 608639, got %v", loc["select_event_id"])
+	}
+}
+
+func TestOrderPlacePlainTextPreviewPricing(t *testing.T) {
+	tempHome := t.TempDir()
+	t.Setenv("FOODA_HOME", tempHome)
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		if r.URL.Path == "/my" {
+			_, _ = w.Write([]byte(`<html><head><meta name="api-client-token" content="dummy-client-token"><meta name="api-session-token" content="dummy-session-token"></head></html>`))
+			return
+		}
+		if strings.Contains(r.URL.Path, "/select_events/") && strings.Contains(r.URL.Path, "/items") {
+			_, _ = w.Write([]byte(`<html><body><input name="info[parent_id]" value="608639"></body></html>`))
+			return
+		}
+		if r.URL.Path == "/api/v2/select_events/by" {
+			_, _ = w.Write([]byte(`{"select_event":{"id":608639,"locations":[{"id":123}],"vendors":[{"id":1,"name":"Taco Shop"}]}}`))
+			return
+		}
+		if r.URL.Path == "/api/v1/cart/items" {
+			_, _ = w.Write([]byte(`{"data":{"items":[{"name":"Taco","price_cents":1999,"quantity":1,"vendor_id":1}]}}`))
+			return
+		}
+		if r.URL.Path == "/api/v1/cart/price" {
+			// subtotal_cents=1999, tax_cents=150, delivery_fee_cents=300, subsidy_cents=1000, total_cents=1449
+			_, _ = w.Write([]byte(`{"data":{"pricing":{"subtotal_cents":1999,"tax_cents":150,"delivery_fee_cents":300,"subsidy_cents":1000,"total_cents":1449}}}`))
+			return
+		}
+	}))
+	defer server.Close()
+
+	cfg, _ := config.Load("")
+	cfg.BaseURL = server.URL
+	_ = client.New(cfg, 0, 0)
+
+	cmd := RootCmd()
+	cmd.SetArgs([]string{"order", "place", "--event", "S608639", "--account", "over-acct", "--building", "over-bldg", "--allow-charge"})
+	cfgPath := filepath.Join(tempHome, "config", "fooda_config.json")
+	_ = os.MkdirAll(filepath.Join(tempHome, "config"), 0o700)
+	cfgJSON, _ := json.Marshal(map[string]any{"base_url": server.URL})
+	_ = os.WriteFile(cfgPath, cfgJSON, 0o600)
+	cmd.PersistentFlags().Set("config", cfgPath)
+
+	var stdout, stderr bytes.Buffer
+	cmd.SetOut(&stdout)
+	cmd.SetErr(&stderr)
+
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("order place preview failed: %v", err)
+	}
+
+	out := stdout.String()
+	if !strings.Contains(out, "Subtotal:     $19.99") {
+		t.Errorf("missing expected subtotal $19.99, got: %s", out)
+	}
+	if !strings.Contains(out, "Tax:          $1.50") {
+		t.Errorf("missing expected tax $1.50, got: %s", out)
+	}
+	if !strings.Contains(out, "Delivery Fee: $3.00") {
+		t.Errorf("missing expected delivery fee $3.00, got: %s", out)
+	}
+	if !strings.Contains(out, "Subsidy:      -$10.00") {
+		t.Errorf("missing expected subsidy -$10.00, got: %s", out)
+	}
+	if !strings.Contains(out, "Total Paid:   $14.49") {
+		t.Errorf("missing expected total paid $14.49, got: %s", out)
+	}
+}
+
+func TestCartItemPriceString(t *testing.T) {
+	cases := []struct {
+		name string
+		in   map[string]any
+		want string
+	}{
+		{"cents float", map[string]any{"price_cents": float64(1999)}, "$19.99"},
+		{"cents zero is real zero", map[string]any{"price_cents": float64(0)}, "$0.00"},
+		{"legacy string", map[string]any{"price": "10.00"}, "$10.00"},
+		{"legacy number", map[string]any{"price": 12.5}, "$12.50"},
+		{"missing", map[string]any{}, "price unavailable"},
+	}
+	for _, tc := range cases {
+		if got := cartItemPriceString(tc.in); got != tc.want {
+			t.Errorf("%s: got %q want %q", tc.name, got, tc.want)
+		}
 	}
 }
