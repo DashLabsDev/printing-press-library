@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.10.1 - 2026-10-11
+
+- fix(clinical-trials): carry first_posted date on normalized trials (#2298).
+
 ## 2026.9.14 - 2026-09-20
 
 - test(clinical-trials): guard the ctgov network failure paths (#2022).
