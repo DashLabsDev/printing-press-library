@@ -5405,6 +5405,12 @@
         "Filter lockers by inside or outside the ticket gates using Multi Ekicube data (exactly one bank within 15 m); unknown gate side never matches, so areas without Multi Ekicube banks return no matches."
       ],
       "path": "library/travel/coinlocker-navi",
+      "release": {
+        "cli_name": "coinlocker-navi-pp-cli",
+        "version": "2026.10.1",
+        "released_at": "2026-10-10T08:56:54Z",
+        "source_commit": "24b9ba5e3db31f0c8677b8be84171b2da5c3eb78"
+      },
       "printer": "zjsng",
       "printer_name": "zjsng",
       "creator": {
@@ -9939,6 +9945,12 @@
         "Search menu items across all of today's events."
       ],
       "path": "library/food-and-dining/fooda",
+      "release": {
+        "cli_name": "fooda-pp-cli",
+        "version": "2026.10.1",
+        "released_at": "2026-10-10T08:56:54Z",
+        "source_commit": "fdb1e53e895a5839598dee6f836b13fe861c99ee"
+      },
       "printer": "enlewof",
       "printer_name": "Allen Lew",
       "creator": {
@@ -14769,6 +14781,12 @@
         "On the park day, see live waits next to the usual wait for this weekday and hour from your own snapshots, with sample counts."
       ],
       "path": "library/travel/japan-theme-parks",
+      "release": {
+        "cli_name": "japan-theme-parks-pp-cli",
+        "version": "2026.10.1",
+        "released_at": "2026-10-10T08:56:54Z",
+        "source_commit": "6f1c0c6001a9e5e434be76965b52888e48c1e20d"
+      },
       "printer": "zjsng",
       "printer_name": "zjsng",
       "creator": {
@@ -14808,6 +14826,12 @@
         "For teamLab venues, keep only time slots with enough stock for the whole party; for every sight, flag channel rules for children (for example SHIBUYA SKY child tickets at the counter only)."
       ],
       "path": "library/travel/japan-timed-tickets",
+      "release": {
+        "cli_name": "japan-timed-tickets-pp-cli",
+        "version": "2026.10.1",
+        "released_at": "2026-10-10T08:56:54Z",
+        "source_commit": "f84e442f9ca72536ec7de62eb0f7fc0df4898506"
+      },
       "printer": "zjsng",
       "printer_name": "zjsng",
       "creator": {
@@ -16407,9 +16431,9 @@
       "path": "library/social-and-messaging/linq",
       "release": {
         "cli_name": "linq-pp-cli",
-        "version": "2026.9.1",
-        "released_at": "2026-09-11T09:22:21Z",
-        "source_commit": "81f5764eda401077520268afe74913c0f21f5b7e"
+        "version": "2026.10.1",
+        "released_at": "2026-10-10T20:37:58Z",
+        "source_commit": "77fa53e95ed498ff4a1aa81defe63d48c1125e23"
       },
       "printer": "cathrynlavery",
       "printer_name": "Cathryn Lavery",
@@ -18172,9 +18196,9 @@
       "path": "library/developer-tools/namecheap",
       "release": {
         "cli_name": "namecheap-pp-cli",
-        "version": "2026.10.2",
-        "released_at": "2026-10-09T20:30:33Z",
-        "source_commit": "f13addeb35c48ae23cf3a93304900c026f1ad04a"
+        "version": "2026.10.3",
+        "released_at": "2026-10-10T19:35:36Z",
+        "source_commit": "0f6bfc3acc69b981f6a386ddbf2127ffeb28f620"
       },
       "printer": "cathrynlavery",
       "printer_name": "Cathryn Lavery",
@@ -18484,6 +18508,61 @@
         "env_vars": [],
         "mcp_ready": "full",
         "spec_format": "internal"
+      }
+    },
+    {
+      "name": "neon",
+      "category": "cloud",
+      "api": "Neon",
+      "description": "Neon API commands in one static binary, plus a local fleet mirror for stale-branch cleanup, usage trends and compute audits.",
+      "search_terms": [
+        "neon",
+        "neon-pp-cli",
+        "Neon API commands in one static binary, plus a local fleet mirror for stale-branch cleanup, usage trends and compute audits.",
+        "Stale branches",
+        "stale",
+        "Find idle or expired branches across every project from the local mirror (run sync first), with delete commands for non-default branches.",
+        "Fleet tree",
+        "tree",
+        "See every org, project, branch and compute in one hierarchy from the local mirror (run sync first).",
+        "Usage trends",
+        "usage trend",
+        "Track compute, storage and transfer per project with period-over-period deltas; on plans without consumption history (below Launch/Scale) it uses per-sync snapshots (basis: sync-snapshots).",
+        "Usage top",
+        "Rank projects by compute, storage, transfer or written data; on plans without consumption history it ranks period-to-date totals from sync snapshots (basis: sync-snapshots).",
+        "Operation wait",
+        "wait",
+        "Block until a branch's async operations finish; exits 0 when done, 6 if an operation failed, 8 on timeout.",
+        "Preview branch up",
+        "preview up",
+        "Create a real branch (or reuse an existing one by name), wait until ready and print its connection string; --expires applies only to newly created branches.",
+        "Branch prune",
+        "prune",
+        "Preview idle or expired branches to delete (from the local mirror); --yes actually deletes them, always skipping default and protected branches.",
+        "Compute audit",
+        "Flag computes that never scale to zero, have fixed autoscaling, or are oversized on non-default branches, from the local mirror (run sync first)."
+      ],
+      "path": "library/cloud/neon",
+      "printer": "gregmushen",
+      "printer_name": "Greg Mushen",
+      "creator": {
+        "handle": "gregmushen",
+        "name": "Greg Mushen"
+      },
+      "mcp": {
+        "binary": "neon-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 184,
+        "public_tool_count": 0,
+        "auth_type": "bearer_token",
+        "env_vars": [
+          "NEON_API_KEY"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "openapi3"
       }
     },
     {
@@ -24909,9 +24988,9 @@
       "path": "library/other/scientific-consensus",
       "release": {
         "cli_name": "scientific-consensus-pp-cli",
-        "version": "2026.9.4",
-        "released_at": "2026-09-17T09:10:25Z",
-        "source_commit": "e7832a9f92fbd1f15cef8f7fe70458cd06dd8706"
+        "version": "2026.10.1",
+        "released_at": "2026-10-10T08:56:54Z",
+        "source_commit": "46115d15264665ec71f4e86c55ce41b8c6f1eb09"
       },
       "printer": "laci141",
       "printer_name": "laci141",
@@ -31649,6 +31728,12 @@
         "--filter type:value (e.g. brand:Great Value), --sort and --list-filters from the page's sort/filter facets."
       ],
       "path": "library/commerce/walmart",
+      "release": {
+        "cli_name": "walmart-pp-cli",
+        "version": "2026.10.1",
+        "released_at": "2026-10-10T08:56:54Z",
+        "source_commit": "66488c5c1df9ac1d8250441baa7f6d05c39a38bb"
+      },
       "printer": "DashLabsDev",
       "printer_name": "Thomas McCormick",
       "creator": {
