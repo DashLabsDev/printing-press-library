@@ -9671,9 +9671,9 @@
       "path": "library/travel/flight-goat",
       "release": {
         "cli_name": "flight-goat-pp-cli",
-        "version": "2026.10.1",
-        "released_at": "2026-10-01T21:49:09Z",
-        "source_commit": "653e24fa44b47dea577b74d0a29d913036ce6707"
+        "version": "2026.10.2",
+        "released_at": "2026-10-12T08:47:00Z",
+        "source_commit": "196bffcfeda6f9b42519e86ad4a48fa9d11e4ad3"
       },
       "printer": "mvanhorn",
       "printer_name": "Matt Van Horn",
@@ -13333,6 +13333,72 @@
         ],
         "mcp_ready": "full",
         "spec_format": "openapi3"
+      }
+    },
+    {
+      "name": "hostfully",
+      "category": "travel",
+      "api": "Hostfully",
+      "description": "Hostfully reservations and guest messaging — plus caller-ID lookup, quotes, and multi-unit vacancy analysis.",
+      "search_terms": [
+        "hostfully",
+        "hostfully-pp-cli",
+        "Hostfully reservations and guest messaging — plus caller-ID lookup, quotes, and multi-unit vacancy analysis.",
+        "Caller-ID Guest Lookup",
+        "whois",
+        "Look up a guest by phone number or name and get every stay, payment status and reservation access PIN.",
+        "Guest Messaging Inbox",
+        "inbox",
+        "Read recent guest messages and threads, and reply through the reservation thread with a dry-run guard.",
+        "Live Complete Quote",
+        "quote",
+        "Price a stay for a property and dates with rent, taxes and fees itemized.",
+        "Service Jobs",
+        "jobs",
+        "List cleaning and maintenance jobs with service and provider identity, including cancelled jobs.",
+        "Multi-Unit Vacancy Finder",
+        "vacancy",
+        "Find consecutive vacant days across several units at once.",
+        "Maintenance Windows",
+        "maintenance",
+        "Find maintenance slots across units around upcoming bookings.",
+        "Turnover Gap Detection",
+        "turnover",
+        "See cleaning windows between each checkout and the next check-in.",
+        "Occupancy Rate Analysis",
+        "occupancy",
+        "Per-unit and overall occupancy for any period.",
+        "Channel Mix Analytics",
+        "channels",
+        "Break down where bookings come from over a period.",
+        "Revenue Estimation",
+        "revenue",
+        "Estimate revenue per unit and month from booked nights.",
+        "Booking Pattern Analysis",
+        "patterns",
+        "Spot weekday/weekend and seasonal booking trends."
+      ],
+      "path": "library/travel/hostfully",
+      "printer": "gregmushen",
+      "printer_name": "Greg Mushen",
+      "creator": {
+        "handle": "gregmushen",
+        "name": "Greg Mushen"
+      },
+      "mcp": {
+        "binary": "hostfully-pp-mcp",
+        "transports": [
+          "stdio",
+          "http"
+        ],
+        "tool_count": 2,
+        "public_tool_count": 0,
+        "auth_type": "api_key",
+        "env_vars": [
+          "HOSTFULLY_API_KEY"
+        ],
+        "mcp_ready": "full",
+        "spec_format": "internal"
       }
     },
     {
