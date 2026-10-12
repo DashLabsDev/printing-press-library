@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.10.2 - 2026-10-12
+
+- fix(flight-goat): propagate --class to Kayak multi-city poll cabinClass (#2308).
+
 ## 2026.10.1 - 2026-10-01
 
 - Validate Flight GOAT award search inputs and cabins (#2153).
