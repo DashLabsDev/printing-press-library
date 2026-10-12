@@ -312,9 +312,18 @@ func coalesceGraphQLPOSTBody(params map[string]string, body []byte) ([]byte, map
 	if err != nil {
 		return body, params, err
 	}
-	// Keep operationName + extensions + variables as query companions for persisted-query GETs;
-	// for POST, strip folded variable keys already moved into body (meta keys may remain).
-	return out, params, nil
+	// POST: everything now lives in the JSON body. Sending operationName /
+	// variables / extensions in the query string too makes the server answer
+	// BLANK_QUERY, so drop them from params.
+	stripped := make(map[string]string, len(params))
+	for k, v := range params {
+		switch k {
+		case "operationName", "variables", "extensions", "query":
+			continue
+		}
+		stripped[k] = v
+	}
+	return out, stripped, nil
 }
 
 // GraphQLResponseSucceeded reports whether a GraphQL HTTP response actually

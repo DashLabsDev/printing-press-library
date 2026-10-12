@@ -1,0 +1,20 @@
+{
+  "schema_version": 2,
+  "applied_at": "2026-10-10",
+  "base_run_id": "20261007-135457",
+  "base_printing_press_version": "4.31.7",
+  "id": "costco-sameday-graphql-post-body-only",
+  "summary": "GraphQL POSTs send operationName / variables / extensions only in the JSON body; coalesceGraphQLPOSTBody drops them (and any query) from the URL params. GETs keep their URL companions.",
+  "reason": "cart updatecartitemsmutation and checkout initializecheckout returned HTTP 400 \"Blank Query\" because the same fields were also sent as URL query params. order place (FinalizeCheckout) shares PostWithParams and was affected the same way.",
+  "files": [
+    "internal/client/graphql_guard.go",
+    "internal/client/graphql_post_body_test.go",
+    "internal/cli/graphql_post_wire_test.go"
+  ],
+  "markers": [
+    "coalesceGraphQLPOSTBody",
+    "TestGraphQLPOSTSendsBodyOnlyNoQueryString",
+    "TestGraphQLPostCommandsSendBodyOnly"
+  ],
+  "validated_outcome": "Local stub only (no live mutation): UpdateCartItemsMutation, InitializeCheckout and FinalizeCheckout (with charge consent) arrive as POST with an empty query string and the operation, variables and persisted hash in the body; GET persisted queries keep operationName/variables/extensions in the URL; charge-gate tests unchanged and green. The new test fails on the previous guard."
+}

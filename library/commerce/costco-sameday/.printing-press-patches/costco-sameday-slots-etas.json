@@ -1,0 +1,43 @@
+{
+  "schema_version": 2,
+  "id": "costco-sameday-slots-etas",
+  "applied_at": "2026-10-10",
+  "base_run_id": "20261007-135457",
+  "base_printing_press_version": "4.31.7",
+  "summary": "Adds read-only `slots etas` (GetAccurateRetailerEtas / GetAccurateRetailerPickupEtas for members, GetAccurateVisitorRetailerEtas / GetAccurateVisitorRetailerPickupEtas for guests, picked from a guest/member probe or --as) printing service type, earliest start/end, fee and label without ids; `slots availableservices` help names it the checkout service picker and an empty services list prints a stderr warning plus a JSON note pointing at `slots etas`; `auth status` and `session context --account-type` report guest vs signed-in member from read-only UserType / GetCurrentUserName / HouseholdByUser probes and cookie NAMES only. A failed ETA query prints the partial result (failed[], partial) and exits non-zero.",
+  "reason": "Smoke: `slots availableservices` returned 0 services while the site showed delivery windows. AvailableServices is checkout-scoped, the box session was a guest, and nothing told the user either.",
+  "shape_sources": {
+    "GetAccurateRetailerEtas": "sameday.costco.com public rspack chunk (module 20847, 2026-10-10): variables {addressId, homeLoadUuid, postalCode, retailerIds, serviceType: DELIVERY}; response data.getAccurateRetailerEtas[] {retailerId, retailerLocationId, etaSeconds, viewSection}",
+    "GetAccurateVisitorRetailerEtas": "public rspack chunk (module 30379): variables {postalCode, retailerIds, explicitRetailerLocationIds, serviceType: DELIVERY}; response data.getAccurateRetailerEtas[]",
+    "GetAccurateRetailerPickupEtas": "public rspack chunk (module 51816, AccuratePickupEtas.tsx): variables {shopIds (pickup shops), retailerLocations}; response data.pickupEtas[]",
+    "GetAccurateVisitorRetailerPickupEtas": "public rspack chunk (module 95186): variables {shopIds, retailerLocations}; response data.pickupEtas[]",
+    "serviceType enum": "public bundle enum DELIVERY|INSTORE|PICKUP|SCAN_AND_PAY|VIRTUAL",
+    "hashes": "internal/client/persisted_queries_seed.json (already present)",
+    "live_confirmed_2026-10-10": "Read-only live run with a signed-in member session: items carry etaSeconds (float), retailerId and viewSection {etaString, condensedEtaString, etaTemplateString, homeCondensedEtaString, homeCondensedEtaXMinFormatString, etaVariant}; no fee field and no window end. ShopCollectionScoped shops carry retailerId (Costco = 5); GetRetailerIdBySlug {slug} answers data.retailer.id. explicitRetailerLocationIds is [AvailabilityRetailerLocationInput!] objects {retailerId, retailerLocationId} (server rejected bare ids; fixed). UserType answers data.currentUser {guest, id, userAccount, accountSwitcherOptional}; GetCurrentUserName answers data.currentUser.firstName. No pickup shop is listed for the tested ZIPs; the site also derives pickup ETAs only from serviceType=pickup shops."
+  },
+  "files": [
+    "internal/client/etas.go",
+    "internal/cli/slots_etas.go",
+    "internal/cli/slots_etas_test.go",
+    "internal/cli/account_type.go",
+    "internal/cli/slots_availableservices.go",
+    "internal/cli/auth.go",
+    "internal/cli/session_context.go"
+  ],
+  "markers": [
+    "newSlotsEtasCmd",
+    "availableServicesEmptyNote",
+    "availableServicesLong",
+    "withJSONNote",
+    "probeAccountType",
+    "cookieNameHintsFrom",
+    "authStatusProbe",
+    "withAccountType",
+    "CostcoShops",
+    "CostcoRetailerID",
+    "etaNoFeeNote",
+    "anyFee",
+    "failErr"
+  ],
+  "validated_outcome": "go build/vet green; go test ./internal/cli (synthetic httptest fixtures, fake ids) green: guest uses visitor queries with postalCode/retailerIds/explicitRetailerLocationIds, member uses member queries with homeLoadUuid, --as skips the probe, unknown falls back to visitor, retailer id comes from shop then GetRetailerIdBySlug then the assumed id, no fake id appears in output, empty AvailableServices warns on stderr and adds a JSON note. Pre-existing TestCacheKeyPartitionsTenantSelectingHeaders failure on base is unchanged. Live (read-only, 2026-10-10): member and guest delivery queries answered for two ZIPs; the visitor location type and the no-fee note were fixed and covered by fake-value tests."
+}

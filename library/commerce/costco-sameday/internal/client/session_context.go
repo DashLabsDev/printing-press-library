@@ -48,6 +48,8 @@ const (
 	ctxVarZoneID       = "zoneId"
 	ctxVarPostalCode   = "postalCode"
 	ctxVarUserLocation = "userLocation"
+	ctxVarAddressID    = "addressId"
+	ctxVarSubtotal     = "subtotal"
 )
 
 // sessionContextOperations maps read operations to the session-derived
@@ -75,6 +77,11 @@ var sessionContextOperations = map[string][]string{
 	"SearchResultsPlacements":       {ctxVarShopID, ctxVarZoneID, ctxVarPostalCode},
 	"SlotCampaignPlacement":         {ctxVarShopID, ctxVarZoneID, ctxVarPostalCode},
 	"ComplementaryProductItems":     {ctxVarShopID, ctxVarZoneID, ctxVarPostalCode},
+	// CartSignaledEta: the store header passes the user location's addressId
+	// (chunk 95722); it is filled from the saved address matching the ZIP.
+	// subtotal is SharedMoneyInput {amount, currencyCode}; the site sends
+	// CartTotals.retailerTotal. A bare --subtotal number is wrapped in USD.
+	"CartSignaledEta": {ctxVarShopID, ctxVarCartID, ctxVarPostalCode, ctxVarAddressID, ctxVarSubtotal},
 }
 
 var postalCodeRe = regexp.MustCompile(`^\d{5}$`)
@@ -140,13 +147,13 @@ func needsForVars(vars []string) SessionNeeds {
 		switch v {
 		case ctxVarShopID:
 			n.Shop = true
-		case ctxVarCartID:
+		case ctxVarCartID, ctxVarSubtotal:
 			n.Shop, n.Cart = true, true
 		case ctxVarZoneID:
 			n.Zone = true
 		case ctxVarPostalCode:
 			n.Location = true
-		case ctxVarUserLocation:
+		case ctxVarUserLocation, ctxVarAddressID:
 			n.Location = true
 		}
 	}
@@ -447,7 +454,7 @@ func (c *Client) ResolveSessionContext(ctx context.Context, needs SessionNeeds) 
 		} else {
 			cartID, err := c.fetchActiveCartID(ctx, out.ShopID)
 			if err != nil {
-				return out, fmt.Errorf("could not resolve the active cartId (requires a signed-in session; run 'costco-sameday-pp-cli auth login --chrome' if it expired): %w", err)
+				return out, fmt.Errorf("could not resolve the active cartId (requires a signed-in session; run 'costco-sameday-pp-cli auth login' if it expired): %w", err)
 			}
 			out.CartID = cartID
 			updates = append(updates, func(cc *sessionContextCache) {
@@ -680,8 +687,10 @@ func postalFromLocationValue(v any) string {
 
 // fillSessionContextParams fills session-derived variables a known read
 // operation declares but the caller left empty. It never overrides explicit
-// values, never runs in verify/dry-run mode, and never fails the request: a
-// resolution error is returned so a later GraphQL error can explain it.
+// values and never runs in verify/dry-run mode. A resolution error is
+// returned so a later GraphQL error can explain it; an *InvalidParamError
+// (bad --subtotal, ambiguous address, explicit cart without a readable
+// total) stops the request before it is sent.
 func (c *Client) fillSessionContextParams(ctx context.Context, method, path string, params map[string]string) (map[string]string, error) {
 	if c == nil || c.DryRun || !strings.Contains(path, "graphql") || !strings.EqualFold(method, "GET") {
 		return params, nil
@@ -693,6 +702,10 @@ func (c *Client) fillSessionContextParams(ctx context.Context, method, path stri
 	vars, ok := sessionContextOperations[op]
 	if !ok {
 		return params, nil
+	}
+	params, err := normalizeMoneyParam(params, ctxVarSubtotal)
+	if err != nil {
+		return params, &InvalidParamError{Err: err}
 	}
 	var missing []string
 	for _, v := range vars {
@@ -729,12 +742,50 @@ func (c *Client) fillSessionContextParams(ctx context.Context, method, path stri
 			val = sc.PostalCode
 		case ctxVarUserLocation:
 			val = sc.UserLocationJSON()
+		case ctxVarSubtotal:
+			// Total the cart the caller named, not the active cart.
+			totalCtx := sc
+			if graphQLVariablePresent(params, ctxVarCartID) {
+				totalCtx.CartID = graphQLVariableString(params, ctxVarCartID)
+			}
+			if graphQLVariablePresent(params, ctxVarShopID) {
+				totalCtx.ShopID = graphQLVariableString(params, ctxVarShopID)
+			}
+			val = c.cartSubtotalJSON(ctx, totalCtx)
+			if val == "" && graphQLVariablePresent(params, ctxVarCartID) {
+				resolveErr = errors.Join(resolveErr, &InvalidParamError{Err: fmt.Errorf("could not read the total of cart %s (--cart-id); pass --subtotal <amount>", totalCtx.CartID)})
+			}
+		case ctxVarAddressID:
+			if addrs, err := c.UserAddresses(ctx); err == nil {
+				var pickErr error
+				val, _, pickErr = PickAddressID(addrs, firstNonEmptyString(graphQLVariableString(updated, ctxVarPostalCode), sc.PostalCode))
+				if pickErr != nil {
+					resolveErr = errors.Join(resolveErr, &InvalidParamError{Err: pickErr})
+				}
+			}
 		}
 		if val != "" {
 			updated[v] = val
 		}
 	}
 	return updated, resolveErr
+}
+
+// InvalidParamError is a session-context problem the request must not be
+// sent with (malformed --subtotal, ambiguous saved address, unreadable total
+// for an explicit --cart-id). It fails the command before any request.
+type InvalidParamError struct{ Err error }
+
+func (e *InvalidParamError) Error() string { return e.Err.Error() }
+func (e *InvalidParamError) Unwrap() error { return e.Err }
+
+// AsInvalidParam returns the first *InvalidParamError in err (or nil).
+func AsInvalidParam(err error) *InvalidParamError {
+	var inv *InvalidParamError
+	if errors.As(err, &inv) {
+		return inv
+	}
+	return nil
 }
 
 // GraphQLError reports a GraphQL response that carried errors and no data.
@@ -776,7 +827,7 @@ func missingVariableHint(name string) string {
 	case ctxVarShopID:
 		return "shopId is looked up from your delivery ZIP; pass --zip <ZIP> (or --shop-id). Run 'costco-sameday-pp-cli session context --zip <ZIP>' to check."
 	case ctxVarCartID:
-		return "cartId is your active cart and needs a signed-in session; run 'costco-sameday-pp-cli session context' (or 'auth login --chrome' if the session expired), or pass --cart-id."
+		return "cartId is your active cart and needs a signed-in session; run 'costco-sameday-pp-cli session context' (or 'auth login' if the session expired), or pass --cart-id."
 	case ctxVarZoneID, ctxVarPostalCode:
 		return "pass --zip <ZIP>; run 'costco-sameday-pp-cli session context --zip <ZIP>' to check the resolved location."
 	case ctxVarUserLocation:
@@ -865,4 +916,96 @@ func NewPageViewID() string {
 	b[8] = (b[8] & 0x3f) | 0x80
 	h := hex.EncodeToString(b[:])
 	return h[0:8] + "-" + h[8:12] + "-" + h[12:16] + "-" + h[16:20] + "-" + h[20:32]
+}
+
+func firstNonEmptyString(vals ...string) string {
+	for _, v := range vals {
+		if strings.TrimSpace(v) != "" {
+			return strings.TrimSpace(v)
+		}
+	}
+	return ""
+}
+
+// moneyAmountRe is a plain decimal amount: digits, optionally a dot and one
+// or two decimals ("42", "42.5", "42.50"). Signs, exponents, a bare or
+// trailing dot, thousands separators and currency symbols are rejected.
+var moneyAmountRe = regexp.MustCompile(`^(0|[1-9][0-9]*)(\.[0-9]{1,2})?$`)
+
+// normalizeMoneyParam turns a bare amount flag value ("42.50") into a
+// SharedMoneyInput JSON object in USD with the amount as a decimal string.
+// A JSON object must carry a string or number amount in the same form and a
+// three-letter currencyCode; anything else is an error, never passed through.
+func normalizeMoneyParam(params map[string]string, name string) (map[string]string, error) {
+	raw := strings.TrimSpace(params[name])
+	if raw == "" {
+		return params, nil
+	}
+	amount, currency := raw, "USD"
+	if strings.HasPrefix(raw, "{") {
+		var obj map[string]any
+		dec := json.NewDecoder(strings.NewReader(raw))
+		dec.UseNumber()
+		if err := dec.Decode(&obj); err != nil {
+			return params, fmt.Errorf("invalid --%s: not a JSON object: %v", kebabFlagName(name), err)
+		}
+		switch v := obj["amount"].(type) {
+		case string:
+			amount = strings.TrimSpace(v)
+		case json.Number:
+			amount = v.String()
+		default:
+			return params, fmt.Errorf("invalid --%s: \"amount\" must be a decimal like 42.50", kebabFlagName(name))
+		}
+		if cc, ok := obj["currencyCode"]; ok {
+			s, _ := cc.(string)
+			if len(s) != 3 || strings.ToUpper(s) != s || strings.ToLower(s) == s {
+				return params, fmt.Errorf("invalid --%s: currencyCode must be a three-letter code like USD", kebabFlagName(name))
+			}
+			currency = s
+		}
+		for k := range obj {
+			if k != "amount" && k != "currencyCode" {
+				return params, fmt.Errorf("invalid --%s: unexpected field %q (only amount and currencyCode)", kebabFlagName(name), k)
+			}
+		}
+	}
+	if !moneyAmountRe.MatchString(amount) {
+		return params, fmt.Errorf("invalid --%s %q: use a plain amount like 42 or 42.50 (no sign, exponent, symbol or trailing dot)", kebabFlagName(name), amount)
+	}
+	b, err := json.Marshal(map[string]string{"amount": amount, "currencyCode": currency})
+	if err != nil {
+		return params, err
+	}
+	out := make(map[string]string, len(params))
+	for k, v := range params {
+		out[k] = v
+	}
+	out[name] = string(b)
+	return out, nil
+}
+
+// cartSubtotalJSON reads CartTotals.retailerTotal for the resolved cart as a
+// SharedMoneyInput JSON string ("" when unavailable).
+func (c *Client) cartSubtotalJSON(ctx context.Context, sc SessionContext) string {
+	if sc.ShopID == "" || sc.CartID == "" {
+		return ""
+	}
+	payload, err := c.graphQLGet(withSessionResolving(ctx), "CartTotals", map[string]any{"shopId": sc.ShopID, "cartId": sc.CartID}, false)
+	if err != nil {
+		return ""
+	}
+	total, _ := digJSON(payload, "data", "cartTotals", "retailerTotal").(map[string]any)
+	if total == nil || total["amount"] == nil {
+		return ""
+	}
+	cur := jsonString(total["currencyCode"])
+	if cur == "" {
+		cur = "USD"
+	}
+	b, err := json.Marshal(map[string]any{"amount": total["amount"], "currencyCode": cur})
+	if err != nil {
+		return ""
+	}
+	return string(b)
 }

@@ -1,0 +1,27 @@
+{
+  "schema_version": 2,
+  "applied_at": "2026-10-10",
+  "base_run_id": "20261007-135457",
+  "base_printing_press_version": "4.31.7",
+  "id": "costco-sameday-slots-window-picker",
+  "summary": "Adds read-only `slots windows` (CheckoutPricedServiceOptionsForDateRange {checkoutSessionId, startDate}) listing option, date, time, window and price/savings label with tokens hidden by default, and `slots pick` (UpdateCheckout checkoutUpdates.serviceOptionUpdate {serviceOptionToken}) gated by --yes with a --dry-run preview; it never finalizes. `slots pick` reports updated:true only when data.updateCheckout is present and not an *Error typename (the checkout page's CheckoutCheckoutErrorResponse) with no top-level errors; otherwise it prints updated:false and exits non-zero. --show-tokens also prints tokens in table output.",
+  "reason": "No CLI way to see or choose delivery windows for an open checkout.",
+  "shape_sources": {
+    "CheckoutPricedServiceOptionsForDateRange": "public rspack chunk 93526 (CheckoutCheckoutStepTypesPricedServiceOptionsStep/queries.ts): operation query, variables {checkoutSessionId, startDate yyyy-MM-dd}; response pricedServiceOptions.presentableFormat.layeredOptions[].layeredOption (SingleSelectionOption.serviceOption | ScheduleSelectionOption.dateGroups[].serviceOptionLines[]) with viewSection postCheckoutDateString/TimeString/WindowString and priceFormattedAttributesString; confirmed by a read-only live run",
+    "UpdateCheckout serviceOptionUpdate": "same chunk: the step's updateCheckout({serviceOptionToken[, selectionMode]}) maps to checkoutUpdates.serviceOptionUpdate",
+    "UpdateCheckout": "public rspack chunk 93526 (CheckoutFlow store): throws on errors[], requires data.updateCheckout, treats __typename CheckoutCheckoutErrorResponse (errors[]) as updated:false"
+  },
+  "files": [
+    "internal/cli/slots_window_picker.go",
+    "internal/cli/slots_window_picker_test.go",
+    "internal/cli/greptile_fixes_test.go"
+  ],
+  "markers": [
+    "newSlotsWindowsCmd",
+    "newSlotsPickCmd",
+    "parseDeliveryWindows",
+    "checkoutSessionEnvName",
+    "pickResult"
+  ],
+  "validated_outcome": "Fake-value stub tests: windows is GET-only, hides tokens unless --show-tokens, surfaces service-option error toasts; pick refuses without --yes, sends nothing on --dry-run, sends POST UpdateCheckout with the chosen token and no query string on --yes, never calls FinalizeCheckout. Live: windows listed read-only against the open checkout; pick NOT run live. File name avoids the _windows.go GOOS suffix."
+}

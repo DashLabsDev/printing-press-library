@@ -959,6 +959,9 @@ func (c *Client) doInternal(ctx context.Context, method, path string, params map
 	// cartId / zoneId / postalCode / userLocation that a known read operation
 	// declares but the caller left empty. Explicit values always win.
 	params, sessionResolveErr := c.fillSessionContextParams(ctx, method, path, params)
+	if inv := AsInvalidParam(sessionResolveErr); inv != nil {
+		return nil, 0, inv
+	}
 	targetURL := c.BaseURL + path
 
 	var bodyBytes []byte

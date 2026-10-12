@@ -161,12 +161,22 @@ func newAuthLoginCmd(flags *rootFlags) *cobra.Command {
 	var profileFlag string
 	var cookiesFile string
 	var diagnose bool
+	var bl browserLoginFlags
 
 	cmd := &cobra.Command{
 		Use:   "login",
-		Short: "Authenticate with the API",
-		Long: `Authenticate using your browser session.
+		Short: "Sign in: opens a browser window, you sign in, the session is saved",
+		Long: `Sign in to Costco Same-Day.
 
+With no flags, auth login opens your installed Chrome/Chromium in a separate
+profile owned by this CLI (not your everyday Chrome profile). Sign in with
+"Sign in via Costco.com" as usual. The CLI reads only the Same-Day session
+cookies (__Host-instacart_sid plus its companions) from that window over the
+DevTools protocol, saves them, and closes the window. It does not read your
+main Chrome cookie store or the Chrome Safe Storage keychain entry. The
+browser runs only during login; other commands use plain HTTP.
+
+Fallbacks:
 Use --chrome to read cookies from Chrome for sameday.costco.com.
 Use --browser as an alias for --chrome.
 --chrome and --browser require a cookie extraction tool (pycookiecheat, cookies, or cookie-scoop-cli).
@@ -184,7 +194,9 @@ and so on) are kept when present and never required.
 If you have multiple Chrome profiles, pycookiecheat and cookie-scoop-cli can
 auto-detect which profile is logged in. Use --profile to select a specific
 profile by name when the installed backend supports it.`,
-		Example: `  costco-sameday-pp-cli auth login --chrome
+		Example: `  costco-sameday-pp-cli auth login
+  costco-sameday-pp-cli auth login --timeout 15m
+  costco-sameday-pp-cli auth login --chrome
   costco-sameday-pp-cli auth login --browser
   costco-sameday-pp-cli auth login --cookies-file storage-state.json
   pbpaste | costco-sameday-pp-cli auth login --cookies-file -
@@ -214,13 +226,7 @@ profile by name when the installed backend supports it.`,
 				}
 				return nil
 			}
-			if !browserFlag && cookiesFile == "" {
-				fmt.Fprintln(w, "Use --chrome, --browser, or --cookies-file to authenticate from your browser session:")
-				fmt.Fprintf(cmd.OutOrStdout(), "  costco-sameday-pp-cli auth login --chrome\n")
-				fmt.Fprintf(cmd.OutOrStdout(), "  costco-sameday-pp-cli auth login --browser\n")
-				fmt.Fprintf(cmd.OutOrStdout(), "  costco-sameday-pp-cli auth login --cookies-file storage-state.json\n")
-				return nil
-			}
+			loginWindow := !browserFlag && cookiesFile == ""
 			if browserFlag && cookiesFile != "" {
 				return authErr(fmt.Errorf("choose either --chrome/--browser or --cookies-file, not both"))
 			}
@@ -235,8 +241,23 @@ profile by name when the installed backend supports it.`,
 			// through — the legacy chain may succeed if persistent cookies
 			// are already on disk.
 			var cookies string
+			var sessionExpiry time.Time
 			fromPressAuth := false
 			fromCookiesFile := false
+			if loginWindow {
+				res, err := runBrowserLoginFromFlags(cmd, flags, bl)
+				if err != nil {
+					return authErr(browserLoginHint(err))
+				}
+				cookies = cookieHeaderOf(res.Cookies)
+				sessionExpiry = res.Expires
+				fromCookiesFile = true // skip press-auth and the Chrome-store chain
+				if res.AccountType.Type == accountTypeMember {
+					fmt.Fprintf(w, "Signed in as a Costco member. Captured %d Same-Day cookies from the login window.\n", len(res.Cookies))
+				} else {
+					fmt.Fprintf(w, "Captured %d Same-Day cookies from the login window (member status not confirmed; check with 'auth status').\n", len(res.Cookies))
+				}
+			}
 			if cookiesFile != "" {
 				var imported importedCookieFile
 				var err error
@@ -322,7 +343,7 @@ profile by name when the installed backend supports it.`,
 				// Step 3: Extract cookies from the resolved profile
 				cookies, err = extractCookies(tool, domain, profile)
 				if err != nil {
-					return authErr(fmt.Errorf("extracting cookies: %w", err))
+					return authErr(keychainHint(fmt.Errorf("extracting cookies: %w", err)))
 				}
 
 				if cookies == "" {
@@ -370,7 +391,7 @@ profile by name when the installed backend supports it.`,
 			}
 			cfg.CredentialDomain = "sameday.costco.com"
 
-			if err := cfg.SaveTokens("", "", cookies, "", time.Time{}); err != nil {
+			if err := cfg.SaveTokens("", "", cookies, "", sessionExpiry); err != nil {
 				return configErr(fmt.Errorf("saving cookies: %w", err))
 			}
 			// Persist the kept cookies so client.LoadCookieJar() carries
@@ -397,7 +418,8 @@ profile by name when the installed backend supports it.`,
 		},
 	}
 
-	cmd.Flags().BoolVar(&browserFlag, "chrome", false, "Read cookies from Chrome")
+	bl.register(cmd)
+	cmd.Flags().BoolVar(&browserFlag, "chrome", false, "Fallback: read cookies from your main Chrome profile (needs a cookie tool and keychain access)")
 	cmd.Flags().BoolVar(&browserFlag, "browser", false, "Alias for --chrome")
 	cmd.Flags().StringVar(&profileFlag, "profile", "", "Chrome profile name, or channel-qualified (e.g. \"Work\", \"Chrome Beta/Default\")")
 	cmd.Flags().BoolVar(&diagnose, "diagnose", false, "With --cookies-file: report input size, format, parse stage, and cookie NAMES only; never prints values or saves anything")
@@ -414,10 +436,16 @@ func cookieToolSupportsProfiles(tool string) bool {
 }
 
 func newAuthStatusCmd(flags *rootFlags) *cobra.Command {
-	return &cobra.Command{
-		Use:     "status",
-		Short:   "Show authentication status",
-		Example: "  costco-sameday-pp-cli auth status",
+	var noProbe bool
+	cmd := &cobra.Command{
+		Use:   "status",
+		Short: "Show authentication status and whether the session is a guest or a signed-in member",
+		Long: "Show whether credentials are stored and, with one read-only GraphQL probe\n" +
+			"(UserType, then GetCurrentUserName, then HouseholdByUser), whether the saved\n" +
+			"session is still valid, whether Same-Day sees a guest or a signed-in member,\n" +
+			"and when the session cookie expires. Cookie NAMES are inspected for hints;\n" +
+			"values are never printed. --no-probe skips the network check.",
+		Example: "  costco-sameday-pp-cli auth status\n  costco-sameday-pp-cli auth status --json",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := config.Load(flags.configPath)
 			if err != nil {
@@ -438,18 +466,57 @@ func newAuthStatusCmd(flags *rootFlags) *cobra.Command {
 				}
 				fmt.Fprintln(w, red("Not authenticated"))
 				fmt.Fprintln(w, "")
-				fmt.Fprintln(w, "Log in from your browser session:")
-				fmt.Fprintf(w, "  costco-sameday-pp-cli auth login --chrome\n")
+				fmt.Fprintln(w, "Sign in (opens a browser window):")
+				fmt.Fprintf(w, "  costco-sameday-pp-cli auth login\n")
 				return authErr(fmt.Errorf("no credentials configured"))
 			}
 
+			hints := cookieNameHintsFrom(cfg.CookieCredential())
+			health := sessionHealth{Session: "not verified (--no-probe)", AccountType: accountTypeResult{Type: accountTypeUnknown, Evidence: "not probed (--no-probe)"}}
+			if !noProbe {
+				health = authStatusProbe(cmd, flags, cfg.TokenExpiry)
+			} else {
+				health.Expires = checkSessionHealth(cmd.Context(), nil, cfg.TokenExpiry, time.Now()).Expires
+			}
+			acct := health.AccountType
+			var statusErr error
+			if health.Expired {
+				statusErr = authErr(fmt.Errorf("session expired or missing; %s", hintRunAuthLogin))
+			}
+			if flags.asJSON {
+				if err := flags.printJSON(cmd, map[string]any{
+					"authenticated":         true,
+					"source":                cfg.AuthSource,
+					"domain":                "sameday.costco.com",
+					"config":                cfg.Path,
+					"session":               health.Session,
+					"session_valid":         health.Valid,
+					"session_expires":       health.Expires,
+					"account_type":          acct.Type,
+					"account_type_source":   acct.Source,
+					"account_type_evidence": acct.Evidence,
+					"cookies":               hints,
+				}); err != nil {
+					return err
+				}
+				return statusErr
+			}
 			fmt.Fprintln(w, green("Authenticated"))
 			fmt.Fprintf(w, "  Source: %s\n", cfg.AuthSource)
 			fmt.Fprintf(w, "  Domain: sameday.costco.com\n")
 			fmt.Fprintf(w, "  Config: %s\n", cfg.Path)
-			return nil
+			fmt.Fprintf(w, "  Session: %s\n", health.Session)
+			fmt.Fprintf(w, "  Account: %s\n", describeAccountType(acct))
+			fmt.Fprintf(w, "  Expires: %s\n", health.Expires)
+			fmt.Fprintf(w, "  Session cookie (%s): %s\n", sessionCookieName, presentWord(hints.SessionCookie))
+			if len(hints.MemberCookieNames) > 0 {
+				fmt.Fprintf(w, "  Costco member cookie names: %s\n", strings.Join(hints.MemberCookieNames, ", "))
+			}
+			return statusErr
 		},
 	}
+	cmd.Flags().BoolVar(&noProbe, "no-probe", false, "Skip the read-only guest/member GraphQL probe")
+	return cmd
 }
 
 // newAuthSetTokenCmd is the escape hatch for sites whose access token can't

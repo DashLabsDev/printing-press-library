@@ -4,6 +4,9 @@
 package cli
 
 import (
+	"io"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"strings"
@@ -31,7 +34,14 @@ func isolatedAuthEnv(t *testing.T) string {
 	t.Setenv("XDG_DATA_HOME", filepath.Join(dir, "data"))
 	t.Setenv("XDG_CACHE_HOME", filepath.Join(dir, "cache"))
 	t.Setenv("COSTCO_SAMEDAY_CONFIG", filepath.Join(dir, "config.toml"))
-	t.Setenv("COSTCO_SAMEDAY_BASE_URL", "")
+	// auth status runs a live read-only probe; keep it on a local stub that
+	// answers as a signed-in member so no test reaches the real site.
+	stub := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = io.WriteString(w, `{"data":{"currentUser":{"guest":false}}}`)
+	}))
+	t.Cleanup(stub.Close)
+	t.Setenv("COSTCO_SAMEDAY_BASE_URL", stub.URL)
 	return dir
 }
 

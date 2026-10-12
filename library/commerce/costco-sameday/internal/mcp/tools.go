@@ -313,19 +313,19 @@ func makeAPIHandler(method, pathTemplate string, readOnly bool, binaryResponse b
 			case strings.Contains(msg, "HTTP 400") && cliutil.LooksLikeAuthError(msg):
 				return mcpToolError("authentication error: " + cliutil.SanitizeErrorBody(msg) +
 					"\nhint: the API rejected the request — this usually means auth is missing or invalid." +
-					"\n      Run 'costco-sameday-pp-cli auth login --chrome' to refresh browser-session credentials." +
+					"\n      Run 'costco-sameday-pp-cli auth login' to sign in again (session missing or expired)." +
 					"\n      See API docs: https://sameday.costco.com" +
 					"\n      Run 'costco-sameday-pp-cli doctor' to check auth status."), nil
 			case strings.Contains(msg, "HTTP 401"):
 				return mcpToolError("authentication failed: " + cliutil.SanitizeErrorBody(msg) +
 					"\nhint: check your API credentials." +
-					"\n      Run 'costco-sameday-pp-cli auth login --chrome' to refresh browser-session credentials." +
+					"\n      Run 'costco-sameday-pp-cli auth login' to sign in again (session missing or expired)." +
 					"\n      See API docs: https://sameday.costco.com" +
 					"\n      Run 'costco-sameday-pp-cli doctor' to check auth status."), nil
 			case strings.Contains(msg, "HTTP 403"):
 				return mcpToolError("permission denied: " + cliutil.SanitizeErrorBody(msg) +
 					"\nhint: your credentials are valid but lack access to this resource. Check that they have the required permissions and match the API's expected auth scheme." +
-					"\n      Run 'costco-sameday-pp-cli auth login --chrome' to refresh browser-session credentials." +
+					"\n      Run 'costco-sameday-pp-cli auth login' to sign in again (session missing or expired)." +
 					"\n      See API docs: https://sameday.costco.com" +
 					"\n      Run 'costco-sameday-pp-cli doctor' to check auth status."), nil
 			case strings.Contains(msg, "HTTP 404"):

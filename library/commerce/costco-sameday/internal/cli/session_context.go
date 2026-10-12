@@ -51,6 +51,7 @@ func init() {
 func newSessionContextCmd(flags *rootFlags) *cobra.Command {
 	var refresh bool
 	var withCart bool
+	var withAccountType bool
 	cmd := &cobra.Command{
 		Use:   "context",
 		Short: "Resolve the delivery ZIP, Costco shopId, zoneId and active cartId for this session",
@@ -68,7 +69,8 @@ default. The cart needs a signed-in session; an explicit shop id resolves it
 without a ZIP.`),
 		Example: `  costco-sameday-pp-cli session context --zip 98027
   costco-sameday-pp-cli session context --json
-  costco-sameday-pp-cli session context --refresh`,
+  costco-sameday-pp-cli session context --refresh
+  costco-sameday-pp-cli session context --account-type --json`,
 		Annotations: map[string]string{"mcp:read-only": "true", "pp:narrative": "session.context"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			c, err := flags.newClient()
@@ -90,6 +92,11 @@ without a ZIP.`),
 			if resolveErr != nil {
 				out["error"] = resolveErr.Error()
 			}
+			if withAccountType {
+				acct := probeAccountType(cmd.Context(), c)
+				out["account_type"] = acct.Type
+				out["account_type_source"] = acct.Source
+			}
 			if err := flags.printJSON(cmd, out); err != nil {
 				return err
 			}
@@ -101,6 +108,7 @@ without a ZIP.`),
 	}
 	cmd.Flags().BoolVar(&refresh, "refresh", false, "Ignore cached shop/zone/cart values and look them up again")
 	cmd.Flags().BoolVar(&withCart, "cart", true, "Also resolve the active cartId (needs a signed-in session)")
+	cmd.Flags().BoolVar(&withAccountType, "account-type", false, "Also report guest vs signed-in member (one read-only probe query)")
 	return cmd
 }
 

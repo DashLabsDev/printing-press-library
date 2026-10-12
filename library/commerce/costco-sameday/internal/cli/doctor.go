@@ -133,7 +133,7 @@ func newDoctorCmd(flags *rootFlags) *cobra.Command {
 				credentialConfigured, authSource := doctorAuthConfiguredState(cfg)
 				if !credentialConfigured {
 					report["auth"] = "not configured"
-					report["auth_hint"] = "costco-sameday-pp-cli auth login --chrome"
+					report["auth_hint"] = "costco-sameday-pp-cli auth login"
 				} else {
 					authConfigured = true
 					report["auth"] = "configured"
@@ -262,6 +262,13 @@ func newDoctorCmd(flags *rootFlags) *cobra.Command {
 							report["credentials"] = fmt.Sprintf("error: %s", authErr)
 						}
 					}
+					// Live session verdict: valid member, guest, or expired (read-only probe).
+					if authHeader != "" && !c.IsDryRun() && !cliutil.IsVerifyEnv() {
+						h := checkSessionHealth(cmd.Context(), c, cfg.TokenExpiry, time.Now())
+						report["session"] = h.Session
+						report["session_account"] = describeAccountType(h.AccountType)
+						report["session_expires"] = h.Expires
+					}
 				}
 			} else if cfg != nil && cfg.BaseURL == "" {
 				report["api"] = "not configured (set base_url in config file)"
@@ -307,6 +314,9 @@ func newDoctorCmd(flags *rootFlags) *cobra.Command {
 				{"credentials_location_warning", "Credentials Storage"},
 				{"api", "API"},
 				{"credentials", "Credentials"},
+				{"session", "Session"},
+				{"session_account", "Account"},
+				{"session_expires", "Session Expires"},
 			}
 			for _, ck := range checkKeys {
 				v, ok := report[ck.key]
