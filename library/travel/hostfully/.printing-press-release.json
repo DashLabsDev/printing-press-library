@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "slug": "hostfully",
+  "cli_name": "hostfully-pp-cli",
+  "version": "2026.10.1",
+  "released_at": "2026-10-12T08:48:46Z",
+  "source_commit": "4fdb9819cb63c6ed49bd16b65cc0602ac3435009",
+  "printing_press_version": "4.33.4",
+  "run_id": "20261010-155604-450d3649",
+  "changes": [
+    {
+      "title": "feat(hostfully): add hostfully",
+      "pr": 2307,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/2307",
+      "commit": "4fdb9819cb63c6ed49bd16b65cc0602ac3435009"
+    }
+  ]
+}

@@ -25,7 +25,7 @@ import (
 	"github.com/spf13/pflag"
 )
 
-var version = "1.0.0"
+var version = "2026.10.1"
 
 type rootFlags struct {
 	asJSON  bool

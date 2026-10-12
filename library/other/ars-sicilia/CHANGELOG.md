@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.10.1 - 2026-10-12
+
+- fix(ars-sicilia): repeated numbers on per-committee archives are distinct acts, not versions (#2309).
+
 ## 2026.9.7 - 2026-09-19
 
 - fix(ars-sicilia): the empty-search hint measures the source lag instead of declaring a fixed band (#2019).
