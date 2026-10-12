@@ -3509,6 +3509,12 @@
         "Find prior calls made through this CLI by task wording and inspect their returned outcomes."
       ],
       "path": "library/ai/bland",
+      "release": {
+        "cli_name": "bland-pp-cli",
+        "version": "2026.10.1",
+        "released_at": "2026-10-11T08:52:49Z",
+        "source_commit": "26b2299662558c224ad765c0faa9a997305deb75"
+      },
       "printer": "gregmushen",
       "printer_name": "Greg Mushen",
       "creator": {
@@ -9699,6 +9705,10 @@
         {
           "handle": "cathrynlavery",
           "name": "Cathryn Lavery"
+        },
+        {
+          "handle": "Alexguitar-zz",
+          "name": "Lex"
         }
       ],
       "mcp": {
@@ -9986,9 +9996,9 @@
       "path": "library/food-and-dining/fooda",
       "release": {
         "cli_name": "fooda-pp-cli",
-        "version": "2026.10.1",
-        "released_at": "2026-10-10T08:56:54Z",
-        "source_commit": "fdb1e53e895a5839598dee6f836b13fe861c99ee"
+        "version": "2026.10.2",
+        "released_at": "2026-10-11T08:52:49Z",
+        "source_commit": "c11db286cbaae20cf3ebef1175e7687fa29fe46e"
       },
       "printer": "enlewof",
       "printer_name": "Allen Lew",
@@ -13182,6 +13192,12 @@
         "Distinguishes stored session presence from a verified signed-in read."
       ],
       "path": "library/commerce/homedepot",
+      "release": {
+        "cli_name": "homedepot-pp-cli",
+        "version": "2026.10.1",
+        "released_at": "2026-10-11T08:52:49Z",
+        "source_commit": "b3416e5b57cfbbedda5a52dd620c1d0d5b78c9c5"
+      },
       "printer": "gregmushen",
       "printer_name": "Greg Mushen",
       "creator": {
@@ -18635,6 +18651,12 @@
         "Flag computes that never scale to zero, have fixed autoscaling, or are oversized on non-default branches, from the local mirror (run sync first)."
       ],
       "path": "library/cloud/neon",
+      "release": {
+        "cli_name": "neon-pp-cli",
+        "version": "2026.10.1",
+        "released_at": "2026-10-11T08:52:49Z",
+        "source_commit": "4141b069a41683bacda7ea902116e94091f3ba10"
+      },
       "printer": "gregmushen",
       "printer_name": "Greg Mushen",
       "creator": {
@@ -29242,6 +29264,12 @@
         "Send a text after checking the sender is wired correctly and showing recent history; requires --yes."
       ],
       "path": "library/social-and-messaging/telnyx",
+      "release": {
+        "cli_name": "telnyx-pp-cli",
+        "version": "2026.10.1",
+        "released_at": "2026-10-11T08:52:49Z",
+        "source_commit": "61570a131dc7fb41ca402dfb7f5a34d77b16f378"
+      },
       "printer": "gregmushen",
       "printer_name": "Greg Mushen",
       "creator": {
