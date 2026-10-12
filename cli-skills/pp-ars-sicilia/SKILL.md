@@ -234,6 +234,8 @@ These capabilities aren't available in any other tool for this API.
 ars-sicilia-pp-cli commissioni sommari --legisl 18 --numero 270 --agent
 ```
 
+**Il numero di seduta riparte in ogni commissione**: la seduta 200 della XVIII esiste nella I, nella II, nella IV e nella V. `--numero` senza `--commissione`/`--codcom` restituisce le sedute con quel numero di tutte le commissioni che l'hanno pubblicata, e la CLI lo ricorda su stderr anche quando la riga è una sola: è il caso in cui sbagliare è facile, perché la seduta che cerchi può non essere ancora pubblicata e quella che arriva è di un'altra commissione. Se parti da `ddl iter`, la commissione sta in `sede` accanto al numero della seduta: passala.
+
 `--commissione` accetta l'ordinale (`PRIMA`..`SESTA`), un frammento della denominazione (`Bilancio`) o, in alternativa, `--codcom 1`-`6`. Un termine che non corrisponde a nessuna commissione **esce con errore** e propone i nomi vicini: non restituisce una lista vuota, che si leggerebbe come "questa commissione non ha lavori".
 
 **ddl** — Disegni di Legge (archivio 221): proposte di legge presentate all'ARS.
@@ -302,6 +304,8 @@ Attenzione a `ddl iniziative`: **non esiste un flag `--iniziativa`**. Il portale
 
 - `ars-sicilia-pp-cli risoluzioni cerca` — Cerca risoluzioni.
 - `ars-sicilia-pp-cli risoluzioni get` — Scarica una singola risoluzione.
+
+Le risoluzioni sono **numerate per commissione** (`1/I`, `1/II`…): nella XVIII ci sono otto atti diversi sotto il numero 1, e la lista non dice di quale commissione sia ogni riga. `risoluzioni get 18 1` apre il primo e su stderr dice quale (`Commissione PRIMA`, letta dall'iter); per sceglierne uno, `--commissione` con l'ordinale (`PRIMA`..`SESTA`) o una parola della denominazione (`Affari`); la sigla romana `I` non aggancia nulla. Lo stesso `--commissione` restringe `risoluzioni cerca`.
 
 
 ### Nessun argomento posizionale sui comandi di ricerca

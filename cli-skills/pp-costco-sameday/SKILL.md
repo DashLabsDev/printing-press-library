@@ -46,7 +46,7 @@ Costco Same-Day (sameday.costco.com) GraphQL CLI. Cookie auth after Costco Azure
 
 ## HTTP Transport
 
-This CLI uses standard HTTP transport with HTTP/2 disabled for browser-facing endpoints. It does not require a resident browser process for normal API calls.
+This CLI uses standard HTTP transport with HTTP/2 disabled for browser-facing endpoints. It does not require a resident browser process for normal API calls. `auth login` starts a browser only for sign-in and closes it after capturing the session cookies; it drives that browser over `--remote-debugging-pipe` (no DevTools network port; Windows falls back to a 127.0.0.1 random port).
 
 ## Command Reference
 
@@ -132,7 +132,11 @@ This CLI uses standard HTTP transport with HTTP/2 disabled for browser-facing en
 
 **slots** — Costco Same-Day slots GraphQL operations
 
-- `costco-sameday-pp-cli slots availableservices` — GraphQL query AvailableServices (persistedQuery)
+- `costco-sameday-pp-cli slots etas` — earliest delivery/pickup ETA, fee and label for a ZIP (read-only; `--as auto|member|guest`, `--service all|delivery|pickup`); exits non-zero with partial output if an ETA query fails; use this to answer "is Same-Day available at ZIP X"
+- `costco-sameday-pp-cli slots availableservices` — checkout service picker; empty outside checkout (stderr warning and JSON `note` point to `slots etas`)
+- `costco-sameday-pp-cli slots windows --checkout-session-id <id>` — delivery windows and savings labels for an open checkout (read-only; tokens hidden unless `--show-tokens`)
+- `costco-sameday-pp-cli slots pick --checkout-session-id <id> --index N` — choose a window (UpdateCheckout; refuses without `--yes`, `--dry-run` previews; never places the order; a rejected update prints `updated: false` and exits non-zero). Ask the user before passing `--yes`
+- `costco-sameday-pp-cli address list` — saved address ids plus a masked label (read-only; the street is never printed). `cart cartsignaledeta` auto-fills `--address-id` (saved address matching the ZIP) and `--subtotal` (cart total)
 - `costco-sameday-pp-cli slots slotcampaignplacement` — GraphQL query SlotCampaignPlacement (persistedQuery)
 
 
@@ -148,7 +152,13 @@ costco-sameday-pp-cli which "<capability in your own words>"
 
 ## Auth Setup
 
-This CLI uses a browser session. Log in to sameday.costco.com in Chrome, then:
+This CLI uses a Costco Same-Day browser session. One-step sign-in (opens a headed Chrome/Chromium window in a CLI-owned profile; the user signs in; the CLI captures only the Same-Day session cookies and closes the window):
+
+```bash
+costco-sameday-pp-cli auth login
+```
+
+It never reads the user's main Chrome cookie store or Chrome Safe Storage. The user must complete sign-in themselves; do not script the sign-in form. Fallbacks:
 
 ```bash
 costco-sameday-pp-cli auth login --chrome
@@ -162,7 +172,13 @@ costco-sameday-pp-cli auth login --cookies-file storage-state.json
 
 `--cookies-file` accepts Playwright storage-state JSON or a raw `Cookie:` header text file. Use `--cookies-file -` to read the header from stdin (for example `pbpaste | costco-sameday-pp-cli auth login --cookies-file -`). Stdin also accepts DevTools "Copy request headers" or "Copy as cURL (bash)" output from a sameday.costco.com request. Only the `__Host-instacart_sid` session cookie is required; it is HttpOnly, so copy it from DevTools Network rather than `document.cookie`. Other Same-Day cookies are kept when present. Add `--diagnose` to check a paste without saving anything: it prints only the byte count, detected format, parse stage, cookie names, and whether `__Host-instacart_sid` is present, never values. The Chrome path requires a cookie extraction tool (`pycookiecheat` via pip, or `cookies` via Homebrew).
 
-Run `costco-sameday-pp-cli doctor` to verify setup.
+Run `costco-sameday-pp-cli doctor` to verify setup. `auth status --json` and `doctor --json` report `session` (valid / guest / expired, from a live read-only probe), `account_type` (`member`, `guest`, `unknown`) and `session_expires`. Cookie names only are reported, never values.
+
+Troubleshooting for agents:
+- Session expired or missing (exit 4, "session is missing or expired"): ask the user to run `costco-sameday-pp-cli auth login` and sign in.
+- "Costco is rate-limiting sign-in" (429 from signin.costco.com): stop; tell the user to wait about 15-30 minutes before one more `auth login`. Do not retry in a loop.
+- Keychain denied ("Chrome Safe Storage") on `auth login --chrome`: suggest `auth login` (browser window, no keychain) or `pbpaste | costco-sameday-pp-cli auth login --cookies-file -` from DevTools "Copy as cURL (bash)".
+- `account_type: guest`: results are not the member account; ask the user to run `auth login`.
 
 ## Agent Mode
 
