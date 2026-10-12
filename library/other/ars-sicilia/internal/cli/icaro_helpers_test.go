@@ -489,6 +489,86 @@ func TestOmonimiHint(t *testing.T) {
 	}
 }
 
+// Sui sommari e sulle risoluzioni il numero riparte in ogni commissione: la
+// seduta 200 della I e quella della II sono due sedute, e chiamarle «versioni
+// della stessa pratica» manda chi legge fuori strada.
+func TestOmonimiHintPerCommissione(t *testing.T) {
+	seduta := func(numero, commissione string) icaro.Record {
+		return icaro.Record{Title: commissione, Fields: map[string]string{"legisl": "18", "numero": numero}}
+	}
+	diverse := []icaro.Record{seduta("200", "I - Affari Istituzionali"), seduta("200", "II - Bilancio")}
+	if got := omonimiHint(diverse, "sommari"); got != "" {
+		t.Errorf("sommari, commissioni diverse: atteso nessun avviso; got %q", got)
+	}
+	stessa := []icaro.Record{seduta("200", "II - Bilancio"), seduta("200", "II - Bilancio")}
+	if got := omonimiHint(stessa, "sommari"); !strings.Contains(got, "versioni") {
+		t.Errorf("sommari, stessa commissione: atteso l'avviso sulle versioni; got %q", got)
+	}
+	ris := []icaro.Record{{Fields: map[string]string{"Legisl.": "18", "Numero": "1"}}, {Fields: map[string]string{"Legisl.": "18", "Numero": "1"}}}
+	if got := omonimiHint(ris, "risoluzioni"); got != "" {
+		t.Errorf("risoluzioni: le righe non sono versioni, atteso nessun avviso; got %q", got)
+	}
+}
+
+// `--numero 240` senza commissione dava la 240 della I come unica risposta,
+// mentre quella citata da `ddl iter` era della II e non era ancora pubblicata:
+// l'avviso deve parlare anche su una riga sola.
+func TestNumeroCommissioneHint(t *testing.T) {
+	una := []icaro.Record{{Title: "I - Affari Istituzionali", Fields: map[string]string{"legisl": "18", "numero": "240"}}}
+	got := numeroCommissioneHint(una, "sommari", map[string]string{"legisl": "18", "numero": "240"})
+	for _, want := range []string{"--numero 240", "--codcom", "sede"} {
+		if !strings.Contains(got, want) {
+			t.Errorf("sommari --numero: avviso %q, manca %q", got, want)
+		}
+	}
+	for _, filtro := range []string{"commissione", "codcom"} {
+		if got := numeroCommissioneHint(una, "sommari", map[string]string{"numero": "240", filtro: "2"}); got != "" {
+			t.Errorf("sommari con --%s: atteso nessun avviso; got %q", filtro, got)
+		}
+	}
+	// Senza --numero sui sommari la commissione sta nel titolo di ogni riga.
+	if got := numeroCommissioneHint(una, "sommari", map[string]string{"anno": "2026"}); got != "" {
+		t.Errorf("sommari senza --numero: atteso nessun avviso; got %q", got)
+	}
+	riga := func(n string) icaro.Record {
+		return icaro.Record{Fields: map[string]string{"Legisl.": "18", "Numero": n}}
+	}
+	got = numeroCommissioneHint([]icaro.Record{riga("1"), riga("1"), riga("2")}, "risoluzioni", map[string]string{"legisl": "18"})
+	for _, want := range []string{"(1)", "atti distinti", "PRIMA..SESTA"} {
+		if !strings.Contains(got, want) {
+			t.Errorf("risoluzioni: avviso %q, manca %q", got, want)
+		}
+	}
+	if got := numeroCommissioneHint([]icaro.Record{riga("1"), riga("2")}, "risoluzioni", map[string]string{"legisl": "18"}); got != "" {
+		t.Errorf("risoluzioni, numeri distinti e niente --numero: atteso nessun avviso; got %q", got)
+	}
+	if got := numeroCommissioneHint([]icaro.Record{riga("1")}, "risoluzioni", map[string]string{"numero": "1"}); got == "" {
+		t.Error("risoluzioni --numero senza commissione: atteso l'avviso anche su una riga")
+	}
+	if got := numeroCommissioneHint([]icaro.Record{riga("1"), riga("1")}, "ddl", map[string]string{"numero": "1"}); got != "" {
+		t.Errorf("ddl: numerazione unica, atteso nessun avviso; got %q", got)
+	}
+}
+
+func TestCommissioneRisoluzione(t *testing.T) {
+	cases := []struct {
+		fields map[string]string
+		body   string
+		want   string
+	}{
+		{map[string]string{"Iter Attuale": "08 apr 2025 Approvata Seduta n. 182 0100 Commissione PRIMA"}, "", "Commissione PRIMA"},
+		{map[string]string{"Iter Attuale": "05 ott 2023 Trasmissione Governo", "Iter Storico": "03 ott 2023 Discussione Seduta n. 51 0500 Commissione QUINTA"}, "", "Commissione QUINTA"},
+		{nil, "XVIII LEGISLATURA RISOLUZIONE RISOLUZIONE N. 1/I Chiarimenti", "1/I"},
+		{nil, "XVIII LEGISLATURA Risoluzione n. 1/V Atto di indirizzo", "1/V"},
+		{nil, "nessuna sigla qui", ""},
+	}
+	for _, c := range cases {
+		if got := commissioneRisoluzione(c.fields, c.body); got != c.want {
+			t.Errorf("commissioneRisoluzione(%v, %q) = %q, want %q", c.fields, c.body, got, c.want)
+		}
+	}
+}
+
 // Sugli archivi Icaro il campo ISIS "Titolo" arriva già dentro Fields e
 // coincide con Record.Title. Sui tre archivi /bd/ (resoconti, sommari,
 // convocazioni) quel campo non esiste nel parsing: senza fallback, "titolo"

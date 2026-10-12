@@ -1,0 +1,14 @@
+{
+  "schema_version": 2,
+  "id": "catalog-go-1269-vuln-floor",
+  "applied_at": "2026-10-11",
+  "base_run_id": "20260528-181840",
+  "base_printing_press_version": "4.30.3",
+  "summary": "Raise this module's Go toolchain floor to 1.26.9 so the nine standard-library fixes shipped in that release are enforced when the CLI is built.",
+  "reason": "With go 1.26.6 in go.mod, publish-time govulncheck reported nine reachable standard-library vulnerabilities in net/http, crypto/tls and net/textproto, all fixed in go1.26.9 (GO-2026-6603, 6605, 6607, 6608, 6610, 6611, 6612, 6613, 6617). The README and SKILL install sections keep the generator's 1.26.6 wording: verify-skill rejects any edit to that generator-owned text, and the default GOTOOLCHAIN downloads 1.26.9 on demand, so a user on an older toolchain still builds a fixed binary. Eight CLIs in the catalog are already on go 1.26.9.",
+  "files": [
+    "go.mod"
+  ],
+  "validated_outcome": "`go run golang.org/x/vuln/cmd/govulncheck@v1.3.0 ./...` goes from 9 reachable standard-library vulnerabilities to none reachable (7 in required modules, not called); `go build ./...` passes on go1.26.9, and `cli-printing-press verify-skill --dir .` passes with the install sections untouched.",
+  "upstream_issue": null
+}

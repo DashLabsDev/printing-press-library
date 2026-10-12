@@ -188,6 +188,7 @@ func runCerca(cmd *cobra.Command, flags *rootFlags, archiveSlug string, p cercaP
 	frHint := fraseHint(p.Params)
 	puntHint := punteggiaturaHint(arc.Slug, p.Params)
 	omonHint := omonimiHint(recs, arc.Slug)
+	commHint := numeroCommissioneHint(recs, arc.Slug, p.Params)
 	spezzHint := spezzatoHint(spezzato)
 	sommHint := sommariHint(truncated, arc.Slug, p.Params, termini)
 	adesso := time.Now()
@@ -202,10 +203,11 @@ func runCerca(cmd *cobra.Command, flags *rootFlags, archiveSlug string, p cercaP
 		warnPertinenza(spezzHint)
 		warnPertinenza(pertHint)
 		warnPertinenza(omonHint)
+		warnPertinenza(commHint)
 		warnPertinenza(sommHint)
 		warnPertinenza(latHint)
 		return emitEnvelope(cmd.OutOrStdout(), flatRecords(recs, firm), truncated,
-			uniscoHint(truncatedHint(truncated, len(recs), arc.Slug), frHint, puntHint, spezzHint, pertHint, omonHint, sommHint, latHint), flags)
+			uniscoHint(truncatedHint(truncated, len(recs), arc.Slug), frHint, puntHint, spezzHint, pertHint, omonHint, commHint, sommHint, latHint), flags)
 	}
 	if err := emitRecords(cmd, flags, *arc, recs, firm); err != nil {
 		return err
@@ -216,6 +218,7 @@ func runCerca(cmd *cobra.Command, flags *rootFlags, archiveSlug string, p cercaP
 	warnPertinenza(spezzHint)
 	warnPertinenza(pertHint)
 	warnPertinenza(omonHint)
+	warnPertinenza(commHint)
 	warnPertinenza(sommHint)
 	warnPertinenza(latHint)
 	return nil
@@ -903,6 +906,27 @@ func unDocPerNumero(slug string) bool {
 	return true
 }
 
+// numeroPerCommissione riporta se in quell'archivio il numero riparte da 1 in
+// ogni commissione. Misurato il 2026-10-11:
+//
+//   - sommari: la seduta 200 della XVIII esiste nella I, nella II, nella IV e
+//     nella V, quattro sedute diverse;
+//   - risoluzioni: il numero è `1/I`, `1/II`…, e sotto 18/1 ci sono otto atti
+//     con titoli e date diversi.
+//
+// Lì due righe con lo stesso numero non sono versioni della stessa pratica, e
+// un `--numero` senza commissione può consegnare la seduta o l'atto di
+// un'altra commissione senza che niente lo faccia notare: la seduta 240 della
+// II (06/10/2026) non era ancora pubblicata, e `--numero 240` dava la 240
+// della I come unica risposta.
+func numeroPerCommissione(slug string) bool {
+	switch slug {
+	case "sommari", "risoluzioni":
+		return true
+	}
+	return false
+}
+
 // campoRecord legge un campo della riga con la stessa normalizzazione che usa
 // flatRecords ("Legisl." → "legisl"), così l'avviso ragiona sulle chiavi che
 // chi legge l'output ha davanti.
@@ -930,7 +954,10 @@ func campoRecord(r icaro.Record, chiave string) string {
 // parla sempre. Il silenzio di questo avviso non è la prova che il numero
 // agganci un documento solo.
 func omonimiHint(recs []icaro.Record, slug string) string {
-	if !unDocPerNumero(slug) || len(recs) < 2 {
+	// Sulle risoluzioni la lista non dice di quale commissione sia la riga,
+	// quindi righe con lo stesso numero non si possono distinguere da qui: ne
+	// parla numeroCommissioneHint, che non le chiama versioni.
+	if !unDocPerNumero(slug) || slug == "risoluzioni" || len(recs) < 2 {
 		return ""
 	}
 	visti := map[string]int{}
@@ -941,6 +968,11 @@ func omonimiHint(recs []icaro.Record, slug string) string {
 			continue
 		}
 		k := campoRecord(r, "legisl") + "/" + n
+		// Sui sommari la commissione sta nel titolo della riga: la seduta 200
+		// della I e quella della II sono due sedute, non due versioni.
+		if slug == "sommari" {
+			k += "/" + titoloAlias(r)
+		}
 		visti[k]++
 		if visti[k] == 2 {
 			doppi = append(doppi, n)
@@ -956,6 +988,79 @@ func omonimiHint(recs []icaro.Record, slug string) string {
 	return fmt.Sprintf(
 		"hint: %s con più di una riga (%s): il portale tiene documenti distinti sotto lo stesso numero — di norma versioni diverse della stessa pratica, non copie da scartare.%s",
 		plurale(len(doppi), "1 numero compare", "%d numeri compaiono"), strings.Join(doppi, ", "), apri)
+}
+
+var (
+	reOrdinaleCommissione = regexp.MustCompile(`Commissione (PRIMA|SECONDA|TERZA|QUARTA|QUINTA|SESTA)\b`)
+	reSiglaRisoluzione    = regexp.MustCompile(`(?i)risoluzione\s+n\.\s*(\d+\s*/\s*[IVX]+)\b`)
+)
+
+// commissioneRisoluzione dice di quale commissione sia la risoluzione aperta.
+// Nei campi della lista e della scheda la commissione non c'è: la si legge
+// nell'iter («Seduta n. 26 0200 Commissione SECONDA»), che dà l'ordinale da
+// ripassare a --commissione, e in mancanza nella sigla del testo, che il
+// portale scrive in più forme («RISOLUZIONE N. 1/I», «Risoluzione n. 1/V»).
+func commissioneRisoluzione(fields map[string]string, body string) string {
+	for _, k := range []string{"Iter Attuale", "Iter Storico"} {
+		if m := reOrdinaleCommissione.FindStringSubmatch(fields[k]); m != nil {
+			return "Commissione " + m[1]
+		}
+	}
+	if m := reSiglaRisoluzione.FindStringSubmatch(body); m != nil {
+		return strings.Join(strings.Fields(m[1]), "")
+	}
+	return ""
+}
+
+// numeroCommissioneHint avvisa che sugli archivi numerati per commissione un
+// numero senza commissione non identifica niente. Parla anche su una riga sola,
+// perché è lì il tranello: `ddl iter` dà «seduta 240, Commissione SECONDA», chi
+// cerca `--numero 240` riceve la 240 della I come unica risposta e la legge
+// come quella che voleva.
+//
+// Sui sommari tace senza `--numero`: la commissione sta nel titolo di ogni
+// riga, e una lista per anno con numeri ripetuti si legge da sé. Sulle
+// risoluzioni la lista non la porta, quindi parla anche quando i numeri
+// ripetuti compaiono in una ricerca senza `--numero`.
+func numeroCommissioneHint(recs []icaro.Record, slug string, params map[string]string) string {
+	if !numeroPerCommissione(slug) ||
+		strings.TrimSpace(params["commissione"]) != "" || strings.TrimSpace(params["codcom"]) != "" {
+		return ""
+	}
+	numero := strings.TrimSpace(params["numero"])
+	switch slug {
+	case "sommari":
+		if numero == "" {
+			return ""
+		}
+		return fmt.Sprintf(
+			"hint: i numeri di seduta ripartono in ogni commissione: `--numero %s` senza commissione restituisce le sedute %s di tutte le commissioni che l'hanno pubblicata (la commissione sta in `titolo`), e quella che cerchi può non esserci ancora. Per fissarla aggiungi `--codcom 1-6` o `--commissione` (es. SECONDA o Bilancio): `ddl iter` la riporta in `sede` accanto al numero della seduta.",
+			numero, numero)
+	case "risoluzioni":
+		var ripetuti []string
+		if numero == "" {
+			visti := map[string]int{}
+			for _, r := range recs {
+				n := campoRecord(r, "numero")
+				k := campoRecord(r, "legisl") + "/" + n
+				visti[k]++
+				if n != "" && visti[k] == 2 {
+					ripetuti = append(ripetuti, n)
+				}
+			}
+			if len(ripetuti) == 0 {
+				return ""
+			}
+		}
+		chi := "righe con lo stesso numero"
+		if len(ripetuti) > 0 {
+			chi = fmt.Sprintf("righe con lo stesso numero (%s)", strings.Join(ripetuti, ", "))
+		}
+		return fmt.Sprintf(
+			"hint: le risoluzioni sono numerate per commissione (la 1/I e la 1/II sono atti diversi) e la lista non dice di quale commissione sia ogni riga: %s sono atti distinti, non versioni. Per restringere aggiungi `--commissione` con l'ordinale (PRIMA..SESTA; «I» non aggancia nulla) o una parola della denominazione (es. Affari).",
+			chi)
+	}
+	return ""
 }
 
 // plurale sceglie fra le due forme e formatta il conteggio: un avviso che dice
@@ -1499,11 +1604,32 @@ func runGetOpts(cmd *cobra.Command, flags *rootFlags, archiveSlug string, legisl
 		fmt.Fprintln(os.Stderr, "hint: "+nota)
 	}
 	if len(recs) > 1 && unDocPerNumero(arc.Slug) {
-		multi := fmt.Sprintf("il portale ha più di un documento per legisl=%d numero=%d — di norma versioni diverse della stessa pratica. Questo è il primo", legisl, numero)
-		if doc.DocNo > 0 {
-			multi += fmt.Sprintf(" (docno %d)", doc.DocNo)
+		var multi string
+		if numeroPerCommissione(arc.Slug) && strings.TrimSpace(extra["commissione"]) == "" {
+			// Qui le righe sono atti di commissioni diverse, non versioni:
+			// `risoluzioni get 18 1` ne apriva uno su otto e chiamava gli
+			// altri versioni della stessa pratica. Si dice quale si è aperto
+			// (la commissione sta nell'iter o nel testo, non nei campi) e come
+			// sceglierne uno.
+			multi = fmt.Sprintf("il numero %d delle %s della legislatura %d esiste in più commissioni, e sono atti distinti. Questo è il primo", numero, arc.Slug, legisl)
+			var quale []string
+			if sigla := commissioneRisoluzione(doc.Fields, doc.Body); sigla != "" {
+				quale = append(quale, sigla)
+			}
+			if doc.DocNo > 0 {
+				quale = append(quale, fmt.Sprintf("docno %d", doc.DocNo))
+			}
+			if len(quale) > 0 {
+				multi += " (" + strings.Join(quale, ", ") + ")"
+			}
+			multi += fmt.Sprintf("; per aprire quello di una commissione aggiungi `--commissione` con l'ordinale (es. `%s get %d %d --commissione SECONDA`), l'elenco è `%s cerca --legisl %d --numero %d`.", arc.Slug, legisl, numero, arc.Slug, legisl, numero)
+		} else {
+			multi = fmt.Sprintf("il portale ha più di un documento per legisl=%d numero=%d — di norma versioni diverse della stessa pratica. Questo è il primo", legisl, numero)
+			if doc.DocNo > 0 {
+				multi += fmt.Sprintf(" (docno %d)", doc.DocNo)
+			}
+			multi += fmt.Sprintf("; gli altri si vedono con `%s cerca --legisl %d --numero %d`.", arc.Slug, legisl, numero)
 		}
-		multi += fmt.Sprintf("; gli altri si vedono con `%s cerca --legisl %d --numero %d`.", arc.Slug, legisl, numero)
 		fmt.Fprintln(os.Stderr, "hint: "+multi)
 		nota = uniscoNote(nota, multi)
 	}

@@ -1,0 +1,17 @@
+{
+  "schema_version": 2,
+  "id": "per-committee-numbering-hints",
+  "applied_at": "2026-10-11",
+  "base_run_id": "20260528-181840",
+  "base_printing_press_version": "4.30.3",
+  "summary": "On the two archives whose numbers restart in every committee (sommari sittings, risoluzioni), repeated numbers are no longer called versions of the same file: a `--numero` without a committee filter says the number is per committee, and `risoluzioni get` gains `--commissione` and names which act it opened.",
+  "reason": "The duplicate-number hint keyed on legislature+number, which is right for ddl 6030 but not here: `commissioni sommari --numero 200` returned four different committees' sittings labelled as versions of one file, and `risoluzioni get 18 1` opened one of eight distinct acts the same way. A news-agent run read `--numero 240` as ambiguous; measured, the II committee's sitting 240 was simply not yet published and the only row was the I committee's, which is exactly where a reader coming from `ddl iter` gets the wrong sitting.",
+  "files": [
+    "internal/cli/icaro_helpers.go",
+    "internal/cli/icaro_helpers_test.go",
+    "internal/cli/risoluzioni_get.go",
+    "SKILL.md",
+    "README.md"
+  ],
+  "validated_outcome": "Live with the installed binary: `commissioni sommari --legisl 18 --numero 200` lists I, II, IV and V with the per-committee hint and no 'versioni' hint; with `--codcom 2` it returns only II and stays silent; `--numero 240` warns on its single row. `risoluzioni cerca --legisl 18` names the repeated numbers as distinct acts; `risoluzioni get 18 1` reports 'Commissione PRIMA, docno 293' (read from the iter, falling back to the 1/I mark in the text, which the portal spells several ways) and how to pick another; `--commissione SECONDA` and `--commissione QUINTA` open two different acts whose iter names that committee (`SECONDA.COMMIS` in the ISIS query). Healthy controls unchanged: ddl 6030 still reports versions on both `cerca` and `get`. Sampled pareri (146, 141, 135): one registration number per file, the existing hint stays."
+}

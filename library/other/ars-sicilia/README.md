@@ -430,7 +430,7 @@ Catalogo Bibliografico (archivio 205) e Opere Multimediali (205multimedia).
 Lavori delle commissioni: convocazioni (229) e sommari (230).
 
 - **`ars-sicilia-pp-cli commissioni convocazioni`** - Convocazioni delle Commissioni.
-- **`ars-sicilia-pp-cli commissioni sommari`** - Sommari dei lavori di commissione. Il backend `/bd/` tronca le risposte grandi e consegna intere quelle piccole: conviene restringere: `--numero` (numero della seduta di commissione, il filtro più selettivo), poi `--anno`, poi `--commissione`. Misurato: `--numero 270` riesce 10 volte su 10, la stessa ricerca senza filtri 2 volte su 8. Se una ricerca fallisce per troncatura, la CLI dice quale filtro aggiungere.
+- **`ars-sicilia-pp-cli commissioni sommari`** - Sommari dei lavori di commissione. Il backend `/bd/` tronca le risposte grandi e consegna intere quelle piccole: conviene restringere: `--numero` (numero della seduta di commissione, il filtro più selettivo), poi `--anno`, poi `--commissione`. Misurato: `--numero 270` riesce 10 volte su 10, la stessa ricerca senza filtri 2 volte su 8. Se una ricerca fallisce per troncatura, la CLI dice quale filtro aggiungere. Il numero di seduta riparte in ogni commissione: `--numero` senza `--commissione`/`--codcom` restituisce le sedute con quel numero di tutte le commissioni, e la CLI lo ricorda su stderr anche quando la riga è una sola.
 
 ### ddl
 
@@ -493,7 +493,7 @@ Resoconti delle Sedute d'Aula (archivio 217).
 Risoluzioni parlamentari (archivio 238).
 
 - **`ars-sicilia-pp-cli risoluzioni cerca`** - Cerca risoluzioni.
-- **`ars-sicilia-pp-cli risoluzioni get`** - Scarica una singola risoluzione.
+- **`ars-sicilia-pp-cli risoluzioni get`** - Scarica una singola risoluzione. Le risoluzioni sono numerate per commissione (`1/I`, `1/II`…), quindi lo stesso numero indica atti diversi: `--commissione` (ordinale `PRIMA`..`SESTA` o una parola della denominazione) sceglie quello giusto, e senza la CLI dice su stderr quale ha aperto.
 
 
 ## Output Formats
