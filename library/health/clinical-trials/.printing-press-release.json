@@ -2,17 +2,17 @@
   "schema_version": 1,
   "slug": "clinical-trials",
   "cli_name": "clinical-trials-pp-cli",
-  "version": "2026.10.1",
-  "released_at": "2026-10-11T08:51:48Z",
-  "source_commit": "926bcb7295f02bc36abaa040763c3d2f291a1606",
+  "version": "2026.10.2",
+  "released_at": "2026-10-13T08:47:40Z",
+  "source_commit": "8342ee9356fa24516a66b258ed3a321b0a6b19d2",
   "printing_press_version": "4.25.0",
   "run_id": "20260623-164233-df565e8d",
   "changes": [
     {
-      "title": "fix(clinical-trials): carry first_posted date on normalized trials",
-      "pr": 2298,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/2298",
-      "commit": "926bcb7295f02bc36abaa040763c3d2f291a1606"
+      "title": "fix(clinical-trials): Trial list fields always marshal as []",
+      "pr": 2311,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/2311",
+      "commit": "8342ee9356fa24516a66b258ed3a321b0a6b19d2"
     }
   ]
 }

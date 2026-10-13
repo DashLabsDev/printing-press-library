@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.10.2 - 2026-10-13
+
+- fix(clinical-trials): Trial list fields always marshal as [] (#2311).
+
 ## 2026.10.1 - 2026-10-11
 
 - fix(clinical-trials): carry first_posted date on normalized trials (#2298).
