@@ -6069,9 +6069,9 @@
       "path": "library/commerce/costco-sameday",
       "release": {
         "cli_name": "costco-sameday-pp-cli",
-        "version": "2026.10.3",
-        "released_at": "2026-10-12T08:48:46Z",
-        "source_commit": "bc734dc5c9603969ffa16d3a50912ddc350803c1"
+        "version": "2026.10.4",
+        "released_at": "2026-10-14T15:37:19Z",
+        "source_commit": "54ca21d4325956ae4739f6e30911622997cef1da"
       },
       "printer": "DashLabsDev",
       "printer_name": "Thomas McCormick",
