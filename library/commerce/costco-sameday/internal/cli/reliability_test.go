@@ -28,6 +28,11 @@ import (
 // scriptedLogin runs runBrowserLogin against a fake pipe browser whose
 // Target.getTargets answers come from pages(poll) and cookies from sid(poll).
 func scriptedLogin(t *testing.T, pages func(poll int) string, sid func(poll int) string, grace time.Duration) (browserLoginResult, error, string) {
+	return scriptedLoginKill(t, pages, sid, grace, 0)
+}
+
+// scriptedLoginKill ends the browser process at poll killAt (0: never).
+func scriptedLoginKill(t *testing.T, pages func(poll int) string, sid func(poll int) string, grace time.Duration, killAt int) (browserLoginResult, error, string) {
 	t.Helper()
 	if runtime.GOOS == "windows" {
 		t.Skip("uses a Unix stand-in process")
@@ -52,6 +57,9 @@ func scriptedLogin(t *testing.T, pages func(poll int) string, sid func(poll int)
 				return `{"product":"FakeChrome/1"}`, ""
 			case "Target.getTargets":
 				poll++
+				if killAt > 0 && poll == killAt {
+					_ = proc.Process.Kill()
+				}
 				return `{"targetInfos":[` + pages(poll) + `]}`, ""
 			case "Storage.getCookies":
 				return `{"cookies":[{"name":"` + sessionCookieName + `","value":"` + sid(poll) + `","domain":"sameday.fake.test","session":true}]}`, ""
@@ -356,5 +364,54 @@ func TestOrderTipGraphQLErrorExitsNonZero(t *testing.T) {
 	out, _, err := runRootSplit(t, "order", "tip", "--checkout-session-id", "sess-fake", "--tip-input-token", "tip-fake", "--yes", "--json")
 	if err == nil || !strings.Contains(err.Error(), "tip rejected (fake)") || !strings.Contains(out, `"updated": false`) {
 		t.Fatalf("err=%v\n%s", err, out)
+	}
+}
+
+func TestBrowserLoginProcessExitNamesLastPage(t *testing.T) {
+	_, err, out := scriptedLoginKill(t,
+		func(int) string { return fakeSSOPage },
+		func(int) string { return "FAKE-GUEST-SID" }, 10*time.Second, 3)
+	if !errors.Is(err, errBrowserClosed) {
+		t.Fatalf("err = %v", err)
+	}
+	if !strings.Contains(err.Error(), "https://signin.fake.test/sso/callback") || !strings.Contains(out, "last page seen") || strings.Contains(err.Error()+out, "FAKE-SECRET-CODE") {
+		t.Fatalf("err=%v out=%q", err, out)
+	}
+}
+
+func TestOrderStartUserLocationZipDrivesShopAndCart(t *testing.T) {
+	rec := routedSameDay(t, withReplies(map[string]string{initializeCheckoutOp: fakeStartOK}))
+	out, _, err := runRootSplit(t, "order", "start", "--user-location", `{"postalCode":"10001"}`, "--json")
+	if err != nil {
+		t.Fatalf("order start: %v\n%s", err, out)
+	}
+	if got := rec.vars["ShopCollectionScoped"]["postalCode"]; got != "10001" {
+		t.Fatalf("shop lookup ZIP = %v", got)
+	}
+	loc, _ := rec.vars[initializeCheckoutOp]["userLocation"].(map[string]any)
+	if loc["postalCode"] != "10001" {
+		t.Fatalf("userLocation = %v", loc)
+	}
+	if _, has := loc["coordinates"]; has {
+		t.Fatalf("coordinates from another ZIP were sent: %v", loc)
+	}
+}
+
+func TestOrderStartFullySpecifiedNeedsNoGeolocation(t *testing.T) {
+	replies := withReplies(map[string]string{initializeCheckoutOp: fakeStartOK})
+	delete(replies, "Geolocation")
+	rec := routedSameDay(t, replies)
+	out, _, err := runRootSplit(t, "order", "start", "--shop-id", "shop-1", "--cart-id", "cart-fake",
+		"--user-location", `{"postalCode":"10001","coordinates":{"latitude":1.5,"longitude":2.5}}`, "--json")
+	if err != nil {
+		t.Fatalf("order start: %v\n%s", err, out)
+	}
+	if _, called := rec.methods["Geolocation"]; called {
+		t.Fatal("Geolocation called although location, shop and cart were given")
+	}
+	v := rec.vars[initializeCheckoutOp]
+	loc, _ := v["userLocation"].(map[string]any)
+	if v["cartId"] != "cart-fake" || v["shopId"] != "shop-1" || loc["postalCode"] != "10001" || loc["coordinates"] == nil {
+		t.Fatalf("vars = %v", v)
 	}
 }

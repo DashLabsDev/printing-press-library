@@ -369,8 +369,10 @@ func runBrowserLogin(ctx context.Context, opts browserLoginOptions) (browserLogi
 			}
 			return res, ctx.Err()
 		case <-exited:
+			// The browser process ended (window closed): no grace delay,
+			// but still name the last page seen.
 			reaped = true
-			return res, errBrowserClosed
+			return res, browserClosedErr(lastPageURL, opts.Out)
 		case <-ticker.C:
 		}
 

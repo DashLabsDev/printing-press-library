@@ -154,9 +154,33 @@ func (p orderStartPlan) variables() map[string]any {
 func resolveOrderStart(cmd *cobra.Command, c *client.Client, serviceType, shopID, cartID, addressID string, loc map[string]any) (orderStartPlan, error) {
 	ctx := cmd.Context()
 	plan := orderStartPlan{ServiceType: serviceType, Sources: map[string]string{}}
-	sc, err := c.ResolveSessionContext(ctx, client.SessionNeeds{Location: true})
-	if err != nil {
-		return plan, classifyAPIErrorOnly(err)
+	// An explicit --user-location ZIP drives session resolution, so the
+	// shop and cart are picked for that ZIP. With location, shop and cart
+	// all supplied, no lookup is needed.
+	explicitZip, _ := loc["postalCode"].(string)
+	explicitZip = strings.TrimSpace(explicitZip)
+	var sc client.SessionContext
+	if explicitZip != "" {
+		if err := client.ValidatePostalCode(explicitZip); err != nil {
+			return plan, usageErr(fmt.Errorf("--user-location postalCode: %w", err))
+		}
+		c.SetSessionPostalCode(explicitZip)
+	}
+	if explicitZip != "" && shopID != "" && cartID != "" {
+		sc.PostalCode = explicitZip
+		sc.Latitude, sc.Longitude = locationCoordinates(loc)
+	} else {
+		var err error
+		sc, err = c.ResolveSessionContext(ctx, client.SessionNeeds{Location: true})
+		if err != nil {
+			return plan, classifyAPIErrorOnly(err)
+		}
+		if explicitZip != "" && sc.PostalCode != explicitZip {
+			// Geolocation coordinates belong to another ZIP; use only the
+			// caller's.
+			sc.PostalCode = explicitZip
+			sc.Latitude, sc.Longitude = locationCoordinates(loc)
+		}
 	}
 	shops, shopsErr := c.CostcoShops(ctx, sc.PostalCode, sc.Latitude, sc.Longitude)
 	want := strings.ToLower(serviceType)
@@ -289,4 +313,15 @@ func orderStartResult(data []byte, status int, plan orderStartPlan) (map[string]
 		"costco-sameday-pp-cli order preview --checkout-session-id " + sid,
 	}
 	return out, ""
+}
+
+// locationCoordinates reads coordinates from a --user-location object.
+func locationCoordinates(loc map[string]any) (*float64, *float64) {
+	coords, _ := loc["coordinates"].(map[string]any)
+	lat, okLat := coords["latitude"].(float64)
+	lng, okLng := coords["longitude"].(float64)
+	if !okLat || !okLng {
+		return nil, nil
+	}
+	return &lat, &lng
 }
