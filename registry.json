@@ -2246,9 +2246,9 @@
       "path": "library/other/ars-sicilia",
       "release": {
         "cli_name": "ars-sicilia-pp-cli",
-        "version": "2026.9.7",
-        "released_at": "2026-09-19T09:16:02Z",
-        "source_commit": "96f12fde5451d1d14a3d6cd378c775b81e7afb4d"
+        "version": "2026.10.1",
+        "released_at": "2026-10-12T08:48:46Z",
+        "source_commit": "ba738e992a81c7f5cdbbc44b24d892ec88ffe2f5"
       },
       "printer": "aborruso",
       "printer_name": "aborruso",
@@ -5069,9 +5069,9 @@
       "path": "library/health/clinical-trials",
       "release": {
         "cli_name": "clinical-trials-pp-cli",
-        "version": "2026.10.1",
-        "released_at": "2026-10-11T08:51:48Z",
-        "source_commit": "926bcb7295f02bc36abaa040763c3d2f291a1606"
+        "version": "2026.10.3",
+        "released_at": "2026-10-14T08:49:37Z",
+        "source_commit": "8183b6b89d72c94bfe10a915afafad5c9081879d"
       },
       "printer": "laci141",
       "printer_name": "laci141",
@@ -6069,9 +6069,9 @@
       "path": "library/commerce/costco-sameday",
       "release": {
         "cli_name": "costco-sameday-pp-cli",
-        "version": "2026.10.2",
-        "released_at": "2026-10-10T08:55:24Z",
-        "source_commit": "7eaf6d03d9d88efbe36b44e113d300838bfa0424"
+        "version": "2026.10.3",
+        "released_at": "2026-10-12T08:48:46Z",
+        "source_commit": "bc734dc5c9603969ffa16d3a50912ddc350803c1"
       },
       "printer": "DashLabsDev",
       "printer_name": "Dash Labs",
@@ -9991,7 +9991,10 @@
         "Remaining dollars of today's subsidy and when it is valid.",
         "Menu search",
         "menu-search",
-        "Search menu items across all of today's events."
+        "Search menu items across all of today's events.",
+        "Delivery status",
+        "delivery-status",
+        "Whether your order for a day (default today) was delivered, with delivery time, vendor and items."
       ],
       "path": "library/food-and-dining/fooda",
       "release": {
@@ -13379,6 +13382,12 @@
         "Spot weekday/weekend and seasonal booking trends."
       ],
       "path": "library/travel/hostfully",
+      "release": {
+        "cli_name": "hostfully-pp-cli",
+        "version": "2026.10.1",
+        "released_at": "2026-10-12T08:48:46Z",
+        "source_commit": "4fdb9819cb63c6ed49bd16b65cc0602ac3435009"
+      },
       "printer": "gregmushen",
       "printer_name": "Greg Mushen",
       "creator": {
