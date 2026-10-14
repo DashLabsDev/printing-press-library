@@ -1887,9 +1887,12 @@ func init() {
 		orderPlanCmd := &cobra.Command{
 			Use:   "plan",
 			Short: "Suggest a budget-optimized add-on item for an event",
+			// The Phase 5 live gate runs this example as written, so it must name an event
+			// that is still live. Events expire: refresh the id (from `events`) and an item
+			// (from `menu`) before re-running the gate.
 			Example: strings.Trim(`
-  # Plan order with $20 budget and 'Beef Bulgogi Bowl' as anchor
-  fooda-pp-cli order plan --event S609348 --budget 20 --anchor "Beef Bulgogi Bowl"
+  # Plan order with $20 budget and 'Chicken Salad' as anchor
+  fooda-pp-cli order plan --event S610441 --budget 20 --anchor "Chicken Salad"
 `, "\n"),
 			Annotations: map[string]string{"pp:data-source": "live", "mcp:read-only": "true", "pp:happy-args": "event=S609348,anchor=Beef Bulgogi Bowl"},
 			RunE: func(cmd *cobra.Command, args []string) error {
@@ -2222,6 +2225,12 @@ func init() {
 				for _, props := range orders {
 					for _, pres := range props.Presenter {
 						o := pres.Order
+						// Scheduled orders share the delivered orders' status and carry a
+						// future date; only the delivery text separates them, and they
+						// have not been served yet. Unrecognized text is kept.
+						if state, _ := classifyDelivery(o.Delivery); state == deliveryScheduled {
+							continue
+						}
 						orderTime := time.Unix(o.OrderFulfilledTimeUnix, 0)
 						if orderTime.Before(cutoff) {
 							continue
@@ -2480,6 +2489,13 @@ func init() {
 		weekAheadCmd := &cobra.Command{
 			Use:   "week-ahead",
 			Short: "View live events for the next 7 days in a daily one-line digest",
+			Long: strings.Trim(`
+View live events for the next days in a daily one-line digest.
+
+An event drops off this list once its delivery is complete, so a day with no event
+does not mean there was no order. Run "delivery-status" to check whether an order
+was delivered.
+`, "\n"),
 			Example: strings.Trim(`
   fooda-pp-cli week-ahead
 `, "\n"),
@@ -2618,6 +2634,9 @@ func init() {
 				}
 				if len(results) == 0 {
 					fmt.Fprintln(cmd.OutOrStdout(), "No upcoming events found.")
+				}
+				if _, hasToday := groups[time.Now().Format("2006-01-02")]; !hasToday {
+					fmt.Fprintln(cmd.ErrOrStderr(), weekAheadDroppedNote)
 				}
 				return nil
 			},
