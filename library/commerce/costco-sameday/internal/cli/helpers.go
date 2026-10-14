@@ -225,6 +225,11 @@ func detectPartialFailure(data []byte) *partialFailureReport {
 		}
 		return report
 	}
+	// Hand-authored (graphql_failure.go): GraphQL reports failures in the
+	// body of a 2xx, as a top-level errors array or an *Error typename.
+	if report := detectGraphQLFailure(top); report != nil {
+		return report
+	}
 	return nil
 }
 

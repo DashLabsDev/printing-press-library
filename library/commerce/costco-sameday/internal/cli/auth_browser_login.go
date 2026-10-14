@@ -208,6 +208,32 @@ func cookieHeaderOf(cs []sessionCookie) string {
 	return strings.Join(parts, "; ")
 }
 
+// browserClosedGrace is how long polls must keep seeing no page target
+// before the login window counts as closed (a var so tests can shorten it).
+var browserClosedGrace = 4 * time.Second
+
+// startLoginBrowserFn starts the login browser (replaced in tests).
+var startLoginBrowserFn = startLoginBrowser
+
+// redactedPageURL keeps only scheme, host and path of a page URL: no query,
+// fragment or user info, which can carry SSO codes or state.
+func redactedPageURL(raw string) string {
+	u, err := url.Parse(raw)
+	if err != nil || u.Host == "" {
+		return ""
+	}
+	return (&url.URL{Scheme: u.Scheme, Host: u.Host, Path: u.Path}).String()
+}
+
+// browserClosedErr reports a closed login window with the last page seen.
+func browserClosedErr(lastURL string, out io.Writer) error {
+	if lastURL == "" {
+		return errBrowserClosed
+	}
+	fmt.Fprintf(out, "Login window closed; last page seen: %s\n", lastURL)
+	return fmt.Errorf("%w (last page seen: %s)", errBrowserClosed, lastURL)
+}
+
 // runBrowserLogin launches the browser, waits for a signed-in session,
 // captures the session cookies and closes the browser.
 //
@@ -265,7 +291,7 @@ func runBrowserLogin(ctx context.Context, opts browserLoginOptions) (browserLogi
 	args = append(args, opts.ExtraFlags...)
 	args = append(args, opts.StartURL)
 	started := time.Now()
-	proc, cdpc, exited, err := startLoginBrowser(ctx, bin, args)
+	proc, cdpc, exited, err := startLoginBrowserFn(ctx, bin, args)
 	if err != nil {
 		return res, err
 	}
@@ -327,6 +353,10 @@ func runBrowserLogin(ctx context.Context, opts browserLoginOptions) (browserLogi
 		lastAcct    accountTypeResult
 		sawSession  bool
 		nextNotice  = time.Now().Add(time.Minute)
+		// noPagesSince is when polls started seeing no page target;
+		// lastPageURL is the last page seen (scheme, host and path only).
+		noPagesSince time.Time
+		lastPageURL  string
 	)
 	ticker := time.NewTicker(opts.PollInterval)
 	defer ticker.Stop()
@@ -352,6 +382,11 @@ func runBrowserLogin(ctx context.Context, opts browserLoginOptions) (browserLogi
 		}
 		pages, onSameDay := 0, false
 		for _, ti := range targets.TargetInfos {
+			if ti.Type == "page" {
+				if u := redactedPageURL(ti.URL); u != "" {
+					lastPageURL = u
+				}
+			}
 			if ti.Type != "page" {
 				continue
 			}
@@ -373,9 +408,19 @@ func runBrowserLogin(ctx context.Context, opts browserLoginOptions) (browserLogi
 			}
 		}
 		if pages == 0 {
+			// SSO redirects (site hops, renderer swaps, popups) can briefly
+			// leave no page target. Only a run of empty polls lasting
+			// browserClosedGrace means the user closed the window.
+			if noPagesSince.IsZero() {
+				noPagesSince = time.Now()
+			}
+			if time.Since(noPagesSince) < browserClosedGrace {
+				continue
+			}
 			closeBrowser()
-			return res, errBrowserClosed
+			return res, browserClosedErr(lastPageURL, opts.Out)
 		}
+		noPagesSince = time.Time{}
 		var jar struct {
 			Cookies []cdpCookie `json:"cookies"`
 		}
