@@ -2,17 +2,17 @@
   "schema_version": 1,
   "slug": "fooda",
   "cli_name": "fooda-pp-cli",
-  "version": "2026.10.2",
-  "released_at": "2026-10-11T08:52:49Z",
-  "source_commit": "c11db286cbaae20cf3ebef1175e7687fa29fe46e",
+  "version": "2026.10.3",
+  "released_at": "2026-10-14T08:51:51Z",
+  "source_commit": "9837e452c7793dd93ee3de048da1dd795fa863a2",
   "printing_press_version": "4.33.2",
   "run_id": "20261009-112517-8bc179ae",
   "changes": [
     {
-      "title": "fix+feat(fooda): order correctness fixes from real orders",
-      "pr": 2305,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/2305",
-      "commit": "c11db286cbaae20cf3ebef1175e7687fa29fe46e"
+      "title": "feat(fooda): add delivery-status, fix served-history",
+      "pr": 2316,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/2316",
+      "commit": "9837e452c7793dd93ee3de048da1dd795fa863a2"
     }
   ]
 }
