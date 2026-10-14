@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.10.6 - 2026-10-14
+
+- feat(thelancet): add per-work authors to curate rows and BibTeX output (#2314).
+
 ## 2026.10.5 - 2026-10-09
 
 - fix(thelancet): dedupe works by DOI on upsert (#2282).
