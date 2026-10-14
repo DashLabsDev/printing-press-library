@@ -2,6 +2,10 @@
 
 This file is maintained by printing-press-library release automation. Do not hand-edit release sections in normal PRs.
 
+## 2026.10.4 - 2026-10-14
+
+- chore(costco-sameday): credit @DashLabsDev in creator and author fields (#2285).
+
 ## 2026.10.3 - 2026-10-12
 
 - fix(costco-sameday): slots etas, one-step browser login, body-only GraphQL POSTs, delivery windows (#2310).
