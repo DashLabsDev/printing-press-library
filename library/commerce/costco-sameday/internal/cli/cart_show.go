@@ -160,14 +160,14 @@ func loadCartView(ctx context.Context, c *client.Client, cartID string) (cartVie
 		}
 		label, _ := p["priceString"].(string)
 		line.PriceLabel = label
-		cents, ok := parsePriceCents(label)
+		cents, multiBuy, ok := parsePriceCents(label)
 		if !ok {
 			missing++
 			continue
 		}
 		total := int64(math.Round(float64(cents) * line.Quantity))
 		line.UnitPrice, line.LineTotal = formatCents(cents), formatCents(total)
-		line.Estimate = strings.Contains(strings.ToLower(label), "/lb") || strings.EqualFold(line.QuantityType, "weight")
+		line.Estimate = multiBuy || strings.Contains(strings.ToLower(label), "/lb") || strings.EqualFold(line.QuantityType, "weight")
 		subtotal += total
 	}
 	view.EstimatedSubtotal = formatCents(subtotal)
@@ -177,24 +177,34 @@ func loadCartView(ctx context.Context, c *client.Client, cartID string) (cartVie
 	return view, nil
 }
 
-var priceRe = regexp.MustCompile(`\$\s*([0-9][0-9,]*)(?:\.([0-9]{2}))?`)
+var (
+	priceRe    = regexp.MustCompile(`\$\s*([0-9][0-9,]*)(?:\.([0-9]{2}))?`)
+	multiBuyRe = regexp.MustCompile(`(?i)\b(\d+)\s*(?:for|/)\s*\$`)
+)
 
 // parsePriceCents reads the first dollar amount in a price label ("$12.99",
-// "$4.99/lb", "$1,299.99").
-func parsePriceCents(label string) (int64, bool) {
+// "$4.99/lb", "$1,299.99"). A multi-buy label ("2 for $5") gives the
+// per-unit price and multiBuy=true, since the deal price needs that count.
+func parsePriceCents(label string) (cents int64, multiBuy bool, ok bool) {
 	m := priceRe.FindStringSubmatch(label)
 	if m == nil {
-		return 0, false
+		return 0, false, false
 	}
 	dollars, err := strconv.ParseInt(strings.ReplaceAll(m[1], ",", ""), 10, 64)
 	if err != nil {
-		return 0, false
+		return 0, false, false
 	}
-	cents := int64(0)
+	frac := int64(0)
 	if m[2] != "" {
-		cents, _ = strconv.ParseInt(m[2], 10, 64)
+		frac, _ = strconv.ParseInt(m[2], 10, 64)
 	}
-	return dollars*100 + cents, true
+	cents = dollars*100 + frac
+	if mb := multiBuyRe.FindStringSubmatch(label); mb != nil {
+		if n, err := strconv.ParseInt(mb[1], 10, 64); err == nil && n > 1 {
+			return int64(math.Round(float64(cents) / float64(n))), true, true
+		}
+	}
+	return cents, false, true
 }
 
 func formatCents(c int64) string {
@@ -232,7 +242,7 @@ func printCartTable(cmd *cobra.Command, v cartView) {
 	}
 	for _, l := range v.Items {
 		if l.Estimate {
-			fmt.Fprintln(w, "* priced by weight; the final amount depends on the weight picked")
+			fmt.Fprintln(w, "* estimate: priced by weight, or a multi-buy deal split per unit")
 			break
 		}
 	}

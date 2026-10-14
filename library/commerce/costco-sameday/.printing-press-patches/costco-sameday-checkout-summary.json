@@ -21,7 +21,10 @@
     "saveBookedWindow",
     "loadBookedWindow",
     "bookedWindowLabel",
-    "booked_window"
+    "booked_window",
+    "pruneBookedWindows",
+    "bookedWindowTTL"
   ],
-  "validated_outcome": "Stub tests: the summary values come from a fake invoice; summary is the first key of order preview and order place --dry-run output; dry-run sends only the invoice GET and never FinalizeCheckout; a refused place sends nothing; a slots pick booked window shows in the same session's preview but not in another session's; the state file holds no raw session id. Not run live (needs an open checkout)."
+  "validated_outcome": "Stub tests: the summary values come from a fake invoice; summary is the first key of order preview and order place --dry-run output; dry-run sends only the invoice GET and never FinalizeCheckout; a refused place sends nothing; a slots pick booked window shows in the same session's preview but not in another session's; the state file holds no raw session id. Not run live (needs an open checkout).",
+  "review_fixes": "PR #2320 review: booked windows are stored one file per hashed session id, written via temp file + rename (no shared read-modify-write); a --token pick without a label clears the earlier entry; entries older than 7 days are ignored on load as well as pruned on save."
 }

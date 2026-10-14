@@ -331,8 +331,12 @@ token is fresh) or --token from 'slots windows --show-tokens'.`),
 			booked := ""
 			if failure == "" {
 				// Remembered for order preview / order place (checkout_summary.go).
+				// --token picks carry no label: the earlier entry is cleared
+				// rather than left looking like the booked window.
 				booked = bookedWindowLabel(preview)
-				out["booked_window"] = booked
+				if booked != "" {
+					out["booked_window"] = booked
+				}
 				saveBookedWindow(sid, booked)
 			}
 			if perr := printNarrativeJSON(cmd, flags, out); perr != nil {

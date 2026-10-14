@@ -300,65 +300,106 @@ func writeSummaryLines(cmd *cobra.Command, s checkoutSummary) {
 }
 
 // --- booked window memory (set by `slots pick`) ---
+//
+// One small file per checkout session (named by a hash of the session id),
+// written to a temp file and renamed, so overlapping picks for different
+// sessions never overwrite each other and readers never see a partial file.
+
+const bookedWindowTTL = 7 * 24 * time.Hour
 
 type bookedWindowEntry struct {
 	Window string    `json:"window"`
 	At     time.Time `json:"at"`
 }
 
-func bookedWindowsPath() (string, error) {
+func bookedWindowsDir() (string, error) {
 	dir, err := cliutil.StateDir()
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(dir, "booked-windows.json"), nil
+	return filepath.Join(dir, "booked-windows"), nil
 }
 
-// sessionKey hashes the checkout session id so the state file holds no ids.
+// sessionKey hashes the checkout session id so the state holds no ids.
 func sessionKey(id string) string {
 	sum := sha256.Sum256([]byte(id))
 	return hex.EncodeToString(sum[:8])
 }
 
-func readBookedWindows() map[string]bookedWindowEntry {
-	out := map[string]bookedWindowEntry{}
-	p, err := bookedWindowsPath()
+func bookedWindowPath(sessionID string) (string, error) {
+	dir, err := bookedWindowsDir()
 	if err != nil {
-		return out
+		return "", err
 	}
-	if b, err := os.ReadFile(p); err == nil {
-		_ = json.Unmarshal(b, &out)
-	}
-	return out
+	return filepath.Join(dir, sessionKey(sessionID)+".json"), nil
 }
 
+// saveBookedWindow records window for the session; an empty window clears
+// any earlier entry (a pick whose label is unknown must not leave the old
+// window behind). Entries older than bookedWindowTTL are pruned.
 func saveBookedWindow(sessionID, window string) {
-	if sessionID == "" || window == "" {
+	if sessionID == "" {
 		return
 	}
-	p, err := bookedWindowsPath()
+	p, err := bookedWindowPath(sessionID)
 	if err != nil {
 		return
 	}
-	m := readBookedWindows()
-	cutoff := time.Now().Add(-7 * 24 * time.Hour)
-	for k, e := range m {
-		if e.At.Before(cutoff) {
-			delete(m, k)
+	pruneBookedWindows(filepath.Dir(p))
+	if window == "" {
+		_ = os.Remove(p)
+		return
+	}
+	b, err := json.Marshal(bookedWindowEntry{Window: window, At: time.Now()})
+	if err != nil {
+		return
+	}
+	if err := os.MkdirAll(filepath.Dir(p), 0o700); err != nil {
+		return
+	}
+	tmp, err := os.CreateTemp(filepath.Dir(p), ".booked-*")
+	if err != nil {
+		return
+	}
+	_, werr := tmp.Write(b)
+	cerr := tmp.Close()
+	if werr != nil || cerr != nil || os.Chmod(tmp.Name(), 0o600) != nil || os.Rename(tmp.Name(), p) != nil {
+		_ = os.Remove(tmp.Name())
+	}
+}
+
+func pruneBookedWindows(dir string) {
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return
+	}
+	cutoff := time.Now().Add(-bookedWindowTTL)
+	for _, e := range entries {
+		if info, err := e.Info(); err == nil && info.ModTime().Before(cutoff) {
+			_ = os.Remove(filepath.Join(dir, e.Name()))
 		}
 	}
-	m[sessionKey(sessionID)] = bookedWindowEntry{Window: window, At: time.Now()}
-	if b, err := json.Marshal(m); err == nil {
-		_ = os.MkdirAll(filepath.Dir(p), 0o700)
-		_ = os.WriteFile(p, b, 0o600)
-	}
 }
 
+// loadBookedWindow returns the session's booked window, or "" when none is
+// recorded or the entry is older than bookedWindowTTL.
 func loadBookedWindow(sessionID string) string {
 	if sessionID == "" {
 		return ""
 	}
-	return readBookedWindows()[sessionKey(sessionID)].Window
+	p, err := bookedWindowPath(sessionID)
+	if err != nil {
+		return ""
+	}
+	b, err := os.ReadFile(p)
+	if err != nil {
+		return ""
+	}
+	var e bookedWindowEntry
+	if json.Unmarshal(b, &e) != nil || time.Since(e.At) > bookedWindowTTL {
+		return ""
+	}
+	return e.Window
 }
 
 // bookedWindowLabel is the human label for a picked window.

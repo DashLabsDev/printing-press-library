@@ -215,13 +215,61 @@ func TestCartShowPricesItems(t *testing.T) {
 }
 
 func TestParsePriceCents(t *testing.T) {
-	for in, want := range map[string]int64{"$3.49": 349, "$10.00/lb": 1000, "$1,299.99": 129999, "2 for $5": 500, "$7": 700} {
-		if got, ok := parsePriceCents(in); !ok || got != want {
-			t.Errorf("parsePriceCents(%q) = %d %v, want %d", in, got, ok, want)
+	cases := []struct {
+		in       string
+		cents    int64
+		multiBuy bool
+	}{
+		{"$3.49", 349, false}, {"$10.00/lb", 1000, false}, {"$1,299.99", 129999, false},
+		{"2 for $5", 250, true}, {"3 for $10.00", 333, true}, {"$7", 700, false},
+	}
+	for _, c := range cases {
+		got, mb, ok := parsePriceCents(c.in)
+		if !ok || got != c.cents || mb != c.multiBuy {
+			t.Errorf("parsePriceCents(%q) = %d %v %v, want %d %v", c.in, got, mb, ok, c.cents, c.multiBuy)
 		}
 	}
-	if _, ok := parsePriceCents("see price in cart"); ok {
+	if _, _, ok := parsePriceCents("see price in cart"); ok {
 		t.Error("parsed a label with no amount")
+	}
+}
+
+func TestCartShowMultiBuyIsPerUnit(t *testing.T) {
+	routedSameDay(t, withReplies(map[string]string{
+		"UserCart": `{"data":{"userCart":{"itemCount":2,"cartItemCollection":{"cartItems":[{"quantity":2,"quantityType":"each","basketProduct":{"id":"items_fake-9","name":"Fake Deal"}}]}}}}`,
+		"Items":    `{"data":{"items":[{"id":"items_fake-9","name":"Fake Deal","price":{"viewSection":{"priceString":"2 for $5"}}}]}}`,
+	}))
+	out, _, err := runRootSplit(t, "cart", "show", "--json")
+	if err != nil || !strings.Contains(out, `"line_total": "$5.00"`) || !strings.Contains(out, `"unit_price": "$2.50"`) || !strings.Contains(out, `"estimate": true`) {
+		t.Fatalf("multi-buy: %v\n%s", err, out)
+	}
+}
+
+func TestBookedWindowTokenPickClearsAndExpires(t *testing.T) {
+	routedSameDay(t, sessionReplies)
+	saveBookedWindow("sess-fake", "Fri 2-4pm (fake)")
+	if got := loadBookedWindow("sess-fake"); got != "Fri 2-4pm (fake)" {
+		t.Fatalf("load = %q", got)
+	}
+	saveBookedWindow("sess-fake", "") // a --token pick has no label
+	if got := loadBookedWindow("sess-fake"); got != "" {
+		t.Fatalf("old window survived an unlabeled pick: %q", got)
+	}
+	// Entries older than the TTL are ignored even when nothing prunes them.
+	p, _ := bookedWindowPath("sess-old-fake")
+	_ = os.MkdirAll(filepath.Dir(p), 0o700)
+	old, _ := json.Marshal(bookedWindowEntry{Window: "Mon 9-11am (fake)", At: time.Now().Add(-8 * 24 * time.Hour)})
+	if err := os.WriteFile(p, old, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if got := loadBookedWindow("sess-old-fake"); got != "" {
+		t.Fatalf("expired entry loaded: %q", got)
+	}
+	// Separate sessions live in separate files.
+	saveBookedWindow("sess-a-fake", "A (fake)")
+	saveBookedWindow("sess-b-fake", "B (fake)")
+	if loadBookedWindow("sess-a-fake") != "A (fake)" || loadBookedWindow("sess-b-fake") != "B (fake)" {
+		t.Fatal("sessions overwrote each other")
 	}
 }
 
@@ -310,9 +358,12 @@ func TestSlotsPickBookedWindowFlowsToPreview(t *testing.T) {
 	if strings.Contains(out, `"window": "`) {
 		t.Fatalf("window leaked across sessions:\n%.400s", out)
 	}
-	p, _ := bookedWindowsPath()
-	raw, _ := os.ReadFile(p)
-	if strings.Contains(string(raw), "sess-fake") {
-		t.Fatalf("state file stores the raw session id: %s", raw)
+	dir, _ := bookedWindowsDir()
+	entries, _ := os.ReadDir(dir)
+	for _, e := range entries {
+		raw, _ := os.ReadFile(filepath.Join(dir, e.Name()))
+		if strings.Contains(e.Name()+string(raw), "sess-fake") {
+			t.Fatalf("state stores the raw session id: %s %s", e.Name(), raw)
+		}
 	}
 }

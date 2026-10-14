@@ -18,5 +18,6 @@
     "parsePriceCents",
     "formatCents"
   ],
-  "validated_outcome": "Stub test: three items (each, weight, unpriced) give $3.49 x2 = $6.98, $10.00/lb x1.5 = $15.00 estimate, subtotal $21.98 and a note for the unpriced item; the list alias works. Read-only live check against an empty cart: 0 items, $0.00."
+  "validated_outcome": "Stub test: three items (each, weight, unpriced) give $3.49 x2 = $6.98, $10.00/lb x1.5 = $15.00 estimate, subtotal $21.98 and a note for the unpriced item; the list alias works. Read-only live check against an empty cart: 0 items, $0.00.",
+  "review_fixes": "PR #2320 review: multi-buy labels (\"2 for $5\") give the per-unit price and are marked estimate instead of treating the deal price as the unit price."
 }
