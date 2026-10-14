@@ -5069,9 +5069,9 @@
       "path": "library/health/clinical-trials",
       "release": {
         "cli_name": "clinical-trials-pp-cli",
-        "version": "2026.10.3",
-        "released_at": "2026-10-14T08:49:37Z",
-        "source_commit": "8183b6b89d72c94bfe10a915afafad5c9081879d"
+        "version": "2026.10.4",
+        "released_at": "2026-10-14T08:50:32Z",
+        "source_commit": "ed2dc468034a913f84c470d9f1339fc901683992"
       },
       "printer": "laci141",
       "printer_name": "laci141",
@@ -6074,10 +6074,10 @@
         "source_commit": "bc734dc5c9603969ffa16d3a50912ddc350803c1"
       },
       "printer": "DashLabsDev",
-      "printer_name": "Dash Labs",
+      "printer_name": "Thomas McCormick",
       "creator": {
         "handle": "DashLabsDev",
-        "name": "Dash Labs"
+        "name": "DashLabsDev"
       },
       "mcp": {
         "binary": "costco-sameday-pp-mcp",
@@ -9999,9 +9999,9 @@
       "path": "library/food-and-dining/fooda",
       "release": {
         "cli_name": "fooda-pp-cli",
-        "version": "2026.10.2",
-        "released_at": "2026-10-11T08:52:49Z",
-        "source_commit": "c11db286cbaae20cf3ebef1175e7687fa29fe46e"
+        "version": "2026.10.3",
+        "released_at": "2026-10-14T08:51:51Z",
+        "source_commit": "9837e452c7793dd93ee3de048da1dd795fa863a2"
       },
       "printer": "enlewof",
       "printer_name": "Allen Lew",
@@ -29675,7 +29675,7 @@
       "printer_name": "Thomas McCormick",
       "creator": {
         "handle": "DashLabsDev",
-        "name": "Thomas McCormick"
+        "name": "DashLabsDev"
       },
       "mcp": {
         "binary": "texas-roadhouse-pp-mcp",
@@ -29725,9 +29725,9 @@
       "path": "library/developer-tools/thelancet",
       "release": {
         "cli_name": "thelancet-pp-cli",
-        "version": "2026.10.5",
-        "released_at": "2026-10-09T08:59:31Z",
-        "source_commit": "6542406ce782b705602ef8cbc35852d217624edc"
+        "version": "2026.10.6",
+        "released_at": "2026-10-14T08:50:32Z",
+        "source_commit": "428dd0e6be95072f307b90398bf81097286451f6"
       },
       "printer": "laci141",
       "printer_name": "laci141",
