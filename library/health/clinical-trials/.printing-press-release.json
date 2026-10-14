@@ -2,17 +2,17 @@
   "schema_version": 1,
   "slug": "clinical-trials",
   "cli_name": "clinical-trials-pp-cli",
-  "version": "2026.10.2",
-  "released_at": "2026-10-13T08:47:40Z",
-  "source_commit": "8342ee9356fa24516a66b258ed3a321b0a6b19d2",
+  "version": "2026.10.3",
+  "released_at": "2026-10-14T08:49:37Z",
+  "source_commit": "8183b6b89d72c94bfe10a915afafad5c9081879d",
   "printing_press_version": "4.25.0",
   "run_id": "20260623-164233-df565e8d",
   "changes": [
     {
-      "title": "fix(clinical-trials): Trial list fields always marshal as []",
-      "pr": 2311,
-      "url": "https://github.com/mvanhorn/printing-press-library/pull/2311",
-      "commit": "8342ee9356fa24516a66b258ed3a321b0a6b19d2"
+      "title": "fix(clinical-trials): keep similar conditions key present",
+      "pr": 2312,
+      "url": "https://github.com/mvanhorn/printing-press-library/pull/2312",
+      "commit": "8183b6b89d72c94bfe10a915afafad5c9081879d"
     }
   ]
 }
