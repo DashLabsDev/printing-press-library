@@ -415,3 +415,22 @@ func TestOrderStartFullySpecifiedNeedsNoGeolocation(t *testing.T) {
 		t.Fatalf("vars = %v", v)
 	}
 }
+
+func TestOrderStartUserLocationZipIsNotSavedAsDefault(t *testing.T) {
+	rec := routedSameDay(t, withReplies(map[string]string{initializeCheckoutOp: fakeStartOK}))
+	if _, _, err := runRootSplit(t, "order", "start", "--user-location", `{"postalCode":"10001"}`, "--json"); err != nil {
+		t.Fatal(err)
+	}
+	// A later command without a ZIP must resolve from the session default, not 10001.
+	out, _, err := runRootSplit(t, "order", "start", "--json")
+	if err != nil {
+		t.Fatalf("second start: %v\n%s", err, out)
+	}
+	if got := rec.vars["ShopCollectionScoped"]["postalCode"]; got == "10001" {
+		t.Fatalf("--user-location ZIP was remembered as the default")
+	}
+	loc, _ := rec.vars[initializeCheckoutOp]["userLocation"].(map[string]any)
+	if loc["postalCode"] == "10001" {
+		t.Fatalf("second request used the earlier --user-location ZIP: %v", loc)
+	}
+}

@@ -154,7 +154,8 @@ func (p orderStartPlan) variables() map[string]any {
 func resolveOrderStart(cmd *cobra.Command, c *client.Client, serviceType, shopID, cartID, addressID string, loc map[string]any) (orderStartPlan, error) {
 	ctx := cmd.Context()
 	plan := orderStartPlan{ServiceType: serviceType, Sources: map[string]string{}}
-	// An explicit --user-location ZIP drives session resolution, so the
+	// An explicit --user-location ZIP applies to this request only (never
+	// saved as the default ZIP) and drives session resolution, so the
 	// shop and cart are picked for that ZIP. With location, shop and cart
 	// all supplied, no lookup is needed.
 	explicitZip, _ := loc["postalCode"].(string)
@@ -164,14 +165,13 @@ func resolveOrderStart(cmd *cobra.Command, c *client.Client, serviceType, shopID
 		if err := client.ValidatePostalCode(explicitZip); err != nil {
 			return plan, usageErr(fmt.Errorf("--user-location postalCode: %w", err))
 		}
-		c.SetSessionPostalCode(explicitZip)
 	}
 	if explicitZip != "" && shopID != "" && cartID != "" {
 		sc.PostalCode = explicitZip
 		sc.Latitude, sc.Longitude = locationCoordinates(loc)
 	} else {
 		var err error
-		sc, err = c.ResolveSessionContext(ctx, client.SessionNeeds{Location: true})
+		sc, err = c.ResolveSessionContext(ctx, client.SessionNeeds{Location: true, PostalCode: explicitZip})
 		if err != nil {
 			return plan, classifyAPIErrorOnly(err)
 		}
@@ -209,7 +209,7 @@ func resolveOrderStart(cmd *cobra.Command, c *client.Client, serviceType, shopID
 	if cartID != "" {
 		plan.CartID, plan.Sources["cart_id"] = cartID, "flag"
 	} else {
-		cs, err := c.ResolveSessionContext(ctx, client.SessionNeeds{Cart: true, ShopID: plan.ShopID})
+		cs, err := c.ResolveSessionContext(ctx, client.SessionNeeds{Cart: true, ShopID: plan.ShopID, PostalCode: explicitZip})
 		if err != nil {
 			return plan, classifyAPIErrorOnly(err)
 		}

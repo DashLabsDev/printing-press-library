@@ -27,5 +27,5 @@
     "locationCoordinates"
   ],
   "validated_outcome": "go build/vet green; local-stub tests: session auto-fill (cart, delivery and pickup shops, ZIP), POST body-only operation, uppercase service type, location-id refusal with no request sent, bad service type / location usage errors, empty-cart redirect exits non-zero with started:false, dry-run sends nothing, one 503 then success retries InitializeCheckout once, UpdateCheckout is not retried on 503. Not run live: InitializeCheckout creates a checkout session.",
-  "review_fixes": "PR #2319 review: an explicit --user-location postalCode now drives session resolution (shop and cart are chosen for that ZIP, geolocation coordinates from another ZIP are not sent), and with location, shop and cart all given no geolocation lookup is made."
+  "review_fixes": "PR #2319 review: an explicit --user-location postalCode now drives session resolution (shop and cart are chosen for that ZIP, geolocation coordinates from another ZIP are not sent), and with location, shop and cart all given no geolocation lookup is made. Second round: the --user-location ZIP is passed per request (SessionNeeds.PostalCode) and is no longer saved as the default ZIP."
 }
