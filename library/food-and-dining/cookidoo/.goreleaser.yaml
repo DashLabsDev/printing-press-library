@@ -1,0 +1,55 @@
+version: 2
+project_name: cookidoo-pp-cli
+changelog:
+  disable: true
+builds:
+  - id: cookidoo-pp-cli
+    main: ./cmd/cookidoo-pp-cli
+    binary: cookidoo-pp-cli
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X github.com/mvanhorn/printing-press-library/library/food-and-dining/cookidoo/internal/cli.version={{ .Version }}
+    targets:
+      - darwin_amd64
+      - darwin_arm64
+      - linux_amd64
+      - linux_arm64
+      - windows_amd64
+      - windows_arm64
+  - id: cookidoo-pp-mcp
+    main: ./cmd/cookidoo-pp-mcp
+    binary: cookidoo-pp-mcp
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
+    targets:
+      - darwin_amd64
+      - darwin_arm64
+      - linux_amd64
+      - linux_arm64
+      - windows_amd64
+      - windows_arm64
+archives:
+  - formats: [tar.gz]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+checksum:
+  name_template: checksums.txt
+brews:
+  - name: cookidoo-pp-cli
+    repository:
+      owner: educrvz
+      name: homebrew-tap
+    homepage: "https://github.com/mvanhorn/printing-press-library"
+    description: "Read-only Cookidoo CLI for public recipe details and local recipe analysis."
+    install: |
+      bin.install "cookidoo-pp-cli"
+      bin.install "cookidoo-pp-mcp"

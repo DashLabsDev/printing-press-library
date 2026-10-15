@@ -1,0 +1,8 @@
+# Root-anchored so cmd/<binary>/ source stays tracked.
+/cookidoo-pp-cli
+/cookidoo-pp-cli.exe
+/cookidoo-pp-mcp
+/cookidoo-pp-mcp.exe
+/bin/
+/build/
+/dist/

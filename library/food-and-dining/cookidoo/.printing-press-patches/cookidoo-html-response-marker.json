@@ -1,0 +1,11 @@
+{
+  "schema_version": 2,
+  "id": "cookidoo-html-response-marker",
+  "applied_at": "2026-10-14",
+  "base_run_id": "20261014-192048",
+  "base_printing_press_version": "4.33.5",
+  "summary": "Mark public Cookidoo page requests as HTML for the generated client response guard.",
+  "reason": "The generated client rejects HTML unless the internal response marker accompanies the HTML Accept header; the recipe extractor parses the page's embedded JSON-LD.",
+  "files": ["internal/cli/cookidoo_views.go"],
+  "validated_outcome": "Full live Phase 5 rerun passed after adding the explicit internal marker; public recipe HTML reaches the JSON-LD extractor."
+}

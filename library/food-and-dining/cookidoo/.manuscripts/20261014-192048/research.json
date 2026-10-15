@@ -1,0 +1,84 @@
+{
+  "api_name": "cookidoo",
+  "novelty_score": 6,
+  "alternatives": [],
+  "gaps": [
+    "Public search is deferred because the browser-rendered search flow does not provide a stable credential-free API contract.",
+    "Authenticated recipe collections, personal meal plans, and account mutations are outside the public release scope."
+  ],
+  "patterns": [],
+  "recommendation": "proceed",
+  "researched_at": "2026-10-14T16:45:00Z",
+  "novel_features": [
+    {
+      "name": "Multi-Recipe Ingredient Plan",
+      "command": "recipes plan",
+      "description": "Combine ingredients from multiple public Cookidoo recipes into one structured plan for review and shopping handoff.",
+      "rationale": "Cookidoo's public recipe pages return one recipe at a time; the CLI fetches and normalizes several recipes locally to produce a combined ingredient plan that no single API response provides.",
+      "example": "cookidoo-pp-cli recipes plan r68517 r68522 --agent",
+      "why_it_matters": "Use this when an agent needs one reviewable ingredient list for several selected recipes before a separate shopping search.",
+      "group": "Read-only meal planning"
+    }
+  ],
+  "novel_features_built": [
+    {
+      "name": "Multi-Recipe Ingredient Plan",
+      "command": "recipes plan",
+      "description": "Combine ingredients from multiple public Cookidoo recipes into one structured plan for review and shopping handoff.",
+      "rationale": "Cookidoo's public recipe pages return one recipe at a time; the CLI fetches and normalizes several recipes locally to produce a combined ingredient plan that no single API response provides.",
+      "example": "cookidoo-pp-cli recipes plan r68517 r68522 --agent",
+      "why_it_matters": "Use this when an agent needs one reviewable ingredient list for several selected recipes before a separate shopping search.",
+      "group": "Read-only meal planning"
+    }
+  ],
+  "auth": {},
+  "narrative": {
+    "display_name": "Cookidoo",
+    "headline": "Read-only Cookidoo CLI for public recipe details and local recipe analysis.",
+    "value_prop": "Fetch public recipe details and normalize ingredients and nutrition for agents and scripts. Combine several recipes into one ingredient plan without accessing a Cookidoo account or changing a meal plan.",
+    "auth_narrative": "Public recipe lookup does not use Cookidoo credentials. Authenticated account actions and personal meal-plan access are outside this CLI's public scope.",
+    "quickstart": [
+      {
+        "command": "cookidoo-pp-cli recipes details r68517 --agent",
+        "comment": "Start with structured details for a public recipe."
+      },
+      {
+        "command": "cookidoo-pp-cli recipes plan r68517 r68522 --agent",
+        "comment": "Combine ingredients from selected public recipes into one plan."
+      }
+    ],
+    "troubleshoots": [
+      {
+        "symptom": "A recipe ID is rejected",
+        "fix": "Use a public Cookidoo recipe ID such as r68517 or a public recipe URL."
+      },
+      {
+        "symptom": "A locale-specific recipe page cannot be found",
+        "fix": "Pass the recipe's locale with --locale, for example --locale pt-BR."
+      }
+    ],
+    "when_to_use": "Use this CLI to retrieve public recipe details, ingredients, or nutrition as structured output, or to combine several public recipes into a machine-readable ingredient plan. Use a separate shopping CLI only when you want to search a retailer catalog and review the resulting candidates.",
+    "anti_triggers": [
+      "Authenticated Cookidoo account data or personal meal plans",
+      "Adding or removing recipes from a Cookidoo week",
+      "Purchases, cart changes, or recipe search requiring browser-only credentials"
+    ],
+    "recipes": [
+      {
+        "title": "Inspect a public recipe",
+        "command": "cookidoo-pp-cli recipes details r68517 --agent",
+        "explanation": "Return public recipe data in agent-friendly structured output."
+      },
+      {
+        "title": "Combine recipe ingredients",
+        "command": "cookidoo-pp-cli recipes plan r68517 r68522 --agent",
+        "explanation": "Create one reviewable ingredient plan from several public recipes."
+      }
+    ],
+    "trigger_phrases": [
+      "get details for a Cookidoo recipe",
+      "extract ingredients from public Cookidoo recipes",
+      "combine ingredients from several recipes"
+    ]
+  }
+}

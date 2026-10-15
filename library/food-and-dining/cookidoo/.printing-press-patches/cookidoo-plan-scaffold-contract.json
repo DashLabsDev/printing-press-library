@@ -1,0 +1,11 @@
+{
+  "schema_version": 2,
+  "id": "cookidoo-plan-scaffold-contract",
+  "applied_at": "2026-10-14",
+  "base_run_id": "20261014-192048",
+  "base_printing_press_version": "4.33.5",
+  "summary": "Align the dormant generated plan scaffold's positional contract with the preserved runtime handler.",
+  "reason": "The extension hook replaces the TODO scaffold at runtime, but publish-time static skill verification reads the scaffold's Use declaration to validate documentation examples.",
+  "files": ["internal/cli/recipes_plan.go"],
+  "validated_outcome": "Full live Phase 5 passed; verify-skill reports no findings after the scaffold's usage metadata was aligned with its runtime replacement."
+}
