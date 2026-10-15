@@ -1,0 +1,8 @@
+# Root-anchored so cmd/<binary>/ source stays tracked.
+/ofa-health-clearances-pp-cli
+/ofa-health-clearances-pp-cli.exe
+/ofa-health-clearances-pp-mcp
+/ofa-health-clearances-pp-mcp.exe
+/bin/
+/build/
+/dist/

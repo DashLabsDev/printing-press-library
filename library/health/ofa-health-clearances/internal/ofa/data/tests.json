@@ -1,0 +1,1454 @@
+[
+ {
+  "code": "ACA",
+  "name": "ADVANCED CARDIAC",
+  "method": "Physical Exam",
+  "category": "Cardiovascular"
+ },
+ {
+  "code": "ADB",
+  "name": "ACHROMATOPSIA DAY BLINDNESS",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "AGI",
+  "name": "AGOUTI",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "AHE",
+  "name": "ALASKAN HUSKY ENCEPHALOPATHY",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "ALP",
+  "name": "AMSTAFF LARYNGEAL PARALYSIS/POLYNEUROPATHY",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "AMS",
+  "name": "ACRAL MUTILATION SYNDROME",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "AN",
+  "name": "ADULT ONSET NEUROPATHY",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "AYE",
+  "name": "AVA EYES",
+  "method": "Physical Exam",
+  "category": "Visual"
+ },
+ {
+  "code": "BBS",
+  "name": "PROGRESSIVE RETINAL ATROPHY BBS2 VARIANT",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "BCA",
+  "name": "BASIC CARDIAC",
+  "method": "Physical Exam",
+  "category": "Cardiovascular"
+ },
+ {
+  "code": "BJE",
+  "name": "BENIGN FAMILIAL JUVENILE EPILEPSY",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "BR",
+  "name": "BAER HEARING TEST",
+  "method": "Physical Exam",
+  "category": "Auditory"
+ },
+ {
+  "code": "BRW",
+  "name": "BROWN (TYRP 1)",
+  "method": "DNA Test",
+  "category": "Integumentary"
+ },
+ {
+  "code": "BUF",
+  "name": "DTR BUFF",
+  "method": "DNA Test",
+  "category": "Integumentary"
+ },
+ {
+  "code": "C4",
+  "name": "PRA-CRD4/CORD1",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "CA",
+  "name": "CONGENITAL CARDIAC",
+  "method": "Physical Exam",
+  "category": "Cardiovascular"
+ },
+ {
+  "code": "CA1",
+  "name": "CEREBELLAR ATAXIA (CA1)",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "CAT",
+  "name": "CATARACTS",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "CBD",
+  "name": "CEREBELLAR DEGENERATION",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "CBM",
+  "name": "COBALAMIN MALABSORPTION",
+  "method": "DNA Test",
+  "category": "Metabolic"
+ },
+ {
+  "code": "CCA",
+  "name": "CNS ATROPHY WITH CEREBELLAR ATAXIA",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "CCD",
+  "name": "NEONATAL CEREBELLAR CORTICAL DEGENERATION",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "CD",
+  "name": "CONE DEGENERATION",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "CD3",
+  "name": "PRA - CONE ROD DYSTROPHY 3",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "CDD",
+  "name": "CONGENITAL DEAFNESS (DNA BASED)",
+  "method": "DNA Test",
+  "category": "Auditory"
+ },
+ {
+  "code": "CDM",
+  "name": "CEREBELLAR DEGERATION-MYOSITITS COMPLEX (CDMC)",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "CDY",
+  "name": "CHONDRODYSTROPHY (CDDY/IVDD)",
+  "method": "DNA Test",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "CEA",
+  "name": "COLLIE EYE ANOMALY",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "CED",
+  "name": "CONGENITAL EYE DISEASE",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "CHG",
+  "name": "CONGENITAL HYPOTHROIDISM W/ GOITER",
+  "method": "DNA Test",
+  "category": "Glandular"
+ },
+ {
+  "code": "CHI",
+  "name": "CANINE HEALTH",
+  "method": "Award",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "CHO",
+  "name": "CHONDRODYSPLASIA (CDPA)",
+  "method": "DNA Test",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "CIM",
+  "name": "CONGENITAL IDIOPATHIC MEGAESOPHAGUS",
+  "method": "DNA Test",
+  "category": "Digestive"
+ },
+ {
+  "code": "CJM",
+  "name": "CARDIOMYOPATHY AND JUVENILE MORTALITY",
+  "method": "DNA Test",
+  "category": "Cardiovascular"
+ },
+ {
+  "code": "CL",
+  "name": "CEROID LIPOFUSCINOSIS",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "CL5",
+  "name": "GOLDEN RETRIEVER NEURONAL CEROID LIPOFUSCINOSIS (NCL)",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "CLD",
+  "name": "CANINE LEUKOCYTE ADHESION DEF.",
+  "method": "DNA Test",
+  "category": "Immune"
+ },
+ {
+  "code": "CMO",
+  "name": "CRANIOMANDIBULAR OSTEOPATHY",
+  "method": "DNA Test",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "CMR",
+  "name": "CANINE MULTIFOCAL RETINOPATHY",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "CMS",
+  "name": "CONGENITAL MYASTHENIC SYNDROME",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "CNM",
+  "name": "CENTRONUCLEAR MYOPATHY",
+  "method": "DNA Test",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "COU",
+  "name": "HEREDITARY CALCIUM OXALATE UROLITHIASIS",
+  "method": "DNA Test",
+  "category": "Urogenital"
+ },
+ {
+  "code": "CP",
+  "name": "CLEFT PALATE",
+  "method": "DNA Test",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "CPS",
+  "name": "CLEFT LIP/PALATE SYNDACTYLY",
+  "method": "DNA Test",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "CR2",
+  "name": "CONE ROD DYSTROPHY 2",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "CRD",
+  "name": "CONE ROD DYSTROPHY",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "CT",
+  "name": "COPPER TOXICOSIS",
+  "method": "DNA Test",
+  "category": "Glandular"
+ },
+ {
+  "code": "CU",
+  "name": "COPPER TOXICOSIS - LIVER",
+  "method": "Lab Test",
+  "category": "Glandular"
+ },
+ {
+  "code": "CY",
+  "name": "CYSTINURIA",
+  "method": "DNA Test",
+  "category": "Urogenital"
+ },
+ {
+  "code": "DAM",
+  "name": "DOBERMAN ALPHA-MANNOSIDOSIS (AMAN)",
+  "method": "DNA Test",
+  "category": "Digestive"
+ },
+ {
+  "code": "DBK",
+  "name": "K LOCUS DATABASE",
+  "method": "DNA Test",
+  "category": "Integumentary"
+ },
+ {
+  "code": "DBR",
+  "name": "DAY BLINDNESS/RETINAL DEGENERATION",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "DCM",
+  "name": "DILATED CARDIOMYOPATHY",
+  "method": "DNA Test",
+  "category": "Cardiovascular"
+ },
+ {
+  "code": "DD",
+  "name": "DISPROPORTIONATE DWARFISM",
+  "method": "DNA Test",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "DDB",
+  "name": "DNA DATA BANK",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "DE",
+  "name": "DENTITION",
+  "method": "Physical Exam",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "DEC",
+  "name": "DRY EYE CURLY COAT SYNDROME",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "DEN",
+  "name": "DEGENERATIVE ENCEPHALOPATHY",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "DL",
+  "name": "D LOCUS",
+  "method": "DNA Test",
+  "category": "Integumentary"
+ },
+ {
+  "code": "DM",
+  "name": "DEGENERATIVE MYELOPATHY",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "DMB",
+  "name": "DEGENERATIVE MYELOPATHY B",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "DMM",
+  "name": "DEGENERATIVE MYELOPATHY RISK MODIFIER",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "DMS",
+  "name": "DERMATOMYOSITIS",
+  "method": "DNA Test",
+  "category": "Integumentary"
+ },
+ {
+  "code": "DPH",
+  "name": "DELAYED POSTOPERATIVE HEMORRHAGE (DEPOH)",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "DSR",
+  "name": "DENTAL SKELETAL RETINAL ANOMALY",
+  "method": "DNA Test",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "DVD",
+  "name": "DOBERMAN VESTIBULAR OSTEOPATHY",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "DVL",
+  "name": "SCREW TAIL (DVL2)",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "DWM",
+  "name": "DANDY WALKER-LIKE MALFORMATION SYNDROME",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "ED",
+  "name": "ECTODERMAL DYSPLASIA",
+  "method": "DNA Test",
+  "category": "Integumentary"
+ },
+ {
+  "code": "EDS",
+  "name": "EHLERS-DANLOS SYNDROME",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "EF",
+  "name": "EPISODIC FALLING",
+  "method": "DNA Test",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "EHK",
+  "name": "EPIDERMOLYTIC HYPERKERATOSIS",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "EIC",
+  "name": "EXERCISE INDUCED COLLAPSE",
+  "method": "DNA Test",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "EL",
+  "name": "ELBOW",
+  "method": "Radiological",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "ENM",
+  "name": "HEREDITARY NECROTIZING MYELOPATHY",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "EOD",
+  "name": "EARLY ONSET DEAFNESS",
+  "method": "DNA Test",
+  "category": "Auditory"
+ },
+ {
+  "code": "EOP",
+  "name": "EARLY ONSET PRA",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "ERD",
+  "name": "EARLY RETINAL DEGENERATION",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "EYE",
+  "name": "EYES",
+  "method": "Physical Exam",
+  "category": "Visual"
+ },
+ {
+  "code": "F7D",
+  "name": "FACTOR VII DEFICIENCY",
+  "method": "DNA Test",
+  "category": "Cardiovascular"
+ },
+ {
+  "code": "FAC",
+  "name": "FANCONI SYNDROME",
+  "method": "DNA Test",
+  "category": "Urogenital"
+ },
+ {
+  "code": "FCS",
+  "name": "FUCOSIDOSIS",
+  "method": "DNA Test",
+  "category": "Metabolic"
+ },
+ {
+  "code": "FED",
+  "name": "FACTOR XI DEFICIENCY",
+  "method": "DNA Test",
+  "category": "Cardiovascular"
+ },
+ {
+  "code": "FEH",
+  "name": "FAMILIAL ENAMEL HYPOPLASIA",
+  "method": "DNA Test",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "FEL",
+  "name": "INT'L ELBOW REGISTRY",
+  "method": "Radiological",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "FHR",
+  "name": "INT'L HIP REGISTRY",
+  "method": "Radiological",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "FN",
+  "name": "FAMILIAL NEPHROPATHY",
+  "method": "DNA Test",
+  "category": "Urogenital"
+ },
+ {
+  "code": "G3A",
+  "name": "GLYCOGEN STORAGE DISEASE IIIA",
+  "method": "DNA Test",
+  "category": "Metabolic"
+ },
+ {
+  "code": "GCL",
+  "name": "GLOBOID CELL LEUKODYSTROPHY",
+  "method": "DNA Test",
+  "category": "Cardiovascular"
+ },
+ {
+  "code": "GCS",
+  "name": "GRAY COLLIE SYNDROME (CYCLIC NEUTROPENIA)",
+  "method": "DNA Test",
+  "category": "Integumentary"
+ },
+ {
+  "code": "GM1",
+  "name": "GM1-GANGLIOSIDOSIS",
+  "method": "DNA Test",
+  "category": "Metabolic"
+ },
+ {
+  "code": "GM2",
+  "name": "GM2-GANGLIOSIDOSIS",
+  "method": "DNA Test",
+  "category": "Metabolic"
+ },
+ {
+  "code": "GR1",
+  "name": "GR1 PROGRESSIVE RETINAL ATROPHY",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "GR2",
+  "name": "GR2 PROGRESSIVE RETINAL ATROPHY",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "GS1",
+  "name": "GLYCOGEN STORAGE DISEASE IA",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "GS2",
+  "name": "GLYCOGEN STORAGE DISEASE II",
+  "method": "DNA Test",
+  "category": "Metabolic"
+ },
+ {
+  "code": "GST",
+  "name": "GSDCA TEMPERAMENT TEST",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "GT",
+  "name": "GLANZMANN'S THROMBASTHENIA",
+  "method": "DNA Test",
+  "category": "Cardiovascular"
+ },
+ {
+  "code": "HCM",
+  "name": "HYPERTROPHIC CARDIOMYOPATHY",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "HD",
+  "name": "HIPS",
+  "method": "Radiological",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "HFH",
+  "name": "HEREDITARY FOOTPAD HYPERKERATOSIS",
+  "method": "DNA Test",
+  "category": "Integumentary"
+ },
+ {
+  "code": "HLQ",
+  "name": "HARLEQUIN",
+  "method": "DNA Test",
+  "category": "Integumentary"
+ },
+ {
+  "code": "HMA",
+  "name": "HEMOPHILIA A",
+  "method": "DNA Test",
+  "category": "Cardiovascular"
+ },
+ {
+  "code": "HMB",
+  "name": "HEMOPHILIA B",
+  "method": "DNA Test",
+  "category": "Cardiovascular"
+ },
+ {
+  "code": "HN",
+  "name": "HEREDITARY NEPHRITIS",
+  "method": "DNA Test",
+  "category": "Urogenital"
+ },
+ {
+  "code": "HNP",
+  "name": "HEREDITARY NASAL PARAKERATOSIS",
+  "method": "DNA Test",
+  "category": "Integumentary"
+ },
+ {
+  "code": "HO",
+  "name": "HOLTER ANECDOTAL INFORMATION",
+  "method": "",
+  "category": "Cardiovascular"
+ },
+ {
+  "code": "HPN",
+  "name": "CONGENITAL HYPOMYELINATING POLYNEUROPATHY (HPN)",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "HS",
+  "name": "HISTIOCYTIC SARCOMA PRE-TEST SH",
+  "method": "DNA Test",
+  "category": "Immune"
+ },
+ {
+  "code": "HU",
+  "name": "HYPERURICOSURIA",
+  "method": "DNA Test",
+  "category": "Urogenital"
+ },
+ {
+  "code": "HYM",
+  "name": "HYPOMYELINATION",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "I2",
+  "name": "ICHTHYOSIS ICH2",
+  "method": "DNA Test",
+  "category": "Integumentary"
+ },
+ {
+  "code": "I3",
+  "name": "ICHTHYOSIS 3 (ICH3)",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "ICA",
+  "name": "INTERNATIONAL CARDIAC EXAM",
+  "method": "Physical Exam",
+  "category": "Visual"
+ },
+ {
+  "code": "ICH",
+  "name": "ICHTHYOSIS",
+  "method": "DNA Test",
+  "category": "Integumentary"
+ },
+ {
+  "code": "ICL",
+  "name": "INT'L CLAD EXAM",
+  "method": "DNA Test",
+  "category": "Immune"
+ },
+ {
+  "code": "IGR",
+  "name": "IRISH SETTER GENETIC REGISTRY",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "IGS",
+  "name": "IMERSLUND-GRASBECK SYNDROME",
+  "method": "DNA Test",
+  "category": "Metabolic"
+ },
+ {
+  "code": "IM",
+  "name": "INHERITED MYOPATHY",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "IMY",
+  "name": "INFLAMMATORY MYOPATHY (MYOSITIS)",
+  "method": "DNA Test",
+  "category": "Metabolic"
+ },
+ {
+  "code": "IOE",
+  "name": "INT'L OPHTHALMOLOGICAL EXAM",
+  "method": "Physical Exam",
+  "category": "Visual"
+ },
+ {
+  "code": "ISH",
+  "name": "INT'L SHOULDER REGISTRY",
+  "method": "Radiological",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "ITG",
+  "name": "CHONDRODYSPLASIA (ITGA10, KBD/NE TYPE)",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "IVA",
+  "name": "INHERITED VENTRICULAR ARRHYTHMIA",
+  "method": "DNA Test",
+  "category": "Cardiovascular"
+ },
+ {
+  "code": "JAD",
+  "name": "JUVENILE ADDISON'S DISEASE",
+  "method": "DNA Test",
+  "category": "Immune"
+ },
+ {
+  "code": "JDC",
+  "name": "JUVENILE DILATED CARDIOMYOPATHY",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "JME",
+  "name": "JUVENILE MYOCLONIC EPILEPSY",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "KD",
+  "name": "KIDNEY",
+  "method": "Lab Test",
+  "category": "Urogenital"
+ },
+ {
+  "code": "L2H",
+  "name": "L 2 HYDROXYGLUTARIC ACIDUREA",
+  "method": "DNA Test",
+  "category": "Metabolic"
+ },
+ {
+  "code": "LA",
+  "name": "LETHAL ACRODERMATITIS",
+  "method": "DNA Test",
+  "category": "Integumentary"
+ },
+ {
+  "code": "LAM",
+  "name": "NEURONAL CEROID LIPOFUSCINOSIS AM BULLDOG TYPE (NCL 10)",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "LD",
+  "name": "LUPOID DERMATOSIS",
+  "method": "DNA Test",
+  "category": "Integumentary"
+ },
+ {
+  "code": "LE",
+  "name": "LAFORA EPILEPSY",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "LEM",
+  "name": "LEUKOENCEPHALOMYELOPATHY",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "LOA",
+  "name": "LATE ONSET ATAXIA",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "LP",
+  "name": "LEGG-CALVE-PERTHES",
+  "method": "Radiological",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "LP2",
+  "name": "LEONBERGER POLYNEUROPATHY 2",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "LP3",
+  "name": "LEONBERGER POLYNEUROPATHY 3",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "LPN",
+  "name": "LEONBERGER POLYNEUROPATHY 1",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "LPP",
+  "name": "JUVENILE LARYNGEAL PARALYSIS & POLYNEUROPATHY (LPP)",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "LSD",
+  "name": "LAGOTTO STORAGE DISEASE",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "LTT",
+  "name": "NEURONAL CEROID LIPOFUSCINOSIS (TT)",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "LXP",
+  "name": "LARYNGEAL PARALYSIS",
+  "method": "DNA Test",
+  "category": "Respiratory"
+ },
+ {
+  "code": "M3A",
+  "name": "MUCOPOLYSACCHARIDOSIS (MPS) IIIA",
+  "method": "DNA Test",
+  "category": "Metabolic"
+ },
+ {
+  "code": "M3B",
+  "name": "MUCOPOLYSACCHARIDOSIS (MPS) IIIB",
+  "method": "DNA Test",
+  "category": "Metabolic"
+ },
+ {
+  "code": "M6",
+  "name": "MUCOPOLYSACCHARIDOSIS (MPS) VI",
+  "method": "DNA Test",
+  "category": "Metabolic"
+ },
+ {
+  "code": "M7",
+  "name": "MUCOPOLYSACCHARIDOSIS (MPS) VII",
+  "method": "DNA Test",
+  "category": "Metabolic"
+ },
+ {
+  "code": "MAC",
+  "name": "MACROTHROMBOCYTOPENIA",
+  "method": "DNA Test",
+  "category": "Cardiovascular"
+ },
+ {
+  "code": "MBA",
+  "name": "MYCOBACTERIUM AVIAN COMPLEX",
+  "method": "DNA Test",
+  "category": "Immune"
+ },
+ {
+  "code": "MBS",
+  "name": "MIZZOU BIOMARKER STUDY",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "MC",
+  "name": "MYOTONIA CONGENITA",
+  "method": "DNA Test",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "MC1",
+  "name": "MCR1 (ELOCUS)",
+  "method": "DNA Test",
+  "category": "Integumentary"
+ },
+ {
+  "code": "MCD",
+  "name": "MACULAR CORNEAL DYSTROPHY",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "MCM",
+  "name": "MAXILLARY CANINE-TOOTH MESIOVERSION",
+  "method": "DNA Test",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "MD",
+  "name": "MUSCULAR DYSTROPHY",
+  "method": "DNA Test",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "MD1",
+  "name": "MULTIPLE DRUG RESISTANCE (MDR1)",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "MDD",
+  "name": "MEDIUM CHAIN ACYL-COA DEHYDROGENASE DEFICIENCY (MCADD)",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "MFE",
+  "name": "MITOCHONDRIAL FISSION ENCEPHALOPATHY",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "MLS",
+  "name": "MUSLADIN-LUEKE SYNDROME",
+  "method": "DNA Test",
+  "category": "Integumentary"
+ },
+ {
+  "code": "MP1",
+  "name": "MUCOPOLYSACCHARIDOSIS I",
+  "method": "DNA Test",
+  "category": "Metabolic"
+ },
+ {
+  "code": "MRL",
+  "name": "MERLE",
+  "method": "DNA Test",
+  "category": "Integumentary"
+ },
+ {
+  "code": "MS",
+  "name": "MICROPHTHALMIA SYNDROME",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "MUD",
+  "name": "MU DATABANK",
+  "method": "",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "NAD",
+  "name": "NEUROAXONAL DYSTROPHY",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "NAR",
+  "name": "NARCOLEPSY",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "NCA",
+  "name": "NEONATAL CEREBELLAR ATAXIA",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "NCL",
+  "name": "NEURONAL CEROID LIPOFUSCINOSIS",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "NDG",
+  "name": "NEURONAL DEGENERATION",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "NE",
+  "name": "NEONATAL ENCEPHALOPATHY",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "NES",
+  "name": "NEONATAL ENCEPHALOPATHY W/SEIZURES",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "NHC",
+  "name": "NON-HSF4 CATARACTS",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "NME",
+  "name": "NECROTIZING MENINGOENCEPHALITIS",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "OAG",
+  "name": "PRIMARY OPEN ANGLE GLAUCOMA",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "OC",
+  "name": "OSTEOCHONDRODYSPLASIA",
+  "method": "DNA Test",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "OI",
+  "name": "OSTEOGENESIS IMPERFECTA",
+  "method": "DNA Test",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "P3",
+  "name": "PRA TYPE 3",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "P4",
+  "name": "RCD4 PROGRESSIVE RETINAL ATROPHY",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "P5",
+  "name": "PROGRESSIVE RETINAL ATROPHY 5 (NECAP-1)",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "PA",
+  "name": "PATELLA",
+  "method": "Physical Exam",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "PBS",
+  "name": "PIEBALD/WHITE SPOTTING",
+  "method": "DNA Test",
+  "category": "Integumentary"
+ },
+ {
+  "code": "PCD",
+  "name": "PRIMARY CILIARY DYSKINESIA",
+  "method": "DNA Test",
+  "category": "Respiratory"
+ },
+ {
+  "code": "PCG",
+  "name": "PRIMARY CLOSED ANGLE GLAUCOMA",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "PD",
+  "name": "PITUITARY DWARFISM",
+  "method": "DNA Test",
+  "category": "Glandular"
+ },
+ {
+  "code": "PDP",
+  "name": "PYRUVATE DEHYDROGENASE PHOSPHATASE DEFICIENCY",
+  "method": "DNA Test",
+  "category": "Metabolic"
+ },
+ {
+  "code": "PF",
+  "name": "PERIANAL FISTULA",
+  "method": "DNA Test",
+  "category": "Digestive"
+ },
+ {
+  "code": "PFK",
+  "name": "PHOSPHOFRUCTOKINASE DEFICIENCY",
+  "method": "DNA Test",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "PH",
+  "name": "PRIMARY HYPEROXALURIA",
+  "method": "DNA Test",
+  "category": "Metabolic"
+ },
+ {
+  "code": "PHD",
+  "name": "PENNHIP HIPS",
+  "method": "Radiological",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "PHP",
+  "name": "PRIMARY HYPERPARATHYROIDISM",
+  "method": "DNA Test",
+  "category": "Glandular"
+ },
+ {
+  "code": "PIP",
+  "name": "PRIMARY IMMUNODEFICIENCY W/PNEUMOCYSTIS SUSCEPTIBILITY",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "PK",
+  "name": "PYRUVATE KINASE DEFICIENCY",
+  "method": "DNA Test",
+  "category": "Cardiovascular"
+ },
+ {
+  "code": "PKD",
+  "name": "POLYCYSTIC KIDNEY DISEASE",
+  "method": "DNA Test",
+  "category": "Urogenital"
+ },
+ {
+  "code": "PLH",
+  "name": "PRA - LAPPONIAN HERDER TYPE",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "PLL",
+  "name": "PRIMARY LENS LUXATION",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "PLN",
+  "name": "PROTEIN LOSING NEPHROPATHY",
+  "method": "DNA Test",
+  "category": "Urogenital"
+ },
+ {
+  "code": "PM",
+  "name": "POLYMYOSITIS",
+  "method": "DNA Test",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "PMD",
+  "name": "PERSISTENT MUELLERIAN DUCT SYNDROME",
+  "method": "DNA Test",
+  "category": "Urogenital"
+ },
+ {
+  "code": "PN",
+  "name": "POLYNEUROPATHY",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "PNA",
+  "name": "CANINE MULTIPLE SYSTEM DEGENERATION",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "PRA",
+  "name": "PROGRESSIVE RETINAL ATROPHY",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "PRM",
+  "name": "PRA MERTK (SWEDISH VALLHUND TYPE)",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "PXD",
+  "name": "PAROXYSMAL DYSKINESIA",
+  "method": "DNA Test",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "RC3",
+  "name": "PRA - ROD CONE DYSPLASIA 3",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "RDO",
+  "name": "RETINAL DYSPLASIA/OPTIC NERVE HYPOPLASIA",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "RDY",
+  "name": "RETINAL DYSPLASIA /OSD",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "RF",
+  "name": "RFGS",
+  "method": "Physical Exam",
+  "category": "Respiratory"
+ },
+ {
+  "code": "RPD",
+  "name": "RECEPTOR PLATELET DISORDER",
+  "method": "DNA Test",
+  "category": "Cardiovascular"
+ },
+ {
+  "code": "RVC",
+  "name": "ARRHYTHMOGENIC RIGHT VENTRICULAR CARDIOMYOPATHY",
+  "method": "DNA Test",
+  "category": "Cardiovascular"
+ },
+ {
+  "code": "SA",
+  "name": "SEBACEOUS ADENITIS",
+  "method": "Lab Test",
+  "category": "Integumentary"
+ },
+ {
+  "code": "SAD",
+  "name": "SHAR-PEI AUTO-INFLAMMATORY DISEASE",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "SAS",
+  "name": "SUBAORTIC STENOSIS (SAS)",
+  "method": "DNA Test",
+  "category": "Cardiovascular"
+ },
+ {
+  "code": "SBA",
+  "name": "SERUM BILE ACID",
+  "method": "Lab Test",
+  "category": "Glandular"
+ },
+ {
+  "code": "SCA",
+  "name": "SPINOCEREBELLAR ATAXIA",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "SCI",
+  "name": "SEVERE COMBINED IMMUNODEFICIENCY",
+  "method": "DNA Test",
+  "category": "Immune"
+ },
+ {
+  "code": "SD",
+  "name": "SPINAL DYSRAPHISM",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "SD2",
+  "name": "SKELETAL DYSPLASIA 2",
+  "method": "DNA Test",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "SDA",
+  "name": "SPONGY DEGENERATION WITH CEREBELLAR ATAXIA",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "SGD",
+  "name": "STARGARDT DISEASE",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "SH",
+  "name": "SHOULDER",
+  "method": "Radiological",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "SHO",
+  "name": "SIBERIAN HUSKY OPTH. REGISTRY",
+  "method": "Physical Exam",
+  "category": "Visual"
+ },
+ {
+  "code": "SHP",
+  "name": "SIBERIAN HUSKY POLYNEUROPATHY",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "SLM",
+  "name": "SPONGIFORM LEUKOENCEPHALOMYELOPATHY",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "SMA",
+  "name": "SPINAL MUSCULAR ATROPHY (SMA)",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "SN",
+  "name": "SENSORY NEUROPATHY",
+  "method": "DNA Test",
+  "category": "Respiratory"
+ },
+ {
+  "code": "SNB",
+  "name": "STATIONARY NIGHT BLINDNESS",
+  "method": "DNA Test",
+  "category": "Visual"
+ },
+ {
+  "code": "SPP",
+  "name": "SHAR-PEI PRIMARY OPEN ANGLE GLAUCOMA/PRIMARY LENS LUXATION",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "SSD",
+  "name": "SUCCINIC SEMIALDEHYDE DEHYDROGENASE DEFICIENCY (SSADHD)",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "SSP",
+  "name": "SIBERIAN HUSKY SHAKING PUPPY SYNDROME",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "TCL",
+  "name": "CARDIAC LAMINOPATHY (CLAM)",
+  "method": "DNA Test",
+  "category": "Cardiovascular"
+ },
+ {
+  "code": "TH",
+  "name": "THYROID",
+  "method": "Lab Test",
+  "category": "Glandular"
+ },
+ {
+  "code": "TNS",
+  "name": "TRAPPED NEUTROPHIL SYNDROME",
+  "method": "DNA Test",
+  "category": "Immune"
+ },
+ {
+  "code": "TP",
+  "name": "THROMBOPATHIA",
+  "method": "DNA Test",
+  "category": "Cardiovascular"
+ },
+ {
+  "code": "TRH",
+  "name": "TRACHEAL HYPOPLASIA",
+  "method": "Radiological",
+  "category": "Respiratory"
+ },
+ {
+  "code": "USE",
+  "name": "SCHUTZHUND USA ELBOW",
+  "method": "Radiological",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "USH",
+  "name": "SCHUTZHUND USA HIP",
+  "method": "Radiological",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "VEG",
+  "name": "VAN DEN ENDE-GUPTA SYNDROME",
+  "method": "DNA Test",
+  "category": "Musculoskeletal"
+ },
+ {
+  "code": "VW",
+  "name": "VON WILLEBRANDS",
+  "method": "DNA Test",
+  "category": "Cardiovascular"
+ },
+ {
+  "code": "WAE",
+  "name": "DPCA WAE",
+  "method": "",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "WHF",
+  "name": "WHIPPET HEALTH FOUNDATION",
+  "method": "DNA Test",
+  "category": "Miscellaneous"
+ },
+ {
+  "code": "WSD",
+  "name": "WOLFHOUND STARTLE DISEASE",
+  "method": "DNA Test",
+  "category": "Nervous"
+ },
+ {
+  "code": "XAN",
+  "name": "XANTHINURIA",
+  "method": "DNA Test",
+  "category": "Urogenital"
+ },
+ {
+  "code": "XMM",
+  "name": "X-LINKED MYOTUBULAR MYOPATHY",
+  "method": "DNA Test",
+  "category": "Musculoskeletal"
+ }
+]
