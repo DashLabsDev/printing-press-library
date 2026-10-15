@@ -1,0 +1,22 @@
+{
+  "schema_version": 2,
+  "id": "cookidoo-greptile-review-fixes",
+  "applied_at": "2026-10-14",
+  "base_run_id": "20261014-192048",
+  "base_printing_press_version": "4.33.5",
+  "summary": "Address Greptile security and correctness findings in the shipped Cookidoo package.",
+  "reason": "The review identified MCP callers controlling the Shopper executable, recipe HTML being returned without its JSON-LD recipe data, concurrent profile writes losing updates, and a patch record stored outside the Cookidoo package.",
+  "files": [
+    "internal/cli/cookidoo_views.go",
+    "internal/cli/cookidoo_html.go",
+    "internal/cli/cookidoo_views_test.go",
+    "internal/cli/profile.go",
+    "internal/cli/profile_concurrency_test.go",
+    "internal/mcp/tools.go",
+    "internal/mcp/tools_test.go",
+    "internal/mcp/cobratree/classify.go",
+    "internal/mcp/cobratree/typemap.go",
+    "internal/mcp/cobratree/shellout_test.go"
+  ],
+  "validated_outcome": "The implementation and regression tests are in the shipped Cookidoo module. Against package code at 9072bca039c782e48bc372e173486a739c9b1257, Go 1.26.9 go test ./..., go test -race ./..., go vet ./..., and go build ./... passed locally with a temporary modfile replacing pinned mcp-go v0.57.0 with cached v0.47.0; the pinned-dependency GitHub govulncheck and five package/manifest/supply-chain verification checks passed on the same code commit. Greptile review is pending on the corrected module paths."
+}

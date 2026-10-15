@@ -1,0 +1,51 @@
+name: cookidoo
+description: "Read-only Cookidoo CLI for public recipe details and local recipe analysis"
+version: "0.1.0"
+category: food-and-dining
+creator:
+  handle: educrvz
+  name: educrvz
+base_url: "https://cookidoo.thermomix.com"
+health_check_path: "/foundation/en-US/explore"
+required_headers:
+  - name: Accept
+    value: "text/html,application/xhtml+xml"
+auth:
+  type: none
+config:
+  format: toml
+  path: "~/.config/cookidoo-cli/config.toml"
+learn:
+  synonyms:
+    "thermomix recipe": "recipe"
+    "meal": "recipe"
+  stopwords:
+    - cookidoo
+    - thermomix
+resources:
+  recipes:
+    description: "Read public Cookidoo recipe information"
+    endpoints:
+      get:
+        method: GET
+        path: "/recipes/recipe/{locale}/{recipe_id}"
+        description: "Get a recipe as schema.org JSON-LD"
+        example: "recipes --locale en-US --recipe-id r68517"
+        happy_args: "--locale=en-US;--recipe-id=r68517"
+        params:
+          - name: locale
+            type: string
+            required: true
+            description: "Cookidoo locale, for example en-US or pt-BR"
+          - name: recipe_id
+            flag_name: recipe-id
+            type: string
+            required: true
+            description: "Cookidoo recipe ID, for example r68517"
+        response:
+          type: object
+        response_format: html
+        html_extract:
+          mode: embedded-json
+          script_selector: 'script[type="application/ld+json"]'
+          json_path: ""

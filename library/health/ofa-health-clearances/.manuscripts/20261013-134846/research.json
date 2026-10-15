@@ -1,0 +1,108 @@
+{
+  "api_name": "ofa-health-clearances",
+  "novelty_score": 0,
+  "alternatives": [],
+  "gaps": [],
+  "patterns": [],
+  "recommendation": "proceed",
+  "researched_at": "2026-10-13T17:53:09Z",
+  "novel_features": [
+    {
+      "name": "Kennel rollup",
+      "command": "kennels",
+      "description": "See which kennels in a breed are actively health-testing young dogs, ranked by tested dogs, CHIC dogs, and latest test date.",
+      "rationale": "Runs one search per report year to defeat OFA's last-value-wins year filter, follows every page, and groups rows by registered-name kennel prefix; no OFA page or single request returns this.",
+      "example": "ofa-health-clearances-pp-cli kennels --breed AUK --born-from 2021 --report-year 2024,2025,2026 --agent",
+      "why_it_matters": "Reach for this when an agent needs to find breeders who test, since OFA exposes no breeder field and no kennel view.",
+      "group": "Breeder vetting"
+    }
+  ],
+  "novel_features_built": [
+    {
+      "name": "Kennel rollup",
+      "command": "kennels",
+      "description": "See which kennels in a breed are actively health-testing young dogs, ranked by tested dogs, CHIC dogs, and latest test date.",
+      "rationale": "Runs one search per report year to defeat OFA's last-value-wins year filter, follows every page, and groups rows by registered-name kennel prefix; no OFA page or single request returns this.",
+      "example": "ofa-health-clearances-pp-cli kennels --breed AUK --born-from 2021 --report-year 2024,2025,2026 --agent",
+      "why_it_matters": "Reach for this when an agent needs to find breeders who test, since OFA exposes no breeder field and no kennel view.",
+      "group": "Breeder vetting"
+    }
+  ],
+  "narrative": {
+    "display_name": "OFA Health Clearances",
+    "headline": "Look up dogs' OFA health clearances (hips, elbows, eyes, cardiac, DNA) and CHIC status by breed, age, and report year, and roll them up by kennel.",
+    "value_prop": "Query OFA's hip, elbow, eye, cardiac, and DNA records from the terminal with every Advanced Search filter. Multi-year searches work correctly (the website keeps only one year per query), every page is fetched, and 'kennels' turns raw records into a ranked list of breeders who actually test.",
+    "quickstart": [
+      {
+        "command": "ofa-health-clearances-pp-cli doctor",
+        "comment": "Check that the OFA search backend is reachable."
+      },
+      {
+        "command": "ofa-health-clearances-pp-cli breeds koolie",
+        "comment": "Find the breed code OFA uses (AUK for Australian Koolie)."
+      },
+      {
+        "command": "ofa-health-clearances-pp-cli results --breed AUK --report-year 2026",
+        "comment": "List this year's Koolie test records."
+      },
+      {
+        "command": "ofa-health-clearances-pp-cli kennels --breed AUK --born-from 2021 --report-year 2024,2025,2026",
+        "comment": "Rank kennels testing young Koolies over three report years."
+      },
+      {
+        "command": "ofa-health-clearances-pp-cli dog 2682765",
+        "comment": "Open one dog's full clearance record, including sire and dam."
+      }
+    ],
+    "troubleshoots": [
+      {
+        "symptom": "Multi-year search returns only one year's rows on the website",
+        "fix": "Pass years to --report-year as a comma list; the CLI runs one query per year and merges them."
+      },
+      {
+        "symptom": "Empty results for a breed name",
+        "fix": "Use the breed code from 'ofa-health-clearances-pp-cli breeds \u003cname\u003e', not the display name."
+      },
+      {
+        "symptom": "Requests slow or throttled",
+        "fix": "The CLI rate-limits to 1 request/second by default; narrow --report-year or --born-from to reduce pages."
+      }
+    ],
+    "when_to_use": "Use this CLI to verify a dog's published OFA health clearances, to measure how deeply a breed is health-tested, or to find kennels whose young dogs have recent clearances before contacting breeders. It covers OFA Advanced Search records (hips, elbows, eyes, cardiac, patella, thyroid, DNA) and CHIC status.",
+    "anti_triggers": [
+      "Do not use it to find a breeder's location, contact details, or litters; OFA records carry none of that.",
+      "Do not use it to republish or bulk-export OFA data; OFA results are copyrighted and public reproduction needs OFA's permission.",
+      "Do not use it for breed-level disease statistics pages or for cats' non-search registries."
+    ],
+    "recipes": [
+      {
+        "title": "Records-first breeder search",
+        "command": "ofa-health-clearances-pp-cli kennels --breed AUK --born-from 2021 --report-year 2022,2023,2024,2025,2026",
+        "explanation": "Kennel prefixes of young Koolies tested in the last five report years."
+      },
+      {
+        "title": "CHIC dogs only",
+        "command": "ofa-health-clearances-pp-cli results --breed AS --chic --report-year 2026 --agent --select name,ofa_number,test",
+        "explanation": "Narrow a large breed to CHIC-certified records and keep only the identifying fields."
+      },
+      {
+        "title": "Hip records for a kennel prefix",
+        "command": "ofa-health-clearances-pp-cli results --breed AUK --name AVALON --test HD",
+        "explanation": "Every hip record whose registered name starts with the kennel prefix."
+      },
+      {
+        "title": "One dog and its parents",
+        "command": "ofa-health-clearances-pp-cli dog 2682765 --json",
+        "explanation": "Full registry conclusions plus sire and dam as structured JSON."
+      }
+    ],
+    "trigger_phrases": [
+      "check OFA clearances",
+      "is this breeder health testing",
+      "OFA hips for this dog",
+      "which kennels test",
+      "use ofa-health-clearances",
+      "run ofa-health-clearances-pp-cli"
+    ]
+  }
+}

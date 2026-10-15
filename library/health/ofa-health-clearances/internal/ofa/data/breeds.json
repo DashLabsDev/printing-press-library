@@ -1,0 +1,4097 @@
+[
+ {
+  "code": "AA",
+  "name": "AMERICAN ALSATIAN",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "AAD",
+  "name": "ALL AMERICAN DOG",
+  "species": "dog",
+  "groups": [
+   "AKC  Group (ALL AMERICAN DOG)"
+  ]
+ },
+ {
+  "code": "AB",
+  "name": "AMERICAN BULLY",
+  "species": "dog",
+  "groups": [
+   "UKC Companion Dog Group"
+  ]
+ },
+ {
+  "code": "ABM",
+  "name": "AMERICAN BANDOGGE MASTIFF",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "ABT",
+  "name": "AMERICAN BOBTAIL",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "ABU",
+  "name": "ALAPAHA BULLDOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "ABY",
+  "name": "ABYSSINIA",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "ACD",
+  "name": "AUSTRALIAN CATTLE DOG",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group",
+   "TKC Pastoral Group"
+  ]
+ },
+ {
+  "code": "ACH",
+  "name": "AMERICAN CANADIAN HERDER",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "AD",
+  "name": "DOGO ARGENTINO",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "UKC Guardian Dog Group"
+  ]
+ },
+ {
+  "code": "ADB",
+  "name": "ALPINE DACHSBRACKE",
+  "species": "dog",
+  "groups": [
+   "UKC Scenthound Group (ALPINE DACHSBRACKE)"
+  ]
+ },
+ {
+  "code": "AE",
+  "name": "AMERICAN ESKIMO DOG",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "CKC Non-Sporting Group",
+   "UKC Northern Group (AMERICAN ESKIMO)"
+  ]
+ },
+ {
+  "code": "AEC",
+  "name": "AMERICAN ENGLISH COONHOUND",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group"
+  ]
+ },
+ {
+  "code": "AF",
+  "name": "AMERICAN FOXHOUND",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Scenthound Group"
+  ]
+ },
+ {
+  "code": "AFP",
+  "name": "AFFENPINSCHER",
+  "species": "dog",
+  "groups": [
+   "AKC Toy Group",
+   "CKC Toy Group",
+   "UKC Companion Dog Group",
+   "TKC Toy Group"
+  ]
+ },
+ {
+  "code": "AG",
+  "name": "ARMENIAN GAMPR",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "AH",
+  "name": "AFGHAN HOUND",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Sighthound and Pariah Dog Group",
+   "TKC Hound Group"
+  ]
+ },
+ {
+  "code": "AHT",
+  "name": "AMERICAN HAIRLESS TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "UKC Terrier Group"
+  ]
+ },
+ {
+  "code": "AK",
+  "name": "AKITA",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Working Group",
+   "UKC Northern Group",
+   "TKC Utility Group"
+  ]
+ },
+ {
+  "code": "AKD",
+  "name": "AKBASH DOG",
+  "species": "dog",
+  "groups": [
+   "UKC Guardian Dog Group"
+  ]
+ },
+ {
+  "code": "AKH",
+  "name": "ALASKAN HUSKY",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "AKK",
+  "name": "ALASKAN KLEE KAI",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "UKC Northern Group"
+  ]
+ },
+ {
+  "code": "AKP",
+  "name": "AUSTRALIAN KELPIE",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group"
+  ]
+ },
+ {
+  "code": "AL",
+  "name": "ALANO",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "ALH",
+  "name": "AMERICAN LEOPARD HOUND",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group (CATAHOULA LEOPARD DOG)",
+   "UKC Scenthound Group"
+  ]
+ },
+ {
+  "code": "AM",
+  "name": "ALASKAN MALAMUTE",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Working Group",
+   "UKC Northern Group",
+   "TKC Working Group"
+  ]
+ },
+ {
+  "code": "AMB",
+  "name": "AMERICAN BULLDOG",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "UKC Guardian Dog Group"
+  ]
+ },
+ {
+  "code": "AMD",
+  "name": "APPENZELLER SENNENHUNDE",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group (APPENZELLER SENNENHUND)",
+   "UKC Guardian Dog Group (APPENZELLER)"
+  ]
+ },
+ {
+  "code": "AMH",
+  "name": "AMERICAN HUSKY",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "AMM",
+  "name": "AMERICAN MOLOSSUS",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "AMP",
+  "name": "AMERICAN MINI-PEI",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "AMT",
+  "name": "AMERICAN HUNT TERRIER",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "ANC",
+  "name": "ALASKAN NOBLE COMPANION DOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "ANS",
+  "name": "ANATOLIAN SHEPHERD",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group (ANATOLIAN SHEPHERD DOG)",
+   "CKC Working Group (ANATOLIAN SHEPHERD DOG)",
+   "UKC Guardian Dog Group",
+   "TKC Pastoral Group (ANATOLIAN SHEPHERD DOG)"
+  ]
+ },
+ {
+  "code": "AS",
+  "name": "AUSTRALIAN SHEPHERD",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group (AUSTRALIAN SHEPHERDS)",
+   "UKC Herding Dog Group",
+   "TKC Pastoral Group"
+  ]
+ },
+ {
+  "code": "ASC",
+  "name": "AMERICAN SHORTHAIR CAT",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "AST",
+  "name": "AUSTRALIAN STUMPY TAIL CATTLE DOG",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group (STUMPY TAIL CATTLE DOG)"
+  ]
+ },
+ {
+  "code": "AT",
+  "name": "AIREDALE TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "AUK",
+  "name": "AUSTRALIAN KOOLIE",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "AUT",
+  "name": "AUSTRALIAN TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "AWS",
+  "name": "AMERICAN WATER SPANIEL",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group",
+   "UKC Gun Dog Group"
+  ]
+ },
+ {
+  "code": "AZ",
+  "name": "AZAWAKH",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Sighthound and Pariah Dog Group"
+  ]
+ },
+ {
+  "code": "BA",
+  "name": "BARBET",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group",
+   "UKC Gun Dog Group"
+  ]
+ },
+ {
+  "code": "BAM",
+  "name": "BAMBINO",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "BAR",
+  "name": "BOUVIER DES ARDENNES",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group (BOUVIER DES ARDENNES)"
+  ]
+ },
+ {
+  "code": "BAS",
+  "name": "BASQUE SHEPHERD",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "BBG",
+  "name": "BASSET BLEU DE GASCOGNE",
+  "species": "dog",
+  "groups": [
+   "UKC Scenthound Group"
+  ]
+ },
+ {
+  "code": "BBS",
+  "name": "WHITE SWISS SHEPHERD",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "BC",
+  "name": "BEARDED COLLIE",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group",
+   "TKC Pastoral Group"
+  ]
+ },
+ {
+  "code": "BCF",
+  "name": "BICHON FRISE",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "CKC Non-Sporting Group",
+   "UKC Companion Dog Group",
+   "TKC Toy Group"
+  ]
+ },
+ {
+  "code": "BCO",
+  "name": "BORDER COLLIE",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group",
+   "TKC Pastoral Group"
+  ]
+ },
+ {
+  "code": "BD",
+  "name": "BEDLINGTON TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "BDA",
+  "name": "BRAQUE D",
+  "species": "dog",
+  "groups": [
+   "CKC Sporting Group",
+   "UKC Gun Dog Group"
+  ]
+ },
+ {
+  "code": "BDB",
+  "name": "BRAQUE DU BOURBONNAIS",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "UKC Gun Dog Group"
+  ]
+ },
+ {
+  "code": "BDF",
+  "name": "BRAQUE FRANCAIS",
+  "species": "dog",
+  "groups": [
+   "CKC Sporting Group (GASCOGNE BRAQUE FRANCAIS)",
+   "UKC Gun Dog Group"
+  ]
+ },
+ {
+  "code": "BDT",
+  "name": "BARBADO DA TERCEIRA",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group"
+  ]
+ },
+ {
+  "code": "BE",
+  "name": "BEAGLE",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Scenthound Group",
+   "TKC Hound Group"
+  ]
+ },
+ {
+  "code": "BEC",
+  "name": "BENGAL CAT",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "BEP",
+  "name": "BERGER PICARD",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group"
+  ]
+ },
+ {
+  "code": "BER",
+  "name": "BERGAMASCO",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group (BERGAMASCO SHEEPDOG)",
+   "UKC Herding Dog Group"
+  ]
+ },
+ {
+  "code": "BEU",
+  "name": "BEAUCERON",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group",
+   "TKC Pastoral Group"
+  ]
+ },
+ {
+  "code": "BF",
+  "name": "BOUVIER DES FLANDRES",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group",
+   "TKC Working Group"
+  ]
+ },
+ {
+  "code": "BFB",
+  "name": "BASSET FAUVE DE BRETAGNE",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Scenthound Group",
+   "TKC Hound Group"
+  ]
+ },
+ {
+  "code": "BG",
+  "name": "BRUSSELS GRIFFON",
+  "species": "dog",
+  "groups": [
+   "AKC Toy Group",
+   "CKC Toy Group",
+   "UKC Companion Dog Group",
+   "TKC Toy Group (GRIFFON BRUXELLOIS)"
+  ]
+ },
+ {
+  "code": "BGT",
+  "name": "BENGAL TIGER",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "BH",
+  "name": "BASSET HOUND",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Scenthound Group",
+   "TKC Hound Group"
+  ]
+ },
+ {
+  "code": "BJ",
+  "name": "BASENJI",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Sighthound and Pariah Dog Group",
+   "TKC Hound Group"
+  ]
+ },
+ {
+  "code": "BL",
+  "name": "BLOODHOUND",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Scenthound Group",
+   "TKC Hound Group"
+  ]
+ },
+ {
+  "code": "BLC",
+  "name": "BLUE LACY",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "BLN",
+  "name": "BELGIAN LAEKENOIS",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "TKC Pastoral Group (BELGIAN SHEPHERD DOG (LAEKENOIS))"
+  ]
+ },
+ {
+  "code": "BLT",
+  "name": "BULL TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "BM",
+  "name": "BELGIAN MALINOIS",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "TKC Pastoral Group (BELGIAN SHEPHERD DOG (MALINOIS))"
+  ]
+ },
+ {
+  "code": "BMC",
+  "name": "BLACK MOUTH CUR",
+  "species": "dog",
+  "groups": [
+   "UKC Scenthound Group"
+  ]
+ },
+ {
+  "code": "BMD",
+  "name": "BERNESE MOUNTAIN DOG",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group (BERNESE MOUNTAIN DOGS)",
+   "CKC Working Group",
+   "UKC Guardian Dog Group",
+   "TKC Working Group"
+  ]
+ },
+ {
+  "code": "BMF",
+  "name": "BULLMASTIFF",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Working Group",
+   "UKC Guardian Dog Group",
+   "TKC Working Group"
+  ]
+ },
+ {
+  "code": "BMH",
+  "name": "BAVARIAN MOUNTAIN SCENT HOUND",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Scenthound Group (BAVARIAN MOUNTAIN HOUND)",
+   "TKC  Group"
+  ]
+ },
+ {
+  "code": "BMS",
+  "name": "BLUE MOUNTAIN SHEPHERD",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "BNE",
+  "name": "BLACK NORWEGIAN ELKHUND",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "BO",
+  "name": "BOERBOEL",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "UKC Guardian Dog Group (SOUTH AFRICAN BOERBOEL)"
+  ]
+ },
+ {
+  "code": "BOH",
+  "name": "BOHEMIAN SHEPHERD",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group"
+  ]
+ },
+ {
+  "code": "BOL",
+  "name": "BOLOGNESE",
+  "species": "dog",
+  "groups": [
+   "AKC Toy Group",
+   "UKC Companion Dog Group",
+   "TKC Toy Group"
+  ]
+ },
+ {
+  "code": "BOZ",
+  "name": "TURKISH BOZ SHEPHERD",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "BP",
+  "name": "BRAQUE FRANCAIS PYRENEES",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group"
+  ]
+ },
+ {
+  "code": "BPS",
+  "name": "BLUE PICARDY SPANIEL",
+  "species": "dog",
+  "groups": [
+   "CKC Sporting Group"
+  ]
+ },
+ {
+  "code": "BRI",
+  "name": "BRACCO ITALIANO",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group"
+  ]
+ },
+ {
+  "code": "BRT",
+  "name": "BORDER TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "BRU",
+  "name": "BLACK RUSSIAN TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Working Group",
+   "UKC Guardian Dog Group",
+   "TKC Utility Group (RUSSIAN BLACK TERRIER)"
+  ]
+ },
+ {
+  "code": "BS",
+  "name": "BRITTANY",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group"
+  ]
+ },
+ {
+  "code": "BSC",
+  "name": "BRITISH SHORTHAIR CAT",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "BSD",
+  "name": "BELGIAN SHEEPDOG",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group (BELGIAN SHEPHERD DOG)"
+  ]
+ },
+ {
+  "code": "BSG",
+  "name": "BRAQUE SAINT-GERMAIN",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "BT",
+  "name": "BELGIAN TERVUREN",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "TKC Pastoral Group (BELGIAN SHEPHERD DOG (TERVUEREN))"
+  ]
+ },
+ {
+  "code": "BTD",
+  "name": "BRITISH TIMBER DOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "BTH",
+  "name": "BLUETICK COONHOUND",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Scenthound Group"
+  ]
+ },
+ {
+  "code": "BTR",
+  "name": "BOSTON TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "CKC Non-Sporting Group",
+   "UKC Companion Dog Group",
+   "TKC Utility Group"
+  ]
+ },
+ {
+  "code": "BU",
+  "name": "BULLDOG",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "CKC Non-Sporting Group",
+   "UKC Companion Dog Group (ENGLISH BULLDOG)",
+   "TKC Utility Group"
+  ]
+ },
+ {
+  "code": "BUC",
+  "name": "BURMILLA",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "BUR",
+  "name": "BURMESE",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "BV",
+  "name": "BLODS DIVENNE",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "BX",
+  "name": "BOXER",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Working Group",
+   "UKC Guardian Dog Group",
+   "TKC Working Group"
+  ]
+ },
+ {
+  "code": "BY",
+  "name": "BOYKIN SPANIEL",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "UKC Gun Dog Group"
+  ]
+ },
+ {
+  "code": "BYT",
+  "name": "BIEWER TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Toy Group",
+   "UKC Companion Dog Group"
+  ]
+ },
+ {
+  "code": "BZ",
+  "name": "BORZOI",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Sighthound and Pariah Dog Group",
+   "TKC Hound Group"
+  ]
+ },
+ {
+  "code": "BZT",
+  "name": "BRAZILIAN TERRIER",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "CA",
+  "name": "CANAAN",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group (CANAAN DOG)",
+   "CKC Working Group (CANAAN DOG)",
+   "UKC Sighthound and Pariah Dog Group (CANAAN DOG)",
+   "TKC Utility Group (CANAAN DOG)"
+  ]
+ },
+ {
+  "code": "CAC",
+  "name": "CENTRAL ASIAN SHEPHERD",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group (CENTRAL ASIAN SHEPHERD DOG)",
+   "UKC Guardian Dog Group"
+  ]
+ },
+ {
+  "code": "CAH",
+  "name": "CARPATHIAN SHEPHERD",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "CAO",
+  "name": "CAUCASIAN SHEPHERD",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group"
+  ]
+ },
+ {
+  "code": "CAR",
+  "name": "CAROLINA DOG",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Sighthound and Pariah Dog Group"
+  ]
+ },
+ {
+  "code": "CB",
+  "name": "CHESAPEAKE BAY RETRIEVER",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group (RETRIEVER (CHESAPEAKE BAY))"
+  ]
+ },
+ {
+  "code": "CBU",
+  "name": "CONTINENTAL BULLDOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "CC",
+  "name": "CHOW CHOW",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "CKC Non-Sporting Group",
+   "UKC Northern Group",
+   "TKC Utility Group"
+  ]
+ },
+ {
+  "code": "CDB",
+  "name": "CA DE BOU",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "CDC",
+  "name": "CAO DE CASTRO LABOREIRO",
+  "species": "dog",
+  "groups": [
+   "UKC Guardian Dog Group"
+  ]
+ },
+ {
+  "code": "CDE",
+  "name": "CIRNECO DELL ETNA",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group (CIRNECO DELL'ETNA)",
+   "UKC Sighthound and Pariah Dog Group (CIRNECO DELL'ETNA)",
+   "TKC Hound Group (CIRNECO DELL'ETNA)"
+  ]
+ },
+ {
+  "code": "CDT",
+  "name": "COTON DE TULEAR",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "CKC Toy Group",
+   "UKC Companion Dog Group",
+   "TKC Toy Group"
+  ]
+ },
+ {
+  "code": "CE",
+  "name": "CANADIAN ESKIMO DOG",
+  "species": "dog",
+  "groups": [
+   "CKC Working Group",
+   "UKC Northern Group",
+   "TKC Working Group"
+  ]
+ },
+ {
+  "code": "CES",
+  "name": "CESKY TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "CF",
+  "name": "CESKY FOUSECK",
+  "species": "dog",
+  "groups": [
+   "UKC Gun Dog Group (CESKY FOUSEK)"
+  ]
+ },
+ {
+  "code": "CFH",
+  "name": "COLOMBIAN FINO HOUND",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "CFO",
+  "name": "CHINESE FOO DOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "CH",
+  "name": "CHIHUAHUA",
+  "species": "dog",
+  "groups": [
+   "AKC Toy Group",
+   "CKC Toy Group",
+   "UKC Companion Dog Group",
+   "TKC Toy Group"
+  ]
+ },
+ {
+  "code": "CHC",
+  "name": "CHINESE CRESTED",
+  "species": "dog",
+  "groups": [
+   "AKC Toy Group",
+   "CKC Toy Group",
+   "UKC Companion Dog Group",
+   "TKC Toy Group"
+  ]
+ },
+ {
+  "code": "CHE",
+  "name": "CHERUBIM",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "CHP",
+  "name": "CHODSKY PES",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "CHQ",
+  "name": "CHINESE CHONGQING DOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "CHR",
+  "name": "CHARTREUX",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "CHY",
+  "name": "CHINOOK HYBRID",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "CI",
+  "name": "CHINOOK",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "UKC Northern Group"
+  ]
+ },
+ {
+  "code": "CLS",
+  "name": "CLUMBER SPANIEL",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group (SPANIEL (CLUMBER))"
+  ]
+ },
+ {
+  "code": "CMD",
+  "name": "COLORADO MOUNTAIN DOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "CN",
+  "name": "BLACK AND TAN COONHOUND",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Scenthound Group (AMERICAN BLACK AND TAN COONHOUND)"
+  ]
+ },
+ {
+  "code": "CO",
+  "name": "COLLIE",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group",
+   "TKC Pastoral Group"
+  ]
+ },
+ {
+  "code": "COR",
+  "name": "CANE CORSO",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "UKC Guardian Dog Group (CANE CORSO ITALIANO)"
+  ]
+ },
+ {
+  "code": "CP",
+  "name": "CHART POLSKI",
+  "species": "dog",
+  "groups": [
+   "UKC Sighthound and Pariah Dog Group"
+  ]
+ },
+ {
+  "code": "CR",
+  "name": "CURLY-COATED RETRIEVER",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group (RETRIEVER (CURLY COATED))"
+  ]
+ },
+ {
+  "code": "CRS",
+  "name": "CROATIAN SHEEPDOG",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group"
+  ]
+ },
+ {
+  "code": "CS",
+  "name": "COCKER SPANIEL",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group (SPANIELS (COCKER))",
+   "CKC Sporting Group (AMERICAN COCKER SPANIEL)",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group (SPANIEL (AMERICAN COCKER))"
+  ]
+ },
+ {
+  "code": "CSD",
+  "name": "CATALAN SHEEPDOG",
+  "species": "dog",
+  "groups": [
+   "UKC Herding Dog Group (CATALONIAN SHEEPDOG)",
+   "TKC Pastoral Group"
+  ]
+ },
+ {
+  "code": "CSU",
+  "name": "CURSINU",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "CT",
+  "name": "CAIRN TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "CW",
+  "name": "CZECHOSLOVAKIAN VLCIAK",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "UKC Herding Dog Group"
+  ]
+ },
+ {
+  "code": "CZS",
+  "name": "CZECH SHEPHERD",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "DB",
+  "name": "DOGUE DE BORDEAUX",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "UKC Guardian Dog Group",
+   "TKC Working Group"
+  ]
+ },
+ {
+  "code": "DBR",
+  "name": "DANISH BROHOLMER",
+  "species": "dog",
+  "groups": [
+   "AKC Foundation Group (BROHOLMER)",
+   "UKC Guardian Dog Group"
+  ]
+ },
+ {
+  "code": "DC",
+  "name": "DOMESTIC CAT",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "DD",
+  "name": "DANDIE DINMONT TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "DH",
+  "name": "DACHSHUND",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Scenthound Group",
+   "TKC Hound Group"
+  ]
+ },
+ {
+  "code": "DM",
+  "name": "DALMATIAN",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "CKC Non-Sporting Group",
+   "UKC Companion Dog Group",
+   "TKC Utility Group"
+  ]
+ },
+ {
+  "code": "DON",
+  "name": "DONSKOY",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "DP",
+  "name": "DOBERMAN PINSCHER",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "UKC Guardian Dog Group",
+   "TKC Working Group (DOBERMANN)"
+  ]
+ },
+ {
+  "code": "DPD",
+  "name": "DRENTSCHE PATRIJSHOND",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group (DRENTSCHE PATRIJSHOND)",
+   "UKC Gun Dog Group (DRENTSCHE PATRIJSHOND)"
+  ]
+ },
+ {
+  "code": "DPT",
+  "name": "OLD DANISH POINTER",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "DR",
+  "name": "DRAHTHAAR",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "DRC",
+  "name": "DEVON REX CAT",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "DS",
+  "name": "DUTCH SHEPHERD",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group"
+  ]
+ },
+ {
+  "code": "DSF",
+  "name": "DANISH SWEDISH FARMDOG",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group (DANISH-SWEDISH FARMDOG)",
+   "UKC Terrier Group (DANISH-SWEDISH FARMDOG)"
+  ]
+ },
+ {
+  "code": "DTR",
+  "name": "NOVA SCOTIA DUCK TOLLING RETRIEVER",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group (NOVA SCOTIA DUCK TOLLING RETRIEVER)",
+   "CKC Sporting Group",
+   "UKC Gun Dog Group (NOVA SCOTIA DUCK TOLLING RETRIEVER)",
+   "TKC Gundog Group (RETRIEVER (NOVA SCOTIA DUCK TOLLING))"
+  ]
+ },
+ {
+  "code": "DV",
+  "name": "DREVER",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Scenthound Group"
+  ]
+ },
+ {
+  "code": "DW",
+  "name": "WACHTELHUND",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group (DEUTSCHER WACHTELHUND)",
+   "UKC Gun Dog Group (DEUTSCHER WACHTELHUND)"
+  ]
+ },
+ {
+  "code": "EB",
+  "name": "ENTLEBUCHER MOUNTAIN DOG",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group (ENTLEBUCHER MOUNTAIN DOG)",
+   "CKC Working Group (ENTLEBUCHER MOUNTAIN DOG)",
+   "UKC Guardian Dog Group",
+   "TKC  Group"
+  ]
+ },
+ {
+  "code": "EC",
+  "name": "ENGLISH COCKER SPANIEL",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group (SPANIEL (COCKER))"
+  ]
+ },
+ {
+  "code": "ED",
+  "name": "ESKIMO DOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "EJT",
+  "name": "ENGLISH JACK RUSSELL TERRIER",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "ELC",
+  "name": "ELF CAT",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "EM",
+  "name": "EGYPTIAN MAU",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "EMD",
+  "name": "ESTRELA MOUNTAIN DOG",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "UKC Guardian Dog Group",
+   "TKC Pastoral Group"
+  ]
+ },
+ {
+  "code": "EN",
+  "name": "ENGLISH SPRINGER SPANIEL",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group (SPANIEL (ENGLISH SPRINGER))"
+  ]
+ },
+ {
+  "code": "EPT",
+  "name": "POINTER",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group",
+   "TKC Gundog Group"
+  ]
+ },
+ {
+  "code": "ES",
+  "name": "ENGLISH SETTER",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group"
+  ]
+ },
+ {
+  "code": "ESC",
+  "name": "EUROPEAN SHORTHAIRED",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "ESP",
+  "name": "ENGLISH SHEPHERD",
+  "species": "dog",
+  "groups": [
+   "UKC Herding Dog Group"
+  ]
+ },
+ {
+  "code": "ET",
+  "name": "ENGLISH TOY SPANIEL",
+  "species": "dog",
+  "groups": [
+   "AKC Toy Group",
+   "CKC Toy Group",
+   "UKC Companion Dog Group"
+  ]
+ },
+ {
+  "code": "EU",
+  "name": "EURASIER",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "CKC Working Group",
+   "UKC Northern Group (EURASIAN)",
+   "TKC Utility Group"
+  ]
+ },
+ {
+  "code": "FB",
+  "name": "BRIARD",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group",
+   "TKC Pastoral Group"
+  ]
+ },
+ {
+  "code": "FBU",
+  "name": "FRENCH BULLDOG",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "CKC Non-Sporting Group",
+   "UKC Companion Dog Group",
+   "TKC Utility Group"
+  ]
+ },
+ {
+  "code": "FH",
+  "name": "ENGLISH FOXHOUND",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Scenthound Group",
+   "TKC Hound Group (FOXHOUND)"
+  ]
+ },
+ {
+  "code": "FIB",
+  "name": "FILA BRASILEIRO",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "FL",
+  "name": "FINNISH LAPPHUND",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Northern Group",
+   "TKC Pastoral Group"
+  ]
+ },
+ {
+  "code": "FNS",
+  "name": "FINNISH SPITZ",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "UKC Northern Group",
+   "TKC Hound Group"
+  ]
+ },
+ {
+  "code": "FR",
+  "name": "FLAT-COATED RETRIEVER",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group",
+   "UKC Gun Dog Group (FLAT COATED RETRIEVER)",
+   "TKC Gundog Group (RETRIEVER (FLAT COATED))"
+  ]
+ },
+ {
+  "code": "FRB",
+  "name": "EPAGNEUL BRETON",
+  "species": "dog",
+  "groups": [
+   "UKC Gun Dog Group"
+  ]
+ },
+ {
+  "code": "FRP",
+  "name": "FRENCH POINTER",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "FRS",
+  "name": "FRENCH SPANIEL",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group",
+   "UKC Gun Dog Group"
+  ]
+ },
+ {
+  "code": "FS",
+  "name": "FIELD SPANIEL",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group (SPANIEL (FIELD))"
+  ]
+ },
+ {
+  "code": "FST",
+  "name": "FRIESE STABIJHOUN",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "FT",
+  "name": "SMOOTH FOX TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group (FOX TERRIER (SMOOTH))"
+  ]
+ },
+ {
+  "code": "GBD",
+  "name": "GRAND BLEU DE GASCOGNE",
+  "species": "dog",
+  "groups": [
+   "UKC Scenthound Group"
+  ]
+ },
+ {
+  "code": "GBG",
+  "name": "GRAND BASSET GRIFFON VENDEEN",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group (GRAND BASSET GRIFFON VEND\u00c9EN DOG)",
+   "UKC Scenthound Group",
+   "TKC Hound Group (BASSET GRIFFON VENDEEN (GRAND))"
+  ]
+ },
+ {
+  "code": "GCO",
+  "name": "GERMAN COOLIE",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "GD",
+  "name": "GREAT DANE",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Working Group",
+   "UKC Guardian Dog Group",
+   "TKC Working Group"
+  ]
+ },
+ {
+  "code": "GH",
+  "name": "GREYHOUND",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Sighthound and Pariah Dog Group",
+   "TKC Hound Group"
+  ]
+ },
+ {
+  "code": "GIT",
+  "name": "GLEN OF IMAAL TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "GLD",
+  "name": "GREENLAND DOG",
+  "species": "dog",
+  "groups": [
+   "CKC Working Group",
+   "UKC Northern Group",
+   "TKC Working Group"
+  ]
+ },
+ {
+  "code": "GLP",
+  "name": "GERMAN LONGHAIRED POINTER",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group",
+   "UKC Gun Dog Group (GERMAN LONG HAIRED POINTER)",
+   "TKC Gundog Group"
+  ]
+ },
+ {
+  "code": "GMP",
+  "name": "GERMAN PINSCHER",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Non-Sporting Group",
+   "UKC Terrier Group",
+   "TKC Working Group"
+  ]
+ },
+ {
+  "code": "GP",
+  "name": "GREAT PYRENEES",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Working Group",
+   "UKC Guardian Dog Group",
+   "TKC Pastoral Group (PYRENEAN MOUNTAIN DOG)"
+  ]
+ },
+ {
+  "code": "GR",
+  "name": "GOLDEN RETRIEVER",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group (RETRIEVER (GOLDEN))"
+  ]
+ },
+ {
+  "code": "GRS",
+  "name": "GERMAN SPITZ",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "UKC Northern Group",
+   "TKC Utility Group"
+  ]
+ },
+ {
+  "code": "GRV",
+  "name": "GOS RATER VALENCIA",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "GS",
+  "name": "GERMAN SHEPHERD DOG",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group",
+   "TKC Pastoral Group"
+  ]
+ },
+ {
+  "code": "GSC",
+  "name": "GIANT SCHNAUZER",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Working Group",
+   "UKC Guardian Dog Group",
+   "TKC Working Group"
+  ]
+ },
+ {
+  "code": "GSE",
+  "name": "GORDON SETTER",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group"
+  ]
+ },
+ {
+  "code": "GSL",
+  "name": "GERMAN SPANIEL",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "GSP",
+  "name": "GERMAN SHORTHAIRED POINTER",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group"
+  ]
+ },
+ {
+  "code": "GWP",
+  "name": "GERMAN WIREHAIRED POINTER",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group (GERMAN WIRE-HAIRED POINTER)",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group"
+  ]
+ },
+ {
+  "code": "HA",
+  "name": "HARRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Scenthound Group",
+   "TKC Hound Group"
+  ]
+ },
+ {
+  "code": "HAM",
+  "name": "HAMILTONSTOVARE",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Scenthound Group",
+   "TKC Hound Group"
+  ]
+ },
+ {
+  "code": "HAN",
+  "name": "HANOVERIAN HOUND",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group (HANOVERIAN SCENTHOUND)",
+   "UKC Scenthound Group"
+  ]
+ },
+ {
+  "code": "HAV",
+  "name": "HAVANESE",
+  "species": "dog",
+  "groups": [
+   "AKC Toy Group",
+   "CKC Toy Group",
+   "UKC Companion Dog Group",
+   "TKC Toy Group"
+  ]
+ },
+ {
+  "code": "HB",
+  "name": "HMONG BOBTAIL",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "HBO",
+  "name": "HAVANA BROWN ORIENTAL CAT",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "HH",
+  "name": "HEDLUND HUSKY",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "HI",
+  "name": "HIMALAYAN",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "HIC",
+  "name": "HIGHLANDER SHORTHAIR",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "HK",
+  "name": "HOKKAIDO KEN",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group (HOKKAIDO)",
+   "UKC Northern Group (HOKKAIDO)"
+  ]
+ },
+ {
+  "code": "HP",
+  "name": "HIMALAYAN-PERSIAN",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "HSD",
+  "name": "HAVANA SILK DOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "HTC",
+  "name": "HANGIN TREE COWDOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "HU",
+  "name": "NEW ZEALAND HUNTAWAY",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "HV",
+  "name": "HOVAWART",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Working Group",
+   "UKC Guardian Dog Group",
+   "TKC Working Group"
+  ]
+ },
+ {
+  "code": "HY",
+  "name": "HYBRID",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "HYF",
+  "name": "HYBRID FELINE",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "HYG",
+  "name": "HYBRID - GANA REGISTERED",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "IH",
+  "name": "IBIZAN HOUND",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Sighthound and Pariah Dog Group",
+   "TKC Hound Group"
+  ]
+ },
+ {
+  "code": "IR",
+  "name": "IRISH SETTER",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group"
+  ]
+ },
+ {
+  "code": "IRT",
+  "name": "IRISH TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "IS",
+  "name": "ICELANDIC SHEEPDOG",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group"
+  ]
+ },
+ {
+  "code": "IT",
+  "name": "ITALIAN GREYHOUND",
+  "species": "dog",
+  "groups": [
+   "AKC Toy Group",
+   "CKC Toy Group",
+   "UKC Companion Dog Group",
+   "TKC Toy Group"
+  ]
+ },
+ {
+  "code": "IW",
+  "name": "IRISH WOLFHOUND",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Sighthound and Pariah Dog Group",
+   "TKC Hound Group"
+  ]
+ },
+ {
+  "code": "IWS",
+  "name": "IRISH WATER SPANIEL",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group (SPANIEL (IRISH WATER))"
+  ]
+ },
+ {
+  "code": "JAI",
+  "name": "JAPANESE AKITAINU",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "UKC Northern Group (JAPANESE AKITA)",
+   "TKC Utility Group (JAPANESE AKITA INU)"
+  ]
+ },
+ {
+  "code": "JAT",
+  "name": "JAPANESE TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "UKC Terrier Group"
+  ]
+ },
+ {
+  "code": "JBT",
+  "name": "JAPANESE BOBTAIL CAT",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "JGT",
+  "name": "JAGD TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group (JAGDTERRIER)",
+   "UKC Terrier Group (JAGDTERRIER)"
+  ]
+ },
+ {
+  "code": "JI",
+  "name": "JINDO",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group (KOREAN JINDO DOG)",
+   "UKC Northern Group"
+  ]
+ },
+ {
+  "code": "JRT",
+  "name": "JACK RUSSELL TERRIER",
+  "species": "dog",
+  "groups": [
+   "UKC Terrier Group",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "JS",
+  "name": "JAPANESE CHIN",
+  "species": "dog",
+  "groups": [
+   "AKC Toy Group",
+   "CKC Toy Group",
+   "UKC Companion Dog Group",
+   "TKC Toy Group"
+  ]
+ },
+ {
+  "code": "JSP",
+  "name": "JAPANESE SPITZ",
+  "species": "dog",
+  "groups": [
+   "AKC Foundation Group",
+   "CKC Non-Sporting Group",
+   "UKC Northern Group",
+   "TKC Utility Group"
+  ]
+ },
+ {
+  "code": "JT",
+  "name": "PARSON RUSSELL TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "KA",
+  "name": "KAI KEN",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "UKC Northern Group (KAI)"
+  ]
+ },
+ {
+  "code": "KAS",
+  "name": "KARST SHEPHERD",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "KB",
+  "name": "KARELIAN BEAR DOG",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Working Group",
+   "UKC Northern Group"
+  ]
+ },
+ {
+  "code": "KCS",
+  "name": "CAVALIER KING CHARLES SPANIEL",
+  "species": "dog",
+  "groups": [
+   "AKC Toy Group",
+   "CKC Toy Group",
+   "UKC Companion Dog Group",
+   "TKC Toy Group (KING CHARLES SPANIEL)"
+  ]
+ },
+ {
+  "code": "KE",
+  "name": "KEESHOND",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "CKC Non-Sporting Group",
+   "UKC Northern Group",
+   "TKC Utility Group"
+  ]
+ },
+ {
+  "code": "KG",
+  "name": "KANGAL DOG",
+  "species": "dog",
+  "groups": [
+   "UKC Guardian Dog Group",
+   "TKC Pastoral Group (TURKISH KANGAL DOG)"
+  ]
+ },
+ {
+  "code": "KK",
+  "name": "KISHU KEN",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Northern Group (KISHU)"
+  ]
+ },
+ {
+  "code": "KL",
+  "name": "KYI-LEO",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "KO",
+  "name": "KOMONDOR",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Working Group",
+   "UKC Guardian Dog Group",
+   "TKC Pastoral Group"
+  ]
+ },
+ {
+  "code": "KOO",
+  "name": "NEDERLANDSE KOOIKERHONDJE",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "UKC Gun Dog Group (KOOIKERHONDJE)",
+   "TKC Utility Group (KOOIKERHONDJE)"
+  ]
+ },
+ {
+  "code": "KP",
+  "name": "KOREAN POONGSAN",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "KR",
+  "name": "KROMFOHRLANDER",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "UKC Companion Dog Group"
+  ]
+ },
+ {
+  "code": "KRD",
+  "name": "KARAKACHAN",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "KS",
+  "name": "KING SHEPHERD",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "KT",
+  "name": "KERRY BLUE TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "KU",
+  "name": "KUVASZ",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Working Group",
+   "UKC Guardian Dog Group"
+  ]
+ },
+ {
+  "code": "LA",
+  "name": "LHASA APSO",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "CKC Non-Sporting Group",
+   "UKC Companion Dog Group",
+   "TKC Utility Group"
+  ]
+ },
+ {
+  "code": "LAK",
+  "name": "LAKELAND TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "LAM",
+  "name": "LAMALESE",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "LB",
+  "name": "LEONBERGER",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Working Group",
+   "UKC Guardian Dog Group",
+   "TKC Working Group"
+  ]
+ },
+ {
+  "code": "LC",
+  "name": "LOUISIANA CATAHOULA LEOPARD",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group (CATAHOULA LEOPARD DOG)",
+   "UKC Herding Dog Group (LOUISIANA CATAHOULA LEOPARD DOG)"
+  ]
+ },
+ {
+  "code": "LD",
+  "name": "AUSTRALIAN LABRADOODLE",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "LEN",
+  "name": "LEN TERRIER",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "LH",
+  "name": "LANCASHIRE HEELER",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group",
+   "TKC Pastoral Group"
+  ]
+ },
+ {
+  "code": "LLD",
+  "name": "LITTLE LION DOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "LMU",
+  "name": "LARGE MUNSTERLANDER",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group"
+  ]
+ },
+ {
+  "code": "LN",
+  "name": "ECT LANDSEER",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "LO",
+  "name": "LOWCHEN",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "CKC Non-Sporting Group",
+   "UKC Companion Dog Group",
+   "TKC Toy Group (LOWCHEN (LITTLE LION DOG))"
+  ]
+ },
+ {
+  "code": "LP",
+  "name": "LUPINE DOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "LPH",
+  "name": "LAPPONIAN HERDER",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group"
+  ]
+ },
+ {
+  "code": "LR",
+  "name": "LABRADOR RETRIEVER",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group (RETRIEVERS (LABRADOR))",
+   "CKC Sporting Group",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group (RETRIEVER (LABRADOR))"
+  ]
+ },
+ {
+  "code": "LS",
+  "name": "LLEWELLIN SETTER",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "LU",
+  "name": "LOUBERAL",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "LUT",
+  "name": "LUCAS TERRIER",
+  "species": "dog",
+  "groups": [
+   "UKC Terrier Group (SPORTING LUCAS TERRIER)"
+  ]
+ },
+ {
+  "code": "LYC",
+  "name": "LYKOI CAT",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "LYK",
+  "name": "LYKOI",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "LZH",
+  "name": "LAIZHOU HONG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "MA",
+  "name": "MAREMMA SHEEPDOG",
+  "species": "dog",
+  "groups": [
+   "UKC Guardian Dog Group",
+   "TKC Pastoral Group"
+  ]
+ },
+ {
+  "code": "MAG",
+  "name": "MAGYAR AGAR",
+  "species": "dog",
+  "groups": [
+   "UKC Sighthound and Pariah Dog Group (HUNGARIAN GREYHOUND)"
+  ]
+ },
+ {
+  "code": "MAR",
+  "name": "MARKIESJE",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "MAS",
+  "name": "MINI AMERICAN/MINI AUSTRALIAN SHEPHERD",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group (MINIATURE AMERICAN SHEPHERD)"
+  ]
+ },
+ {
+  "code": "MAS/AM",
+  "name": "MINIATURE AMERICAN SHEPHERD",
+  "species": "",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group (MINIATURE AMERICAN SHEPHERD)"
+  ]
+ },
+ {
+  "code": "MAS/AUS",
+  "name": "MINIATURE AUSTRALIAN SHEPHERD",
+  "species": "",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group (MINIATURE AMERICAN SHEPHERD)"
+  ]
+ },
+ {
+  "code": "MBT",
+  "name": "MINIATURE BULL TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "UKC Terrier Group"
+  ]
+ },
+ {
+  "code": "MCC",
+  "name": "MAINE COON CAT",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "MCN",
+  "name": "MCNAB",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "MCR",
+  "name": "MOUNTAIN CUR",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Scenthound Group"
+  ]
+ },
+ {
+  "code": "MDI",
+  "name": "MUDI",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group"
+  ]
+ },
+ {
+  "code": "MF",
+  "name": "MASTIFF",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Working Group",
+   "UKC Guardian Dog Group",
+   "TKC Working Group"
+  ]
+ },
+ {
+  "code": "MIN",
+  "name": "MINUET CAT",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "MK",
+  "name": "MI-KI",
+  "species": "dog",
+  "groups": [
+   "UKC Companion Dog Group"
+  ]
+ },
+ {
+  "code": "ML",
+  "name": "MALTESE",
+  "species": "dog",
+  "groups": [
+   "AKC Toy Group",
+   "CKC Toy Group",
+   "UKC Companion Dog Group",
+   "TKC Toy Group"
+  ]
+ },
+ {
+  "code": "MLP",
+  "name": "PIRINEOS MASTIFF",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "MP",
+  "name": "MINIATURE PINSCHER",
+  "species": "dog",
+  "groups": [
+   "AKC Toy Group",
+   "CKC Toy Group",
+   "UKC Companion Dog Group",
+   "TKC Toy Group"
+  ]
+ },
+ {
+  "code": "MSC",
+  "name": "MINIATURE SCHNAUZER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Utility Group"
+  ]
+ },
+ {
+  "code": "MSD",
+  "name": "MINIATURE SHEEPDOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "MSH",
+  "name": "MAJORCA SHEPHERD DOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "MST",
+  "name": "AMERICAN MORKSHIRE TERRIER",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "MT",
+  "name": "MANCHESTER TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "MTF",
+  "name": "MOUNTAIN FEIST",
+  "species": "dog",
+  "groups": [
+   "UKC Terrier Group"
+  ]
+ },
+ {
+  "code": "MU",
+  "name": "MUNSTERLANDER",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "NAI",
+  "name": "NATIVE AM. INDIAN DOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "NAS",
+  "name": "NORTH AMERICAN SHEPHERD",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "NAV",
+  "name": "NATIVE AM. VILLAGE DOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "NB",
+  "name": "NORWEGIAN BUHUND",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Northern Group",
+   "TKC Pastoral Group"
+  ]
+ },
+ {
+  "code": "NE",
+  "name": "NORWEGIAN ELKHOUND",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Northern Group",
+   "TKC Hound Group"
+  ]
+ },
+ {
+  "code": "NEB",
+  "name": "NEBELUNG",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "NF",
+  "name": "NEWFOUNDLAND",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Working Group",
+   "UKC Guardian Dog Group",
+   "TKC Working Group"
+  ]
+ },
+ {
+  "code": "NFC",
+  "name": "NORWEGIAN FOREST CAT",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "NFT",
+  "name": "NORFOLK TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "NGS",
+  "name": "NEW GUINEA SINGING DOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "NHL",
+  "name": "NENETS HERDING LAIKA",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "NI",
+  "name": "NORTHERN INUIT",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "NL",
+  "name": "NORWEGIAN LUNDEHUND",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "UKC Northern Group (LUNDEHUND)"
+  ]
+ },
+ {
+  "code": "NMF",
+  "name": "NEAPOLITAN MASTIFF",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Working Group",
+   "UKC Guardian Dog Group",
+   "TKC Working Group"
+  ]
+ },
+ {
+  "code": "NOR",
+  "name": "NORRBOTTENSPETS",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Northern Group (NORRBOTTENSPETZ)"
+  ]
+ },
+ {
+  "code": "NOT",
+  "name": "NORTHERN TIMBER DOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "NT",
+  "name": "NORWICH TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "OD",
+  "name": "OUDDUITSE HERDER",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "OEB",
+  "name": "OLDE ENGLISH BULLDOGGE",
+  "species": "dog",
+  "groups": [
+   "UKC Guardian Dog Group"
+  ]
+ },
+ {
+  "code": "OH",
+  "name": "OTTERHOUND",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Scenthound Group",
+   "TKC Hound Group"
+  ]
+ },
+ {
+  "code": "OVB",
+  "name": "OLDE VICTORIAN BULLDOGGE",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "PA",
+  "name": "PAPILLON",
+  "species": "dog",
+  "groups": [
+   "AKC Toy Group",
+   "CKC Toy Group",
+   "UKC Companion Dog Group",
+   "TKC Toy Group"
+  ]
+ },
+ {
+  "code": "PAS",
+  "name": "PONT-AUDEMER SPANIEL",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group"
+  ]
+ },
+ {
+  "code": "PBG",
+  "name": "PETIT BASSET GRIFFON VENDEEN",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Scenthound Group",
+   "TKC Hound Group (BASSET GRIFFON VENDEEN (PETIT))"
+  ]
+ },
+ {
+  "code": "PBT",
+  "name": "AMERICAN PIT BULL TERRIER",
+  "species": "dog",
+  "groups": [
+   "UKC Terrier Group"
+  ]
+ },
+ {
+  "code": "PC",
+  "name": "PERSIAN CAT",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "PCD",
+  "name": "PORTUGUESE CATTLE DOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "PDB",
+  "name": "PERDIGUERO DE BURGOS",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "PG",
+  "name": "PUG",
+  "species": "dog",
+  "groups": [
+   "AKC Toy Group",
+   "CKC Toy Group",
+   "UKC Companion Dog Group",
+   "TKC Toy Group"
+  ]
+ },
+ {
+  "code": "PH",
+  "name": "PHARAOH HOUND",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Sighthound and Pariah Dog Group",
+   "TKC Hound Group"
+  ]
+ },
+ {
+  "code": "PHS",
+  "name": "POLISH HUNTING SPANIEL",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "PIC",
+  "name": "PICARDY SPANIEL",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "PIO",
+  "name": "PERUVIAN INCA ORCHID",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Sighthound and Pariah Dog Group"
+  ]
+ },
+ {
+  "code": "PK",
+  "name": "PEKINGESE",
+  "species": "dog",
+  "groups": [
+   "AKC Toy Group",
+   "CKC Toy Group",
+   "UKC Companion Dog Group",
+   "TKC Toy Group"
+  ]
+ },
+ {
+  "code": "PL",
+  "name": "PLOTT",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Scenthound Group (PLOTT HOUND)"
+  ]
+ },
+ {
+  "code": "PM",
+  "name": "PUMI",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group",
+   "TKC Pastoral Group (HUNGARIAN PUMI)"
+  ]
+ },
+ {
+  "code": "PMF",
+  "name": "PYRENEAN MASTIFF",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "UKC Guardian Dog Group",
+   "TKC  Group"
+  ]
+ },
+ {
+  "code": "PN",
+  "name": "POMERANIAN",
+  "species": "dog",
+  "groups": [
+   "AKC Toy Group",
+   "CKC Toy Group",
+   "UKC Companion Dog Group",
+   "TKC Toy Group"
+  ]
+ },
+ {
+  "code": "PO",
+  "name": "POODLE",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "UKC Companion Dog Group",
+   "TKC Utility Group"
+  ]
+ },
+ {
+  "code": "PON",
+  "name": "POLISH LOWLAND SHEEPDOG",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group (POLISH OWCZAREK NIZINNY)",
+   "TKC Pastoral Group"
+  ]
+ },
+ {
+  "code": "POR",
+  "name": "PORCELAINE",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group (PORCELAINE)",
+   "UKC Scenthound Group (PORCELAINE)"
+  ]
+ },
+ {
+  "code": "POS",
+  "name": "PORTUGUESE SHEEPDOG",
+  "species": "dog",
+  "groups": [
+   "AKC Foundation Group",
+   "UKC Herding Dog Group"
+  ]
+ },
+ {
+  "code": "PP",
+  "name": "PUDELPOINTER",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group",
+   "UKC Gun Dog Group"
+  ]
+ },
+ {
+  "code": "PPC",
+  "name": "PERRO DE PRESA CANARIO",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group (PRESA CANARIO)",
+   "UKC Guardian Dog Group"
+  ]
+ },
+ {
+  "code": "PPD",
+  "name": "PORTUGUESE PODENGO PEQUENO",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group"
+  ]
+ },
+ {
+  "code": "PPG",
+  "name": "PORTUGUESE PODENGO",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Sighthound and Pariah Dog Group (PODENGO PORTUGUESE)",
+   "TKC Hound Group"
+  ]
+ },
+ {
+  "code": "PPN",
+  "name": "PORTUGUESE POINTER",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "UKC Gun Dog Group",
+   "TKC  Group"
+  ]
+ },
+ {
+  "code": "PQR",
+  "name": "PHU QUOC RIDGEBACK",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "PRT",
+  "name": "PRAGUE RATTER",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "PS",
+  "name": "PYRENEAN SHEPHERD",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "TKC Pastoral Group (PYRENEAN SHEEPDOG)"
+  ]
+ },
+ {
+  "code": "PSD",
+  "name": "POLISH SHEEPDOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "PT",
+  "name": "PATTERDALE TERRIER",
+  "species": "dog",
+  "groups": [
+   "UKC Terrier Group"
+  ]
+ },
+ {
+  "code": "PTS",
+  "name": "POLISH TATRA SHEEPDOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "PU",
+  "name": "PULI",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group",
+   "TKC Pastoral Group (HUNGARIAN PULI)"
+  ]
+ },
+ {
+  "code": "PW",
+  "name": "PORTUGUESE WATER DOG",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Working Group",
+   "UKC Gun Dog Group",
+   "TKC Working Group"
+  ]
+ },
+ {
+  "code": "RA",
+  "name": "RAFEIRO DO ALENTEJO",
+  "species": "dog",
+  "groups": [
+   "AKC Foundation Group"
+  ]
+ },
+ {
+  "code": "RAT",
+  "name": "RAT TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group"
+  ]
+ },
+ {
+  "code": "RBS",
+  "name": "ROMANIAN BUCOVINA SHEPHERD",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "RCN",
+  "name": "REDBONE COONHOUND",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Scenthound Group"
+  ]
+ },
+ {
+  "code": "RD",
+  "name": "RAGDOLL",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "REL",
+  "name": "RUSSIAN EUROPEAN LIAKA",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "RMF",
+  "name": "RAGAMUFFIN",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "RMS",
+  "name": "ROMANIAN MIORITIC SHEEPDOG",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group (ROMANIAN MIORITIC SHEPHERD DOG)"
+  ]
+ },
+ {
+  "code": "RO",
+  "name": "ROTTWEILER",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Working Group",
+   "UKC Guardian Dog Group",
+   "TKC Working Group"
+  ]
+ },
+ {
+  "code": "RR",
+  "name": "RHODESIAN RIDGEBACK",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Sighthound and Pariah Dog Group",
+   "TKC Hound Group"
+  ]
+ },
+ {
+  "code": "RS",
+  "name": "RUSSIAN SETTER",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "RSD",
+  "name": "RUSSIAN SALON DOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "RT",
+  "name": "RUSSIAN TOY",
+  "species": "dog",
+  "groups": [
+   "AKC Toy Group",
+   "CKC Toy Group (RUSSKIY TOY)",
+   "UKC Companion Dog Group (RUSSKIY TOY)",
+   "TKC  Group"
+  ]
+ },
+ {
+  "code": "RTB",
+  "name": "RUSSIAN TSVETNAYA BOLONKA",
+  "species": "dog",
+  "groups": [
+   "AKC Toy Group"
+  ]
+ },
+ {
+  "code": "RUS",
+  "name": "RUSSELL TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group"
+  ]
+ },
+ {
+  "code": "RWD",
+  "name": "LAGOTTO ROMAGNOLO",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group"
+  ]
+ },
+ {
+  "code": "RWI",
+  "name": "IRISH RED & WHITE SETTER",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group (IRISH RED AND WHITE SETTER)",
+   "CKC Sporting Group (IRISH RED AND WHITE SETTER)",
+   "UKC Gun Dog Group (IRISH RED AND WHITE SETTER)",
+   "TKC Gundog Group"
+  ]
+ },
+ {
+  "code": "SA",
+  "name": "SAMOYED",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Working Group",
+   "UKC Northern Group",
+   "TKC Pastoral Group"
+  ]
+ },
+ {
+  "code": "SAA",
+  "name": "SAARLOOSWOLFHOND",
+  "species": "dog",
+  "groups": [
+   "UKC Herding Dog Group (SAARLOOSEWOLFDOG)"
+  ]
+ },
+ {
+  "code": "SAP",
+  "name": "SAPSAREE",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "SAR",
+  "name": "SARPLANINAC",
+  "species": "dog",
+  "groups": [
+   "UKC Guardian Dog Group"
+  ]
+ },
+ {
+  "code": "SB",
+  "name": "ST. BERNARD",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group (SAINT BERNARD)",
+   "CKC Working Group (SAINT BERNARD)",
+   "UKC Guardian Dog Group (SAINT BERNARD)",
+   "TKC Working Group"
+  ]
+ },
+ {
+  "code": "SBT",
+  "name": "STAFFORDSHIRE BULL TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "SC",
+  "name": "STANDARD SCHNAUZER",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Working Group",
+   "UKC Guardian Dog Group",
+   "TKC Utility Group (SCHNAUZER)"
+  ]
+ },
+ {
+  "code": "SCH",
+  "name": "SCHAPENDOES",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group"
+  ]
+ },
+ {
+  "code": "SCO",
+  "name": "OLD TIME SCOTCH COLLIE",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "SD",
+  "name": "OLD ENGLISH SHEEPDOG",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group",
+   "TKC Pastoral Group"
+  ]
+ },
+ {
+  "code": "SDH",
+  "name": "SCOTTISH DEERHOUND",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Sighthound and Pariah Dog Group",
+   "TKC Hound Group (DEERHOUND)"
+  ]
+ },
+ {
+  "code": "SE",
+  "name": "SWEDISH ELKHOUND",
+  "species": "dog",
+  "groups": [
+   "UKC Northern Group"
+  ]
+ },
+ {
+  "code": "SEL",
+  "name": "SEALYHAM TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "SEP",
+  "name": "SEPPALA SIBERIAN SLED DOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "SFC",
+  "name": "SCOTTISH FOLD",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "SGH",
+  "name": "SPANISH GREYHOUND",
+  "species": "dog",
+  "groups": [
+   "UKC Sighthound and Pariah Dog Group"
+  ]
+ },
+ {
+  "code": "SH",
+  "name": "SIBERIAN HUSKY",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Working Group",
+   "UKC Northern Group",
+   "TKC Working Group"
+  ]
+ },
+ {
+  "code": "SHB",
+  "name": "SHORTY BULL",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "SHK",
+  "name": "SHIKOKU KEN",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Northern Group"
+  ]
+ },
+ {
+  "code": "SHT",
+  "name": "SHIH TZU",
+  "species": "dog",
+  "groups": [
+   "AKC Toy Group",
+   "CKC Non-Sporting Group",
+   "UKC Companion Dog Group",
+   "TKC Utility Group"
+  ]
+ },
+ {
+  "code": "SHU",
+  "name": "SHIBA INU",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "CKC Non-Sporting Group",
+   "UKC Northern Group (SHIBA)",
+   "TKC Utility Group (JAPANESE SHIBA INU)"
+  ]
+ },
+ {
+  "code": "SI",
+  "name": "SPINONE ITALIANO",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group (ITALIAN SPINONE)"
+  ]
+ },
+ {
+  "code": "SIC",
+  "name": "SIBERIAN CAT",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "SIM",
+  "name": "SIAMESE CAT",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "SIT",
+  "name": "SEGUGIO ITALIANO",
+  "species": "dog",
+  "groups": [
+   "AKC Foundation Group"
+  ]
+ },
+ {
+  "code": "SK",
+  "name": "SCHIPPERKE",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "CKC Non-Sporting Group",
+   "UKC Companion Dog Group",
+   "TKC Utility Group"
+  ]
+ },
+ {
+  "code": "SKT",
+  "name": "SILKY TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Toy Group",
+   "CKC Toy Group",
+   "UKC Terrier Group",
+   "TKC Toy Group (AUSTRALIAN SILKY TERRIER)"
+  ]
+ },
+ {
+  "code": "SL",
+  "name": "SALUKI",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Sighthound and Pariah Dog Group",
+   "TKC Hound Group"
+  ]
+ },
+ {
+  "code": "SLG",
+  "name": "SLOUGHI",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Sighthound and Pariah Dog Group",
+   "TKC Hound Group"
+  ]
+ },
+ {
+  "code": "SLH",
+  "name": "SHILOH SHEPHERD",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "SLK",
+  "name": "SLOVENSKY KOPOV",
+  "species": "dog",
+  "groups": [
+   "AKC Foundation Group"
+  ]
+ },
+ {
+  "code": "SLO",
+  "name": "SLOVENSKY CUVAC",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Guardian Dog Group (SLOVAC CUVAC)"
+  ]
+ },
+ {
+  "code": "SLT",
+  "name": "SLOVAK TCHOUVATCH",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "SMH",
+  "name": "GREATER SWISS MOUNTAIN DOG",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Working Group",
+   "UKC Guardian Dog Group",
+   "TKC Working Group (GREAT SWISS MOUNTAIN DOG)"
+  ]
+ },
+ {
+  "code": "SMU",
+  "name": "SMALL MUNSTERLANDER",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group (KLEINER MUNSTERLANDER VORSTEHUND)",
+   "UKC Gun Dog Group",
+   "TKC  Group"
+  ]
+ },
+ {
+  "code": "SO",
+  "name": "SOMALI",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "SOB",
+  "name": "STONEHENGE OLDE BULLDOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "SP",
+  "name": "CHINESE SHAR-PEI",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "CKC Non-Sporting Group",
+   "UKC Northern Group",
+   "TKC Utility Group (SHAR PEI)"
+  ]
+ },
+ {
+  "code": "SPM",
+  "name": "SPANISH MASTIFF",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "UKC Guardian Dog Group"
+  ]
+ },
+ {
+  "code": "SRL",
+  "name": "SELKIRK REX LONGHAIR",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "SRS",
+  "name": "SOUTH RUSSIAN SHEPHERD",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "SS",
+  "name": "SHETLAND SHEEPDOG",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group (SHETLAND SHEEPDOGS)",
+   "UKC Herding Dog Group",
+   "TKC Pastoral Group"
+  ]
+ },
+ {
+  "code": "SST",
+  "name": "SCOTTISH STRAIGHT",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "ST",
+  "name": "SCOTTISH TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "STA",
+  "name": "AMERICAN STAFFORDSHIRE TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group"
+  ]
+ },
+ {
+  "code": "STH",
+  "name": "STABYHOUN",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "UKC Gun Dog Group"
+  ]
+ },
+ {
+  "code": "SU",
+  "name": "SUSSEX SPANIEL",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group (SPANIEL (SUSSEX))"
+  ]
+ },
+ {
+  "code": "SUS",
+  "name": "SAINT-USAGE SPANIEL",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "SWD",
+  "name": "SPANISH WATER DOG",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group",
+   "TKC Gundog Group"
+  ]
+ },
+ {
+  "code": "SWH",
+  "name": "SILKEN WINDHOUND",
+  "species": "dog",
+  "groups": [
+   "UKC Sighthound and Pariah Dog Group"
+  ]
+ },
+ {
+  "code": "SWL",
+  "name": "SWEDISH LAPPHUND",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Northern Group",
+   "TKC  Group"
+  ]
+ },
+ {
+  "code": "SWP",
+  "name": "SLOVAKIAN WIREHAIRED POINTER",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "UKC Gun Dog Group (SLOVAKIAN WIRE-HAIRED POINTING DOG)"
+  ]
+ },
+ {
+  "code": "SX",
+  "name": "SPHYNX",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "SYT",
+  "name": "SKYE TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "TA",
+  "name": "TOSA",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "UKC Guardian Dog Group (TOSA KEN)"
+  ]
+ },
+ {
+  "code": "TAC",
+  "name": "TURKISH ANGORA CAT",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "TAI",
+  "name": "TAIGAN",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "TAM",
+  "name": "TAMASKAN",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "TAS",
+  "name": "TOY AUSTRALIAN SHEPHERD",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "TBC",
+  "name": "TREEING TENNESSEE BRINDLE",
+  "species": "dog",
+  "groups": [
+   "AKC Foundation Group (TREEING TENNESSEE BRINDLE COONHOUND)",
+   "UKC Scenthound Group"
+  ]
+ },
+ {
+  "code": "TBD",
+  "name": "THAI BANGKAEW",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "TDS",
+  "name": "TUNDRA SHEPHERD",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "TFT",
+  "name": "TOY FOX TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Toy Group",
+   "CKC Toy Group",
+   "UKC Terrier Group"
+  ]
+ },
+ {
+  "code": "TJ",
+  "name": "TORNJAK",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "UKC Guardian Dog Group"
+  ]
+ },
+ {
+  "code": "TK",
+  "name": "TIBETAN KYIAPSO",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "TM",
+  "name": "TIBETAN MASTIFF",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group",
+   "CKC Working Group",
+   "UKC Guardian Dog Group",
+   "TKC Working Group"
+  ]
+ },
+ {
+  "code": "TNT",
+  "name": "TENTERFIELD TERRIER",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "TR",
+  "name": "THAI RIDGEBACK",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Sighthound and Pariah Dog Group"
+  ]
+ },
+ {
+  "code": "TRT",
+  "name": "TEDDY ROOSEVELT TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "UKC Terrier Group"
+  ]
+ },
+ {
+  "code": "TS",
+  "name": "TIBETAN SPANIEL",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "CKC Non-Sporting Group",
+   "UKC Companion Dog Group",
+   "TKC Utility Group"
+  ]
+ },
+ {
+  "code": "TSV",
+  "name": "TRANSYLVANIAN",
+  "species": "cat",
+  "groups": []
+ },
+ {
+  "code": "TT",
+  "name": "TIBETAN TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "CKC Non-Sporting Group",
+   "UKC Companion Dog Group",
+   "TKC Utility Group"
+  ]
+ },
+ {
+  "code": "TVH",
+  "name": "TRANSYLVANIAN HOUND",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Scenthound Group"
+  ]
+ },
+ {
+  "code": "TW",
+  "name": "TREEING WALKER COONHOUND",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group",
+   "UKC Scenthound Group"
+  ]
+ },
+ {
+  "code": "TWD",
+  "name": "TAIWAN DOG",
+  "species": "dog",
+  "groups": [
+   "AKC Foundation Group"
+  ]
+ },
+ {
+  "code": "VDD",
+  "name": "DEUTSCH-DRAHTHAAR",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "VEO",
+  "name": "VOSTOCHNO-EVROPEISKAYA OVCHARKA",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "VG",
+  "name": "SWEDISH VALLHUND",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group",
+   "TKC Pastoral Group"
+  ]
+ },
+ {
+  "code": "VI",
+  "name": "VOLPINO ITALIANO",
+  "species": "dog",
+  "groups": [
+   "AKC Foundation Group",
+   "UKC Northern Group"
+  ]
+ },
+ {
+  "code": "VS",
+  "name": "VOSTOZNO-SIBIRSKAJA LAJKA",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "VT",
+  "name": "VALENCIAN TERRIER",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "VZ",
+  "name": "VIZSLA",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group (SMOOTH VIZSLA)",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group (HUNGARIAN VIZSLA)"
+  ]
+ },
+ {
+  "code": "WAH",
+  "name": "WALKER HOUND",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "WCC",
+  "name": "CARDIGAN WELSH CORGI",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group",
+   "TKC Pastoral Group (WELSH CORGI (CARDIGAN))"
+  ]
+ },
+ {
+  "code": "WCP",
+  "name": "PEMBROKE WELSH CORGI",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group",
+   "UKC Herding Dog Group",
+   "TKC Pastoral Group (WELSH CORGI (PEMBROKE))"
+  ]
+ },
+ {
+  "code": "WD",
+  "name": "AMERICAN WOLFDOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "WE",
+  "name": "WEIMARANER",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group"
+  ]
+ },
+ {
+  "code": "WEN",
+  "name": "WETTERHOUN",
+  "species": "dog",
+  "groups": [
+   "AKC Foundation Group"
+  ]
+ },
+ {
+  "code": "WF",
+  "name": "WIRE FOX TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group (FOX TERRIER (WIRE))"
+  ]
+ },
+ {
+  "code": "WG",
+  "name": "WIREHAIRED POINTING GRIFFON",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group (WIRE-HAIRED POINTING GRIFFON)",
+   "UKC Gun Dog Group"
+  ]
+ },
+ {
+  "code": "WH",
+  "name": "WEST HIGHLAND WHITE TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "WHS",
+  "name": "WHITE SHEPHERD",
+  "species": "dog",
+  "groups": [
+   "UKC Herding Dog Group"
+  ]
+ },
+ {
+  "code": "WHT",
+  "name": "SOFT COATED WHEATEN TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group (SOFT-COATED WHEATEN TERRIER)",
+   "UKC Terrier Group (SOFT-COATED WHEATEN TERRIER)",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "WIN",
+  "name": "WINDSPRITE",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "WK",
+  "name": "WORKING KELPIE",
+  "species": "dog",
+  "groups": [
+   "AKC Herding Group"
+  ]
+ },
+ {
+  "code": "WO",
+  "name": "WOLF",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "WP",
+  "name": "WHIPPET",
+  "species": "dog",
+  "groups": [
+   "AKC Hound Group (WHIPPETS)",
+   "UKC Sighthound and Pariah Dog Group",
+   "TKC Hound Group"
+  ]
+ },
+ {
+  "code": "WS",
+  "name": "WELSH SPRINGER SPANIEL",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "UKC Gun Dog Group",
+   "TKC Gundog Group (SPANIEL (WELSH SPRINGER))"
+  ]
+ },
+ {
+  "code": "WSD",
+  "name": "WELSH SHEEPDOG",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "WSL",
+  "name": "WEST SIBERIAN LAIKA",
+  "species": "dog",
+  "groups": [
+   "UKC Northern Group"
+  ]
+ },
+ {
+  "code": "WT",
+  "name": "WELSH TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Terrier Group",
+   "CKC Terrier Group",
+   "UKC Terrier Group",
+   "TKC Terrier Group"
+  ]
+ },
+ {
+  "code": "WVZ",
+  "name": "WIREHAIRED VIZSLA",
+  "species": "dog",
+  "groups": [
+   "AKC Sporting Group",
+   "CKC Sporting Group (WIRE-HAIRED VIZSLA)",
+   "UKC Gun Dog Group (HUNGARIAN WIRE-HAIRED VIZSLA)",
+   "TKC Gundog Group (HUNGARIAN WIRE HAIRED VIZSLA)"
+  ]
+ },
+ {
+  "code": "WX",
+  "name": "WOLF HYBRID",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "XC",
+  "name": "XOLOITZCUINTLI",
+  "species": "dog",
+  "groups": [
+   "AKC Non-Sporting Group",
+   "CKC Non-Sporting Group (STANDARD XOLOITZCUINTLI)",
+   "UKC Sighthound and Pariah Dog Group"
+  ]
+ },
+ {
+  "code": "YH",
+  "name": "YUGOSLAVIAN HERDER",
+  "species": "dog",
+  "groups": []
+ },
+ {
+  "code": "YL",
+  "name": "YAKUTIAN LAIKA",
+  "species": "dog",
+  "groups": [
+   "AKC Working Group"
+  ]
+ },
+ {
+  "code": "YT",
+  "name": "YORKSHIRE TERRIER",
+  "species": "dog",
+  "groups": [
+   "AKC Toy Group",
+   "CKC Toy Group",
+   "UKC Companion Dog Group",
+   "TKC Toy Group"
+  ]
+ }
+]

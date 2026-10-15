@@ -1,0 +1,81 @@
+name: ofa-health-clearances
+display_name: OFA Health Clearances
+version: "1.0.0"
+category: health
+base_url: https://api.ofa.org
+http_transport: standard
+health_check_path: /api/as.php
+description: >
+  Dog health clearances (hips, elbows, eyes, cardiac, DNA) and CHIC status from
+  the Orthopedic Foundation for Animals (OFA) Advanced Search backend used by
+  ofa.org; read-only, no auth.
+required_headers:
+  - name: Origin
+    value: https://ofa.org
+  - name: Referer
+    value: https://ofa.org/advanced-search/
+auth:
+  type: none
+resources:
+  backend:
+    description: Raw OFA Advanced Search backend calls (HTML). Prefer 'results', 'dog', and 'kennels'.
+    endpoints:
+      search:
+        method: POST
+        path: /api/as.php
+        mutation: false
+        request_content_type: application/x-www-form-urlencoded
+        description: Run one raw Advanced Search query and return the result table rows (20 rows per page)
+        response_format: html
+        html_extract:
+          mode: table
+        happy_args: "--breed=AUK;--report-year=2026"
+        body:
+          - name: api_action
+            type: string
+            default: as_action
+            description: Backend action selector (always as_action for searches)
+          - name: breed
+            body_name: "as_filter[brdvar][]"
+            type: string
+            description: OFA breed code, e.g. AUK (Australian Koolie); see 'ofa-health-clearances-pp-cli breeds'
+          - name: test
+            body_name: "as_filter[test][]"
+            type: string
+            description: OFA registry code, e.g. HD (hips) or EL (elbows); see 'ofa-health-clearances-pp-cli tests'
+          - name: report_year
+            flag_name: report-year
+            body_name: "as_filter[reportyear]"
+            type: string
+            description: Single report year (the backend keeps only one value)
+          - name: chic
+            body_name: "as_filter[special][chic]"
+            type: string
+            enum: ["Y", "N"]
+            description: Y to restrict to CHIC-certified dogs
+          - name: page
+            body_name: api_page
+            type: int
+            description: Result page number (20 rows per page)
+      detail:
+        method: GET
+        path: /api/as.php
+        description: Fetch one dog's raw detail page (HTML) by OFA application number
+        response_format: html
+        html_extract:
+          mode: page
+        happy_args: "--appnum=2682765"
+        params:
+          - name: a
+            flag_name: page-route
+            aliases: []
+            type: string
+            default: /advanced-search/
+            description: Backend page route (always /advanced-search/)
+          - name: appnum
+            type: string
+            required: true
+            description: OFA application number (data-appnum on result rows), e.g. 2682765
+
+mcp:
+  endpoint_tools: hidden

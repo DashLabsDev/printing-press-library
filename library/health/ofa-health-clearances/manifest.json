@@ -1,0 +1,27 @@
+{
+  "manifest_version": "0.3",
+  "name": "ofa-health-clearances-pp-mcp",
+  "display_name": "OFA Health Clearances",
+  "version": "1.0.0",
+  "description": "Look up dogs' OFA health clearances (hips, elbows, eyes, cardiac, DNA) and CHIC status by breed, age, and report year, and roll them up by kennel.",
+  "author": {
+    "name": "CLI Printing Press"
+  },
+  "license": "Apache-2.0",
+  "server": {
+    "type": "binary",
+    "entry_point": "bin/ofa-health-clearances-pp-mcp",
+    "mcp_config": {
+      "command": "${__dirname}/bin/ofa-health-clearances-pp-mcp",
+      "args": []
+    }
+  },
+  "compatibility": {
+    "claude_desktop": ">=1.0.0",
+    "platforms": [
+      "darwin",
+      "linux",
+      "win32"
+    ]
+  }
+}

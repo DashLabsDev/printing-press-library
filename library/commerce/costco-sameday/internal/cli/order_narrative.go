@@ -183,14 +183,25 @@ Requires --yes for a live mutation. --dry-run never sends the mutation.`,
 			if err != nil {
 				return classifyAPIError(cmd.OutOrStdout(), err, flags)
 			}
-			return printNarrativeJSON(cmd, flags, map[string]any{
+			out := map[string]any{
 				"would_charge": false,
 				"dry_run":      false,
 				"operation":    "UpdateCheckout",
 				"action":       "tipsUpdate",
 				"http_status":  status,
 				"response":     json.RawMessage(data),
-			})
+			}
+			// GraphQL errors or an *ErrorResponse typename mean the tip
+			// did not change (graphql_failure.go).
+			failure := detectPartialFailure(data)
+			out["updated"] = failure == nil
+			if err := printNarrativeJSON(cmd, flags, out); err != nil {
+				return err
+			}
+			if failure != nil {
+				return apiErr(fmt.Errorf("UpdateCheckout did not change the tip: %s", failure.Message))
+			}
+			return nil
 		},
 	}
 	cmd.Flags().StringVar(&checkoutSessionID, "checkout-session-id", "", "Checkout session id")

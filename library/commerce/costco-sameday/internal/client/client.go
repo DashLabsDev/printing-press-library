@@ -959,6 +959,9 @@ func (c *Client) doInternal(ctx context.Context, method, path string, params map
 	// cartId / zoneId / postalCode / userLocation that a known read operation
 	// declares but the caller left empty. Explicit values always win.
 	params, sessionResolveErr := c.fillSessionContextParams(ctx, method, path, params)
+	if strings.Contains(path, "graphql") {
+		params = normalizeServiceTypeParam(params)
+	}
 	if inv := AsInvalidParam(sessionResolveErr); inv != nil {
 		return nil, 0, inv
 	}
@@ -1014,6 +1017,10 @@ func (c *Client) doInternal(ctx context.Context, method, path string, params map
 	// transport failure or server error; a write may already have committed
 	// remotely even when its wire method is GET.
 	canRetryAmbiguousFailure := readOnlyIntent || (!mutationIntent && platform.CanRetryRequest(method, requestIdempotencyKey(c.Config, headerOverrides)))
+	// 5xx (the server answered "unavailable") may also be retried for the
+	// non-charging GraphQL POSTs in serverErrorRetryableOperations, never
+	// for FinalizeCheckout or any other write (hand-authored, retry_5xx.go).
+	canRetryServerError := canRetryAmbiguousFailure || serverErrorRetryable(path, params, bodyBytes, finalizeHashes)
 	endpointClass := safeEndpointClass(method, path)
 	retryPolicy, err := c.platformRetryPolicy(endpointClass)
 	if err != nil {
@@ -1264,7 +1271,7 @@ func (c *Client) doInternal(ctx context.Context, method, path string, params map
 		}
 
 		// Server error - retry with backoff
-		if resp.StatusCode >= 500 && attempt < maxRetries && canRetryAmbiguousFailure {
+		if resp.StatusCode >= 500 && attempt < maxRetries && canRetryServerError {
 			wait := time.Duration(math.Pow(2, float64(attempt))) * time.Second
 			if !retryWithinBudget(wait) {
 				return nil, resp.StatusCode, apiErr

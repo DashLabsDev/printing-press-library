@@ -1,0 +1,36 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-10-14T19:29:02.090086Z",
+  "printing_press_version": "4.33.5",
+  "api_name": "cookidoo",
+  "display_name": "Cookidoo",
+  "cli_name": "cookidoo-pp-cli",
+  "creator": {
+    "handle": "educrvz",
+    "name": "educrvz"
+  },
+  "owner": "educrvz",
+  "printer": "educrvz",
+  "printer_name": "educrvz",
+  "spec_url": "https://cookidoo.thermomix.com/recipes/recipe/en-US/r68517",
+  "spec_path": "spec.yaml",
+  "spec_format": "internal",
+  "spec_source": "docs",
+  "spec_checksum": "sha256:27a53043f27501db26c71b692cb7f8c48b559bf796416169eb14efdd98099ecf",
+  "run_id": "20261014-192048",
+  "category": "food-and-dining",
+  "description": "Read-only Cookidoo CLI for public recipe details and local recipe analysis.",
+  "mcp_binary": "cookidoo-pp-mcp",
+  "mcp_tool_count": 1,
+  "mcp_public_tool_count": 1,
+  "mcp_ready": "full",
+  "api_version": "0.1.0",
+  "auth_type": "none",
+  "novel_features": [
+    {
+      "name": "Multi-Recipe Ingredient Plan",
+      "command": "recipes plan",
+      "description": "Combine ingredients from multiple public Cookidoo recipes into one structured plan for review and shopping handoff."
+    }
+  ]
+}

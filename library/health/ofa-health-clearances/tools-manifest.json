@@ -1,0 +1,105 @@
+{
+  "api_name": "ofa-health-clearances",
+  "base_url": "https://api.ofa.org",
+  "description": "Look up dogs' OFA health clearances (hips, elbows, eyes, cardiac, DNA) and CHIC status by breed, age, and report year, and roll them up by kennel.",
+  "mcp_ready": "full",
+  "http_transport": "standard",
+  "mcp": {
+    "endpoint_tools": "hidden"
+  },
+  "auth": {
+    "type": "none"
+  },
+  "required_headers": [
+    {
+      "name": "Origin",
+      "value": "https://ofa.org"
+    },
+    {
+      "name": "Referer",
+      "value": "https://ofa.org/advanced-search/"
+    }
+  ],
+  "tools": [
+    {
+      "name": "backend_detail",
+      "description": "Fetch one dog's raw detail page (HTML) by OFA application number. Required: appnum. Optional: page-route (default: /advanced-search/).",
+      "method": "GET",
+      "path": "/api/as.php",
+      "no_auth": true,
+      "params": [
+        {
+          "name": "page-route",
+          "wire_name": "a",
+          "type": "string",
+          "location": "query",
+          "description": "Backend page route (always /advanced-search/)"
+        },
+        {
+          "name": "appnum",
+          "type": "string",
+          "location": "query",
+          "description": "OFA application number (data-appnum on result rows), e.g. 2682765",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "backend_search",
+      "description": "Run one raw Advanced Search query and return the result table rows (20 rows per page). Optional: api_action (default: as_action), breed, test (plus 3 more).",
+      "method": "POST",
+      "path": "/api/as.php",
+      "no_auth": true,
+      "params": [
+        {
+          "name": "api_action",
+          "type": "string",
+          "location": "body",
+          "description": "Backend action selector (always as_action for searches)"
+        },
+        {
+          "name": "breed",
+          "wire_name": "as_filter[brdvar][]",
+          "type": "string",
+          "location": "body",
+          "description": "OFA breed code, e.g. AUK (Australian Koolie); see 'ofa-health-clearances-pp-cli breeds'"
+        },
+        {
+          "name": "test",
+          "wire_name": "as_filter[test][]",
+          "type": "string",
+          "location": "body",
+          "description": "OFA registry code, e.g. HD (hips) or EL (elbows); see 'ofa-health-clearances-pp-cli tests'"
+        },
+        {
+          "name": "report-year",
+          "wire_name": "as_filter[reportyear]",
+          "type": "string",
+          "location": "body",
+          "description": "Single report year (the backend keeps only one value)"
+        },
+        {
+          "name": "chic",
+          "wire_name": "as_filter[special][chic]",
+          "type": "string",
+          "location": "body",
+          "description": "Y to restrict to CHIC-certified dogs"
+        },
+        {
+          "name": "page",
+          "wire_name": "api_page",
+          "type": "int",
+          "location": "body",
+          "description": "Result page number (20 rows per page)"
+        }
+      ]
+    }
+  ],
+  "novel_features": [
+    {
+      "name": "Kennel rollup",
+      "command": "kennels",
+      "description": "See which kennels in a breed are actively health-testing young dogs, ranked by tested dogs, CHIC dogs, and latest test date."
+    }
+  ]
+}
