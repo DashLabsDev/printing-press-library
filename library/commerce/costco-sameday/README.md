@@ -447,6 +447,18 @@ Static request headers can be configured under `headers`; per-command header ove
 **`cart updatecartitemsmutation` / `checkout initializecheckout` fail with HTTP 400 "Blank Query"**
 - Fixed in this version: GraphQL POSTs now send operationName, variables and extensions in the JSON body only. Older builds also put them in the URL, which Costco rejects. `order place` used the same path.
 
+**`auth login` says the login window closed while you were still signing in**
+- SSO redirects can briefly leave no page open. The login now waits about 4 seconds without a page before it treats the window as closed, and the error names the last page seen (host and path only, never the query string).
+
+**Starting a checkout: `order start`**
+- `costco-sameday-pp-cli order start` opens a checkout session (InitializeCheckout) and never charges. Cart, shop and ZIP are filled from your session; override with `--cart-id`, `--shop-id`, `--zip` or `--address-id`. `--service-type` takes delivery (default) or pickup, in any case.
+- `--shop-id` is the shop id from `session context`, not the store's retailer location id. Mixing them made InitializeCheckout report an empty cart; a location id is now refused and the right shop id is named.
+- `--user-location` takes JSON: `{"postalCode":"<ZIP>","coordinates":{"latitude":<lat>,"longitude":<lng>},"addressId":"<optional saved address id>"}`.
+- A 5xx from InitializeCheckout is retried. Other writes (UpdateCheckout, FinalizeCheckout, cart changes) are never retried automatically.
+
+**A command printed GraphQL errors but exited 0**
+- Fixed in this version: a top-level `errors` array, or a result whose type ends in `Error` / `ErrorResponse` (for example `CheckoutCheckoutErrorsCheckoutRedirectError`), now gives `success: false` and a non-zero exit.
+
 **`slots etas` shows no fee**
 - The store-header ETA queries carry only the time and label. The delivery fee and any savings show per window in `slots windows` once a checkout is open.
 

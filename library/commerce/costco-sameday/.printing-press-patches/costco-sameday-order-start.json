@@ -1,0 +1,31 @@
+{
+  "schema_version": 2,
+  "id": "costco-sameday-order-start",
+  "applied_at": "2026-10-14",
+  "base_run_id": "20261007-135457",
+  "base_printing_press_version": "4.31.7",
+  "summary": "order start opens a checkout session via InitializeCheckout (never FinalizeCheckout): cart, shop and ZIP/coordinates are filled from the session context, --service-type accepts delivery/pickup in any case (also normalized for the generated checkout initializecheckout), --help documents the userLocation JSON and the shop id vs retailer location id distinction, a retailer location id passed as --shop-id is refused with the right shop id named, an empty-cart redirect error explains the likely id mix-up, and --dry-run sends nothing. 5xx responses are retried only for an allowlist of non-charging operations (InitializeCheckout); other writes are not retried.",
+  "reason": "A user report: order start needed cart/shop/ZIP passed by hand, rejected lowercase 'delivery', gave no location format, mixing the store location id with the shop id produced a misleading empty-cart error, and transient 5xx responses failed the start.",
+  "files": [
+    "internal/cli/order_start.go",
+    "internal/client/retry_5xx.go",
+    "internal/client/service_type.go",
+    "internal/client/client.go",
+    "internal/cli/reliability_test.go",
+    "README.md",
+    "SKILL.md"
+  ],
+  "markers": [
+    "newOrderStartCmd",
+    "resolveOrderStart",
+    "checkShopIDNotLocation",
+    "orderStartResult",
+    "serverErrorRetryable",
+    "serverErrorRetryableOperations",
+    "NormalizeServiceType",
+    "normalizeServiceTypeParam",
+    "locationCoordinates"
+  ],
+  "validated_outcome": "go build/vet green; local-stub tests: session auto-fill (cart, delivery and pickup shops, ZIP), POST body-only operation, uppercase service type, location-id refusal with no request sent, bad service type / location usage errors, empty-cart redirect exits non-zero with started:false, dry-run sends nothing, one 503 then success retries InitializeCheckout once, UpdateCheckout is not retried on 503. Not run live: InitializeCheckout creates a checkout session.",
+  "review_fixes": "PR #2319 review: an explicit --user-location postalCode now drives session resolution (shop and cart are chosen for that ZIP, geolocation coordinates from another ZIP are not sent), and with location, shop and cart all given no geolocation lookup is made. Second round: the --user-location ZIP is passed per request (SessionNeeds.PostalCode) and is no longer saved as the default ZIP."
+}
